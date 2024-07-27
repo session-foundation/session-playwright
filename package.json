@@ -38,6 +38,7 @@
     "allure-open": "allure open ./allure-report"
   },
   "dependencies": {
+    "buffer-crc32": "^1.0.0",
     "libsodium-wrappers-sumo": "^0.7.14",
     "session-tooling": "git+https://github.com/Bi1b/session-tooling"
   }

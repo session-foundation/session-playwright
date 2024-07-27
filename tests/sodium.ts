@@ -6,3 +6,7 @@ export async function getSodiumNode() {
   await libSodiumWrappers.ready;
   return (libSodiumWrappers as any).default as LibSodiumType;
 }
+
+export type WithSodium = {
+  sodium: LibSodiumType;
+};
