@@ -59,7 +59,7 @@ concurrency:
 jobs:
   desktop-regression:
     name: Desktop Regression Tests
-    runs-on: [self-hosted, linux, x64, qa-desktop]
+    runs-on: [self-hosted, Linux, X64, qa-desktop]
     container:
       image: mcr.microsoft.com/playwright:v1.47.1-noble
       options: --cpus 8
@@ -156,7 +156,7 @@ jobs:
           cd  $GITHUB_WORKSPACE/playwright
           yarn tsc
 
-      - name: Run the Android tests
+      - name: Run the Desktop tests
         run: |
           cd $GITHUB_WORKSPACE/playwright
           yarn test -g "Create User"
