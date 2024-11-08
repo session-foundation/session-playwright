@@ -7,10 +7,10 @@ on:
         required: true
         type: choice
         options:
-          - oxen-io/session-playwright
+          - session-foundation/session-playwright
           - burtonemily/session-playwright
           - bilb/session-playwright
-        default: oxen-io/session-playwright
+        default: session-foundation/session-playwright
 
       BRANCH_TO_CHECKOUT_PW:
         description: 'branch to checkout on session-playwright'
@@ -23,10 +23,9 @@ on:
         required: true
         type: choice
         options:
-          - oxen-io/session-desktop
+          - session-foundation/session-desktop
           - bilb/session-desktop
-          - yougotwill/session-desktop
-        default: oxen-io/session-desktop
+        default: session-foundation/session-desktop
 
       BRANCH_TO_CHECKOUT_SESSION:
         description: 'Branch to checkout on session-desktop'
