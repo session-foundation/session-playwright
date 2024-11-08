@@ -49,7 +49,7 @@ on:
         description: 'Playwright workers to start'
         required: true
         type: number
-        default: 4
+        default: 6
 
 concurrency:
   group: ${{ github.workflow }}
@@ -61,11 +61,10 @@ jobs:
     runs-on: [self-hosted, Linux, X64, qa-desktop]
     container:
       image: mcr.microsoft.com/playwright:v1.47.1-noble
-      options: --cpus 8
+      options: --cpus 16
 
     env:
-      SESSION_DESKTOP_ROOT: '$GITHUB_WORKSPACE/desktop'
-      # PLAYWRIGHT_CUSTOM_REPORTER: 1
+      PLAYWRIGHT_CUSTOM_REPORTER: 1
       PLAYWRIGHT_REPEAT_COUNT: ${{ github.event.inputs.PLAYWRIGHT_REPEAT_COUNT }}
       PLAYWRIGHT_RETRIES_COUNT: ${{ github.event.inputs.PLAYWRIGHT_RETRIES_COUNT }}
       PLAYWRIGHT_WORKER_COUNT: ${{ github.event.inputs.PLAYWRIGHT_WORKER_COUNT }}
@@ -75,7 +74,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Runner Details
         run: |
-          echo "SESSION_DESKTOP_ROOT ${{ env.SESSION_DESKTOP_ROOT }}"
           echo "PLAYWRIGHT_REPO ${{ github.event.inputs.PLAYWRIGHT_REPO }}"
           echo "BRANCH_TO_CHECKOUT_PW ${{ github.event.inputs.BRANCH_TO_CHECKOUT_PW }}"
           echo "SESSION_DESKTOP_REPO ${{ github.event.inputs.SESSION_DESKTOP_REPO }}"
@@ -158,7 +156,7 @@ jobs:
       - name: Run the Desktop tests
         run: |
           cd $GITHUB_WORKSPACE/playwright
-          yarn test -g "Create User"
+          SESSION_DESKTOP_ROOT=$GITHUB_WORKSPACE/desktop nice ionice xvfb-run --auto-servernum --server-num=1 --server-args='-screen 0, 1920x1080x24' yarn test
 
       - name: Kill all running electron app
         if: always()
