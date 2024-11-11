@@ -30,8 +30,8 @@ export async function waitForTestIdWithText(
     const escapedText = text.replace(/"/g, '\\\"');
 
     builtSelector += `:has-text("${escapedText}")`;
-    console.warn('builtSelector:', builtSelector);
-    // console.warn('Text is tiny bubble: ', escapedText);
+    console.info('builtSelector:', builtSelector);
+    // console.info('Text is tiny bubble: ', escapedText);
   }
   // console.info('looking for selector', builtSelector);
   const found = await window.waitForSelector(builtSelector, {
@@ -69,8 +69,7 @@ export async function waitForTextMessage(
     const escapedText = text.replace(/"/g, '\\\"');
 
     builtSelector += `:has-text("${escapedText}")`;
-    console.warn('builtSelector:', builtSelector);
-    // console.warn('Text is tiny bubble: ', escapedText);
+    console.info('builtSelector:', builtSelector);
   }
   const el = await window.waitForSelector(builtSelector, { timeout: maxWait });
   console.info(`Text message found. Text: , ${text}`);
@@ -226,11 +225,14 @@ export async function clickOnMatchingText(
   window: Page,
   text: string,
   rightButton = false,
+  timeoutMs?: number,
 ) {
   console.info(`clickOnMatchingText: "${text}"`);
   return window.click(
     `"${text}"`,
-    rightButton ? { button: 'right' } : undefined,
+    rightButton
+      ? { button: 'right', timeout: timeoutMs }
+      : { timeout: timeoutMs },
   );
 }
 
@@ -245,7 +247,7 @@ export async function clickOnTestIdWithText(
   console.info(
     `clickOnTestIdWithText with testId:${dataTestId} and text:${
       text || 'none'
-    }`,
+    }, rightButton:${!!rightButton}`,
   );
 
   const builtSelector = !text
@@ -289,18 +291,11 @@ export async function typeIntoInput(
 ) {
   console.info(`typeIntoInput testId: ${dataTestId} : "${text}"`);
   const builtSelector = `css=[data-testid=${dataTestId}]`;
-  return window.fill(builtSelector, text);
-}
-
-export async function typeIntoInputSlow(
-  window: Page,
-  dataTestId: DataTestId,
-  text: string,
-) {
-  console.info(`typeIntoInput testId: ${dataTestId} : "${text}"`);
-  const builtSelector = `css=[data-testid=${dataTestId}]`;
-  await window.waitForSelector(builtSelector);
-  return window.type(builtSelector, text, { delay: 100 });
+  // the new input made with onboarding element needs a click to reveal the input in the DOM
+  await clickOnTestIdWithText(window, dataTestId);
+  // reset the content to be empty before typing into the input
+  await window.fill(builtSelector, '');
+  return window.type(builtSelector, text);
 }
 
 export async function doesTextIncludeString(
@@ -317,6 +312,16 @@ export async function doesTextIncludeString(
   } else {
     throw new Error(`Text not found: "${text}"`);
   }
+}
+
+export async function grabTextFromElement(
+  window: Page,
+  strategy: Strategy,
+  selector: string,
+) {
+  const builtSelector = `css=[${strategy}=${selector}]`;
+  const element = await window.waitForSelector(builtSelector);
+  return element.innerText();
 }
 
 export async function hasElementBeenDeleted(
@@ -395,6 +400,27 @@ export async function hasElementPoppedUpThatShouldnt(
   if (elVisible === true) {
     throw new Error(fakeError);
   }
+  return builtSelector;
+}
+
+export async function doesElementExist(
+  window: Page,
+  strategy: Strategy,
+  selector: string,
+  text?: string,
+) {
+  const builtSelector = !text
+    ? `css=[${strategy}=${selector}]`
+    : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
+
+  const fakeError = `Element ${selector} does not exist`;
+  const elVisible = await window.isVisible(builtSelector);
+  if (!elVisible) {
+    console.log(fakeError);
+    return undefined;
+  }
+  console.log(`Element ${selector} exists`);
+  return builtSelector;
 }
 
 export async function measureSendingTime(window: Page, messageNumber: number) {

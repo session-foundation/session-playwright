@@ -15,6 +15,8 @@ import {
   waitForElement,
   waitForLoadingAnimationToFinish,
 } from './utilities/utils';
+import { recoverFromSeed } from './setup/recovery_using_seed';
+import { englishStrippedStr } from '../locale/localizedString';
 
 sessionTestTwoWindows(
   'Delete account from swarm',
@@ -29,8 +31,8 @@ sessionTestTwoWindows(
       const testReply = `${userB.userName} to ${userA.userName}`;
       // Create contact and send new message
       await Promise.all([
-        sendNewMessage(windowA, userB.sessionid, testMessage),
-        sendNewMessage(windowB, userA.sessionid, testReply),
+        sendNewMessage(windowA, userB.accountid, testMessage),
+        sendNewMessage(windowB, userA.accountid, testReply),
       ]);
       // Delete all data from device
       // Click on settings tab
@@ -39,17 +41,23 @@ sessionTestTwoWindows(
       await clickOnTestIdWithText(
         windowA,
         'clear-data-settings-menu-item',
-        'Clear Data',
+        englishStrippedStr('sessionClearData').toString(),
       );
       // Select entire account
       await clickOnTestIdWithText(
         windowA,
         'label-device_and_network',
-        'Clear Device and Network',
+        englishStrippedStr('clearDeviceAndNetwork').toString(),
       );
       // Confirm deletion by clicking Clear, twice
-      await clickOnMatchingText(windowA, 'Clear');
-      await clickOnMatchingText(windowA, 'Clear');
+      await clickOnMatchingText(
+        windowA,
+        englishStrippedStr('clear').toString(),
+      );
+      await clickOnMatchingText(
+        windowA,
+        englishStrippedStr('clear').toString(),
+      );
       await waitForLoadingAnimationToFinish(windowA, 'loading-spinner');
       // await sleepFor(7500);
       // Wait for window to close and reopen
@@ -58,26 +66,27 @@ sessionTestTwoWindows(
       restoringWindows = await openApp(1); // not using sessionTest here as we need to close and reopen one of the window
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
-      await clickOnTestIdWithText(
-        restoringWindow,
-        'restore-using-recovery',
-        'Restore your account',
-      );
+      await clickOnTestIdWithText(restoringWindow, 'existing-account-button');
       // Fill in recovery phrase
       await typeIntoInput(
         restoringWindow,
         'recovery-phrase-input',
-        userA.recoveryPhrase,
+        userA.recoveryPassword,
       );
       // Enter display name
+      await clickOnTestIdWithText(restoringWindow, 'continue-button');
+      await waitForLoadingAnimationToFinish(
+        restoringWindow,
+        'loading-animation',
+      );
+
       await typeIntoInput(
         restoringWindow,
         'display-name-input',
         userA.userName,
       );
       // Click continue
-      await clickOnTestIdWithText(restoringWindow, 'continue-session-button');
-
+      await clickOnTestIdWithText(restoringWindow, 'continue-button');
       await sleepFor(5000, true); // just to allow any messages from our swarm to show up
 
       // Need to verify that no conversation is found at all
@@ -122,37 +131,25 @@ sessionTestTwoWindows(
       await clickOnTestIdWithText(
         windowA,
         'clear-data-settings-menu-item',
-        'Clear Data',
+        englishStrippedStr('sessionClearData').toString(),
       );
       // Keep 'Clear Device only' selection
       // Confirm deletion by clicking Clear, twice
-      await clickOnMatchingText(windowA, 'Clear');
-      await clickOnMatchingText(windowA, 'Clear');
+      await clickOnMatchingText(
+        windowA,
+        englishStrippedStr('clear').toString(),
+      );
+      await clickOnMatchingText(
+        windowA,
+        englishStrippedStr('clear').toString(),
+      );
       await waitForLoadingAnimationToFinish(windowA, 'loading-spinner');
       // Wait for window to close and reopen
       // await windowA.close();
       restoringWindows = await openApp(1);
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
-      await clickOnTestIdWithText(
-        restoringWindow,
-        'restore-using-recovery',
-        'Restore your account',
-      );
-      // Fill in recovery phrase
-      await typeIntoInput(
-        restoringWindow,
-        'recovery-phrase-input',
-        userA.recoveryPhrase,
-      );
-      // Enter display name
-      await typeIntoInput(
-        restoringWindow,
-        'display-name-input',
-        userA.userName,
-      );
-      // Click continue
-      await clickOnTestIdWithText(restoringWindow, 'continue-session-button');
+      await recoverFromSeed(restoringWindow, userA.recoveryPassword);
       await sleepFor(5000, true); // just to allow any messages from our swarm to show up
       // Check if message from user B is restored
       await waitForElement(
