@@ -12,6 +12,7 @@ import {
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
+  hasElementBeenDeleted,
   typeIntoInput,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -308,5 +309,69 @@ test_Alice_1W_Bob_1W(
       alice.userName,
     );
     await sendMessage(aliceWindow1, 'Testing read receipts');
+  },
+);
+
+test_Alice_1W_Bob_1W(
+  'Delete conversation',
+  async ({ aliceWindow1, bobWindow1, alice, bob }) => {
+    // Create contact and send new message
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    // Confirm contact by checking Messages tab (name should appear in list)
+    await Promise.all([
+      clickOnTestIdWithText(aliceWindow1, 'message-section'),
+      clickOnTestIdWithText(bobWindow1, 'message-section'),
+    ]);
+    await Promise.all([
+      clickOnElement({
+        window: aliceWindow1,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+      clickOnElement({
+        window: bobWindow1,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+    ]);
+    await Promise.all([
+      waitForTestIdWithText(
+        aliceWindow1,
+        'module-conversation__user__profile-name',
+        bob.userName,
+      ),
+      waitForTestIdWithText(
+        bobWindow1,
+        'module-conversation__user__profile-name',
+        alice.userName,
+      ),
+    ]);
+    // Delete contact
+    await clickOnTestIdWithText(aliceWindow1, 'message-section');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      bob.userName,
+      true,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'context-menu-item',
+      englishStrippedStr('conversationsDelete').toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('delete').toString(),
+    );
+    // TODO add Check modal strings
+    // Check if conversation is deleted
+    await hasElementBeenDeleted(
+      aliceWindow1,
+      'data-testid',
+      'module-conversation__user__profile-name',
+      1000,
+      bob.userName,
+    );
   },
 );
