@@ -1,3 +1,4 @@
+import { englishStrippedStr } from '../locale/localizedString';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -14,7 +15,7 @@ test_Alice_1W_Bob_1W(
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testMessage = `Sender: ${alice.userName} Receiver: ${bob.userName}`;
     // send a message to User B from User A
-    await sendNewMessage(aliceWindow1, bob.sessionid, `${testMessage}`);
+    await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
     await clickOnTestIdWithText(bobWindow1, 'message-request-banner');
     // Select message request from User A
@@ -29,9 +30,16 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       bobWindow1,
       'message-request-response-message',
-      `You have accepted ${alice.userName}'s message request`,
+      englishStrippedStr('messageRequestYouHaveAccepted')
+        .withArgs({
+          name: alice.userName,
+        })
+        .toString(),
     );
-    await waitForMatchingText(bobWindow1, 'No pending message requests');
+    await waitForMatchingText(
+      bobWindow1,
+      englishStrippedStr('messageRequestsNonePending').toString(),
+    );
   },
 );
 
@@ -41,7 +49,7 @@ test_Alice_1W_Bob_1W(
     const testMessage = `Sender: ${alice.userName}, Receiver: ${bob.userName}`;
     const testReply = `Sender: ${bob.userName}, Receiver: ${alice.userName}`;
     // send a message to User B from User A
-    await sendNewMessage(aliceWindow1, bob.sessionid, `${testMessage}`);
+    await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
     await clickOnTestIdWithText(bobWindow1, 'message-request-banner');
     // Select message request from User A
@@ -56,9 +64,16 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       bobWindow1,
       'message-request-response-message',
-      `You have accepted ${alice.userName}'s message request`,
+      englishStrippedStr('messageRequestYouHaveAccepted')
+        .withArgs({
+          name: alice.userName,
+        })
+        .toString(),
     );
-    await waitForMatchingText(bobWindow1, 'No pending message requests');
+    await waitForMatchingText(
+      bobWindow1,
+      englishStrippedStr('messageRequestsNonePending').toString(),
+    );
   },
 );
 
@@ -67,7 +82,7 @@ test_Alice_1W_Bob_1W(
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testMessage = `Sender: ${alice.userName}, Receiver: ${bob.userName}`;
     // send a message to User B from User A
-    await sendNewMessage(aliceWindow1, bob.sessionid, `${testMessage}`);
+    await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
     await clickOnTestIdWithText(bobWindow1, 'message-request-banner');
     // Select message request from User A
@@ -77,15 +92,22 @@ test_Alice_1W_Bob_1W(
       alice.userName,
     );
     // Check that using the accept button has intended use
-    await clickOnTestIdWithText(bobWindow1, 'decline-message-request');
+    await clickOnTestIdWithText(
+      bobWindow1,
+      'decline-message-request',
+      englishStrippedStr('decline').toString(),
+    );
     // Confirm decline
     await clickOnTestIdWithText(
       bobWindow1,
       'session-confirm-ok-button',
-      'Decline',
+      englishStrippedStr('delete').toString(),
     );
     // Check config message of message request acceptance
-    await waitForMatchingText(bobWindow1, 'No pending message requests');
+    await waitForMatchingText(
+      bobWindow1,
+      englishStrippedStr('messageRequestsNonePending').toString(),
+    );
   },
 );
 
@@ -94,23 +116,33 @@ test_Alice_1W_Bob_1W(
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testMessage = `Sender: ${alice.userName}, Receiver: ${bob.userName}`;
     // send a message to User B from User A
-    await sendNewMessage(aliceWindow1, bob.sessionid, `${testMessage}`);
+    await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
     await clickOnTestIdWithText(bobWindow1, 'message-request-banner');
     // Select 'Clear All' button
-    await clickOnMatchingText(bobWindow1, 'Clear All');
+    await clickOnMatchingText(
+      bobWindow1,
+      englishStrippedStr('clearAll').toString(),
+    );
     // Confirm decline
-    await clickOnTestIdWithText(bobWindow1, 'session-confirm-ok-button', 'OK');
+    await clickOnTestIdWithText(
+      bobWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('clear').toString(),
+    );
     // Navigate back to message request folder to check
     await clickOnTestIdWithText(bobWindow1, 'settings-section');
 
     await clickOnTestIdWithText(
       bobWindow1,
       'message-requests-settings-menu-item',
-      'Message Requests',
+      englishStrippedStr('sessionMessageRequests').toString(),
     );
     // Check config message of message request acceptance
-    await waitForMatchingText(bobWindow1, 'No pending message requests');
+    await waitForMatchingText(
+      bobWindow1,
+      englishStrippedStr('messageRequestsNonePending').toString(),
+    );
   },
 );
 
