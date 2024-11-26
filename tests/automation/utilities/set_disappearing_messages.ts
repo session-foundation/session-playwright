@@ -53,15 +53,22 @@ export const setDisappearingMessages = async (
       defaultTime = await waitForElement(
         windowA,
         'data-testid',
-        'input-12-hours',
+        'input-time-option-43200-seconds',
       );
     } else {
-      defaultTime = await waitForElement(windowA, 'data-testid', 'input-1-day');
+      defaultTime = await waitForElement(
+        windowA,
+        'data-testid',
+        'input-time-option-86400-seconds',
+        1000,
+      );
     }
     const checked = await defaultTime.isChecked();
     if (checked) {
       console.info('Timer default time is correct');
     } else {
+      console.info('Default timer not set correctly');
+
       throw new Error('Default timer not set correctly');
     }
   }
