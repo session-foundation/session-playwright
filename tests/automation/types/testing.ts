@@ -16,16 +16,19 @@ export type Group = {
 export type ConversationType = '1:1' | 'group' | 'community' | 'note-to-self';
 
 export type DMTimeOption =
-  | 'input-10-seconds'
+  | 'time-option-0-seconds'
+  | 'time-option-5-seconds'
   | 'time-option-10-seconds'
   | 'time-option-30-seconds'
-  | 'time-option-1-minute'
+  | 'time-option-60-seconds'
   | 'time-option-5-minutes'
-  | 'time-option-1-hour'
+  | 'time-option-30-minutes'
+  | 'time-option-1-hours'
+  | 'time-option-6-hours'
   | 'time-option-12-hours'
-  | 'time-option-1-day'
-  | 'time-option-1-week'
-  | 'time-option-2-weeks';
+  | 'time-option-1-days'
+  | 'time-option-7-days'
+  | 'time-option-14-days';
 
 type DisappearOpts1o1 = [
   '1:1',
@@ -84,7 +87,7 @@ export type DataTestId =
   | 'label-device_and_network'
   | 'message-request-banner'
   | 'module-conversation__user__profile-name'
-  | 'decline-message-request'
+  | 'delete-message-request'
   | 'session-confirm-ok-button'
   | 'dropdownitem-5-seconds'
   | 'disappearing-messages-dropdown'
@@ -139,26 +142,17 @@ export type DataTestId =
   | 'disappear-after-read-option'
   | 'disappearing-messages'
   | 'disappear-after-send-option'
-  | 'time-option-1-minute'
-  | 'time-option-10-seconds'
   | 'disappear-set-button'
   | 'add-user-button'
   | 'message-content'
   | 'group-update-message'
   | 'message-request-response-message'
   | 'image-upload-click'
-  | 'input-10-seconds'
-  | 'time-option-30-seconds'
-  | 'time-option-1-minute'
-  | 'time-option-5-minutes'
-  | 'time-option-1-hour'
-  | 'time-option-12-hours'
-  | 'time-option-1-day'
-  | 'time-option-1-week'
-  | 'time-option-2-weeks'
   | 'leave-group-button'
   | 'create-account-button'
   | 'continue-button'
   | 'existing-account-button'
   | 'context-menu-item'
-  | 'block-unblock-modal-description';
+  | 'block-unblock-modal-description'
+  | DMTimeOption
+  | `input-${DMTimeOption}`;

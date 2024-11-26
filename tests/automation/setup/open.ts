@@ -55,6 +55,7 @@ const openElectronAppOnly = async (multi: string) => {
   const uniqueId = v4();
   process.env.NODE_APP_INSTANCE = `${MULTI_PREFIX}-devprod-${uniqueId}-${process.env.MULTI}`;
   process.env.NODE_ENV = NODE_ENV;
+  process.env.SESSION_DEBUG = '1';
 
   if (!isEmpty(process.env.CI)) {
     const sessionBinPath = getSessionDesktopBinPath();

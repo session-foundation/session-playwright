@@ -94,8 +94,8 @@ test_Alice_1W_Bob_1W(
     // Check that using the accept button has intended use
     await clickOnTestIdWithText(
       bobWindow1,
-      'decline-message-request',
-      englishStrippedStr('decline').toString(),
+      'delete-message-request',
+      englishStrippedStr('delete').toString(),
     );
     // Confirm decline
     await clickOnTestIdWithText(

@@ -74,8 +74,8 @@ test_Alice_2W_Bob_1W(
     await sleepFor(1000);
     await clickOnTestIdWithText(
       aliceWindow1,
-      'decline-message-request',
-      englishStrippedStr('decline').toString(),
+      'delete-message-request',
+      englishStrippedStr('delete').toString(),
     );
     await clickOnTestIdWithText(
       aliceWindow1,
