@@ -1,5 +1,9 @@
 import { Page } from '@playwright/test';
-import { ConversationType, DisappearOptions } from '../types/testing';
+import {
+  ConversationType,
+  DataTestId,
+  DisappearOptions,
+} from '../types/testing';
 import {
   clickOnElement,
   clickOnMatchingText,
@@ -50,16 +54,19 @@ export const setDisappearingMessages = async (
     // Check that 1 Day default is automatically selected (default time is only relevant to 1:1's)
     let defaultTime;
     if (timerType === 'disappear-after-read-option') {
-      defaultTime = await waitForElement(
-        windowA,
-        'data-testid',
-        'input-time-option-43200-seconds',
-      );
+      // making explicit DataTestId here as `waitForElement` currently allows a string
+      // TODO: add explicit typing to waitForElement
+      const dataTestId: DataTestId = 'input-time-option-12-hours';
+      defaultTime = await waitForElement(windowA, 'data-testid', dataTestId);
     } else {
+      // making explicit DataTestId here as `waitForElement` currently allows a string
+      // TODO: add explicit typing to waitForElement
+      const dataTestId: DataTestId = 'input-time-option-1-days';
+
       defaultTime = await waitForElement(
         windowA,
         'data-testid',
-        'input-time-option-86400-seconds',
+        dataTestId,
         1000,
       );
     }
@@ -67,8 +74,6 @@ export const setDisappearingMessages = async (
     if (checked) {
       console.info('Timer default time is correct');
     } else {
-      console.info('Default timer not set correctly');
-
       throw new Error('Default timer not set correctly');
     }
   }
