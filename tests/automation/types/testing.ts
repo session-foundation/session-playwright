@@ -165,4 +165,5 @@ export type DataTestId =
   | 'block-unblock-modal-description'
   | DMTimeOption
   | `input-${DMTimeOption}`
-  | 'disappear-messages-type-and-time';
+  | 'disappear-messages-type-and-time'
+  | 'hide-recovery-password-button';
