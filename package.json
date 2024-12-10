@@ -29,6 +29,7 @@
     "uuid": "^9.0.1"
   },
   "scripts": {
+    "build": "yarn tsc --watch",
     "lint": "yarn prettier . --write && yarn eslint .",
     "test": "npx playwright test",
     "watch": "tsc -w",
