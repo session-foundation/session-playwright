@@ -5,6 +5,9 @@ test-results/
 **/*.js
 /*.js
 *.js
+*.js.map
+/*.js.map
+**/*.js.map
 .vscode/settings.json
 tests/automation/todo
 allure-report
@@ -14,3 +17,5 @@ TODO.md
 playwright.config.js
 sessionReporter.js
 .env
+output/
+dist/

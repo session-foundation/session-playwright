@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { englishStrippedStr } from '../../locale/localizedString';
 import { Group, User } from '../types/testing';
 import { sendMessage } from '../utilities/message';
 import { sendNewMessage } from '../utilities/send_message';
@@ -9,8 +10,6 @@ import {
   waitForTestIdWithText,
   waitForTextMessages,
 } from '../utilities/utils';
-import { englishStrippedStr } from '../../locale/localizedString';
-import { doForAll } from '../../promise_utils';
 
 export const createGroup = async (
   userName: string,
@@ -22,11 +21,6 @@ export const createGroup = async (
   windowC: Page,
 ): Promise<Group> => {
   const group: Group = { userName, userOne, userTwo, userThree };
-  const groupUpdateInviteControlText = englishStrippedStr(
-    'groupInviteYouAndMoreNew',
-  )
-    .withArgs({ count: 2 })
-    .toString();
 
   const messageAB = `${userOne.userName} to ${userTwo.userName}`;
   const messageBA = `${userTwo.userName} to ${userOne.userName}`;
@@ -83,26 +77,37 @@ export const createGroup = async (
   await waitForTestIdWithText(
     windowA,
     'group-update-message',
-    groupUpdateInviteControlText,
+    englishStrippedStr('groupMemberNewTwo')
+      .withArgs({ name: userTwo.userName, other_name: userThree.userName })
+      .toString(),
   );
-
+  // Click on message section
+  await Promise.all([
+    clickOnTestIdWithText(windowB, 'message-section'),
+    clickOnTestIdWithText(windowC, 'message-section'),
+  ]);
+  // Click on test group
+  await Promise.all([
+    clickOnMatchingText(windowB, group.userName),
+    clickOnMatchingText(windowC, group.userName),
+  ]);
   // Make sure the empty state is in windowB & windowC
-  await doForAll(
-    async (w) => {
-      // Navigate to group in the window
-      await clickOnTestIdWithText(w, 'message-section');
-      // Click on test group
-      await clickOnMatchingText(w, group.userName);
-      // Make sure the empty state is in w
-      return waitForTestIdWithText(
-        w,
-        'group-update-message',
-        groupUpdateInviteControlText,
-      );
-    },
-    [windowB, windowC],
-  );
-
+  await Promise.all([
+    waitForTestIdWithText(
+      windowB,
+      'empty-conversation-notification',
+      englishStrippedStr('groupInviteYouAndOtherNew')
+        .withArgs({ other_name: userThree.userName })
+        .toString(),
+    ),
+    waitForTestIdWithText(
+      windowC,
+      'empty-conversation-notification',
+      englishStrippedStr('groupInviteYouAndOtherNew')
+        .withArgs({ other_name: userTwo.userName })
+        .toString(),
+    ),
+  ]);
   // Send message in group chat from user A
   await sendMessage(windowA, msgAToGroup);
   // Focus screen
