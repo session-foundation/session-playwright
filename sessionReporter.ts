@@ -99,17 +99,6 @@ class SessionReporter implements Reporter {
 
       console.warn('stderr:');
       result.stderr.map((t) => process.stderr.write(t.toString()));
-
-      if (result.error) {
-        if (result.error.message) {
-          console.warn('\nmessage:');
-          process.stderr.write(result.error.message.toString());
-        }
-        if (result.error.stack) {
-          console.warn('\nstack:');
-          process.stderr.write(result.error.stack.toString());
-        }
-      }
     } else {
       console.log(
         `${getChalkColorForStatus(result)(

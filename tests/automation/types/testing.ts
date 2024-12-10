@@ -126,7 +126,7 @@ export type DataTestId =
   | 'messages-container'
   | 'chooser-new-group'
   | 'new-closed-group-name'
-  | 'create-group-button'
+  | 'next-button'
   | 'link-device'
   | 'group-name-input'
   | 'right-panel-group-name'

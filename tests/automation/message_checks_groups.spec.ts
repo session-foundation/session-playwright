@@ -1,5 +1,5 @@
 import { englishStrippedStr } from '../locale/localizedString';
-import { doForAll, sleepFor } from '../promise_utils';
+import { sleepFor } from '../promise_utils';
 import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { replyTo } from './utilities/reply_message';
@@ -252,11 +252,15 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await sleepFor(1000);
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+      englishStrippedStr('deleteMessageDeleted')
+        .withArgs({ count: 1 })
+        .toString(),
     );
     await waitForMatchingText(
       charlieWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+      englishStrippedStr('deleteMessageDeleted')
+        .withArgs({ count: 1 })
+        .toString(),
     );
   },
 );
@@ -289,19 +293,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
         .withArgs({ count: 1 })
         .toString(),
     );
-    await doForAll(
-      async (w) => {
-        if (w !== aliceWindow1) {
-          // we should have the "This message was deleted" placeholder only where the change wasn't made
-          await waitForMatchingText(
-            w,
-            englishStrippedStr('deleteMessageDeletedGlobally').toString(),
-          );
-        }
-        // the message should be gone on all windows
-        await hasTextMessageBeenDeleted(w, deletedMessage, 5000);
-      },
-      [aliceWindow1, bobWindow1, charlieWindow1],
-    );
+    await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage, 5000);
+    // Should still be there for user B and C
+    await waitForMatchingText(bobWindow1, deletedMessage);
+    await waitForMatchingText(charlieWindow1, deletedMessage);
   },
 );

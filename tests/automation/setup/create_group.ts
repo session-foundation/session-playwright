@@ -7,10 +7,9 @@ import {
   clickOnTestIdWithText,
   typeIntoInput,
   waitForTestIdWithText,
-  waitForTextMessages,
+  waitForTextMessage,
 } from '../utilities/utils';
 import { englishStrippedStr } from '../../locale/localizedString';
-import { doForAll } from '../../promise_utils';
 
 export const createGroup = async (
   userName: string,
@@ -22,10 +21,8 @@ export const createGroup = async (
   windowC: Page,
 ): Promise<Group> => {
   const group: Group = { userName, userOne, userTwo, userThree };
-  const groupUpdateInviteControlText = englishStrippedStr(
-    'groupInviteYouAndMoreNew',
-  )
-    .withArgs({ count: 2 })
+  const emptyStateGroupText = englishStrippedStr('groupNoMessages')
+    .withArgs({ group_name: group.userName })
     .toString();
 
   const messageAB = `${userOne.userName} to ${userTwo.userName}`;
@@ -70,7 +67,7 @@ export const createGroup = async (
   // Select user C
   await clickOnMatchingText(windowA, userThree.userName);
   // Click Next
-  await clickOnTestIdWithText(windowA, 'create-group-button');
+  await clickOnTestIdWithText(windowA, 'next-button');
   // Check group was successfully created
   await clickOnMatchingText(windowB, group.userName);
   await waitForTestIdWithText(
@@ -79,29 +76,38 @@ export const createGroup = async (
     group.userName,
   );
   // Make sure the empty state is in windowA
-  // Updated in group v2
   await waitForTestIdWithText(
     windowA,
-    'group-update-message',
-    groupUpdateInviteControlText,
+    'empty-conversation-notification',
+    emptyStateGroupText,
   );
 
-  // Make sure the empty state is in windowB & windowC
-  await doForAll(
-    async (w) => {
-      // Navigate to group in the window
-      await clickOnTestIdWithText(w, 'message-section');
+  await Promise.all([
+    (async () => {
+      // Navigate to group in window B
+      await clickOnTestIdWithText(windowB, 'message-section');
       // Click on test group
-      await clickOnMatchingText(w, group.userName);
-      // Make sure the empty state is in w
+      await clickOnMatchingText(windowB, group.userName);
+      // Make sure the empty state is in windowB
       return waitForTestIdWithText(
-        w,
-        'group-update-message',
-        groupUpdateInviteControlText,
+        windowB,
+        'empty-conversation-notification',
+        emptyStateGroupText,
       );
-    },
-    [windowB, windowC],
-  );
+    })(),
+    (async () => {
+      // Navigate to group in window C
+      await clickOnTestIdWithText(windowC, 'message-section');
+      // Click on test group
+      await clickOnMatchingText(windowC, group.userName);
+      // Make sure the empty state is in windowC
+      return waitForTestIdWithText(
+        windowC,
+        'empty-conversation-notification',
+        emptyStateGroupText,
+      );
+    })(),
+  ]);
 
   // Send message in group chat from user A
   await sendMessage(windowA, msgAToGroup);
@@ -119,13 +125,16 @@ export const createGroup = async (
   // Verify that each messages was received by the other two accounts
 
   // windowA should see the message from B and the message from C
-  await waitForTextMessages(windowA, [msgBToGroup, msgCToGroup]);
+  await waitForTextMessage(windowA, msgBToGroup);
+  await waitForTextMessage(windowA, msgCToGroup);
 
   // windowB should see the message from A and the message from C
-  await waitForTextMessages(windowB, [msgAToGroup, msgCToGroup]);
+  await waitForTextMessage(windowB, msgAToGroup);
+  await waitForTextMessage(windowB, msgCToGroup);
 
   // windowC must see the message from A and the message from B
-  await waitForTextMessages(windowC, [msgAToGroup, msgBToGroup]);
+  await waitForTextMessage(windowC, msgAToGroup);
+  await waitForTextMessage(windowC, msgBToGroup);
 
   // Focus screen
   // await clickOnTestIdWithText(windowB, 'scroll-to-bottom-button');

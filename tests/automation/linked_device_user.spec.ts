@@ -276,7 +276,9 @@ test_Alice_2W_Bob_1W(
     await hasTextMessageBeenDeleted(aliceWindow1, unsentMessage, 1000);
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+      englishStrippedStr('deleteMessageDeleted')
+        .withArgs({ count: 1 })
+        .toString(),
     );
     // linked device for deleted message
     await hasTextMessageBeenDeleted(aliceWindow2, unsentMessage, 1000);

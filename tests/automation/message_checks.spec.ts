@@ -262,7 +262,9 @@ test_Alice_1W_Bob_1W(
     await sleepFor(1000);
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+      englishStrippedStr('deleteMessageDeleted')
+        .withArgs({ count: 1 })
+        .toString(),
     );
   },
 );
