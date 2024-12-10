@@ -9,7 +9,7 @@ import {
   waitForTestIdWithText,
 } from './utilities/utils';
 // import { leaveGroup } from './utilities/leave_group';
-import { sleepFor } from '../promise_utils';
+import { doForAll, sleepFor } from '../promise_utils';
 import { newUser } from './setup/new_user';
 import {
   sessionTestThreeWindows,
@@ -18,7 +18,6 @@ import {
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { leaveGroup } from './utilities/leave_group';
-import { shortenWithBrackets } from '../pubkey';
 import { englishStrippedStr } from '../locale/localizedString';
 
 // Note: Note using the group fixture here as we want to test it thoroughly
@@ -85,26 +84,19 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
       aliceWindow1,
       englishStrippedStr('okay').toString(),
     );
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'group-update-message',
-      englishStrippedStr('legacyGroupMemberNew')
-        .withArgs({ name: dracula.userName })
-        .toString(),
-    );
-    await waitForTestIdWithText(
-      bobWindow1,
-      'group-update-message',
-      englishStrippedStr('legacyGroupMemberNew')
-        .withArgs({ name: shortenWithBrackets(dracula.accountid) })
-        .toString(),
-    );
-    await waitForTestIdWithText(
-      charlieWindow1,
-      'group-update-message',
-      englishStrippedStr('legacyGroupMemberNew')
-        .withArgs({ name: shortenWithBrackets(dracula.accountid) })
-        .toString(),
+    // even if Bob and Charlie do not know Dracula's name,
+    // Alice sets Dracula's name in the group members that every one will use as a fallback
+    await doForAll(
+      async (w) => {
+        return waitForTestIdWithText(
+          w,
+          'group-update-message',
+          englishStrippedStr('groupMemberNew')
+            .withArgs({ name: dracula.userName })
+            .toString(),
+        );
+      },
+      [aliceWindow1, bobWindow1, charlieWindow1],
     );
     await clickOnElement({
       window: draculaWindow1,

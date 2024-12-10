@@ -90,6 +90,16 @@ export async function waitForTextMessage(
   return el;
 }
 
+export async function waitForTextMessages(
+  window: Page,
+  texts: Array<string>,
+  maxWait?: number,
+) {
+  return Promise.all(
+    texts.map(async (t) => waitForTextMessage(window, t, maxWait)),
+  );
+}
+
 export async function waitForControlMessageWithText(
   window: Page,
   text: string,
