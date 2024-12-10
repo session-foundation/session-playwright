@@ -17,6 +17,7 @@ import {
   clickOnTestIdWithText,
   clickOnTextMessage,
   doWhileWithMax,
+  hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
   typeIntoInput,
   waitForLoadingAnimationToFinish,
@@ -332,5 +333,92 @@ test_Alice_2W_Bob_1W(
     );
     // Check if user B is in blocked contact list
     await waitForMatchingText(aliceWindow2, bob.userName);
+  },
+);
+
+test_Alice_2W_Bob_1W(
+  'Deleted conversation syncs',
+  async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
+    // Create contact and send new message
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    // Confirm contact by checking Messages tab (name should appear in list)
+    await Promise.all([
+      clickOnTestIdWithText(aliceWindow1, 'message-section'),
+      clickOnTestIdWithText(bobWindow1, 'message-section'),
+      clickOnTestIdWithText(aliceWindow2, 'message-section'),
+    ]);
+    await Promise.all([
+      clickOnElement({
+        window: aliceWindow1,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+      clickOnElement({
+        window: bobWindow1,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+      clickOnElement({
+        window: aliceWindow2,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+    ]);
+    await Promise.all([
+      waitForTestIdWithText(
+        aliceWindow1,
+        'module-conversation__user__profile-name',
+        bob.userName,
+      ),
+      waitForTestIdWithText(
+        bobWindow1,
+        'module-conversation__user__profile-name',
+        alice.userName,
+      ),
+      waitForTestIdWithText(
+        aliceWindow2,
+        'module-conversation__user__profile-name',
+        bob.userName,
+      ),
+    ]);
+    // Delete contact
+    await clickOnTestIdWithText(aliceWindow1, 'message-section');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      bob.userName,
+      true,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'context-menu-item',
+      englishStrippedStr('conversationsDelete').toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('delete').toString(),
+    );
+    // TODO add Check modal strings
+    // Need to close 'New Conversation' screen
+    await clickOnTestIdWithText(aliceWindow2, 'new-conversation-button');
+    // Check if conversation is deleted
+    // Need to wait for deletion to propagate to linked device
+    await Promise.all([
+      hasElementBeenDeleted(
+        aliceWindow1,
+        'data-testid',
+        'module-conversation__user__profile-name',
+        1000,
+        bob.userName,
+      ),
+      hasElementBeenDeleted(
+        aliceWindow2,
+        'data-testid',
+        'module-conversation__user__profile-name',
+        8000,
+        bob.userName,
+      ),
+    ]);
   },
 );

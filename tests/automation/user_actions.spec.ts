@@ -5,6 +5,7 @@ import {
   sessionTestTwoWindows,
   test_Alice_1W_Bob_1W,
   test_Alice_1W_no_network,
+  test_Alice_2W,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { sendMessage } from './utilities/message';
@@ -12,6 +13,8 @@ import {
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
+  doesElementExist,
+  hasElementBeenDeleted,
   typeIntoInput,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -308,5 +311,127 @@ test_Alice_1W_Bob_1W(
       alice.userName,
     );
     await sendMessage(aliceWindow1, 'Testing read receipts');
+  },
+);
+
+test_Alice_1W_Bob_1W(
+  'Delete conversation',
+  async ({ aliceWindow1, bobWindow1, alice, bob }) => {
+    // Create contact and send new message
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    // Confirm contact by checking Messages tab (name should appear in list)
+    await Promise.all([
+      clickOnTestIdWithText(aliceWindow1, 'message-section'),
+      clickOnTestIdWithText(bobWindow1, 'message-section'),
+    ]);
+    await Promise.all([
+      clickOnElement({
+        window: aliceWindow1,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+      clickOnElement({
+        window: bobWindow1,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+    ]);
+    await Promise.all([
+      waitForTestIdWithText(
+        aliceWindow1,
+        'module-conversation__user__profile-name',
+        bob.userName,
+      ),
+      waitForTestIdWithText(
+        bobWindow1,
+        'module-conversation__user__profile-name',
+        alice.userName,
+      ),
+    ]);
+    // Delete contact
+    await clickOnTestIdWithText(aliceWindow1, 'message-section');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      bob.userName,
+      true,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'context-menu-item',
+      englishStrippedStr('conversationsDelete').toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('delete').toString(),
+    );
+    // TODO add Check modal strings
+    // Check if conversation is deleted
+    await hasElementBeenDeleted(
+      aliceWindow1,
+      'data-testid',
+      'module-conversation__user__profile-name',
+      1000,
+      bob.userName,
+    );
+  },
+);
+
+test_Alice_2W(
+  'Hide recovery password',
+  async ({ aliceWindow1, aliceWindow2 }) => {
+    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'recovery-password-settings-menu-item',
+    );
+    await clickOnTestIdWithText(aliceWindow1, 'hide-recovery-password-button');
+    // Check first modal heading
+    await waitForMatchingText(
+      aliceWindow1,
+      englishStrippedStr('recoveryPasswordHidePermanently').toString(),
+    );
+    // Check first modal description
+    await waitForMatchingText(
+      aliceWindow1,
+      englishStrippedStr(
+        'recoveryPasswordHidePermanentlyDescription1',
+      ).toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('theContinue').toString(),
+    );
+    // Check second modal heading
+    await waitForMatchingText(
+      aliceWindow1,
+      englishStrippedStr('recoveryPasswordHidePermanently').toString(),
+    );
+    // Check second modal description
+    await waitForMatchingText(
+      aliceWindow1,
+      englishStrippedStr(
+        'recoveryPasswordHidePermanentlyDescription2',
+      ).toString(),
+    );
+    // Click yes
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('yes').toString(),
+    );
+    await doesElementExist(
+      aliceWindow1,
+      'data-testid',
+      'recovery-password-settings-menu-item',
+    );
+    // Check linked device if Recovery Password is still visible (it should be)
+    await clickOnTestIdWithText(aliceWindow2, 'settings-section');
+    await waitForTestIdWithText(
+      aliceWindow2,
+      'recovery-password-settings-menu-item',
+    );
   },
 );
