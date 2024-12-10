@@ -206,7 +206,7 @@ test_Alice_2W(
     await setDisappearingMessages(aliceWindow1, [
       'note-to-self',
       'disappear-after-send-option',
-      'input-10-seconds',
+      'time-option-10-seconds',
     ]);
     // Check control message is visible and correct
     await doesTextIncludeString(
