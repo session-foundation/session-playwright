@@ -95,14 +95,14 @@ export const createGroup = async (
   await Promise.all([
     waitForTestIdWithText(
       windowB,
-      'empty-conversation-notification',
+      'group-update-message',
       englishStrippedStr('groupInviteYouAndOtherNew')
         .withArgs({ other_name: userThree.userName })
         .toString(),
     ),
     waitForTestIdWithText(
       windowC,
-      'empty-conversation-notification',
+      'group-update-message',
       englishStrippedStr('groupInviteYouAndOtherNew')
         .withArgs({ other_name: userTwo.userName })
         .toString(),
