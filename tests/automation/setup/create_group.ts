@@ -10,6 +10,7 @@ import {
   waitForTestIdWithText,
   waitForTextMessages,
 } from '../utilities/utils';
+import { sortByPubkey } from '../../pubkey';
 
 export const createGroup = async (
   userName: string,
@@ -72,13 +73,15 @@ export const createGroup = async (
     'header-conversation-name',
     group.userName,
   );
+  // Need to sort users by pubkey
+  const [firstUser, secondUser] = await sortByPubkey(userTwo, userThree);
   // Make sure the empty state is in windowA
   // Updated in group v2
   await waitForTestIdWithText(
     windowA,
     'group-update-message',
     englishStrippedStr('groupMemberNewTwo')
-      .withArgs({ name: userTwo.userName, other_name: userThree.userName })
+      .withArgs({ name: firstUser, other_name: secondUser })
       .toString(),
   );
   // Click on message section
@@ -88,8 +91,16 @@ export const createGroup = async (
   ]);
   // Click on test group
   await Promise.all([
-    clickOnMatchingText(windowB, group.userName),
-    clickOnMatchingText(windowC, group.userName),
+    clickOnTestIdWithText(
+      windowB,
+      'module-conversation__user__profile-name',
+      group.userName,
+    ),
+    clickOnTestIdWithText(
+      windowC,
+      'module-conversation__user__profile-name',
+      group.userName,
+    ),
   ]);
   // Make sure the empty state is in windowB & windowC
   await Promise.all([

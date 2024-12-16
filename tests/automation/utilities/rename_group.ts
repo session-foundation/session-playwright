@@ -18,6 +18,7 @@ export const renameGroup = async (
   await clickOnTestIdWithText(window, 'edit-group-name');
   await typeIntoInput(window, 'group-name-input', newGroupName);
   await window.keyboard.press('Enter');
+  await clickOnMatchingText(window, 'Okay');
   await waitForTestIdWithText(window, 'right-panel-group-name', newGroupName);
   await clickOnTestIdWithText(window, 'back-button-conversation-options');
   // Check config message

@@ -82,7 +82,7 @@ function getExpectedStringFromKey(
     case 'legacyGroupMemberNew':
       return '{name} joined the group.';
     case 'groupNameNew':
-      return 'Group name is now {group_name}. ';
+      return 'Group name is now {group_name}.';
     case 'groupNameEnterPlease':
       return 'Please enter a group name.';
     case 'cancel':
@@ -99,7 +99,6 @@ function getExpectedStringFromKey(
       return 'Delete';
     case 'copy':
       return 'Copy';
-
     case 'clearMessagesForEveryone':
       return 'Clear for everyone';
     case 'block':
@@ -150,6 +149,14 @@ function getExpectedStringFromKey(
       return 'Leave';
     case 'disappearingMessagesFollowSetting':
       return 'Follow Setting';
+    case 'groupMemberNew':
+      return '{name} was invited to join the group.';
+    case 'deleteMessageDeletedGlobally':
+      return 'This message was deleted';
+    case 'groupMemberNewTwo':
+      return '{name} and {other_name} were invited to join the group.';
+    case 'groupInviteYouAndOtherNew':
+      return 'You and {other_name} were invited to join the group.';
     default:
       // returning nul means we don't have an expected string yet for this key.
       // This will make the test fail
