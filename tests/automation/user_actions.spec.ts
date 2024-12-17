@@ -361,12 +361,12 @@ test_Alice_1W_Bob_1W(
       'context-menu-item',
       englishStrippedStr('conversationsDelete').toString(),
     );
+    // TODO add Check modal strings
     await clickOnTestIdWithText(
       aliceWindow1,
       'session-confirm-ok-button',
       englishStrippedStr('delete').toString(),
     );
-    // TODO add Check modal strings
     // Check if conversation is deleted
     await hasElementBeenDeleted(
       aliceWindow1,
