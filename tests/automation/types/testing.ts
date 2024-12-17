@@ -161,4 +161,5 @@ export type DataTestId =
   | 'continue-button'
   | 'existing-account-button'
   | 'context-menu-item'
-  | 'block-unblock-modal-description';
+  | 'block-unblock-modal-description'
+  | 'session-error-message';
