@@ -12,6 +12,7 @@ import {
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
+  hasElementBeenDeleted,
   typeIntoInput,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -310,3 +311,58 @@ test_Alice_1W_Bob_1W(
     await sendMessage(aliceWindow1, 'Testing read receipts');
   },
 );
+
+sessionTestTwoWindows('Delete contact', async ([windowA, windowB]) => {
+  // no fixture for that one
+  const [userA, userB] = await Promise.all([
+    newUser(windowA, 'Alice'),
+    newUser(windowB, 'Bob'),
+  ]);
+  await createContact(windowA, windowB, userA, userB);
+  // Navigate to contacts tab in User B's window
+  await waitForTestIdWithText(
+    windowB,
+    'message-request-response-message',
+    `You have accepted ${userA.userName}'s message request`,
+  );
+  await Promise.all([
+    clickOnElement({
+      window: windowA,
+      strategy: 'data-testid',
+      selector: 'new-conversation-button',
+    }),
+    clickOnElement({
+      window: windowB,
+      strategy: 'data-testid',
+      selector: 'new-conversation-button',
+    }),
+  ]);
+  await Promise.all([
+    waitForTestIdWithText(
+      windowA,
+      'module-conversation__user__profile-name',
+      userB.userName,
+    ),
+    waitForTestIdWithText(
+      windowB,
+      'module-conversation__user__profile-name',
+      userA.userName,
+    ),
+  ]);
+  await clickOnTestIdWithText(
+    windowA,
+    'module-conversation__user__profile-name',
+    userB.userName,
+    true,
+  );
+  await clickOnMatchingText(windowA, 'Delete Conversation');
+  await waitForMatchingText(windowA, 'Delete Conversation');
+  await clickOnTestIdWithText(windowA, 'session-confirm-ok-button', 'Delete');
+  await hasElementBeenDeleted(
+    windowA,
+    'data-testid',
+    'module-conversation__user__profile-name',
+    1000,
+    userB.userName,
+  );
+});
