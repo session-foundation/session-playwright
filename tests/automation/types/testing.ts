@@ -23,9 +23,10 @@ export type DMTimeOption =
   | 'time-option-5-minutes'
   | 'time-option-1-hour'
   | 'time-option-12-hours'
-  | 'time-option-1-day'
-  | 'time-option-1-week'
-  | 'time-option-2-weeks';
+  | 'time-option-1-days'
+  | 'time-option-7-days'
+  | 'time-option-14-days'
+  | 'disappear-off-option';
 
 type DisappearOpts1o1 = [
   '1:1',
@@ -163,3 +164,7 @@ export type DataTestId =
   | 'context-menu-item'
   | 'block-unblock-modal-description'
   | 'session-error-message';
+  | DMTimeOption
+  | `input-${DMTimeOption}`
+  | 'disappear-messages-type-and-time'
+  | 'hide-recovery-password-button';
