@@ -56,7 +56,7 @@ test_Alice_2W_Bob_1W(
     await clickOnTestIdWithText(aliceWindow1, 'send-message-button');
     await replyTo({
       senderWindow: bobWindow1,
-      textMessage: testMessage,
+      textMessage: testImageMessage,
       replyText: testReply,
       receiverWindow: aliceWindow1,
     });

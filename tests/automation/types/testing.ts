@@ -168,6 +168,6 @@ export type DataTestId =
   | 'disappear-messages-type-and-time'
   | 'hide-recovery-password-button'
   | 'chooser-new-community'
-  | 'new-community-conversation'
+  | 'join-community-conversation'
   | 'join-community-button'
   | 'scroll-to-bottom-button';
