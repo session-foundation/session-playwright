@@ -70,7 +70,7 @@ import {
     ).toString(),
   },
 ].forEach(({ testName, displayName, expectedError }) => {
-  sessionTestOneWindow(`Display name ${testName}`, async ([window]) => {
+  sessionTestOneWindow(`Display name validation: "${testName}"`, async ([window]) => {
     await clickOnTestIdWithText(window, 'create-account-button');
     await typeIntoInput(window, 'display-name-input', displayName);
     await clickOnTestIdWithText(window, 'continue-button');
