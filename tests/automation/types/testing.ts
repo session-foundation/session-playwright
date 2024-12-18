@@ -163,7 +163,7 @@ export type DataTestId =
   | 'existing-account-button'
   | 'context-menu-item'
   | 'block-unblock-modal-description'
-  | 'session-error-message';
+  | 'session-error-message'
   | DMTimeOption
   | `input-${DMTimeOption}`
   | 'disappear-messages-type-and-time'
