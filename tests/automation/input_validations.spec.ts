@@ -7,110 +7,83 @@ import {
   waitForTestIdWithText,
 } from './utilities/utils';
 
-sessionTestOneWindow('Onboarding incorrect seed', async ([window]) => {
-  const incorrectSeed =
-    'ruby bakery illness push rift reef nabbing bawled hope zork silk lobster hope';
-  const expectedError = englishStrippedStr(
-    'recoveryPasswordErrorMessageIncorrect',
-  ).toString();
-  await clickOnTestIdWithText(window, 'existing-account-button');
-  await typeIntoInput(window, 'recovery-phrase-input', incorrectSeed);
-  await clickOnTestIdWithText(window, 'continue-button');
-  await waitForTestIdWithText(window, 'session-error-message');
-  const actualError = await grabTextFromElement(
-    window,
-    'data-testid',
-    'session-error-message',
-  );
-  if (actualError !== expectedError) {
-    throw new Error(
-      `Expected error message: ${expectedError}, but got: ${actualError}`,
+[
+  {
+    testName: 'Incorrect seed',
+    // the word 'zork' is not on the mnemonic word list which triggers the expected error
+    incorrectSeed:
+      'ruby bakery illness push rift reef nabbing bawled hope zork silk lobster hope',
+    expectedError: englishStrippedStr(
+      'recoveryPasswordErrorMessageIncorrect',
+    ).toString(),
+  },
+  {
+    testName: 'Too short seed',
+    incorrectSeed: 'zork',
+    expectedError: englishStrippedStr(
+      'recoveryPasswordErrorMessageShort',
+    ).toString(),
+  },
+  {
+    testName: 'Wrong seed',
+    // the seed phrase is too long but contains only valid mnemonics which triggers the generic error
+    incorrectSeed:
+      'ruby bakery illness push rift reef nabbing bawled hope ruby silk lobster hope ruby ruby ruby',
+    expectedError: englishStrippedStr(
+      'recoveryPasswordErrorMessageGeneric',
+    ).toString(),
+  },
+].forEach(({ testName, incorrectSeed, expectedError }) => {
+  sessionTestOneWindow(`Incorrect seed ${testName}`, async ([window]) => {
+    await clickOnTestIdWithText(window, 'existing-account-button');
+    await typeIntoInput(window, 'recovery-phrase-input', incorrectSeed);
+    await clickOnTestIdWithText(window, 'continue-button');
+    await waitForTestIdWithText(window, 'session-error-message');
+    const actualError = await grabTextFromElement(
+      window,
+      'data-testid',
+      'session-error-message',
     );
-  }
+    console.log('actualError', actualError);
+    console.log('expectedError', expectedError);
+    if (actualError !== expectedError) {
+      throw new Error(
+        `Expected error message: ${expectedError}, but got: ${actualError}`,
+      );
+    }
+  });
 });
 
-sessionTestOneWindow('Onboarding too short seed', async ([window]) => {
-  const incorrectSeed = 'zork';
-  const expectedError = englishStrippedStr(
-    'recoveryPasswordErrorMessageShort',
-  ).toString();
-  await clickOnTestIdWithText(window, 'existing-account-button');
-  await typeIntoInput(window, 'recovery-phrase-input', incorrectSeed);
-  await clickOnTestIdWithText(window, 'continue-button');
-  await waitForTestIdWithText(window, 'session-error-message');
-  const actualError = await grabTextFromElement(
-    window,
-    'data-testid',
-    'session-error-message',
-  );
-  if (actualError !== expectedError) {
-    throw new Error(
-      `Expected error message: ${expectedError}, but got: ${actualError}`,
+[
+  {
+    testName: 'No name',
+    // This currently fails - displays wrong error message
+    displayName: ' ',
+    expectedError: englishStrippedStr('displayNameErrorDescription').toString(),
+  },
+  {
+    testName: 'Too long name',
+    displayName:
+      'One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed int',
+    expectedError: englishStrippedStr(
+      'displayNameErrorDescriptionShorter',
+    ).toString(),
+  },
+].forEach(({ testName, displayName, expectedError }) => {
+  sessionTestOneWindow(`Display name ${testName}`, async ([window]) => {
+    await clickOnTestIdWithText(window, 'create-account-button');
+    await typeIntoInput(window, 'display-name-input', displayName);
+    await clickOnTestIdWithText(window, 'continue-button');
+    await waitForTestIdWithText(window, 'session-error-message');
+    const actualError = await grabTextFromElement(
+      window,
+      'data-testid',
+      'session-error-message',
     );
-  }
-});
-
-sessionTestOneWindow('Onboarding wrong seed', async ([window]) => {
-  const incorrectSeed =
-    'ruby bakery illness push rift reef nabbing bawled hope ruby silk lobster hope ruby ruby ruby';
-  const expectedError = englishStrippedStr(
-    'recoveryPasswordErrorMessageGeneric',
-  ).toString();
-  await clickOnTestIdWithText(window, 'existing-account-button');
-  await typeIntoInput(window, 'recovery-phrase-input', incorrectSeed);
-  await clickOnTestIdWithText(window, 'continue-button');
-  await waitForTestIdWithText(window, 'session-error-message');
-  const actualError = await grabTextFromElement(
-    window,
-    'data-testid',
-    'session-error-message',
-  );
-  if (actualError !== expectedError) {
-    throw new Error(
-      `Expected error message: ${expectedError}, but got: ${actualError}`,
-    );
-  }
-});
-
-sessionTestOneWindow('Onboarding no name', async ([window]) => {
-  const emptyName = ' ';
-  const expectedError = englishStrippedStr(
-    'displayNameErrorDescription',
-  ).toString();
-  await clickOnTestIdWithText(window, 'create-account-button');
-  await typeIntoInput(window, 'display-name-input', emptyName);
-  await clickOnTestIdWithText(window, 'continue-button');
-  await waitForTestIdWithText(window, 'session-error-message');
-  const actualError = await grabTextFromElement(
-    window,
-    'data-testid',
-    'session-error-message',
-  );
-  if (actualError !== expectedError) {
-    throw new Error(
-      `Expected error message: ${expectedError}, but got: ${actualError}`,
-    );
-  }
-});
-
-sessionTestOneWindow('Onboarding too long name', async ([window]) => {
-  const tooLongName =
-    'One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed int';
-  const expectedError = englishStrippedStr(
-    'displayNameErrorDescriptionShorter',
-  ).toString();
-  await clickOnTestIdWithText(window, 'create-account-button');
-  await typeIntoInput(window, 'display-name-input', tooLongName);
-  await clickOnTestIdWithText(window, 'continue-button');
-  await waitForTestIdWithText(window, 'session-error-message');
-  const actualError = await grabTextFromElement(
-    window,
-    'data-testid',
-    'session-error-message',
-  );
-  if (actualError !== expectedError) {
-    throw new Error(
-      `Expected error message: ${expectedError}, but got: ${actualError}`,
-    );
-  }
+    if (actualError !== expectedError) {
+      throw new Error(
+        `Expected error message: ${expectedError}, but got: ${actualError}`,
+      );
+    }
+  });
 });
