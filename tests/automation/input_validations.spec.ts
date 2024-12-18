@@ -34,7 +34,7 @@ import {
     ).toString(),
   },
 ].forEach(({ testName, incorrectSeed, expectedError }) => {
-  sessionTestOneWindow(`Incorrect seed ${testName}`, async ([window]) => {
+  sessionTestOneWindow(`Seed validation: "${testName}"`, async ([window]) => {
     await clickOnTestIdWithText(window, 'existing-account-button');
     await typeIntoInput(window, 'recovery-phrase-input', incorrectSeed);
     await clickOnTestIdWithText(window, 'continue-button');
