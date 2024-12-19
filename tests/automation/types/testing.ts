@@ -167,4 +167,8 @@ export type DataTestId =
   | DMTimeOption
   | `input-${DMTimeOption}`
   | 'disappear-messages-type-and-time'
-  | 'hide-recovery-password-button';
+  | 'hide-recovery-password-button'
+  | 'chooser-new-community'
+  | 'join-community-conversation'
+  | 'join-community-button'
+  | 'scroll-to-bottom-button';
