@@ -26,7 +26,7 @@ test_Alice_2W_Bob_1W(
   'Send image to community',
   async ({ alice, bob, aliceWindow1, bobWindow1 }) => {
     const testMessage = 'Testing sending images to communities';
-    const testImageMessage = `Image message + ${new Date().getTime()}`;
+    const testImageMessage = `Image message + ${Date.now()}`;
     const testReply = `${bob.userName} replying to image from ${alice.userName}`;
     await Promise.all([joinCommunity(aliceWindow1), joinCommunity(bobWindow1)]);
     await Promise.all([
