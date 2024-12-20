@@ -153,18 +153,18 @@ test_Alice_1W_Bob_1W(
 test_Alice_2W_Bob_1W(
   'Block message request',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
-    const testMessage = `Sender: ${alice.userName}, Receiver: ${bob.userName}`;
-    // send a message to User B from User A
+    const testMessage = `Sender: ${bob.userName}, Receiver: ${alice.userName}`;
+    // send a message to Bob to Alice
     await sendNewMessage(bobWindow1, alice.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
     await clickOnTestIdWithText(aliceWindow1, 'message-request-banner');
-    // Select message request from User A
+    // Select message request from Bob
     await clickOnTestIdWithText(
       aliceWindow1,
       'module-conversation__user__profile-name',
       bob.userName,
     );
-    // Block User A
+    // Block Bob
     await clickOnTestIdWithText(
       aliceWindow1,
       'decline-and-block-message-request',
@@ -194,4 +194,3 @@ test_Alice_2W_Bob_1W(
     await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
   },
 );
-// Delete request (not a feature yet)
