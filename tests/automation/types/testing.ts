@@ -173,4 +173,5 @@ export type DataTestId =
   | 'join-community-button'
   | 'scroll-to-bottom-button'
   | 'decline-and-block-message-request'
-  | 'contact';
+  | 'contact'
+  | 'modal-heading';
