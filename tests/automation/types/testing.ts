@@ -171,4 +171,6 @@ export type DataTestId =
   | 'chooser-new-community'
   | 'join-community-conversation'
   | 'join-community-button'
-  | 'scroll-to-bottom-button';
+  | 'scroll-to-bottom-button'
+  | 'decline-and-block-message-request'
+  | 'contact';
