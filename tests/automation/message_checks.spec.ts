@@ -1,11 +1,13 @@
 import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
+import { testCommunityName } from './constants/community';
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
   test_Alice_1W_Bob_1W,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
+import { joinCommunity } from './utilities/join_community';
 import { sendMessage } from './utilities/message';
 import { replyTo } from './utilities/reply_message';
 import {
@@ -16,6 +18,7 @@ import {
   hasTextMessageBeenDeleted,
   measureSendingTime,
   typeIntoInput,
+  waitForElement,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -344,5 +347,44 @@ test_Alice_1W_Bob_1W(
       replyText: testReply,
       receiverWindow: aliceWindow1,
     });
+  },
+);
+
+test_Alice_1W_Bob_1W(
+  'Send community invite',
+  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    await joinCommunity(aliceWindow1);
+    await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
+    await clickOnTestIdWithText(aliceWindow1, 'add-user-button');
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'modal-heading',
+      englishStrippedStr('membersInvite').toString(),
+    );
+    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
+    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      bob.userName,
+    );
+    await Promise.all([
+      waitForElement(
+        aliceWindow1,
+        'class',
+        'group-name',
+        undefined,
+        testCommunityName,
+      ),
+      waitForElement(
+        bobWindow1,
+        'class',
+        'group-name',
+        undefined,
+        testCommunityName,
+      ),
+    ]);
   },
 );
