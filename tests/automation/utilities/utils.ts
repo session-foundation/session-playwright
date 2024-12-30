@@ -464,3 +464,31 @@ export async function doWhileWithMax(
     );
   }
 }
+
+export async function checkModalStrings(
+  window: Page,
+  expectedHeading: string,
+  expectedDescription: string,
+) {
+  const heading = await waitForElement(window, 'data-testid', 'modal-heading');
+  const description = await waitForElement(
+    window,
+    'data-testid',
+    'modal-description',
+  );
+
+  const headingText = await heading.innerText();
+  const descriptionText = await description.innerText();
+
+  if (headingText !== expectedHeading) {
+    throw new Error(
+      `Expected heading: ${expectedHeading}, got: ${headingText}`,
+    );
+  }
+
+  if (descriptionText !== expectedDescription) {
+    throw new Error(
+      `Expected description: ${expectedDescription}, got: ${descriptionText}`,
+    );
+  }
+}
