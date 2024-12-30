@@ -10,6 +10,7 @@ import {
 import { createContact } from './utilities/create_contact';
 import { sendMessage } from './utilities/message';
 import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
@@ -474,3 +475,54 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
     'Note to Self',
   );
 });
+
+test_Alice_1W_no_network(
+  'Hide note to self',
+  async ({ aliceWindow1, alice }) => {
+    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'chooser-new-conversation-button',
+    );
+    await typeIntoInput(
+      aliceWindow1,
+      'new-session-conversation',
+      alice.accountid,
+    );
+    await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'header-conversation-name',
+      'Note to Self',
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      'Note to Self',
+      true,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'context-menu-item',
+      'Hide Note to Self',
+    );
+    // Currently fails due to no test tag on description
+    // await checkModalStrings(
+    //   aliceWindow1,
+    //   englishStrippedStr('noteToSelfHide').toString(),
+    //   englishStrippedStr('noteToSelfHideDescription').toString(),
+    // );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('hide').toString(),
+    );
+    await hasElementBeenDeleted(
+      aliceWindow1,
+      'data-testid',
+      'module-conversation__user__profile-name',
+      5000,
+      englishStrippedStr('noteToSelf').toString(),
+    );
+  },
+);
