@@ -173,4 +173,7 @@ export type DataTestId =
   | 'scroll-to-bottom-button'
   | 'decline-and-block-message-request'
   | 'contact'
-  | 'modal-heading';
+  | 'modal-heading'
+  | 'chooser-invite-friend'
+  | 'your-account-id'
+  | 'copy-button-account-id';
