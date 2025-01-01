@@ -472,7 +472,7 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   await waitForTestIdWithText(
     aliceWindow1,
     'header-conversation-name',
-    'Note to Self',
+    englishStrippedStr('noteToSelf').toString(),
   );
 });
 
@@ -493,18 +493,18 @@ test_Alice_1W_no_network(
     await waitForTestIdWithText(
       aliceWindow1,
       'header-conversation-name',
-      'Note to Self',
+      englishStrippedStr('noteToSelf').toString(),
     );
     await clickOnTestIdWithText(
       aliceWindow1,
       'module-conversation__user__profile-name',
-      'Note to Self',
+      englishStrippedStr('noteToSelf').toString(),
       true,
     );
     await clickOnTestIdWithText(
       aliceWindow1,
       'context-menu-item',
-      'Hide Note to Self',
+      englishStrippedStr('noteToSelfHide').toString(),
     );
     // Currently fails due to no test tag on description
     // await checkModalStrings(

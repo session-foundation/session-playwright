@@ -450,7 +450,7 @@ test_Alice_2W(
     await waitForTestIdWithText(
       aliceWindow1,
       'header-conversation-name',
-      'Note to Self',
+      englishStrippedStr('noteToSelf').toString(),
     );
     await sendMessage(aliceWindow1, 'Testing note to self');
     // Check if note to self is visible in linked device
@@ -458,18 +458,18 @@ test_Alice_2W(
     await waitForTestIdWithText(
       aliceWindow2,
       'module-conversation__user__profile-name',
-      'Note to Self',
+      englishStrippedStr('noteToSelf').toString(),
     );
     await clickOnTestIdWithText(
       aliceWindow1,
       'module-conversation__user__profile-name',
-      'Note to Self',
+      englishStrippedStr('noteToSelf').toString(),
       true,
     );
     await clickOnTestIdWithText(
       aliceWindow1,
       'context-menu-item',
-      'Hide Note to Self',
+      englishStrippedStr('noteToSelfHide').toString(),
     );
     await clickOnTestIdWithText(
       aliceWindow1,
@@ -484,14 +484,14 @@ test_Alice_2W(
         'data-testid',
         'module-conversation__user__profile-name',
         5000,
-        'Note to Self',
+        englishStrippedStr('noteToSelf').toString(),
       ),
       hasElementBeenDeleted(
         aliceWindow2,
         'data-testid',
         'module-conversation__user__profile-name',
         8000,
-        'Note to Self',
+        englishStrippedStr('noteToSelf').toString(),
       ),
     ]);
   },
