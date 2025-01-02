@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { Page, expect } from '@playwright/test';
+import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
 import { forceCloseAllWindows } from './setup/closeWindows';
 import { newUser } from './setup/new_user';
@@ -18,7 +19,6 @@ import {
   clickOnTestIdWithText,
   clickOnTextMessage,
   doWhileWithMax,
-  doesElementExist,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
   typeIntoInput,
@@ -28,7 +28,6 @@ import {
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
-import { englishStrippedStr } from '../locale/localizedString';
 
 sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
   let aliceWindow2: Page | undefined;
