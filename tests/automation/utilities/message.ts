@@ -10,6 +10,10 @@ export const sendMessage = async (window: Page, message: string) => {
     strategy: 'data-testid',
     selector: 'send-message-button',
   });
+  await waitForSentTick(window, message);
+};
+
+export const waitForSentTick = async (window: Page, message: string) => {
   // wait for confirmation tick to send reply message
   const selc = `css=[data-testid=message-content]:has-text("${message}"):has([data-testid=msg-status][data-testtype=sent])`;
   console.info('waiting for sent tick of message: ', message);

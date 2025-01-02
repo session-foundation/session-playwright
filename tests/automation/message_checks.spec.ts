@@ -8,9 +8,10 @@ import {
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
-import { sendMessage } from './utilities/message';
+import { sendMessage, waitForSentTick } from './utilities/message';
 import { replyTo } from './utilities/reply_message';
 import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
@@ -42,6 +43,7 @@ test_Alice_1W_Bob_1W(
       strategy: 'data-testid',
       selector: 'send-message-button',
     });
+    await waitForSentTick(aliceWindow1, testMessage);
     // Click on untrusted attachment in window B
     await sleepFor(1000);
     await clickOnMatchingText(
@@ -52,7 +54,20 @@ test_Alice_1W_Bob_1W(
         })
         .toString(),
     );
-    await clickOnTestIdWithText(bobWindow1, 'session-confirm-ok-button');
+    await checkModalStrings(
+      bobWindow1,
+      englishStrippedStr('attachmentsAutoDownloadModalTitle').toString(),
+      englishStrippedStr('attachmentsAutoDownloadModalDescription')
+        .withArgs({
+          conversation_name: alice.userName,
+        })
+        .toString(),
+    );
+    await clickOnTestIdWithText(
+      bobWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('download').toString(),
+    );
     await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
     // Waiting for image to change from loading state to loaded (takes a second)
     await sleepFor(1000);
