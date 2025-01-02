@@ -12,7 +12,6 @@ import {
   hasTextMessageBeenDeleted,
   lookForPartialTestId,
   typeIntoInput,
-  typeIntoInputSlow,
   waitForElement,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
