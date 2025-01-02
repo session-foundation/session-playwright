@@ -12,11 +12,13 @@ import { createContact } from './utilities/create_contact';
 import { linkedDevice } from './utilities/linked_device';
 import { sendMessage } from './utilities/message';
 import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
   clickOnTextMessage,
   doWhileWithMax,
+  doesElementExist,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
   typeIntoInput,
@@ -396,12 +398,18 @@ test_Alice_2W_Bob_1W(
       'context-menu-item',
       englishStrippedStr('conversationsDelete').toString(),
     );
+    await checkModalStrings(
+      aliceWindow1,
+      englishStrippedStr('conversationsDelete').toString(),
+      englishStrippedStr('conversationsDeleteDescription')
+        .withArgs({ name: bob.userName })
+        .toString(),
+    );
     await clickOnTestIdWithText(
       aliceWindow1,
       'session-confirm-ok-button',
       englishStrippedStr('delete').toString(),
     );
-    // TODO add Check modal strings
     // Need to close 'New Conversation' screen
     await clickOnTestIdWithText(aliceWindow2, 'new-conversation-button');
     // Check if conversation is deleted
@@ -420,6 +428,70 @@ test_Alice_2W_Bob_1W(
         'module-conversation__user__profile-name',
         8000,
         bob.userName,
+      ),
+    ]);
+  },
+);
+
+test_Alice_2W(
+  'Hide note to self syncs',
+  async ({ alice, aliceWindow1, aliceWindow2 }) => {
+    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'chooser-new-conversation-button',
+    );
+    await typeIntoInput(
+      aliceWindow1,
+      'new-session-conversation',
+      alice.accountid,
+    );
+    await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'header-conversation-name',
+      englishStrippedStr('noteToSelf').toString(),
+    );
+    await sendMessage(aliceWindow1, 'Testing note to self');
+    // Check if note to self is visible in linked device
+    await sleepFor(1000);
+    await waitForTestIdWithText(
+      aliceWindow2,
+      'module-conversation__user__profile-name',
+      englishStrippedStr('noteToSelf').toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      englishStrippedStr('noteToSelf').toString(),
+      true,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'context-menu-item',
+      englishStrippedStr('noteToSelfHide').toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('hide').toString(),
+    );
+    // Check linked device for hidden note to self
+    await sleepFor(1000);
+    await Promise.all([
+      hasElementBeenDeleted(
+        aliceWindow1,
+        'data-testid',
+        'module-conversation__user__profile-name',
+        5000,
+        englishStrippedStr('noteToSelf').toString(),
+      ),
+      hasElementBeenDeleted(
+        aliceWindow2,
+        'data-testid',
+        'module-conversation__user__profile-name',
+        8000,
+        englishStrippedStr('noteToSelf').toString(),
       ),
     ]);
   },
