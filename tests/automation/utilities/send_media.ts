@@ -2,9 +2,13 @@ import { Page } from '@playwright/test';
 import { waitForSentTick } from './message';
 import { clickOnElement, typeIntoInput } from './utils';
 
-export const sendImage = async (window: Page, testMessage: string) => {
-  // Send image
-  await window.setInputFiles("input[type='file']", 'fixtures/test-image.png');
+export const sendMedia = async (
+  window: Page,
+  path: string,
+  testMessage: string,
+) => {
+  // Send media
+  await window.setInputFiles("input[type='file']", `${path}`);
   await typeIntoInput(window, 'message-input-text-area', testMessage);
   await clickOnElement({
     window,
