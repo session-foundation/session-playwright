@@ -1,4 +1,5 @@
 import { expect } from '@playwright/test';
+import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
 import { newUser } from './setup/new_user';
 import {
@@ -10,7 +11,6 @@ import {
 import { createContact } from './utilities/create_contact';
 import { sendMessage } from './utilities/message';
 import {
-  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
@@ -20,7 +20,6 @@ import {
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utilities/utils';
-import { englishStrippedStr } from '../locale/localizedString';
 
 // Send message in one to one conversation with new contact
 sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {

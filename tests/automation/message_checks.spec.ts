@@ -346,7 +346,11 @@ test_Alice_1W_Bob_1W(
     // doesn't pop up if manually typing link (needs to be pasted)
     // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
     const firstCopyBtn = await aliceWindow1
-      .locator("[data-testid=context-menu-item]:has-text('Copy')")
+      .locator(
+        `[data-testid=context-menu-item]:has-text(${englishStrippedStr(
+          'copy',
+        ).toString()})`,
+      )
       .nth(0);
     await firstCopyBtn.click();
     await waitForTestIdWithText(
