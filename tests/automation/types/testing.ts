@@ -56,7 +56,10 @@ export type WithPage = { window: Page };
 export type WithMaxWait = { maxWait?: number };
 export type WithRightButton = { rightButton?: boolean };
 
-export type loaderType = 'loading-animation' | 'loading-spinner';
+export type loaderType =
+  | 'loading-animation'
+  | 'loading-spinner'
+  | 'link-preview-loading';
 
 export type Strategy = 'data-testid' | 'class' | ':has-text';
 
@@ -176,4 +179,6 @@ export type DataTestId =
   | 'modal-heading'
   | 'chooser-invite-friend'
   | 'your-account-id'
-  | 'copy-button-account-id';
+  | 'copy-button-account-id'
+  | 'link-preview-title'
+  | 'link-preview-image';
