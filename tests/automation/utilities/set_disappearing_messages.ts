@@ -1,6 +1,5 @@
 import { Page } from '@playwright/test';
 import { englishStrippedStr } from '../../locale/localizedString';
-import { sleepFor } from '../../promise_utils';
 import { ConversationType, DisappearOptions } from '../types/testing';
 import {
   clickOnElement,
@@ -13,7 +12,12 @@ import {
 
 export const setDisappearingMessages = async (
   windowA: Page,
-  [conversationType, timerType, timerDuration]: DisappearOptions,
+  [
+    conversationType,
+    timerType,
+    timerDuration,
+    disappearAction,
+  ]: DisappearOptions,
   windowB?: Page,
 ) => {
   const enforcedType: ConversationType = conversationType;
@@ -89,7 +93,27 @@ export const setDisappearingMessages = async (
       windowB,
       englishStrippedStr('disappearingMessagesFollowSetting').toString(),
     );
-    await sleepFor(1000);
+    // switch(disappearAction) {
+
+    //   case: 'read';
+    //    let action = englishStrippedStr('disappearingMessagesTypeRead').toString()
+    //    return action
+    //   case: 'sent';
+    //   action = englishStrippedStr('disappearingMessagesTypeSent').toString()
+    //   return action
+    //   default:
+    //     throw new Error('Invalid disappearAction');
+    // }
+    // await checkModalStrings(
+    //   windowB,
+    //   englishStrippedStr('disappearingMessagesFollowSetting').toString(),
+    //   englishStrippedStr('disappearingMessagesFollowSettingDescription')
+    //     .withArgs({
+    //       time: timerDuration,
+    //       disappearing_messages_type: 'sent',
+    //     })
+    //     .toString(),
+    // );
     await clickOnElement({
       window: windowB,
       strategy: 'data-testid',
