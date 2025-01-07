@@ -12,12 +12,8 @@ import {
 
 export const setDisappearingMessages = async (
   windowA: Page,
-  [
-    conversationType,
-    timerType,
-    timerDuration,
-    disappearAction,
-  ]: DisappearOptions,
+  [conversationType, timerType, timerDuration] // disappearAction,
+  : DisappearOptions,
   windowB?: Page,
 ) => {
   const enforcedType: ConversationType = conversationType;
@@ -93,26 +89,18 @@ export const setDisappearingMessages = async (
       windowB,
       englishStrippedStr('disappearingMessagesFollowSetting').toString(),
     );
-    // switch(disappearAction) {
-
-    //   case: 'read';
-    //    let action = englishStrippedStr('disappearingMessagesTypeRead').toString()
-    //    return action
-    //   case: 'sent';
-    //   action = englishStrippedStr('disappearingMessagesTypeSent').toString()
-    //   return action
-    //   default:
-    //     throw new Error('Invalid disappearAction');
+    // Need test tag of modal-description for this to work
+    // let action;
+    // if (disappearAction) {
+    //   action = englishStrippedStr('disappearingMessagesTypeRead').toString();
+    // } else {
+    //   action = englishStrippedStr('disappearingMessagesTypeSent').toString();
     // }
+
     // await checkModalStrings(
     //   windowB,
     //   englishStrippedStr('disappearingMessagesFollowSetting').toString(),
-    //   englishStrippedStr('disappearingMessagesFollowSettingDescription')
-    //     .withArgs({
-    //       time: timerDuration,
-    //       disappearing_messages_type: 'sent',
-    //     })
-    //     .toString(),
+    //   action,
     // );
     await clickOnElement({
       window: windowB,
