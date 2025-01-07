@@ -1,17 +1,24 @@
 import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
+import { longText } from './constants/variables';
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
   test_Alice_1W_Bob_1W,
 } from './setup/sessionTest';
+import { MediaType } from './types/testing';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
 import { sendMessage, waitForSentTick } from './utilities/message';
-import { replyTo } from './utilities/reply_message';
+import { replyTo, replyToMedia } from './utilities/reply_message';
 import {
-  checkModalStrings,
+  sendLinkPreview,
+  sendMedia,
+  sendVoiceMessage,
+  trustUser,
+} from './utilities/send_media';
+import {
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
@@ -26,211 +33,75 @@ import {
   waitForTextMessage,
 } from './utilities/utils';
 
-test_Alice_1W_Bob_1W(
-  'Send image 1:1',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const testMessage = `${alice.userName} sending image to ${bob.userName}`;
-    const testReply = `${bob.userName} replying to image from ${alice.userName}`;
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-
-    await aliceWindow1.setInputFiles(
-      "input[type='file']",
-      'fixtures/test-image.png',
-    );
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', testMessage);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
-    await waitForSentTick(aliceWindow1, testMessage);
-    // Click on untrusted attachment in window B
-    await sleepFor(1000);
-    await clickOnMatchingText(
-      bobWindow1,
-      englishStrippedStr('attachmentsClickToDownload')
-        .withArgs({
-          file_type: englishStrippedStr('media').toString().toLowerCase(),
-        })
-        .toString(),
-    );
-    await checkModalStrings(
-      bobWindow1,
-      englishStrippedStr('attachmentsAutoDownloadModalTitle').toString(),
-      englishStrippedStr('attachmentsAutoDownloadModalDescription')
-        .withArgs({
-          conversation_name: alice.userName,
-        })
-        .toString(),
-    );
-    await clickOnTestIdWithText(
-      bobWindow1,
-      'session-confirm-ok-button',
-      englishStrippedStr('download').toString(),
-    );
-    await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
-    // Waiting for image to change from loading state to loaded (takes a second)
-    await sleepFor(1000);
-
-    await replyTo({
-      senderWindow: bobWindow1,
-      textMessage: testMessage,
-      replyText: testReply,
-      receiverWindow: aliceWindow1,
-    });
+[
+  {
+    mediaType: 'image',
+    path: 'fixtures/test-image.png',
+    mediaTag: 'media',
   },
-);
-
-test_Alice_1W_Bob_1W(
-  'Send video 1:1',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const testMessage = `${alice.userName} sending video to ${bob.userName}`;
-    const testReply = `${bob.userName} replying to video from ${alice.userName}`;
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-
-    await aliceWindow1.setInputFiles(
-      "input[type='file']",
-      'fixtures/test-video.mp4',
-    );
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', testMessage);
-    // give some time before we send the message, as the video preview takes some time to be added
-    await sleepFor(1000);
-
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
-    await clickOnMatchingText(
-      bobWindow1,
-      englishStrippedStr('attachmentsClickToDownload')
-        .withArgs({
-          file_type: englishStrippedStr('media').toString().toLowerCase(),
-        })
-        .toString(),
-    );
-    await clickOnTestIdWithText(bobWindow1, 'session-confirm-ok-button');
-    await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
-    // Waiting for video to change from loading state to loaded (takes a second)
-    await sleepFor(1000);
-    await replyTo({
-      senderWindow: bobWindow1,
-      textMessage: testMessage,
-      replyText: testReply,
-      receiverWindow: aliceWindow1,
-    });
+  {
+    mediaType: 'video',
+    path: 'fixtures/test-video.mp4',
+    mediaTag: 'media',
   },
-);
-
-test_Alice_1W_Bob_1W(
-  'Send document 1:1',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const testMessage = `${alice.userName} sending document to ${bob.userName}`;
-    const testReply = `${bob.userName} replying to document from ${alice.userName}`;
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await aliceWindow1.setInputFiles(
-      "input[type='file']",
-      'fixtures/test-file.pdf',
-    );
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', testMessage);
-    await sleepFor(100);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
-    await sleepFor(1000);
-    await clickOnMatchingText(
-      bobWindow1,
-      englishStrippedStr('attachmentsClickToDownload')
-        .withArgs({
-          file_type: englishStrippedStr('file').toString().toLowerCase(),
-        })
-        .toString(),
-    );
-    await clickOnTestIdWithText(bobWindow1, 'session-confirm-ok-button');
-    await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
-    // Waiting for video to change from loading state to loaded (takes a second)
-    await sleepFor(500);
-    await replyTo({
-      senderWindow: bobWindow1,
-      textMessage: testMessage,
-      replyText: testReply,
-      receiverWindow: aliceWindow1,
-    });
+  {
+    mediaType: 'gif',
+    path: 'fixtures/test-gif.gif',
+    mediaTag: 'media',
   },
-);
-
-test_Alice_1W_Bob_1W(
-  'Send voice message 1:1',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    // const testReply = `${bob.userName} to ${alice.userName}`;
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-
-    await clickOnTestIdWithText(aliceWindow1, 'microphone-button');
-    await clickOnTestIdWithText(aliceWindow1, 'session-toast');
-    await clickOnTestIdWithText(aliceWindow1, 'enable-microphone');
-    await clickOnTestIdWithText(aliceWindow1, 'message-section');
-    await clickOnTestIdWithText(aliceWindow1, 'microphone-button');
-    await sleepFor(5000);
-    await clickOnTestIdWithText(aliceWindow1, 'end-voice-message');
-    await sleepFor(4000);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
-    await sleepFor(1000);
-    await clickOnMatchingText(
-      bobWindow1,
-      englishStrippedStr('attachmentsClickToDownload')
-        .withArgs({
-          file_type: englishStrippedStr('audio').toString().toLowerCase(),
-        })
-        .toString(),
-    );
-    await clickOnTestIdWithText(bobWindow1, 'session-confirm-ok-button');
+  {
+    mediaType: 'document',
+    path: 'fixtures/test-file.pdf',
+    mediaTag: 'file',
   },
-);
-
-test_Alice_1W_Bob_1W(
-  'Send GIF 1:1',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    // const testReply = `${bob.userName} to ${alice.userName}`;
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-
-    await aliceWindow1.setInputFiles(
-      "input[type='file']",
-      'fixtures/test-gif.gif',
-    );
-    await sleepFor(100);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
-    await sleepFor(1000);
-    await clickOnMatchingText(
-      bobWindow1,
-      englishStrippedStr('attachmentsClickToDownload')
-        .withArgs({
-          file_type: englishStrippedStr('media').toString().toLowerCase(),
-        })
-        .toString(),
-    );
+  {
+    mediaType: 'voice',
+    path: '',
+    mediaTag: 'audio',
   },
-);
+].forEach(({ mediaType, path, mediaTag }) => {
+  test_Alice_1W_Bob_1W(
+    `Send ${mediaType} 1:1`,
+    async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+      const testMessage = `${alice.userName} sending ${mediaType} to ${bob.userName}`;
+      const testReply = `${bob.userName} replying to ${mediaType} from ${alice.userName}`;
+      await createContact(aliceWindow1, bobWindow1, alice, bob);
+      if (mediaType === 'voice') {
+        await sendVoiceMessage(aliceWindow1);
+      } else {
+        await sendMedia(aliceWindow1, path, testMessage);
+      }
+      // Click on untrusted attachment in window B
+      await sleepFor(1000);
+      await trustUser(bobWindow1, alice.userName, mediaTag as MediaType);
+      await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
+      // Waiting for image to change from loading state to loaded (takes a second)
+      await sleepFor(1000);
+      if (mediaType === 'voice') {
+        await replyToMedia({
+          senderWindow: bobWindow1,
+          strategy: 'data-testid',
+          selector: 'audio-player',
+          replyText: testReply,
+          receiverWindow: aliceWindow1,
+        });
+      } else {
+        await replyTo({
+          senderWindow: bobWindow1,
+          textMessage: testMessage,
+          replyText: testReply,
+          receiverWindow: aliceWindow1,
+        });
+      }
+    },
+  );
+});
 
 test_Alice_1W_Bob_1W(
   'Send long text 1:1',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testReply = `${bob.userName} replying to long text message from ${alice.userName}`;
-    const longText =
-      // eslint-disable-next-line max-len
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vestibulum quis lacinia mi. Praesent fermentum vehicula rhoncus. Aliquam ac purus lobortis, convallis nisi quis, pulvinar elit. Nam commodo eros in molestie lobortis. Donec at mattis est. In tempor ex nec velit mattis, vitae feugiat augue maximus. Nullam risus libero, bibendum et enim et, viverra viverra est. Suspendisse potenti. Sed ut nibh in sem rhoncus suscipit. Etiam tristique leo sit amet ullamcorper dictum. Suspendisse sollicitudin, lectus et suscipit eleifend, libero dui ultricies neque, non elementum nulla orci bibendum lorem. Suspendisse potenti. Aenean a tellus imperdiet, iaculis metus quis, pretium diam. Nunc varius vitae enim vestibulum interdum. In hac habitasse platea dictumst. Donec auctor sem quis eleifend fermentum. Vestibulum neque nulla, maximus non arcu gravida, condimentum euismod turpis. Cras ac mattis orci. Quisque ac enim pharetra felis sodales eleifend. Aliquam erat volutpat. Donec sit amet mollis nibh, eget feugiat ipsum. Integer vestibulum purus ac suscipit egestas. Duis vitae aliquet ligula.';
-
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-
     await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
     await sleepFor(100);
     await clickOnElement({
@@ -238,6 +109,7 @@ test_Alice_1W_Bob_1W(
       strategy: 'data-testid',
       selector: 'send-message-button',
     });
+    await waitForSentTick(aliceWindow1, longText);
     await sleepFor(1000);
     await replyTo({
       senderWindow: bobWindow1,
@@ -245,6 +117,69 @@ test_Alice_1W_Bob_1W(
       replyText: testReply,
       receiverWindow: aliceWindow1,
     });
+  },
+);
+
+test_Alice_1W_Bob_1W(
+  'Send link 1:1',
+  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    const testLink = 'https://getsession.org/';
+    const testReply = `${bob.userName} replying to link from ${alice.userName}`;
+
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    await sendLinkPreview(aliceWindow1, testLink);
+    await waitForElement(
+      bobWindow1,
+      'class',
+      'module-message__link-preview__title',
+      undefined,
+      'Session | Send Messages, Not Metadata. | Private Messenger',
+    );
+    await replyTo({
+      senderWindow: bobWindow1,
+      textMessage: testLink,
+      replyText: testReply,
+      receiverWindow: aliceWindow1,
+    });
+  },
+);
+
+test_Alice_1W_Bob_1W(
+  'Send community invite',
+  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    await joinCommunity(aliceWindow1);
+    await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
+    await clickOnTestIdWithText(aliceWindow1, 'add-user-button');
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'modal-heading',
+      englishStrippedStr('membersInvite').toString(),
+    );
+    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
+    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      bob.userName,
+    );
+    await Promise.all([
+      waitForElement(
+        aliceWindow1,
+        'class',
+        'group-name',
+        undefined,
+        testCommunityName,
+      ),
+      waitForElement(
+        bobWindow1,
+        'class',
+        'group-name',
+        undefined,
+        testCommunityName,
+      ),
+    ]);
   },
 );
 
@@ -335,125 +270,5 @@ sessionTestTwoWindows(
       timesArray.push(timeMs);
     }
     console.log(timesArray);
-  },
-);
-
-test_Alice_1W_Bob_1W(
-  'Send link 1:1',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const testMessage = 'https://getsession.org/';
-    const testReply = `${bob.userName} replying to link from ${alice.userName}`;
-
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', testMessage);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'message-content',
-      testMessage,
-      true,
-    );
-    // Need to copy link to clipboard, as the enable link preview modal
-    // doesn't pop up if manually typing link (needs to be pasted)
-    // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
-    const firstCopyBtn = aliceWindow1
-      .locator(
-        `[data-testid=context-menu-item]:has-text(${englishStrippedStr(
-          'copy',
-        ).toString()})`,
-      )
-      .nth(0);
-    await firstCopyBtn.click();
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      englishStrippedStr('copied').toString(),
-    );
-    await clickOnTestIdWithText(aliceWindow1, 'message-input-text-area');
-    const isMac = process.platform === 'darwin';
-    await aliceWindow1.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
-    // No test tag on modal-description
-    // await checkModalStrings(
-    //   aliceWindow1,
-    //   englishStrippedStr('linkPreviewsEnable').toString(),
-    //   englishStrippedStr('linkPreviewsFirstDescription')
-    //     .withArgs({ app_name: 'Session' })
-    //     .toString(),
-    // );
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'session-confirm-ok-button',
-      englishStrippedStr('enable').toString(),
-    );
-    // Needs to be changed to link-preview-loading
-    await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
-    // Also needs to be implemented
-    // await waitForTestIdWithText(aliceWindow1, 'link-preview-image')
-    // await waitForTestIdWithText(
-    //   aliceWindow1,
-    //   'link-preview-title',
-    //   'Session | Send Messages, Not Metadata. | Private Messenger',
-    // );
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
-    await waitForElement(
-      bobWindow1,
-      'class',
-      'module-message__link-preview__title',
-      undefined,
-      'Session | Send Messages, Not Metadata. | Private Messenger',
-    );
-    await replyTo({
-      senderWindow: bobWindow1,
-      textMessage: testMessage,
-      replyText: testReply,
-      receiverWindow: aliceWindow1,
-    });
-  },
-);
-
-test_Alice_1W_Bob_1W(
-  'Send community invite',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await joinCommunity(aliceWindow1);
-    await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
-    await clickOnTestIdWithText(aliceWindow1, 'add-user-button');
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'modal-heading',
-      englishStrippedStr('membersInvite').toString(),
-    );
-    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
-    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
-    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'module-conversation__user__profile-name',
-      bob.userName,
-    );
-    await Promise.all([
-      waitForElement(
-        aliceWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
-      ),
-      waitForElement(
-        bobWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
-      ),
-    ]);
   },
 );
