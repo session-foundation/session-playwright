@@ -25,6 +25,7 @@ import {
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
+import { makeVoiceCall } from './utilities/voice_call';
 
 // Disappearing time settings for all tests
 const timeOption: DMTimeOption = 'time-option-30-seconds';
@@ -273,6 +274,79 @@ test_Alice_1W_Bob_1W(
         'group-name',
         undefined,
         testCommunityName,
+      ),
+    ]);
+  },
+);
+
+test_Alice_1W_Bob_1W(
+  `Send disappearing call message 1:1`,
+  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    // Set disappearing messages
+    await setDisappearingMessages(
+      aliceWindow1,
+      ['1:1', disappearingMessageType, timeOption, disappearAction],
+      bobWindow1,
+    );
+    await Promise.all([
+      waitForTestIdWithText(
+        aliceWindow1,
+        'disappear-control-message',
+        englishStrippedStr('disappearingMessagesSetYou')
+          .withArgs({
+            time: '30 seconds',
+            disappearing_messages_type: disappearAction,
+          })
+          .toString(),
+      ),
+      waitForTestIdWithText(
+        bobWindow1,
+        'disappear-control-message',
+        englishStrippedStr('disappearingMessagesSet')
+          .withArgs({
+            time: '30 seconds',
+            disappearing_messages_type: disappearAction,
+            name: alice.userName,
+          })
+          .toString(),
+      ),
+    ]);
+    await makeVoiceCall(aliceWindow1, bobWindow1, alice, bob);
+    // In the receivers window, the message is 'Call in progress'
+    await Promise.all([
+      waitForTestIdWithText(
+        bobWindow1,
+        'call-notification-answered-a-call',
+        englishStrippedStr('callsInProgress').toString(),
+      ),
+      // In the callers window, the message is 'You called {reciverName}'
+      waitForTestIdWithText(
+        aliceWindow1,
+        'call-notification-started-call',
+        englishStrippedStr('callsYouCalled')
+          .withArgs({ name: bob.userName })
+          .toString(),
+      ),
+    ]);
+    // Wait 30 seconds for call message to disappear
+    await sleepFor(30000);
+    await Promise.all([
+      hasElementBeenDeleted(
+        bobWindow1,
+        'data-testid',
+        'call-notification-answered-a-call',
+        undefined,
+        englishStrippedStr('callsInProgress').toString(),
+      ),
+      hasElementBeenDeleted(
+        aliceWindow1,
+        'data-testid',
+        'call-notification-started-call',
+        undefined,
+        englishStrippedStr('callsYouCalled')
+          .withArgs({ name: bob.userName })
+          .toString(),
       ),
     ]);
   },
