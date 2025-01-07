@@ -60,12 +60,10 @@ export type WithPage = { window: Page };
 export type WithMaxWait = { maxWait?: number };
 export type WithRightButton = { rightButton?: boolean };
 
-export type LoaderType =
+export type loaderType =
   | 'loading-animation'
   | 'loading-spinner'
   | 'link-preview-loading';
-
-export type MediaType = 'media' | 'file' | 'audio';
 
 export type Strategy = 'data-testid' | 'class' | ':has-text';
 
