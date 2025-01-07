@@ -11,6 +11,7 @@ import {
   WithPage,
   WithRightButton,
   LoaderType,
+  DMTimeOption,
 } from '../types/testing';
 // eslint-disable-next-line import/no-cycle
 import { sendMessage } from './message';
@@ -492,4 +493,10 @@ export async function checkModalStrings(
       `Expected description: ${expectedDescription}, got: ${descriptionText}`,
     );
   }
+}
+
+export async function formatTimeOption(option: DMTimeOption) {
+  const timePart = option.replace('time-option-', '');
+  const formattedTime = timePart.replace(/-/g, ' ');
+  return formattedTime;
 }

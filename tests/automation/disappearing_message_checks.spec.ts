@@ -1,8 +1,12 @@
 import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
+import { testCommunityName } from './constants/community';
+import { longText, mediaArray } from './constants/variables';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
-import { DMTimeOption, MediaType } from './types/testing';
+import { DMTimeOption } from './types/testing';
 import { createContact } from './utilities/create_contact';
+import { joinCommunity } from './utilities/join_community';
+import { waitForSentTick } from './utilities/message';
 import {
   sendLinkPreview,
   sendMedia,
@@ -21,43 +25,13 @@ import {
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
-import { longText } from './constants/variables';
-import { waitForSentTick } from './utilities/message';
-import { joinCommunity } from './utilities/join_community';
-import { testCommunityName } from './constants/community';
 
 // Disappearing time settings for all tests
 const timeOption: DMTimeOption = 'time-option-30-seconds';
 const disappearingMessageType = 'disappear-after-send-option';
 const disappearAction = 'sent';
 
-[
-  {
-    mediaType: 'image',
-    path: 'fixtures/test-image.png',
-    attachmentType: 'media',
-  },
-  {
-    mediaType: 'video',
-    path: 'fixtures/test-video.mp4',
-    attachmentType: 'media',
-  },
-  {
-    mediaType: 'gif',
-    path: 'fixtures/test-gif.gif',
-    attachmentType: 'media',
-  },
-  {
-    mediaType: 'document',
-    path: 'fixtures/test-file.pdf',
-    attachmentType: 'file',
-  },
-  {
-    mediaType: 'voice',
-    path: '',
-    attachmentType: 'audio',
-  },
-].forEach(({ mediaType, path, attachmentType }) => {
+mediaArray.forEach(({ mediaType, path, attachmentType }) => {
   test_Alice_1W_Bob_1W(
     `Send disappearing ${mediaType} 1:1`,
     async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
@@ -99,7 +73,7 @@ const disappearAction = 'sent';
         await sendMedia(aliceWindow1, path, testMessage);
       }
       // Click on untrusted attachment
-      await trustUser(bobWindow1, alice.userName, attachmentType as MediaType);
+      await trustUser(bobWindow1, alice.userName, attachmentType);
 
       await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
       if (mediaType === 'voice') {
