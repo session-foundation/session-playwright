@@ -31,7 +31,7 @@
   },
   "scripts": {
     "lint": "yarn prettier . --write && yarn eslint .",
-    "build": "yarn tsc --watch",
+    "dev": "yarn tsc --watch",
     "test": "npx playwright test",
     "watch": "tsc -w",
     "allure-create": "allure generate ./allure-results",

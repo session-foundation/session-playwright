@@ -16,6 +16,7 @@ export const waitForSentTick = async (window: Page, message: string) => {
     Boolean(tickMessageSent),
   );
 };
+
 export const sendMessage = async (window: Page, message: string) => {
   // type into message input box
   await typeIntoInput(window, 'message-input-text-area', message);

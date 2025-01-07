@@ -2,18 +2,24 @@ import { Page } from '@playwright/test';
 import { englishStrippedStr } from '../../locale/localizedString';
 import { ConversationType, DisappearOptions } from '../types/testing';
 import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
   doWhileWithMax,
+  formatTimeOption,
   waitForElement,
   waitForTestIdWithText,
 } from './utils';
 
 export const setDisappearingMessages = async (
   windowA: Page,
-  [conversationType, timerType, timerDuration] // disappearAction,
-  : DisappearOptions,
+  [
+    conversationType,
+    timerType,
+    timerDuration,
+    disappearAction,
+  ]: DisappearOptions,
   windowB?: Page,
 ) => {
   const enforcedType: ConversationType = conversationType;
@@ -89,19 +95,27 @@ export const setDisappearingMessages = async (
       windowB,
       englishStrippedStr('disappearingMessagesFollowSetting').toString(),
     );
-    // Need test tag of modal-description for this to work
-    // let action;
-    // if (disappearAction) {
-    //   action = englishStrippedStr('disappearingMessagesTypeRead').toString();
-    // } else {
-    //   action = englishStrippedStr('disappearingMessagesTypeSent').toString();
-    // }
 
-    // await checkModalStrings(
-    //   windowB,
-    //   englishStrippedStr('disappearingMessagesFollowSetting').toString(),
-    //   action,
-    // );
+    let action;
+    if (disappearAction === 'read') {
+      action = englishStrippedStr('disappearingMessagesTypeRead').toString();
+    } else {
+      action = englishStrippedStr('disappearingMessagesTypeSent').toString();
+    }
+
+    const formattedTime = await formatTimeOption(timerDuration);
+
+    const modalDescription = englishStrippedStr(
+      'disappearingMessagesFollowSettingOn',
+    )
+      .withArgs({ time: formattedTime, disappearing_messages_type: action })
+      .toString();
+
+    await checkModalStrings(
+      windowB,
+      englishStrippedStr('disappearingMessagesFollowSetting').toString(),
+      modalDescription,
+    );
     await clickOnElement({
       window: windowB,
       strategy: 'data-testid',

@@ -1,13 +1,12 @@
 import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
-import { longText } from './constants/variables';
+import { longText, mediaArray } from './constants/variables';
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
   test_Alice_1W_Bob_1W,
 } from './setup/sessionTest';
-import { MediaType } from './types/testing';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
 import { sendMessage, waitForSentTick } from './utilities/message';
@@ -33,33 +32,7 @@ import {
   waitForTextMessage,
 } from './utilities/utils';
 
-[
-  {
-    mediaType: 'image',
-    path: 'fixtures/test-image.png',
-    mediaTag: 'media',
-  },
-  {
-    mediaType: 'video',
-    path: 'fixtures/test-video.mp4',
-    mediaTag: 'media',
-  },
-  {
-    mediaType: 'gif',
-    path: 'fixtures/test-gif.gif',
-    mediaTag: 'media',
-  },
-  {
-    mediaType: 'document',
-    path: 'fixtures/test-file.pdf',
-    mediaTag: 'file',
-  },
-  {
-    mediaType: 'voice',
-    path: '',
-    mediaTag: 'audio',
-  },
-].forEach(({ mediaType, path, mediaTag }) => {
+mediaArray.forEach(({ mediaType, path, attachmentType }) => {
   test_Alice_1W_Bob_1W(
     `Send ${mediaType} 1:1`,
     async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
@@ -73,7 +46,7 @@ import {
       }
       // Click on untrusted attachment in window B
       await sleepFor(1000);
-      await trustUser(bobWindow1, alice.userName, mediaTag as MediaType);
+      await trustUser(bobWindow1, alice.userName, attachmentType);
       await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
       // Waiting for image to change from loading state to loaded (takes a second)
       await sleepFor(1000);
