@@ -32,15 +32,19 @@ type DisappearOpts1o1 = [
   '1:1',
   'disappear-after-read-option' | 'disappear-after-send-option',
   DMTimeOption,
+  DisappearActions,
 ];
 
 type DisappearOptsGroup = [
   'group' | 'note-to-self',
   'disappear-after-send-option',
   DMTimeOption,
+  DisappearActions,
 ];
 
 export type DisappearOptions = DisappearOpts1o1 | DisappearOptsGroup;
+
+export type DisappearActions = 'read' | 'sent';
 
 export type StrategyExtractionObj =
   | {
@@ -56,11 +60,12 @@ export type WithPage = { window: Page };
 export type WithMaxWait = { maxWait?: number };
 export type WithRightButton = { rightButton?: boolean };
 
-export type loaderType =
+export type LoaderType =
   | 'loading-animation'
   | 'loading-spinner'
   | 'link-preview-loading';
 
+export type MediaType = 'image' | 'video' | 'audio' | 'file';
 export type Strategy = 'data-testid' | 'class' | ':has-text';
 
 // Would be good to find a way to sort those with prettier
@@ -182,4 +187,5 @@ export type DataTestId =
   | 'your-account-id'
   | 'copy-button-account-id'
   | 'link-preview-title'
-  | 'link-preview-image';
+  | 'link-preview-image'
+  | 'audio-player';
