@@ -245,3 +245,123 @@ sessionTestTwoWindows(
     console.log(timesArray);
   },
 );
+
+test_Alice_1W_Bob_1W(
+  'Send link 1:1',
+  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    const testMessage = 'https://getsession.org/';
+    const testReply = `${bob.userName} replying to link from ${alice.userName}`;
+
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    await typeIntoInput(aliceWindow1, 'message-input-text-area', testMessage);
+    await clickOnElement({
+      window: aliceWindow1,
+      strategy: 'data-testid',
+      selector: 'send-message-button',
+    });
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'message-content',
+      testMessage,
+      true,
+    );
+    // Need to copy link to clipboard, as the enable link preview modal
+    // doesn't pop up if manually typing link (needs to be pasted)
+    // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
+    const firstCopyBtn = await aliceWindow1
+      .locator(
+        `[data-testid=context-menu-item]:has-text(${englishStrippedStr(
+          'copy',
+        ).toString()})`,
+      )
+      .nth(0);
+    await firstCopyBtn.click();
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'session-toast',
+      englishStrippedStr('copied').toString(),
+    );
+    await clickOnTestIdWithText(aliceWindow1, 'message-input-text-area');
+    const isMac = process.platform === 'darwin';
+    await aliceWindow1.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
+    // No test tag on modal-description
+    // await checkModalStrings(
+    //   aliceWindow1,
+    //   englishStrippedStr('linkPreviewsEnable').toString(),
+    //   englishStrippedStr('linkPreviewsFirstDescription')
+    //     .withArgs({ app_name: 'Session' })
+    //     .toString(),
+    // );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('enable').toString(),
+    );
+    // Needs to be changed to link-preview-loading
+    await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
+    // Also needs to be implemented
+    // await waitForTestIdWithText(aliceWindow1, 'link-preview-image')
+    // await waitForTestIdWithText(
+    //   aliceWindow1,
+    //   'link-preview-title',
+    //   'Session | Send Messages, Not Metadata. | Private Messenger',
+    // );
+    await clickOnElement({
+      window: aliceWindow1,
+      strategy: 'data-testid',
+      selector: 'send-message-button',
+    });
+    await waitForElement(
+      bobWindow1,
+      'class',
+      'module-message__link-preview__title',
+      undefined,
+      'Session | Send Messages, Not Metadata. | Private Messenger',
+    );
+    await replyTo({
+      senderWindow: bobWindow1,
+      textMessage: testMessage,
+      replyText: testReply,
+      receiverWindow: aliceWindow1,
+    });
+  },
+);
+
+test_Alice_1W_Bob_1W(
+  'Send community invite',
+  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    await joinCommunity(aliceWindow1);
+    await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
+    await clickOnTestIdWithText(aliceWindow1, 'add-user-button');
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'modal-heading',
+      englishStrippedStr('membersInvite').toString(),
+    );
+    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
+    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      bob.userName,
+    );
+    await Promise.all([
+      waitForElement(
+        aliceWindow1,
+        'class',
+        'group-name',
+        undefined,
+        testCommunityName,
+      ),
+      waitForElement(
+        bobWindow1,
+        'class',
+        'group-name',
+        undefined,
+        testCommunityName,
+      ),
+    ]);
+  },
+);
