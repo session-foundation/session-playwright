@@ -1,19 +1,25 @@
 import { Page } from '@playwright/test';
 import { englishStrippedStr } from '../../locale/localizedString';
-import { sleepFor } from '../../promise_utils';
 import { ConversationType, DisappearOptions } from '../types/testing';
 import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
   doWhileWithMax,
+  formatTimeOption,
   waitForElement,
   waitForTestIdWithText,
 } from './utils';
 
 export const setDisappearingMessages = async (
   windowA: Page,
-  [conversationType, timerType, timerDuration]: DisappearOptions,
+  [
+    conversationType,
+    timerType,
+    timerDuration,
+    disappearAction,
+  ]: DisappearOptions,
   windowB?: Page,
 ) => {
   const enforcedType: ConversationType = conversationType;
@@ -55,10 +61,14 @@ export const setDisappearingMessages = async (
       defaultTime = await waitForElement(
         windowA,
         'data-testid',
-        'input-12-hours',
+        'input-time-option-12-hours',
       );
     } else {
-      defaultTime = await waitForElement(windowA, 'data-testid', 'input-1-day');
+      defaultTime = await waitForElement(
+        windowA,
+        'data-testid',
+        'input-time-option-1-days',
+      );
     }
     const checked = await defaultTime.isChecked();
     if (checked) {
@@ -85,7 +95,27 @@ export const setDisappearingMessages = async (
       windowB,
       englishStrippedStr('disappearingMessagesFollowSetting').toString(),
     );
-    sleepFor(1000);
+
+    let action;
+    if (disappearAction === 'read') {
+      action = englishStrippedStr('disappearingMessagesTypeRead').toString();
+    } else {
+      action = englishStrippedStr('disappearingMessagesTypeSent').toString();
+    }
+
+    const formattedTime = await formatTimeOption(timerDuration);
+
+    const modalDescription = englishStrippedStr(
+      'disappearingMessagesFollowSettingOn',
+    )
+      .withArgs({ time: formattedTime, disappearing_messages_type: action })
+      .toString();
+
+    await checkModalStrings(
+      windowB,
+      englishStrippedStr('disappearingMessagesFollowSetting').toString(),
+      modalDescription,
+    );
     await clickOnElement({
       window: windowB,
       strategy: 'data-testid',
