@@ -65,8 +65,7 @@ export type LoaderType =
   | 'loading-spinner'
   | 'link-preview-loading';
 
-export type MediaType = 'media' | 'file' | 'audio';
-
+export type MediaType = 'image' | 'video' | 'audio' | 'file';
 export type Strategy = 'data-testid' | 'class' | ':has-text';
 
 // Would be good to find a way to sort those with prettier
