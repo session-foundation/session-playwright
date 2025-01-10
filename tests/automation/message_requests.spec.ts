@@ -98,8 +98,8 @@ test_Alice_1W_Bob_1W(
 
     await clickOnTestIdWithText(
       bobWindow1,
-      'decline-message-request',
-      englishStrippedStr('decline').toString(),
+      'delete-message-request',
+      englishStrippedStr('delete').toString(),
     );
     // Confirm decline
     await clickOnTestIdWithText(

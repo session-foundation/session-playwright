@@ -6,7 +6,6 @@ let initialLocale: Locale | undefined;
 
 let translationDictionary: LocalizerDictionary | undefined;
 
-
 /**
  * Returns the current dictionary to use for translations.
  */
