@@ -57,7 +57,7 @@ export type WithMaxWait = { maxWait?: number };
 export type WithRightButton = { rightButton?: boolean };
 
 export type loaderType = 'loading-animation' | 'loading-spinner';
-
+export type MediaType = 'image' | 'video' | 'audio' | 'file';
 export type Strategy = 'data-testid' | 'class' | ':has-text';
 
 // Would be good to find a way to sort those with prettier
@@ -174,4 +174,6 @@ export type DataTestId =
   | 'scroll-to-bottom-button'
   | 'decline-and-block-message-request'
   | 'contact'
-  | 'modal-heading';
+  | 'modal-heading'
+  | 'call-notification-answered-a-call'
+  | 'call-notification-started-call';

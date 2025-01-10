@@ -85,7 +85,7 @@ export const setDisappearingMessages = async (
       windowB,
       englishStrippedStr('disappearingMessagesFollowSetting').toString(),
     );
-    sleepFor(1000);
+    await sleepFor(1000);
     await clickOnElement({
       window: windowB,
       strategy: 'data-testid',

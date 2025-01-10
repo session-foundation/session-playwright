@@ -166,6 +166,7 @@ test_Alice_1W_Bob_1W(
       selector: 'send-message-button',
     });
     await sleepFor(1000);
+
     await clickOnMatchingText(
       bobWindow1,
       englishStrippedStr('attachmentsClickToDownload')
@@ -175,6 +176,8 @@ test_Alice_1W_Bob_1W(
         .toString(),
     );
     await clickOnTestIdWithText(bobWindow1, 'session-confirm-ok-button');
+    await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
+    await waitForElement(bobWindow1, 'class', 'rhap_progress-section');
   },
 );
 
@@ -357,14 +360,21 @@ test_Alice_1W_Bob_1W(
     await joinCommunity(aliceWindow1);
     await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
     await clickOnTestIdWithText(aliceWindow1, 'add-user-button');
-    await waitForTestIdWithText(
+    // Implementing in groups rebuild
+    // await waitForTestIdWithText(
+    //   aliceWindow1,
+    //   'modal-heading',
+    //   englishStrippedStr('membersInvite').toString(),
+    // );
+    // await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await clickOnMatchingText(aliceWindow1, bob.userName);
+    // await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
+    await clickOnMatchingText(
       aliceWindow1,
-      'modal-heading',
-      englishStrippedStr('membersInvite').toString(),
+      englishStrippedStr('okay').toString(),
     );
-    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
-    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
-    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+    // Implementing in groups rebuild
+    // await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
     await clickOnTestIdWithText(
       aliceWindow1,
       'module-conversation__user__profile-name',

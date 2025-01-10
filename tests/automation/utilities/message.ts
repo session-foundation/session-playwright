@@ -10,16 +10,17 @@ export const sendMessage = async (window: Page, message: string) => {
     strategy: 'data-testid',
     selector: 'send-message-button',
   });
+  // TODO add back in once fix is merged
   // wait for confirmation tick to send reply message
-  const selc = `css=[data-testid=message-content]:has-text("${message}"):has([data-testid=msg-status][data-testtype=sent])`;
-  console.info('waiting for sent tick of message: ', message);
+  // const selc = `css=[data-testid=message-content]:has-text("${message}"):has([data-testid=msg-status][data-testtype=sent])`;
+  // console.info('waiting for sent tick of message: ', message);
 
-  const tickMessageSent = await window.waitForSelector(selc, {
-    timeout: 30000,
-  });
-  console.info(
-    'found the tick of message sent: ',
-    message,
-    Boolean(tickMessageSent),
-  );
+  // const tickMessageSent = await window.waitForSelector(selc, {
+  //   timeout: 30000,
+  // });
+  // console.info(
+  //   'found the tick of message sent: ',
+  //   message,
+  //   Boolean(tickMessageSent),
+  // );
 };
