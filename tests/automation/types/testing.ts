@@ -32,15 +32,19 @@ type DisappearOpts1o1 = [
   '1:1',
   'disappear-after-read-option' | 'disappear-after-send-option',
   DMTimeOption,
+  DisappearActions,
 ];
 
 type DisappearOptsGroup = [
   'group' | 'note-to-self',
   'disappear-after-send-option',
   DMTimeOption,
+  DisappearActions,
 ];
 
 export type DisappearOptions = DisappearOpts1o1 | DisappearOptsGroup;
+
+export type DisappearActions = 'read' | 'sent';
 
 export type StrategyExtractionObj =
   | {

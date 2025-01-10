@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+// eslint-disable-next-line import/no-cycle
 import { clickOnElement, typeIntoInput } from './utils';
 
 export const sendMessage = async (window: Page, message: string) => {
@@ -23,4 +24,16 @@ export const sendMessage = async (window: Page, message: string) => {
   //   message,
   //   Boolean(tickMessageSent),
   // );
+};
+
+export const sendMessage = async (window: Page, message: string) => {
+  // type into message input box
+  await typeIntoInput(window, 'message-input-text-area', message);
+  // click up arrow (send)
+  await clickOnElement({
+    window,
+    strategy: 'data-testid',
+    selector: 'send-message-button',
+  });
+  await waitForSentTick(window, message);
 };
