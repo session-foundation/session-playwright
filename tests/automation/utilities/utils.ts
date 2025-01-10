@@ -55,7 +55,21 @@ export async function waitForElement(
     ? `css=[${strategy}=${selector}]`
     : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
 
-  return window.waitForSelector(builtSelector, { timeout: maxWaitMs });
+  const start = Date.now();
+  if (!selector.includes('path-light-container')) {
+    console.log(`waitForElement: ${builtSelector} for maxMs ${maxWaitMs}`);
+  }
+
+  const el = await window.waitForSelector(builtSelector, {
+    timeout: maxWaitMs,
+  });
+  if (!selector.includes('path-light-container')) {
+    console.log(
+      `waitForElement: got ${builtSelector} after ${Date.now() - start}ms`,
+    );
+  }
+
+  return el;
 }
 
 export async function waitForTextMessage(
@@ -74,7 +88,7 @@ export async function waitForTextMessage(
     console.info('builtSelector:', builtSelector);
   }
   const el = await window.waitForSelector(builtSelector, { timeout: maxWait });
-  console.info(`Text message found. Text: , ${text}`);
+  console.info(`Text message found. Text: "${text}"`);
   return el;
 }
 
@@ -119,6 +133,9 @@ export async function waitForMatchingPlaceholder(
         );
 
         found = true;
+      }
+      if (!found) {
+        await sleepFor(100, true);
       }
     } catch (e) {
       await sleepFor(1000, true);

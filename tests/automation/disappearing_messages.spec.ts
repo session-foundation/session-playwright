@@ -46,7 +46,7 @@ test_Alice_2W_Bob_1W(
 
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', 'disappear-after-read-option', 'time-option-10-seconds', 'read'],
+      ['1:1', 'disappear-after-read-option', 'time-option-10-seconds'],
       bobWindow1,
     );
 
@@ -106,7 +106,7 @@ test_Alice_2W_Bob_1W(
     );
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', 'disappear-after-send-option', 'time-option-10-seconds', 'sent'],
+      ['1:1', 'disappear-after-send-option', 'time-option-10-seconds'],
       bobWindow1,
     );
     // Check control message is correct and appearing
@@ -159,7 +159,6 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
       'group',
       'disappear-after-send-option',
       'time-option-10-seconds',
-      'sent',
     ]);
     // Check control message is visible and correct
     await doesTextIncludeString(
@@ -211,7 +210,6 @@ test_Alice_2W(
       'note-to-self',
       'disappear-after-send-option',
       'input-10-seconds',
-      'sent',
     ]);
     // Check control message is visible and correct
     await doesTextIncludeString(
@@ -242,7 +240,7 @@ test_Alice_2W_Bob_1W(
     // Set disappearing messages to on
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', 'disappear-after-send-option', 'time-option-10-seconds', 'sent'],
+      ['1:1', 'disappear-after-send-option', 'time-option-10-seconds'],
       bobWindow1,
     );
     // Check control message is visible and correct

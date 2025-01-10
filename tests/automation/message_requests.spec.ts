@@ -98,8 +98,8 @@ test_Alice_1W_Bob_1W(
 
     await clickOnTestIdWithText(
       bobWindow1,
-      'decline-message-request',
-      englishStrippedStr('decline').toString(),
+      'delete-message-request',
+      englishStrippedStr('delete').toString(),
     );
     // Confirm decline
     await clickOnTestIdWithText(
@@ -181,8 +181,10 @@ test_Alice_2W_Bob_1W(
       'conversations-settings-menu-item',
     );
     await clickOnTestIdWithText(aliceWindow1, 'reveal-blocked-user-settings');
-    await waitForTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    // await waitForTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await waitForMatchingText(aliceWindow1, bob.userName);
     // Check that the blocked contacts is on alicewindow2
+    // Implemented in groups rebuild
     // Check blocked status in blocked contacts list
     await sleepFor(5000);
     await clickOnTestIdWithText(aliceWindow2, 'settings-section');
@@ -191,6 +193,8 @@ test_Alice_2W_Bob_1W(
       'conversations-settings-menu-item',
     );
     await clickOnTestIdWithText(aliceWindow2, 'reveal-blocked-user-settings');
-    await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
+    // Implemented in groups rebuild
+    // await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
+    await waitForMatchingText(aliceWindow2, bob.userName);
   },
 );

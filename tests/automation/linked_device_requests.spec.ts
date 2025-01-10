@@ -74,8 +74,8 @@ test_Alice_2W_Bob_1W(
     await sleepFor(1000);
     await clickOnTestIdWithText(
       aliceWindow1,
-      'decline-message-request',
-      englishStrippedStr('decline').toString(),
+      'delete-message-request',
+      englishStrippedStr('delete').toString(),
     );
     await clickOnTestIdWithText(
       aliceWindow1,
@@ -87,7 +87,7 @@ test_Alice_2W_Bob_1W(
     // It happens because we have a race condition between the update from libsession and the update from the swarm, both with the same seqno.
     // See SES-1563
     console.info(
-      'This test is subject to a race condition and so is most of the times, broken. See SES-1563',
+      'This test is subject to a race condition and so is most of the times, broken. See SES-2518',
     );
 
     await waitForMatchingText(

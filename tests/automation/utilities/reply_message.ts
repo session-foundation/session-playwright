@@ -36,12 +36,17 @@ export const replyTo = async ({
   for (let index = 0; index < 5; index++) {
     try {
       await clickOnTextMessage(senderWindow, textMessage, true, 1000);
+      // those 2 sleepfor are to try to avoid the layout shift which happens when we click too fast in the context menu
+      await sleepFor(200, true);
+
       await clickOnMatchingText(
         senderWindow,
         englishStrippedStr('reply').toString(),
         false,
         1000,
       );
+      await sleepFor(200, true);
+
       break;
     } catch (e) {
       console.info(
