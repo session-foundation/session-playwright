@@ -70,20 +70,26 @@ import {
     ).toString(),
   },
 ].forEach(({ testName, displayName, expectedError }) => {
-  sessionTestOneWindow(`Display name validation: "${testName}"`, async ([window]) => {
-    await clickOnTestIdWithText(window, 'create-account-button');
-    await typeIntoInput(window, 'display-name-input', displayName);
-    await clickOnTestIdWithText(window, 'continue-button');
-    await waitForTestIdWithText(window, 'session-error-message');
-    const actualError = await grabTextFromElement(
-      window,
-      'data-testid',
-      'session-error-message',
-    );
-    if (actualError !== expectedError) {
-      throw new Error(
-        `Expected error message: ${expectedError}, but got: ${actualError}`,
+  sessionTestOneWindow(
+    `Display name validation: "${testName}"`,
+    async ([window]) => {
+      await clickOnTestIdWithText(window, 'create-account-button');
+      await typeIntoInput(window, 'display-name-input', displayName);
+      await clickOnTestIdWithText(window, 'continue-button');
+      await waitForTestIdWithText(window, 'session-error-message');
+      const actualError = await grabTextFromElement(
+        window,
+        'data-testid',
+        'session-error-message',
       );
-    }
-  });
+      if (testName === 'No name') {
+        console.log('Expected failure: see SES-2832');
+      }
+      if (actualError !== expectedError) {
+        throw new Error(
+          `Expected error message: ${expectedError}, but got: ${actualError}`,
+        );
+      }
+    },
+  );
 });
