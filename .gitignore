@@ -5,6 +5,7 @@ test-results/
 **/*.js
 /*.js
 *.js
+*.js.map
 .vscode/settings.json
 tests/automation/todo
 allure-report

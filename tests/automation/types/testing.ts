@@ -28,21 +28,26 @@ export type DMTimeOption =
   | 'time-option-12-hours'
   | 'time-option-1-days'
   | 'time-option-7-days'
-  | 'time-option-14-days';
+  | 'time-option-14-days'
+  | 'disappear-off-option';
 
 type DisappearOpts1o1 = [
   '1:1',
   'disappear-after-read-option' | 'disappear-after-send-option',
   DMTimeOption,
+  DisappearActions,
 ];
 
 type DisappearOptsGroup = [
   'group' | 'note-to-self',
   'disappear-after-send-option',
   DMTimeOption,
+  DisappearActions,
 ];
 
 export type DisappearOptions = DisappearOpts1o1 | DisappearOptsGroup;
+
+export type DisappearActions = 'read' | 'sent';
 
 export type StrategyExtractionObj =
   | {
@@ -58,8 +63,12 @@ export type WithPage = { window: Page };
 export type WithMaxWait = { maxWait?: number };
 export type WithRightButton = { rightButton?: boolean };
 
-export type loaderType = 'loading-animation' | 'loading-spinner';
+export type LoaderType =
+  | 'loading-animation'
+  | 'loading-spinner'
+  | 'link-preview-loading';
 
+export type MediaType = 'image' | 'video' | 'audio' | 'file';
 export type Strategy = 'data-testid' | 'class' | ':has-text';
 
 // Would be good to find a way to sort those with prettier
@@ -154,5 +163,23 @@ export type DataTestId =
   | 'existing-account-button'
   | 'context-menu-item'
   | 'block-unblock-modal-description'
+  | 'session-error-message'
   | DMTimeOption
-  | `input-${DMTimeOption}`;
+  | `input-${DMTimeOption}`
+  | 'disappear-messages-type-and-time'
+  | 'hide-recovery-password-button'
+  | 'chooser-new-community'
+  | 'join-community-conversation'
+  | 'join-community-button'
+  | 'scroll-to-bottom-button'
+  | 'decline-and-block-message-request'
+  | 'contact'
+  | 'modal-heading'
+  | 'chooser-invite-friend'
+  | 'your-account-id'
+  | 'copy-button-account-id'
+  | 'link-preview-title'
+  | 'link-preview-image'
+  | 'audio-player'
+  | 'call-notification-answered-a-call'
+  | 'call-notification-started-call';
