@@ -1,25 +1,19 @@
 import { Page } from '@playwright/test';
 import { englishStrippedStr } from '../../locale/localizedString';
+import { sleepFor } from '../../promise_utils';
 import { ConversationType, DisappearOptions } from '../types/testing';
 import {
-  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
   doWhileWithMax,
-  formatTimeOption,
   waitForElement,
   waitForTestIdWithText,
 } from './utils';
 
 export const setDisappearingMessages = async (
   windowA: Page,
-  [
-    conversationType,
-    timerType,
-    timerDuration,
-    disappearAction,
-  ]: DisappearOptions,
+  [conversationType, timerType, timerDuration]: DisappearOptions,
   windowB?: Page,
 ) => {
   const enforcedType: ConversationType = conversationType;

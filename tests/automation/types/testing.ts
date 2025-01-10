@@ -32,14 +32,12 @@ type DisappearOpts1o1 = [
   '1:1',
   'disappear-after-read-option' | 'disappear-after-send-option',
   DMTimeOption,
-  DisappearActions,
 ];
 
 type DisappearOptsGroup = [
   'group' | 'note-to-self',
   'disappear-after-send-option',
   DMTimeOption,
-  DisappearActions,
 ];
 
 export type DisappearOptions = DisappearOpts1o1 | DisappearOptsGroup;
@@ -60,7 +58,7 @@ export type WithPage = { window: Page };
 export type WithMaxWait = { maxWait?: number };
 export type WithRightButton = { rightButton?: boolean };
 
-export type loaderType = 'loading-animation' | 'loading-spinner';
+export type LoaderType = 'loading-animation' | 'loading-spinner';
 export type MediaType = 'image' | 'video' | 'audio' | 'file';
 export type Strategy = 'data-testid' | 'class' | ':has-text';
 

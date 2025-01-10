@@ -26,14 +26,14 @@ export const sendMessage = async (window: Page, message: string) => {
   // );
 };
 
-export const sendMessage = async (window: Page, message: string) => {
-  // type into message input box
-  await typeIntoInput(window, 'message-input-text-area', message);
-  // click up arrow (send)
-  await clickOnElement({
-    window,
-    strategy: 'data-testid',
-    selector: 'send-message-button',
-  });
-  await waitForSentTick(window, message);
-};
+// export const sendMessage = async (window: Page, message: string) => {
+//   // type into message input box
+//   await typeIntoInput(window, 'message-input-text-area', message);
+//   // click up arrow (send)
+//   await clickOnElement({
+//     window,
+//     strategy: 'data-testid',
+//     selector: 'send-message-button',
+//   });
+//   await waitForSentTick(window, message);
+// };
