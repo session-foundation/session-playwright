@@ -6,7 +6,6 @@ import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { DMTimeOption } from './types/testing';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
-
 import {
   sendLinkPreview,
   sendMedia,

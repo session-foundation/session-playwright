@@ -42,6 +42,8 @@ type DisappearOptsGroup = [
 
 export type DisappearOptions = DisappearOpts1o1 | DisappearOptsGroup;
 
+export type DisappearActions = 'read' | 'sent';
+
 export type StrategyExtractionObj =
   | {
       strategy: Extract<Strategy, ':has-text' | 'class'>;
@@ -56,7 +58,7 @@ export type WithPage = { window: Page };
 export type WithMaxWait = { maxWait?: number };
 export type WithRightButton = { rightButton?: boolean };
 
-export type loaderType = 'loading-animation' | 'loading-spinner';
+export type LoaderType = 'loading-animation' | 'loading-spinner';
 export type MediaType = 'image' | 'video' | 'audio' | 'file';
 export type Strategy = 'data-testid' | 'class' | ':has-text';
 

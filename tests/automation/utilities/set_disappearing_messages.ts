@@ -55,10 +55,14 @@ export const setDisappearingMessages = async (
       defaultTime = await waitForElement(
         windowA,
         'data-testid',
-        'input-12-hours',
+        'input-time-option-12-hours',
       );
     } else {
-      defaultTime = await waitForElement(windowA, 'data-testid', 'input-1-day');
+      defaultTime = await waitForElement(
+        windowA,
+        'data-testid',
+        'input-time-option-1-days',
+      );
     }
     const checked = await defaultTime.isChecked();
     if (checked) {
