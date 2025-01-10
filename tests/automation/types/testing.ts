@@ -188,4 +188,6 @@ export type DataTestId =
   | 'copy-button-account-id'
   | 'link-preview-title'
   | 'link-preview-image'
-  | 'audio-player';
+  | 'audio-player'
+  | 'call-notification-answered-a-call'
+  | 'call-notification-started-call';

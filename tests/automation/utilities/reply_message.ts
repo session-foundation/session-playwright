@@ -75,7 +75,7 @@ export const replyToMedia = async ({
   for (let index = 0; index < 5; index++) {
     try {
       await selc.click({ button: 'right' });
-      await sleepFor(100);
+      await sleepFor(200);
       await clickOnMatchingText(
         senderWindow,
         englishStrippedStr('reply').toString(),
