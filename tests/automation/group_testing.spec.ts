@@ -205,6 +205,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'mentions-popup-row',
       charlie.userName,
     );
+    // ALice tags Bob
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'mentions-popup-row',
+      bob.userName,
+    );
+    await waitForMatchingText(bobWindow1, 'You');
 
     // in windowB we should be able to mentions alice and charlie
     await clickOnTestIdWithText(
@@ -225,6 +232,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'mentions-popup-row',
       charlie.userName,
     );
+    // Bob tags Charlie
+    await clickOnTestIdWithText(
+      bobWindow1,
+      'mentions-popup-row',
+      charlie.userName,
+    );
+    await waitForMatchingText(charlieWindow1, 'You');
 
     // in charlieWindow1 we should be able to mentions alice and userB
     await clickOnTestIdWithText(
@@ -245,12 +259,41 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'mentions-popup-row',
       bob.userName,
     );
+    // Charlie tags Alice
+    await clickOnTestIdWithText(
+      charlieWindow1,
+      'mentions-popup-row',
+      alice.userName,
+    );
+    await waitForMatchingText(aliceWindow1, 'You');
   },
 );
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Leave group',
-  async ({ charlieWindow1, groupCreated }) => {
+  async ({
+    aliceWindow1,
+    bobWindow1,
+    charlie,
+    charlieWindow1,
+    groupCreated,
+  }) => {
     await leaveGroup(charlieWindow1, groupCreated);
+    await Promise.all([
+      waitForTestIdWithText(
+        aliceWindow1,
+        'group-update-message',
+        englishStrippedStr('groupMemberLeft')
+          .withArgs({ name: charlie.userName })
+          .toString(),
+      ),
+      waitForTestIdWithText(
+        bobWindow1,
+        'group-update-message',
+        englishStrippedStr('groupMemberLeft')
+          .withArgs({ name: charlie.userName })
+          .toString(),
+      ),
+    ]);
   },
 );

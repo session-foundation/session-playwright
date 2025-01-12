@@ -82,7 +82,7 @@ function getExpectedStringFromKey(
     case 'legacyGroupMemberNew':
       return '{name} joined the group.';
     case 'groupNameNew':
-      return 'Group name is now {group_name}. ';
+      return 'Group name is now {group_name}.';
     case 'groupNameEnterPlease':
       return 'Please enter a group name.';
     case 'cancel':
