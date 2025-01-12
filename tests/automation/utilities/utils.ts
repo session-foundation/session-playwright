@@ -10,8 +10,10 @@ import {
   WithMaxWait,
   WithPage,
   WithRightButton,
-  loaderType,
+  LoaderType,
+  DMTimeOption,
 } from '../types/testing';
+// eslint-disable-next-line import/no-cycle
 import { sendMessage } from './message';
 
 // WAIT FOR FUNCTIONS
@@ -90,16 +92,6 @@ export async function waitForTextMessage(
   return el;
 }
 
-export async function waitForTextMessages(
-  window: Page,
-  texts: Array<string>,
-  maxWait?: number,
-) {
-  return Promise.all(
-    texts.map(async (t) => waitForTextMessage(window, t, maxWait)),
-  );
-}
-
 export async function waitForControlMessageWithText(
   window: Page,
   text: string,
@@ -161,7 +153,7 @@ export async function waitForMatchingPlaceholder(
 }
 export async function waitForLoadingAnimationToFinish(
   window: Page,
-  loader: loaderType,
+  loader: LoaderType,
   maxWait?: number,
 ) {
   let loadingAnimation: ElementHandle<SVGElement | HTMLElement> | undefined;
@@ -183,6 +175,35 @@ export async function waitForLoadingAnimationToFinish(
     }
   } while (loadingAnimation);
   console.info('Loading animation has finished');
+}
+
+export async function doWhileWithMax(
+  maxWaitMs: number,
+  waitBetweenMs: number,
+  label: string,
+  actionTodo: () => Promise<boolean>,
+) {
+  const start = Date.now();
+  let iteration = 0;
+  let wasSuccess = false;
+  do {
+    try {
+      wasSuccess = await actionTodo();
+    } catch (e) {
+      console.error(
+        `doWhileWithMax with label:"${label}" iteration:${iteration} failed with: ${e.message}`,
+        e,
+      );
+    }
+    iteration++;
+    await sleepFor(waitBetweenMs);
+  } while (!wasSuccess && Date.now() - start < maxWaitMs);
+
+  if (!wasSuccess) {
+    throw new Error(
+      `doWhileWithMax with label:"${label}" still failing after ${maxWaitMs}ms`,
+    );
+  }
 }
 
 export async function checkPathLight(window: Page, maxWait?: number) {
@@ -463,31 +484,36 @@ export async function measureSendingTime(window: Page, messageNumber: number) {
   return timeMs;
 }
 
-export async function doWhileWithMax(
-  maxWaitMs: number,
-  waitBetweenMs: number,
-  label: string,
-  actionTodo: () => Promise<boolean>,
+export async function checkModalStrings(
+  window: Page,
+  expectedHeading: string,
+  expectedDescription: string,
 ) {
-  const start = Date.now();
-  let iteration = 0;
-  let wasSuccess = false;
-  do {
-    try {
-      wasSuccess = await actionTodo();
-    } catch (e) {
-      console.error(
-        `doWhileWithMax with label:"${label}" iteration:${iteration} failed with: ${e.message}`,
-        e,
-      );
-    }
-    iteration++;
-    await sleepFor(waitBetweenMs);
-  } while (!wasSuccess && Date.now() - start < maxWaitMs);
+  const heading = await waitForElement(window, 'data-testid', 'modal-heading');
+  const description = await waitForElement(
+    window,
+    'data-testid',
+    'modal-description',
+  );
 
-  if (!wasSuccess) {
+  const headingText = await heading.innerText();
+  const descriptionText = await description.innerText();
+
+  if (headingText !== expectedHeading) {
     throw new Error(
-      `doWhileWithMax with label:"${label}" still failing after ${maxWaitMs}ms`,
+      `Expected heading: ${expectedHeading}, got: ${headingText}`,
     );
   }
+
+  if (descriptionText !== expectedDescription) {
+    throw new Error(
+      `Expected description: ${expectedDescription}, got: ${descriptionText}`,
+    );
+  }
+}
+
+export async function formatTimeOption(option: DMTimeOption) {
+  const timePart = option.replace('time-option-', '');
+  const formattedTime = timePart.replace(/-/g, ' ');
+  return formattedTime;
 }

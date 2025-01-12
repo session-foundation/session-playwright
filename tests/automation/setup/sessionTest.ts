@@ -1,7 +1,5 @@
 /* eslint-disable no-empty-pattern */
 /* eslint-disable @typescript-eslint/array-type */
-import chalk from 'chalk';
-
 import { Page, TestInfo, test } from '@playwright/test';
 import { Group, User } from '../types/testing';
 import { linkedDevice } from '../utilities/linked_device';
@@ -150,9 +148,8 @@ function sessionTestGeneric<
         for (let index = 0; index < links.length; index++) {
           const link = links[index];
           console.info(
-            `linking a window with "${chalk.green(
-              users[link - 1].recoveryPassword,
-            )}"`,
+            'linking a window with ',
+            users[link - 1].recoveryPassword,
           );
           const linked = await linkedDevice(users[link - 1].recoveryPassword);
           linkedWindows.push(linked);

@@ -1,5 +1,3 @@
-import { Page } from '@playwright/test';
-
 export const sleepFor = async (ms: number, showLog = false) => {
   if (showLog) {
     // eslint-disable-next-line no-console
@@ -9,14 +7,3 @@ export const sleepFor = async (ms: number, showLog = false) => {
     setTimeout(resolve, ms);
   });
 };
-
-export async function doForAll<T>(
-  fn: (window: Page) => Promise<T>,
-  windows: Array<Page>,
-) {
-  return Promise.all(
-    windows.map(async (w) => {
-      return fn(w);
-    }),
-  );
-}
