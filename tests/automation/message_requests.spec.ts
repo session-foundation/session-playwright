@@ -7,6 +7,7 @@ import {
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
 import {
+  checkModalStrings,
   clickOnMatchingText,
   clickOnTestIdWithText,
   waitForMatchingText,
@@ -170,6 +171,13 @@ test_Alice_2W_Bob_1W(
       'decline-and-block-message-request',
     );
     // Check modal strings
+    await checkModalStrings(
+      aliceWindow1,
+      englishStrippedStr('block').toString(),
+      englishStrippedStr('blockDescription')
+        .withArgs({ name: bob.userName })
+        .toString(),
+    );
     // Confirm block
     await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
     // Need to wait for the blocked status to sync
@@ -181,10 +189,8 @@ test_Alice_2W_Bob_1W(
       'conversations-settings-menu-item',
     );
     await clickOnTestIdWithText(aliceWindow1, 'reveal-blocked-user-settings');
-    // await waitForTestIdWithText(aliceWindow1, 'contact', bob.userName);
-    await waitForMatchingText(aliceWindow1, bob.userName);
+    await waitForTestIdWithText(aliceWindow1, 'contact', bob.userName);
     // Check that the blocked contacts is on alicewindow2
-    // Implemented in groups rebuild
     // Check blocked status in blocked contacts list
     await sleepFor(5000);
     await clickOnTestIdWithText(aliceWindow2, 'settings-section');
@@ -193,8 +199,7 @@ test_Alice_2W_Bob_1W(
       'conversations-settings-menu-item',
     );
     await clickOnTestIdWithText(aliceWindow2, 'reveal-blocked-user-settings');
-    // Implemented in groups rebuild
-    // await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
+    await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
     await waitForMatchingText(aliceWindow2, bob.userName);
   },
 );

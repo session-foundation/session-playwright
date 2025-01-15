@@ -1,19 +1,25 @@
 import { Page } from '@playwright/test';
 import { englishStrippedStr } from '../../locale/localizedString';
-import { sleepFor } from '../../promise_utils';
 import { ConversationType, DisappearOptions } from '../types/testing';
 import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
   doWhileWithMax,
+  formatTimeOption,
   waitForElement,
   waitForTestIdWithText,
 } from './utils';
 
 export const setDisappearingMessages = async (
   windowA: Page,
-  [conversationType, timerType, timerDuration]: DisappearOptions,
+  [
+    conversationType,
+    timerType,
+    timerDuration,
+    disappearAction,
+  ]: DisappearOptions,
   windowB?: Page,
 ) => {
   const enforcedType: ConversationType = conversationType;
@@ -52,15 +58,6 @@ export const setDisappearingMessages = async (
     // Check that 1 Day default is automatically selected (default time is only relevant to 1:1's)
     let defaultTime;
     if (timerType === 'disappear-after-read-option') {
-      // making explicit DataTestId here as `waitForElement` currently allows a string
-      // TODO: add explicit typing to waitForElement
-      const dataTestId: DataTestId = 'input-time-option-12-hours';
-      defaultTime = await waitForElement(windowA, 'data-testid', dataTestId);
-    } else {
-      // making explicit DataTestId here as `waitForElement` currently allows a string
-      // TODO: add explicit typing to waitForElement
-      const dataTestId: DataTestId = 'input-time-option-1-days';
-
       defaultTime = await waitForElement(
         windowA,
         'data-testid',
@@ -98,7 +95,27 @@ export const setDisappearingMessages = async (
       windowB,
       englishStrippedStr('disappearingMessagesFollowSetting').toString(),
     );
-    await sleepFor(1000);
+
+    let action;
+    if (disappearAction === 'read') {
+      action = englishStrippedStr('disappearingMessagesTypeRead').toString();
+    } else {
+      action = englishStrippedStr('disappearingMessagesTypeSent').toString();
+    }
+
+    const formattedTime = await formatTimeOption(timerDuration);
+
+    const modalDescription = englishStrippedStr(
+      'disappearingMessagesFollowSettingOn',
+    )
+      .withArgs({ time: formattedTime, disappearing_messages_type: action })
+      .toString();
+
+    await checkModalStrings(
+      windowB,
+      englishStrippedStr('disappearingMessagesFollowSetting').toString(),
+      modalDescription,
+    );
     await clickOnElement({
       window: windowB,
       strategy: 'data-testid',

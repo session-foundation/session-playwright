@@ -3,17 +3,15 @@ import { sleepFor } from '../promise_utils';
 import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { replyTo } from './utilities/reply_message';
+import { sendLinkPreview } from './utilities/send_media';
 import {
-  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
   clickOnTextMessage,
   hasTextMessageBeenDeleted,
   lookForPartialTestId,
   typeIntoInput,
   waitForElement,
-  waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
   waitForTextMessage,
@@ -56,7 +54,14 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Send video to group',
-  async ({ alice, bob, aliceWindow1, bobWindow1, groupCreated }) => {
+  async ({
+    alice,
+    bob,
+    aliceWindow1,
+    bobWindow1,
+    charlieWindow1,
+    groupCreated,
+  }) => {
     const testMessage = `${alice.userName} sending video to ${groupCreated.userName}`;
     const testReply = `${bob.userName} replying to video from ${alice.userName} in ${groupCreated.userName}`;
     await aliceWindow1.setInputFiles(
@@ -71,6 +76,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       selector: 'send-message-button',
     });
     await sleepFor(1000);
+    await waitForTextMessage(charlieWindow1, testMessage);
     await replyTo({
       senderWindow: bobWindow1,
       textMessage: testMessage,
@@ -82,7 +88,14 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Send document to group',
-  async ({ alice, bob, aliceWindow1, bobWindow1, groupCreated }) => {
+  async ({
+    alice,
+    bob,
+    aliceWindow1,
+    bobWindow1,
+    charlieWindow1,
+    groupCreated,
+  }) => {
     const testMessage = `${alice.userName} sending document to ${groupCreated.userName}`;
     const testReply = `${bob.userName} replying to document from ${alice.userName} in ${groupCreated.userName}`;
     await aliceWindow1.setInputFiles(
@@ -96,6 +109,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       selector: 'send-message-button',
     });
     await sleepFor(1000);
+    await waitForTextMessage(charlieWindow1, testMessage);
     await replyTo({
       senderWindow: bobWindow1,
       textMessage: testMessage,
@@ -167,7 +181,14 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Send GIF to group',
-  async ({ alice, bob, aliceWindow1, bobWindow1, groupCreated }) => {
+  async ({
+    alice,
+    bob,
+    aliceWindow1,
+    bobWindow1,
+    charlieWindow1,
+    groupCreated,
+  }) => {
     const testMessage = `${alice.userName} sending GIF to ${groupCreated.userName}`;
 
     const testReply = `${bob.userName} replying to GIF from ${alice.userName} in ${groupCreated.userName}`;
@@ -190,6 +211,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       replyText: testReply,
       receiverWindow: aliceWindow1,
     });
+    await waitForTextMessage(charlieWindow1, testMessage);
   },
 );
 
@@ -235,66 +257,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     charlieWindow1,
     groupCreated,
   }) => {
-    const testMessage = `${alice.userName} sending link to ${groupCreated.userName}`;
     const testReply = `${bob.userName} replying to link from ${alice.userName} in ${groupCreated.userName}`;
     const testLink = 'https://getsession.org/';
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', testLink);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'message-content',
-      testMessage,
-      true,
-    );
-    // Need to copy link to clipboard, as the enable link preview modal
-    // doesn't pop up if manually typing link (needs to be pasted)
-    // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
-    const firstCopyBtn = aliceWindow1
-      .locator(
-        `[data-testid=context-menu-item]:has-text(${englishStrippedStr(
-          'copy',
-        ).toString()})`,
-      )
-      .nth(0);
-    await firstCopyBtn.click();
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      englishStrippedStr('copied').toString(),
-    );
-    await clickOnTestIdWithText(aliceWindow1, 'message-input-text-area');
-    const isMac = process.platform === 'darwin';
-    await aliceWindow1.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
-    await checkModalStrings(
-      aliceWindow1,
-      englishStrippedStr('linkPreviewsEnable').toString(),
-      englishStrippedStr('linkPreviewsFirstDescription')
-        .withArgs({ app_name: 'Session' })
-        .toString(),
-    );
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'session-confirm-ok-button',
-      englishStrippedStr('enable').toString(),
-    );
-    // Needs to be changed to link-preview-loading
-    await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
-    // Also needs to be implemented
-    // await waitForTestIdWithText(aliceWindow1, 'link-preview-image')
-    // await waitForTestIdWithText(
-    //   aliceWindow1,
-    //   'link-preview-title',
-    //   'Session | Send Messages, Not Metadata. | Private Messenger',
-    // );
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
+    await sendLinkPreview(aliceWindow1, testLink);
     await Promise.all([
       waitForElement(
         bobWindow1,
@@ -313,7 +278,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     ]);
     await replyTo({
       senderWindow: bobWindow1,
-      textMessage: testMessage,
+      textMessage: testLink,
       replyText: testReply,
       receiverWindow: aliceWindow1,
     });
@@ -359,15 +324,11 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await sleepFor(1000);
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('deleteMessageDeleted')
-        .withArgs({ count: 1 })
-        .toString(),
+      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
     );
     await waitForMatchingText(
       charlieWindow1,
-      englishStrippedStr('deleteMessageDeleted')
-        .withArgs({ count: 1 })
-        .toString(),
+      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
     );
   },
 );
@@ -401,7 +362,14 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
         .toString(),
     );
     await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage, 5000);
+    await waitForMatchingText(
+      aliceWindow1,
+      englishStrippedStr('deleteMessageDeleted')
+        .withArgs({ count: 1 })
+        .toString(),
+    );
     // Should still be there for user B and C
+    // Currently failing see https://optf.atlassian.net/browse/SES-3167
     await waitForMatchingText(bobWindow1, deletedMessage);
     await waitForMatchingText(charlieWindow1, deletedMessage);
   },

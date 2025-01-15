@@ -1,6 +1,9 @@
 import { Page } from '@playwright/test';
 import { testCommunityLink } from '../constants/community';
-import { clickOnTestIdWithText } from './utils';
+import {
+  clickOnTestIdWithText,
+  waitForLoadingAnimationToFinish,
+} from './utils';
 
 export const joinCommunity = async (window: Page) => {
   await clickOnTestIdWithText(window, 'new-conversation-button');
@@ -11,5 +14,6 @@ export const joinCommunity = async (window: Page) => {
   await window.click(communityInput);
   await window.fill(communityInput, testCommunityLink);
   await window.press(communityInput, 'Enter');
+  await waitForLoadingAnimationToFinish(window, 'loading-spinner');
   // await clickOnTestIdWithText(window, 'join-community-button');
 };

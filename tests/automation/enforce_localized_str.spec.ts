@@ -41,7 +41,11 @@ function extractAllTokens(text: string) {
   >;
 }
 
-const pluralTokens = ['deleteMessageDeleted'] as const;
+const pluralTokens = [
+  'deleteMessageDeleted',
+  'deleteMessage',
+  'deleteMessageConfirm',
+] as const;
 type PluralToken = (typeof pluralTokens)[number];
 type NonPluralTokens = Exclude<TokenString<LocalizerDictionary>, PluralToken>;
 
@@ -65,6 +69,12 @@ function getExpectedStringFromKey(
     // plurals are centralized here
     case 'deleteMessageDeleted':
       return args.count === 1 ? 'Message deleted' : 'Messages deleted';
+    case 'deleteMessage':
+      return args.count === 1 ? 'Delete Message' : 'Delete Messages';
+    case 'deleteMessageConfirm':
+      return args.count === 1
+        ? 'Are you sure you want to delete this message?'
+        : 'Are you sure you want to delete these messages?';
     case 'accept':
       return 'Accept';
     case 'sessionClearData':
@@ -149,6 +159,14 @@ function getExpectedStringFromKey(
       return 'Leave';
     case 'disappearingMessagesFollowSetting':
       return 'Follow Setting';
+    case 'groupMemberNew':
+      return '{name} was invited to join the group.';
+    case 'deleteMessageDeletedGlobally':
+      return 'This message was deleted';
+    case 'groupMemberNewTwo':
+      return '{name} and {other_name} were invited to join the group.';
+    case 'groupInviteYouAndOtherNew':
+      return 'You and {other_name} were invited to join the group.';
     case 'disappearingMessagesSet':
       return '{name} has set messages to disappear {time} after they have been {disappearing_messages_type}.';
     case 'membersInvite':
@@ -157,6 +175,8 @@ function getExpectedStringFromKey(
       return 'Call in progress';
     case 'callsYouCalled':
       return 'You called {name}';
+    case 'callsCalledYou':
+      return '{name} called you';
     case 'disappearingMessagesTurnedOffYou':
       return 'You turned off disappearing messages. Messages you send will no longer disappear.';
     case 'disappearingMessagesTurnedOff':
@@ -189,6 +209,24 @@ function getExpectedStringFromKey(
       return 'Voice and Video Calls (Beta)';
     case 'callsVoiceAndVideoModalDescription':
       return 'Your IP is visible to your call partner and an Oxen Foundation server while using beta calls.';
+    case 'blockDescription':
+      return 'Are you sure you want to block {name}? Blocked users cannot send you message requests, group invites or call you.';
+    case 'conversationsDeleteDescription':
+      return 'Are you sure you want to delete your conversation with {name}? New messages from {name} will start a new conversation.';
+    case 'noteToSelfHide':
+      return 'Hide Note to Self';
+    case 'noteToSelfHideDescription':
+      return 'Are you sure you want to hide Note to Self?';
+    case 'hide':
+      return 'Hide';
+    case 'accountIdCopied':
+      return 'Account ID Copied';
+    case 'shareAccountIdDescriptionCopied':
+      return 'Share with your friends wherever you usually speak with them — then move the conversation here.';
+    case 'disappearingMessagesTypeRead':
+      return 'read';
+    case 'disappearingMessagesTypeSent':
+      return 'sent';
     default:
       // returning nul means we don't have an expected string yet for this key.
       // This will make the test fail

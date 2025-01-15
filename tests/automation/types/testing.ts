@@ -29,18 +29,21 @@ export type DMTimeOption =
   | 'time-option-1-days'
   | 'time-option-7-days'
   | 'time-option-14-days'
+  | 'input-10-seconds'
   | 'disappear-off-option';
 
 type DisappearOpts1o1 = [
   '1:1',
   'disappear-after-read-option' | 'disappear-after-send-option',
   DMTimeOption,
+  DisappearActions,
 ];
 
 type DisappearOptsGroup = [
   'group' | 'note-to-self',
   'disappear-after-send-option',
   DMTimeOption,
+  DisappearActions,
 ];
 
 export type DisappearOptions = DisappearOpts1o1 | DisappearOptsGroup;
@@ -129,7 +132,7 @@ export type DataTestId =
   | 'messages-container'
   | 'chooser-new-group'
   | 'new-closed-group-name'
-  | 'next-button'
+  | 'create-group-button'
   | 'link-device'
   | 'group-name-input'
   | 'right-panel-group-name'
@@ -170,4 +173,11 @@ export type DataTestId =
   | 'contact'
   | 'modal-heading'
   | 'call-notification-answered-a-call'
-  | 'call-notification-started-call';
+  | 'call-notification-started-call'
+  | 'audio-player'
+  | 'chooser-invite-friend'
+  | 'your-account-id'
+  | 'copy-button-account-id'
+  | 'link-preview-image'
+  | 'link-preview-title'
+  | 'error-message';

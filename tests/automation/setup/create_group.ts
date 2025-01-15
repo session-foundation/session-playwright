@@ -1,5 +1,4 @@
 import { Page } from '@playwright/test';
-import { englishStrippedStr } from '../../locale/localizedString';
 import { Group, User } from '../types/testing';
 import { sendMessage } from '../utilities/message';
 import { sendNewMessage } from '../utilities/send_message';
@@ -8,7 +7,7 @@ import {
   clickOnTestIdWithText,
   typeIntoInput,
   waitForTestIdWithText,
-  waitForTextMessage,
+  waitForTextMessages,
 } from '../utilities/utils';
 import { englishStrippedStr } from '../../locale/localizedString';
 import { sortByPubkey } from '../../pubkey';
@@ -23,10 +22,6 @@ export const createGroup = async (
   windowC: Page,
 ): Promise<Group> => {
   const group: Group = { userName, userOne, userTwo, userThree };
-  const emptyStateGroupText = englishStrippedStr('groupNoMessages')
-    .withArgs({ group_name: group.userName })
-    .toString();
-
   const messageAB = `${userOne.userName} to ${userTwo.userName}`;
   const messageBA = `${userTwo.userName} to ${userOne.userName}`;
   const messageCA = `${userThree.userName} to ${userOne.userName}`;
@@ -61,7 +56,6 @@ export const createGroup = async (
   // Create group with existing contact and session ID (of non-contact)
   // Click new closed group tab
   await clickOnTestIdWithText(windowA, 'new-conversation-button');
-  await waitForTestIdWithText(windowA, 'chooser-new-group');
   await clickOnTestIdWithText(windowA, 'chooser-new-group');
   // Enter group name
   await typeIntoInput(windowA, 'new-closed-group-name', group.userName);
@@ -70,7 +64,7 @@ export const createGroup = async (
   // Select user C
   await clickOnMatchingText(windowA, userThree.userName);
   // Click Next
-  await clickOnTestIdWithText(windowA, 'next-button');
+  await clickOnTestIdWithText(windowA, 'create-group-button');
   // Check group was successfully created
   await clickOnMatchingText(windowB, group.userName);
   await waitForTestIdWithText(
@@ -79,8 +73,9 @@ export const createGroup = async (
     group.userName,
   );
   // Need to sort users by pubkey
-  const [firstUser, secondUser] = await sortByPubkey(userTwo, userThree);
+  const [firstUser, secondUser] = sortByPubkey(userTwo, userThree);
   // Make sure the empty state is in windowA
+  // Updated in group v2
   await waitForTestIdWithText(
     windowA,
     'group-update-message',
@@ -139,16 +134,13 @@ export const createGroup = async (
   // Verify that each messages was received by the other two accounts
 
   // windowA should see the message from B and the message from C
-  await waitForTextMessage(windowA, msgBToGroup);
-  await waitForTextMessage(windowA, msgCToGroup);
+  await waitForTextMessages(windowA, [msgBToGroup, msgCToGroup]);
 
   // windowB should see the message from A and the message from C
-  await waitForTextMessage(windowB, msgAToGroup);
-  await waitForTextMessage(windowB, msgCToGroup);
+  await waitForTextMessages(windowB, [msgAToGroup, msgCToGroup]);
 
   // windowC must see the message from A and the message from B
-  await waitForTextMessage(windowC, msgAToGroup);
-  await waitForTextMessage(windowC, msgBToGroup);
+  await waitForTextMessages(windowC, [msgAToGroup, msgBToGroup]);
 
   // Focus screen
   // await clickOnTestIdWithText(windowB, 'scroll-to-bottom-button');
