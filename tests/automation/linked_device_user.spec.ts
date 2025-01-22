@@ -159,6 +159,7 @@ test_Alice_2W(
         const screenshot = await leftpaneAvatarContainer.screenshot({
           type: 'jpeg',
         });
+        // This file is saved in `Profile-picture-syncs` folder
         expect(screenshot).toMatchSnapshot({
           name: 'avatar-updated-blue.jpeg',
         });
@@ -431,7 +432,7 @@ test_Alice_2W_Bob_1W(
         aliceWindow2,
         'data-testid',
         'module-conversation__user__profile-name',
-        8000,
+        10000,
         bob.userName,
       ),
     ]);

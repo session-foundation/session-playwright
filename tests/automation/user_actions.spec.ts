@@ -179,7 +179,12 @@ test_Alice_1W_no_network(
     await clickOnTestIdWithText(aliceWindow1, 'image-upload-click');
     await clickOnTestIdWithText(aliceWindow1, 'save-button-profile-update');
     await waitForTestIdWithText(aliceWindow1, 'loading-spinner');
-
+    // if we were asked to update the snapshots, make sure we wait for the change to be received before taking a screenshot.
+    if (testInfo.config.updateSnapshots === 'all') {
+      await sleepFor(15000);
+    } else {
+      await sleepFor(2000);
+    }
     await sleepFor(500);
     const leftpaneAvatarContainer = await waitForTestIdWithText(
       aliceWindow1,
@@ -191,22 +196,16 @@ test_Alice_1W_no_network(
     let lastError: Error | undefined;
     do {
       try {
-        // if we were asked to update the snapshots, make sure we wait for the change to be received before taking a screenshot.
-        if (testInfo.config.updateSnapshots === 'all') {
-          await sleepFor(15000);
-        } else {
-          await sleepFor(500);
-        }
-
         const screenshot = await leftpaneAvatarContainer.screenshot({
           type: 'jpeg',
         });
+        // this file is saved in `Change -avatar` folder
         expect(screenshot).toMatchSnapshot({
           name: 'avatar-updated-blue.jpeg',
         });
         correctScreenshot = true;
         console.info(
-          `screenshot matching of "Check profile picture syncs" passed after "${tryNumber}" retries!`,
+          `screenshot matching of "Check profile picture" passed after "${tryNumber}" retries!`,
         );
       } catch (e) {
         lastError = e;
@@ -216,7 +215,7 @@ test_Alice_1W_no_network(
 
     if (!correctScreenshot) {
       console.info(
-        `screenshot matching of "Check profile picture syncs" try "${tryNumber}" failed with: ${lastError?.message}`,
+        `screenshot matching of "Check profile picture" try "${tryNumber}" failed with: ${lastError?.message}`,
       );
       throw new Error('waiting 20s and still the screenshot is not right');
     }
