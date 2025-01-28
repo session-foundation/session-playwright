@@ -111,7 +111,7 @@ test_Alice_1W_Bob_1W(
     // make sure the confirm dialogs shows up
     await clickOnTestIdWithText(
       aliceWindow1,
-      'block-unblock-modal-description',
+      'modal-description',
       englishStrippedStr('blockUnblockName')
         .withArgs({ name: 'Bob' })
         .toString(),

@@ -153,6 +153,6 @@ export type DataTestId =
   | 'continue-button'
   | 'existing-account-button'
   | 'context-menu-item'
-  | 'block-unblock-modal-description'
+  | 'modal-description'
   | DMTimeOption
   | `input-${DMTimeOption}`;
