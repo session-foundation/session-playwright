@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+import { englishStrippedStr } from '../../locale/localizedString';
 import { Group, User } from '../types/testing';
 import { sendMessage } from '../utilities/message';
 import { sendNewMessage } from '../utilities/send_message';

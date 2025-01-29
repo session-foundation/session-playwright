@@ -7,7 +7,11 @@ module.exports = {
     },
   },
 
+<<<<<<< HEAD
+  extends: ['airbnb', 'airbnb-typescript/base', 'prettier', 'plugin:@typescript-eslint/recommended'],
+=======
   extends: ['airbnb-base', 'airbnb-typescript/base', 'prettier', 'plugin:@typescript-eslint/recommended'],
+>>>>>>> upstream/main
 
   plugins: ['mocha', 'more', '@typescript-eslint'],
   parser: '@typescript-eslint/parser',

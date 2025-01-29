@@ -6,6 +6,11 @@ test-results/
 /*.js
 *.js
 *.js.map
+<<<<<<< HEAD
+/*.js.map
+**/*.js.map
+=======
+>>>>>>> upstream/main
 .vscode/settings.json
 tests/automation/todo
 allure-report
