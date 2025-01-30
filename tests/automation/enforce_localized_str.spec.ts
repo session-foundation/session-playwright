@@ -152,6 +152,46 @@ function getExpectedStringFromKey(
       return '{name} and {other_name} were invited to join the group.';
     case 'groupInviteYouAndOtherNew':
       return 'You and {other_name} were invited to join the group.';
+    case 'disappearingMessagesSet':
+      return '{name} has set messages to disappear {time} after they have been {disappearing_messages_type}.';
+    case 'membersInvite':
+      return 'Invite Contacts';
+    case 'callsInProgress':
+      return 'Call in progress';
+    case 'callsYouCalled':
+      return 'You called {name}';
+    case 'disappearingMessagesTurnedOffYou':
+      return 'You turned off disappearing messages. Messages you send will no longer disappear.';
+    case 'disappearingMessagesTurnedOff':
+      return '{name} has turned disappearing messages off. Messages they send will no longer disappear.';
+    case 'displayNameErrorDescription':
+      return 'Please enter a display name';
+    case 'conversationsDelete':
+      return 'Delete Conversation';
+    case 'recoveryPasswordHidePermanently':
+      return 'Hide Recovery Password Permanently';
+    case 'theContinue':
+      return 'Continue';
+    case 'yes':
+      return 'Yes';
+    case 'copied':
+      return 'Copied';
+    case 'linkPreviewsEnable':
+      return 'Enable Link Previews';
+    case 'linkPreviewsFirstDescription':
+      return "Display previews for URLs you send and receive. This can be useful, however Session must contact linked websites to generate previews. You can always turn off link previews in Session's settings.";
+    case 'enable':
+      return 'Enable';
+    case 'attachmentsAutoDownloadModalTitle':
+      return 'Auto Download';
+    case 'attachmentsAutoDownloadModalDescription':
+      return 'Would you like to automatically download all files from {conversation_name}?';
+    case 'download':
+      return 'Download';
+    case 'callsVoiceAndVideoBeta':
+      return 'Voice and Video Calls (Beta)';
+    case 'callsVoiceAndVideoModalDescription':
+      return 'Your IP is visible to your call partner and an Oxen Foundation server while using beta calls.';
     default:
       // returning nul means we don't have an expected string yet for this key.
       // This will make the test fail
