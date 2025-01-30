@@ -1,8 +1,13 @@
 import { test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
-import { LocalizerDictionary } from '../locale/localizerType';
-import { TokenString, englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../locale/localizedString';
+import {
+  isPluralToken,
+  type MergedLocalizerTokens,
+  type PluralLocalizerTokens,
+  type SimpleLocalizerTokens,
+} from '../localization/localeTools';
 
 function readTsFiles(dir: string): Record<string, string> {
   const tsFilesContent: Record<string, string> = {};
@@ -36,23 +41,13 @@ function extractAllTokens(text: string) {
 
   const matches = [...text.matchAll(pattern)];
 
-  return matches.map((match) => match?.[1]) as Array<
-    TokenString<LocalizerDictionary>
-  >;
-}
-
-const pluralTokens = ['deleteMessageDeleted'] as const;
-type PluralToken = (typeof pluralTokens)[number];
-type NonPluralTokens = Exclude<TokenString<LocalizerDictionary>, PluralToken>;
-
-function isPluralToken(
-  token: TokenString<LocalizerDictionary>,
-): token is PluralToken {
-  return pluralTokens.includes(token as any);
+  return matches.map((match) => match?.[1]) as Array<MergedLocalizerTokens>;
 }
 
 function getExpectedStringFromKey(
-  args: { key: NonPluralTokens } | { key: PluralToken; count: number },
+  args:
+    | { key: SimpleLocalizerTokens }
+    | { key: PluralLocalizerTokens; count: number },
 ) {
   if (isPluralToken(args.key)) {
     if (!('count' in args)) {
@@ -208,14 +203,14 @@ test('Enforce localized strings return expected values', async () => {
   // Example usage
   const tsFiles = readTsFiles('.');
 
-  const tokensToValidateSet: Set<TokenString<LocalizerDictionary>> = new Set();
+  const tokensToValidateSet: Set<MergedLocalizerTokens> = new Set();
   Object.entries(tsFiles).forEach(([_, content]) => {
     const tokens = extractAllTokens(content);
 
     tokens.forEach((t) => tokensToValidateSet.add(t));
   });
 
-  const unknownKeys: Array<TokenString<LocalizerDictionary>> = [];
+  const unknownKeys: Array<MergedLocalizerTokens> = [];
 
   let atLeastOneFailed = false;
 

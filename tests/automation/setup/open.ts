@@ -85,7 +85,7 @@ const openElectronAppOnly = async (multi: string) => {
   }
 };
 
-const logBrowserConsole = true;
+const logBrowserConsole = false;
 
 const openAppAndWait = async (multi: string) => {
   const electronApp = await openElectronAppOnly(multi);
