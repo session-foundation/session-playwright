@@ -1,5 +1,7 @@
 /* eslint-disable no-empty-pattern */
 /* eslint-disable @typescript-eslint/array-type */
+import chalk from 'chalk';
+
 import { Page, TestInfo, test } from '@playwright/test';
 import { Group, User } from '../types/testing';
 import { linkedDevice } from '../utilities/linked_device';

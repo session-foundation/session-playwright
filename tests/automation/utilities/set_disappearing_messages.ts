@@ -1,6 +1,12 @@
 import { Page } from '@playwright/test';
+import {
+  ConversationType,
+  DataTestId,
+  DisappearOptions,
+} from '../types/testing';
 import { englishStrippedStr } from '../../locale/localizedString';
 import { ConversationType, DisappearOptions } from '../types/testing';
+import { sleepFor } from '../../promise_utils';
 import {
   checkModalStrings,
   clickOnElement,
@@ -58,16 +64,20 @@ export const setDisappearingMessages = async (
     // Check that 1 Day default is automatically selected (default time is only relevant to 1:1's)
     let defaultTime;
     if (timerType === 'disappear-after-read-option') {
-      defaultTime = await waitForElement(
-        windowA,
-        'data-testid',
-        'input-time-option-12-hours',
-      );
+      // making explicit DataTestId here as `waitForElement` currently allows a string
+      // TODO: add explicit typing to waitForElement
+      const dataTestId: DataTestId = 'input-time-option-12-hours';
+      defaultTime = await waitForElement(windowA, 'data-testid', dataTestId);
     } else {
+      // making explicit DataTestId here as `waitForElement` currently allows a string
+      // TODO: add explicit typing to waitForElement
+      const dataTestId: DataTestId = 'input-time-option-1-days';
+
       defaultTime = await waitForElement(
         windowA,
         'data-testid',
-        'input-time-option-1-days',
+        dataTestId,
+        1000,
       );
     }
     const checked = await defaultTime.isChecked();
