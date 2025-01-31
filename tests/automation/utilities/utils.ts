@@ -32,7 +32,7 @@ export async function waitForTestIdWithText(
     const escapedText = text.replace(/"/g, '\\\"');
 
     builtSelector += `:has-text("${escapedText}")`;
-    console.info('builtSelector:', builtSelector);
+    // console.info('builtSelector:', builtSelector);
     // console.info('Text is tiny bubble: ', escapedText);
   }
   // console.info('looking for selector', builtSelector);
@@ -499,6 +499,9 @@ export async function checkModalStrings(
   expectedHeading: string,
   expectedDescription: string,
 ) {
+  function removeNewLines(input: string): string {
+    return input.replace(/\s+/g, ' ').trim();
+  }
   const heading = await waitForElement(window, 'data-testid', 'modal-heading');
   const description = await waitForElement(
     window,
@@ -508,6 +511,7 @@ export async function checkModalStrings(
 
   const headingText = await heading.innerText();
   const descriptionText = await description.innerText();
+  const formattedDescription = removeNewLines(descriptionText);
 
   if (headingText !== expectedHeading) {
     throw new Error(
@@ -515,9 +519,9 @@ export async function checkModalStrings(
     );
   }
 
-  if (descriptionText !== expectedDescription) {
+  if (formattedDescription !== expectedDescription) {
     throw new Error(
-      `Expected description: ${expectedDescription}, got: ${descriptionText}`,
+      `Expected description: ${expectedDescription}, got: ${formattedDescription}`,
     );
   }
 }

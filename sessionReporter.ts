@@ -75,8 +75,11 @@ function printFailedTestLogs() {
 
 class SessionReporter implements Reporter {
   private startTime = 0;
+
   private allTestsCount = 0;
+
   private allResults: Array<TestAndResult> = [];
+
   private countWorkers = 1;
 
   onBegin(config: FullConfig, suite: Suite) {

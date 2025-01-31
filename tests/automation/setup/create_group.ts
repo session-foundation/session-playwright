@@ -22,7 +22,6 @@ export const createGroup = async (
   windowC: Page,
 ): Promise<Group> => {
   const group: Group = { userName, userOne, userTwo, userThree };
-
   const messageAB = `${userOne.userName} to ${userTwo.userName}`;
   const messageBA = `${userTwo.userName} to ${userOne.userName}`;
   const messageCA = `${userThree.userName} to ${userOne.userName}`;
@@ -57,7 +56,6 @@ export const createGroup = async (
   // Create group with existing contact and session ID (of non-contact)
   // Click new closed group tab
   await clickOnTestIdWithText(windowA, 'new-conversation-button');
-  await waitForTestIdWithText(windowA, 'chooser-new-group');
   await clickOnTestIdWithText(windowA, 'chooser-new-group');
   // Enter group name
   await typeIntoInput(windowA, 'new-closed-group-name', group.userName);
@@ -75,7 +73,7 @@ export const createGroup = async (
     group.userName,
   );
   // Need to sort users by pubkey
-  const [firstUser, secondUser] = await sortByPubkey(userTwo, userThree);
+  const [firstUser, secondUser] = sortByPubkey(userTwo, userThree);
   // Make sure the empty state is in windowA
   // Updated in group v2
   await waitForTestIdWithText(

@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 import { englishStrippedStr } from '../../locale/localizedString';
 import { sleepFor } from '../../promise_utils';
 import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
@@ -10,6 +11,7 @@ import {
   waitForTestIdWithText,
 } from './utils';
 import { MediaType } from '../types/testing';
+import { waitForSentTick } from './message';
 
 export const sendMedia = async (
   window: Page,
@@ -24,8 +26,7 @@ export const sendMedia = async (
     strategy: 'data-testid',
     selector: 'send-message-button',
   });
-  //   Implementing in groups rebuild
-  // await waitForSentTick(window, testMessage);
+  await waitForSentTick(window, testMessage);
 };
 
 export const sendVoiceMessage = async (window: Page) => {
@@ -74,35 +75,37 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
   await clickOnTestIdWithText(window, 'message-input-text-area');
   const isMac = process.platform === 'darwin';
   await window.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
-  //   Implementing in groups rebuild
-  // await checkModalStrings(
-  //   window,
-  //   englishStrippedStr('linkPreviewsEnable').toString(),
-  //   englishStrippedStr('linkPreviewsFirstDescription').toString(),
-  // );
+  await checkModalStrings(
+    window,
+    englishStrippedStr('linkPreviewsEnable').toString(),
+    englishStrippedStr('linkPreviewsFirstDescription').toString(),
+  );
   await clickOnTestIdWithText(
     window,
     'session-confirm-ok-button',
     englishStrippedStr('enable').toString(),
   );
   await waitForLoadingAnimationToFinish(window, 'loading-spinner');
-  // Also needs to be implemented in groups
-  // await waitForTestIdWithText(window, 'link-preview-image');
-  // await waitForTestIdWithText(
-  //   window,
-  //   'link-preview-title',
-  //   'Session | Send Messages, Not Metadata. | Private Messenger',
-  // );
+  await waitForTestIdWithText(window, 'link-preview-image');
+  await waitForTestIdWithText(
+    window,
+    'link-preview-title',
+    'Session | Send Messages, Not Metadata. | Private Messenger',
+  );
   await clickOnElement({
     window,
     strategy: 'data-testid',
     selector: 'send-message-button',
   });
-  //   Implementing in groups rebuild
-  // await waitForSentTick(window, testLink);
+
+  await waitForSentTick(window, testLink);
 };
 
-export const trustUser = async (window: Page, mediaType: MediaType) => {
+export const trustUser = async (
+  window: Page,
+  mediaType: MediaType,
+  userName: string,
+) => {
   await clickOnMatchingText(
     window,
     englishStrippedStr('attachmentsClickToDownload')
@@ -111,16 +114,15 @@ export const trustUser = async (window: Page, mediaType: MediaType) => {
       })
       .toString(),
   );
-  //   Implementing in groups rebuild
-  // await checkModalStrings(
-  //   window,
-  //   englishStrippedStr('attachmentsAutoDownloadModalTitle').toString(),
-  //   englishStrippedStr('attachmentsAutoDownloadModalDescription')
-  //     .withArgs({
-  //       conversation_name: userName,
-  //     })
-  //     .toString(),
-  // );
+  await checkModalStrings(
+    window,
+    englishStrippedStr('attachmentsAutoDownloadModalTitle').toString(),
+    englishStrippedStr('attachmentsAutoDownloadModalDescription')
+      .withArgs({
+        conversation_name: userName,
+      })
+      .toString(),
+  );
   await clickOnTestIdWithText(
     window,
     'session-confirm-ok-button',
