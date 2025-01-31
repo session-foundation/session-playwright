@@ -5,8 +5,6 @@ import {
   DisappearOptions,
 } from '../types/testing';
 import { englishStrippedStr } from '../../locale/localizedString';
-import { ConversationType, DisappearOptions } from '../types/testing';
-import { sleepFor } from '../../promise_utils';
 import {
   checkModalStrings,
   clickOnElement,

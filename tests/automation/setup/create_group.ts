@@ -10,7 +10,6 @@ import {
   waitForTestIdWithText,
   waitForTextMessages,
 } from '../utilities/utils';
-import { englishStrippedStr } from '../../locale/localizedString';
 import { sortByPubkey } from '../../pubkey';
 
 export const createGroup = async (
