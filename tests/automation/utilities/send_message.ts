@@ -15,4 +15,3 @@ export const sendNewMessage = async (
   await clickOnTestIdWithText(window, 'next-new-conversation-button');
   await sendMessage(window, message);
 };
-
