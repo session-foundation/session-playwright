@@ -1,8 +1,12 @@
 import { sleepFor } from '../promise_utils';
-import { mediaArray } from './constants/variables';
+import { longText, mediaArray } from './constants/variables';
 import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
 import { DMTimeOption } from './types/testing';
-import { sendMedia, sendVoiceMessage } from './utilities/send_media';
+import {
+  sendLinkPreview,
+  sendMedia,
+  sendVoiceMessage,
+} from './utilities/send_media';
 import { setDisappearingMessages } from './utilities/set_disappearing_messages';
 import {
   hasElementBeenDeleted,
@@ -11,6 +15,7 @@ import {
   waitForLoadingAnimationToFinish,
   waitForTextMessage,
 } from './utilities/utils';
+import { sendMessage } from './utilities/message';
 
 // Disappearing time settings for all tests
 const timeOption: DMTimeOption = 'time-option-30-seconds';
@@ -77,3 +82,70 @@ mediaArray.forEach(({ mediaType, path }) => {
     },
   );
 });
+
+test_group_Alice_1W_Bob_1W_Charlie_1W(
+  'Send disappearing long text to groups',
+  async ({ aliceWindow1, bobWindow1, charlieWindow1 }) => {
+    await setDisappearingMessages(aliceWindow1, [
+      'group',
+      disappearingMessageType,
+      timeOption,
+    ]);
+    await sendMessage(aliceWindow1, longText);
+    await Promise.all([
+      waitForTextMessage(bobWindow1, longText),
+      waitForTextMessage(charlieWindow1, longText),
+    ]);
+    await sleepFor(30000);
+    await Promise.all([
+      hasTextMessageBeenDeleted(bobWindow1, longText),
+      hasTextMessageBeenDeleted(charlieWindow1, longText),
+    ]);
+  },
+);
+
+test_group_Alice_1W_Bob_1W_Charlie_1W(
+  'Send disappearing link to groups',
+  async ({ aliceWindow1, bobWindow1, charlieWindow1 }) => {
+    const testLink = 'https://getsession.org/';
+    await setDisappearingMessages(aliceWindow1, [
+      'group',
+      disappearingMessageType,
+      timeOption,
+    ]);
+    await sendLinkPreview(aliceWindow1, testLink);
+    await Promise.all([
+      waitForElement(
+        bobWindow1,
+        'class',
+        'module-message__link-preview__title',
+        undefined,
+        'Session | Send Messages, Not Metadata. | Private Messenger',
+      ),
+      waitForElement(
+        charlieWindow1,
+        'class',
+        'module-message__link-preview__title',
+        undefined,
+        'Session | Send Messages, Not Metadata. | Private Messenger',
+      ),
+    ]);
+    await sleepFor(30000);
+    await Promise.all([
+      hasElementBeenDeleted(
+        bobWindow1,
+        'class',
+        'module-message__link-preview__title',
+        undefined,
+        'Session | Send Messages, Not Metadata. | Private Messenger',
+      ),
+      hasElementBeenDeleted(
+        charlieWindow1,
+        'class',
+        'module-message__link-preview__title',
+        undefined,
+        'Session | Send Messages, Not Metadata. | Private Messenger',
+      ),
+    ]);
+  },
+);
