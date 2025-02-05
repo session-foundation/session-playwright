@@ -38,7 +38,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
     `Send disappearing ${mediaType} 1:1`,
     async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
       const testMessage = `${alice.userName} sending disappearing ${mediaType} to ${bob.userName}`;
-      const formattedTime = await formatTimeOption(timeOption);
+      const formattedTime = formatTimeOption(timeOption);
       await createContact(aliceWindow1, bobWindow1, alice, bob);
       // Set disappearing messages
       await setDisappearingMessages(
@@ -96,7 +96,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
 test_Alice_1W_Bob_1W(
   `Send disappearing long text 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const formattedTime = await formatTimeOption(timeOption);
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Set disappearing messages
     await setDisappearingMessages(
@@ -146,7 +146,7 @@ test_Alice_1W_Bob_1W(
   `Send disappearing link preview 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testLink = 'https://getsession.org/';
-    const formattedTime = await formatTimeOption(timeOption);
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Set disappearing messages
     await setDisappearingMessages(
@@ -200,7 +200,7 @@ test_Alice_1W_Bob_1W(
 test_Alice_1W_Bob_1W(
   `Send disappearing community invite 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const formattedTime = await formatTimeOption(timeOption);
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Set disappearing messages
     await setDisappearingMessages(
@@ -289,7 +289,7 @@ test_Alice_1W_Bob_1W(
 test_Alice_1W_Bob_1W(
   `Send disappearing call message 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const formattedTime = await formatTimeOption(timeOption);
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Set disappearing messages
     await setDisappearingMessages(

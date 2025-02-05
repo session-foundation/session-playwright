@@ -29,7 +29,7 @@ test_Alice_2W_Bob_1W(
     const disappearingMessagesType = 'disappear-after-read-option';
     const timeOption: DMTimeOption = 'time-option-10-seconds';
     const disappearAction: DisappearActions = 'read';
-    const formattedTime = await formatTimeOption(timeOption);
+    const formattedTime = formatTimeOption(timeOption);
     const testMessage =
       'Testing disappearing messages timer is working correctly';
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
@@ -93,7 +93,7 @@ test_Alice_2W_Bob_1W(
     const disappearingMessagesType = 'disappear-after-send-option';
     const timeOption: DMTimeOption = 'time-option-10-seconds';
     const disappearAction: DisappearActions = 'sent';
-    const formattedTime = await formatTimeOption(timeOption);
+    const formattedTime = formatTimeOption(timeOption);
     const testMessage =
       'Testing disappearing messages timer is working correctly';
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
@@ -152,7 +152,7 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     const disappearingMessagesType = 'disappear-after-send-option';
     const timeOption: DMTimeOption = 'time-option-10-seconds';
     const disappearAction: DisappearActions = 'sent';
-    const formattedTime = await formatTimeOption(timeOption);
+    const formattedTime = formatTimeOption(timeOption);
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
       .withArgs({
         time: formattedTime,
@@ -205,7 +205,7 @@ test_Alice_2W(
     const disappearAction: DisappearActions = 'sent';
     const testMessage = 'Message to test note to self';
     const testMessageDisappear = 'Message testing disappearing messages';
-    const formattedTime = await formatTimeOption(timeOption);
+    const formattedTime = formatTimeOption(timeOption);
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
       .withArgs({
         time: formattedTime,
@@ -252,7 +252,7 @@ test_Alice_2W_Bob_1W(
     const timeOption: DMTimeOption = 'time-option-10-seconds';
     const disappearAction: DisappearActions = 'sent';
     const testMessage = 'Turning disappearing messages off';
-    const formattedTime = await formatTimeOption(timeOption);
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Click on conversation on linked device
     await clickOnTestIdWithText(

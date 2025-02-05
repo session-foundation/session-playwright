@@ -526,7 +526,7 @@ export async function checkModalStrings(
   }
 }
 
-export async function formatTimeOption(option: DMTimeOption) {
+export function formatTimeOption(option: DMTimeOption) {
   const timePart = option.replace('time-option-', '');
   const formattedTime = timePart.replace(/-/g, ' ');
   return formattedTime;

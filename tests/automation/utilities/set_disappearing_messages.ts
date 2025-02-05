@@ -111,7 +111,7 @@ export const setDisappearingMessages = async (
       action = englishStrippedStr('disappearingMessagesTypeSent').toString();
     }
 
-    const formattedTime = await formatTimeOption(timerDuration);
+    const formattedTime = formatTimeOption(timerDuration);
 
     const modalDescription = englishStrippedStr(
       'disappearingMessagesFollowSettingOn',
