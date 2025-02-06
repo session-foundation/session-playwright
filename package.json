@@ -2,12 +2,13 @@
   "name": "session-playwright",
   "version": "1.0.0",
   "main": "index.js",
-  "repository": "git@github.com:oxen-io/session-playwright.git",
+  "repository": "git@github.com:session-foundation/session-playwright.git",
   "author": "Audric Ackermann <audric@loki.network>",
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.50.1",
     "@types/fs-extra": "^11.0.1",
+    "@types/libsodium-wrappers-sumo": "^0.7.8",
     "@types/lodash": "^4.14.196",
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
@@ -26,7 +27,8 @@
     "fs-extra": "^11.1.1",
     "lodash": "^4.17.21",
     "prettier": "^3.0.1",
-    "typescript": "^5.1.6",
+    "semver": "^7.5.4",
+    "typescript": "^5.5.4",
     "uuid": "^9.0.1"
   },
   "scripts": {
@@ -37,5 +39,9 @@
     "allure-create": "allure generate ./allure-results",
     "allure-open": "allure open ./allure-report"
   },
-  "dependencies": {}
+  "dependencies": {
+    "buffer-crc32": "^1.0.0",
+    "libsodium-wrappers-sumo": "^0.7.14",
+    "session-tooling": "git+https://github.com/Bi1b/session-tooling"
+  }
 }

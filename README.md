@@ -5,7 +5,7 @@ This repository holds the code to do regression testing with Playwright for Sess
 ## Setup
 
 
-`git clone https://github.com/oxen-io/session-playwright/`
+`git clone https://github.com/session-foundation/session-playwright/`
 
 Install [nvm](https://github.com/nvm-sh/nvm) or [nvm for windows](https://github.com/coreybutler/nvm-windows).
 
