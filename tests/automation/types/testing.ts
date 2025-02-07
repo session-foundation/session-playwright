@@ -162,7 +162,7 @@ export type DataTestId =
   | 'continue-button'
   | 'existing-account-button'
   | 'context-menu-item'
-  | 'block-unblock-modal-description'
+  | 'modal-description'
   | 'session-error-message'
   | DMTimeOption
   | `input-${DMTimeOption}`

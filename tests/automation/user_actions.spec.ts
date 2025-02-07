@@ -123,7 +123,7 @@ test_Alice_1W_Bob_1W(
     // make sure the confirm dialogs shows up
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('blockUnblock').toString(),
+      'modal-description',
       englishStrippedStr('blockUnblockName')
         .withArgs({ name: bob.userName })
         .toString(),
@@ -199,7 +199,7 @@ test_Alice_1W_no_network(
         const screenshot = await leftpaneAvatarContainer.screenshot({
           type: 'jpeg',
         });
-        // this file is saved in `Change -avatar` folder
+        // this file is saved in `Change-avatar` folder
         expect(screenshot).toMatchSnapshot({
           name: 'avatar-updated-blue.jpeg',
         });
