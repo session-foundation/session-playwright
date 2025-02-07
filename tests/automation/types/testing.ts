@@ -47,6 +47,9 @@ type DisappearOptsGroup = [
 ];
 
 export type DisappearOptions = DisappearOpts1o1 | DisappearOptsGroup;
+export type DisappearType =
+  | 'disappear-after-read-option'
+  | 'disappear-after-send-option';
 
 export type DisappearActions = 'read' | 'sent';
 

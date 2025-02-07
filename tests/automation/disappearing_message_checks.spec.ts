@@ -1,9 +1,12 @@
 import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
-import { longText, mediaArray } from './constants/variables';
+import {
+  defaultDisappearingOptions,
+  longText,
+  mediaArray,
+} from './constants/variables';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
-import { DMTimeOption } from './types/testing';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
 import { waitForSentTick } from './utilities/message';
@@ -29,9 +32,8 @@ import {
 import { makeVoiceCall } from './utilities/voice_call';
 
 // Disappearing time settings for all tests
-const timeOption: DMTimeOption = 'time-option-30-seconds';
-const disappearingMessageType = 'disappear-after-send-option';
-const disappearAction = 'sent';
+const { timeOption, disappearingMessageType, disappearAction } =
+  defaultDisappearingOptions.DAS;
 
 mediaArray.forEach(({ mediaType, path, attachmentType }) => {
   test_Alice_1W_Bob_1W(

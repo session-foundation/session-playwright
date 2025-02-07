@@ -1,4 +1,9 @@
-import { MediaType } from '../types/testing';
+import {
+  DMTimeOption,
+  DisappearActions,
+  DisappearType,
+  MediaType,
+} from '../types/testing';
 
 export const longText =
   // eslint-disable-next-line max-len
@@ -31,3 +36,26 @@ export const mediaArray = [
     attachmentType: 'audio' as MediaType,
   },
 ];
+
+export const defaultDisappearingOptions = {
+  DAS: {
+    timeOption: 'time-option-30-seconds' as DMTimeOption,
+    disappearingMessageType: 'disappear-after-send-option' as DisappearType,
+    disappearAction: 'sent' as DisappearActions,
+  },
+  DAR: {
+    timeOption: 'time-option-1-days' as DMTimeOption,
+    disappearingMessageType: 'disappear-after-read-option' as DisappearType,
+    disappearAction: 'read' as DisappearActions,
+  },
+  group: {
+    timeOption: 'time-option-1-days' as DMTimeOption,
+    disappearingMessageType: 'disappear-after-send-option' as DisappearType,
+    disappearAction: 'sent' as DisappearActions,
+  },
+  nTS: {
+    timeOption: 'time-option-1-days' as DMTimeOption,
+    disappearingMessageType: 'disappear-after-send-option' as DisappearType,
+    disappearAction: 'sent' as DisappearActions,
+  },
+};

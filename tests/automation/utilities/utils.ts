@@ -494,14 +494,15 @@ export async function measureSendingTime(window: Page, messageNumber: number) {
   return timeMs;
 }
 
+export function removeNewLines(input: string): string {
+  return input.replace(/\s+/g, ' ').trim();
+}
+
 export async function checkModalStrings(
   window: Page,
   expectedHeading: string,
   expectedDescription: string,
 ) {
-  function removeNewLines(input: string): string {
-    return input.replace(/\s+/g, ' ').trim();
-  }
   const heading = await waitForElement(window, 'data-testid', 'modal-heading');
   const description = await waitForElement(
     window,

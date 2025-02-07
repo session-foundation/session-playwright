@@ -1,5 +1,7 @@
 /* eslint-disable no-empty-pattern */
 /* eslint-disable @typescript-eslint/array-type */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Page, TestInfo, test } from '@playwright/test';
 import { Group, User } from '../types/testing';
 import { linkedDevice } from '../utilities/linked_device';
@@ -18,7 +20,6 @@ type Tuple<T, N extends number> = N extends N
     ? T[]
     : _TupleOf<T, N, []>
   : never;
-// eslint-disable-next-line @typescript-eslint/naming-convention
 type _TupleOf<T, N extends number, R extends unknown[]> = R['length'] extends N
   ? R
   : _TupleOf<T, N, [T, ...R]>;
@@ -34,7 +35,6 @@ type WithAliceWindow1 = { aliceWindow1: Page };
 type WithAliceWindow2 = { aliceWindow2: Page };
 type WithBobWindow1 = { bobWindow1: Page };
 type WithCharlieWindow1 = { charlieWindow1: Page };
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type WithDraculaWindow1 = { draculaWindow1: Page };
 
 type WithGroupCreated = { groupCreated: Group };
@@ -200,7 +200,6 @@ function sessionTestGeneric<
  * Setup the test with 1 user and a single window, but don't wait for the network to be ready.
  * Used for tests which don't need network (i.e. setting/checking passwords etc)
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export function test_Alice_1W_no_network(
   testname: string,
   testCallback: (
@@ -228,7 +227,6 @@ export function test_Alice_1W_no_network(
  * Setup the test with 1 user and 2 windows total:
  * - Alice with 2 windows.
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export function test_Alice_2W(
   testname: string,
   testCallback: (
@@ -258,7 +256,6 @@ export function test_Alice_2W(
  * - Alice with 1 window,
  * - Bob with 1 window.
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export function test_Alice_1W_Bob_1W(
   testname: string,
   testCallback: (
@@ -289,7 +286,6 @@ export function test_Alice_1W_Bob_1W(
  * - Alice with 2 windows,
  * - Bob with 1 window.
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export function test_Alice_2W_Bob_1W(
   testname: string,
   testCallback: (
@@ -326,7 +322,6 @@ export function test_Alice_2W_Bob_1W(
  * - Bob with 1 window,
  * - Charlie with 1 window.
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export function test_group_Alice_1W_Bob_1W_Charlie_1W(
   testname: string,
   testCallback: (
@@ -367,7 +362,6 @@ export function test_group_Alice_1W_Bob_1W_Charlie_1W(
  * - Bob with 1 window,
  * - Charlie with 1 window.
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export function test_group_Alice_2W_Bob_1W_Charlie_1W(
   testname: string,
   testCallback: (
@@ -411,7 +405,6 @@ export function test_group_Alice_2W_Bob_1W_Charlie_1W(
  * - Charlie with 1 window,
  * - Dracula with 1 window,
  */
-// eslint-disable-next-line @typescript-eslint/naming-convention
 export function test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
   testname: string,
   testCallback: (
