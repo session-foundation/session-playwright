@@ -53,7 +53,7 @@ export const defaultDisappearingOptions = {
     disappearingMessageType: 'disappear-after-send-option' as DisappearType,
     disappearAction: 'sent' as DisappearActions,
   },
-  nTS: {
+  NTS: {
     timeOption: 'time-option-1-days' as DMTimeOption,
     disappearingMessageType: 'disappear-after-send-option' as DisappearType,
     disappearAction: 'sent' as DisappearActions,
