@@ -5,6 +5,7 @@ import {
   test_Alice_2W_Bob_1W,
   test_group_Alice_2W_Bob_1W_Charlie_1W,
 } from './setup/sessionTest';
+import { DMTimeOption, DisappearActions } from './types/testing';
 import { createContact } from './utilities/create_contact';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -14,6 +15,7 @@ import {
   clickOnMatchingText,
   clickOnTestIdWithText,
   doesTextIncludeString,
+  formatTimeOption,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
   typeIntoInput,
@@ -24,12 +26,15 @@ import {
 test_Alice_2W_Bob_1W(
   'Disappear after read 1:1',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
+    const disappearingMessagesType = 'disappear-after-read-option';
+    const timeOption: DMTimeOption = 'time-option-10-seconds';
+    const disappearAction: DisappearActions = 'read';
+    const formattedTime = formatTimeOption(timeOption);
     const testMessage =
       'Testing disappearing messages timer is working correctly';
-
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
       .withArgs({
-        time: '10 seconds',
+        time: formattedTime,
         disappearing_messages_type: englishStrippedStr(
           'disappearingMessagesTypeRead',
         ).toString(),
@@ -46,7 +51,7 @@ test_Alice_2W_Bob_1W(
 
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', 'disappear-after-read-option', 'time-option-10-seconds'],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
 
@@ -85,11 +90,15 @@ test_Alice_2W_Bob_1W(
 test_Alice_2W_Bob_1W(
   'Disappear after send 1:1',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
+    const disappearingMessagesType = 'disappear-after-send-option';
+    const timeOption: DMTimeOption = 'time-option-10-seconds';
+    const disappearAction: DisappearActions = 'sent';
+    const formattedTime = formatTimeOption(timeOption);
     const testMessage =
       'Testing disappearing messages timer is working correctly';
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
       .withArgs({
-        time: '10 seconds',
+        time: formattedTime,
         disappearing_messages_type: englishStrippedStr(
           'disappearingMessagesTypeSent',
         ).toString(),
@@ -106,7 +115,7 @@ test_Alice_2W_Bob_1W(
     );
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', 'disappear-after-send-option', 'time-option-10-seconds'],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     // Check control message is correct and appearing
@@ -140,9 +149,13 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     charlieWindow1,
     groupCreated,
   }) => {
+    const disappearingMessagesType = 'disappear-after-send-option';
+    const timeOption: DMTimeOption = 'time-option-10-seconds';
+    const disappearAction: DisappearActions = 'sent';
+    const formattedTime = formatTimeOption(timeOption);
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
       .withArgs({
-        time: '10 seconds',
+        time: formattedTime,
         disappearing_messages_type: englishStrippedStr(
           'disappearingMessagesTypeSent',
         ).toString(),
@@ -157,8 +170,9 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     );
     await setDisappearingMessages(aliceWindow1, [
       'group',
-      'disappear-after-send-option',
-      'time-option-10-seconds',
+      disappearingMessagesType,
+      timeOption,
+      disappearAction,
     ]);
     // Check control message is visible and correct
     await doesTextIncludeString(
@@ -186,11 +200,15 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
 test_Alice_2W(
   'Disappear after send note to self',
   async ({ alice, aliceWindow1, aliceWindow2 }) => {
+    const disappearingMessagesType = 'disappear-after-send-option';
+    const timeOption: DMTimeOption = 'time-option-10-seconds';
+    const disappearAction: DisappearActions = 'sent';
     const testMessage = 'Message to test note to self';
     const testMessageDisappear = 'Message testing disappearing messages';
+    const formattedTime = formatTimeOption(timeOption);
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
       .withArgs({
-        time: '10 seconds',
+        time: formattedTime,
         disappearing_messages_type: englishStrippedStr(
           'disappearingMessagesTypeSent',
         ).toString(),
@@ -208,8 +226,9 @@ test_Alice_2W(
     // Enable disappearing messages
     await setDisappearingMessages(aliceWindow1, [
       'note-to-self',
-      'disappear-after-send-option',
-      'time-option-10-seconds',
+      disappearingMessagesType,
+      timeOption,
+      disappearAction,
     ]);
     // Check control message is visible and correct
     await doesTextIncludeString(
@@ -229,7 +248,11 @@ test_Alice_2W(
 test_Alice_2W_Bob_1W(
   'Disappear after send off 1:1',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
+    const disappearingMessagesType = 'disappear-after-send-option';
+    const timeOption: DMTimeOption = 'time-option-10-seconds';
+    const disappearAction: DisappearActions = 'sent';
     const testMessage = 'Turning disappearing messages off';
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Click on conversation on linked device
     await clickOnTestIdWithText(
@@ -240,13 +263,13 @@ test_Alice_2W_Bob_1W(
     // Set disappearing messages to on
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', 'disappear-after-send-option', 'time-option-10-seconds'],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     // Check control message is visible and correct
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
       .withArgs({
-        time: '10 seconds',
+        time: formattedTime,
         disappearing_messages_type: englishStrippedStr(
           'disappearingMessagesTypeSent',
         ).toString(),
@@ -269,7 +292,7 @@ test_Alice_2W_Bob_1W(
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
             name: alice.userName,
-            time: '10 seconds',
+            time: formattedTime,
             disappearing_messages_type: englishStrippedStr(
               'disappearingMessagesTypeSent',
             ).toString(),

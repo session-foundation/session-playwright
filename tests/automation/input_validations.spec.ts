@@ -44,8 +44,6 @@ import {
       'data-testid',
       'session-error-message',
     );
-    console.log('actualError', actualError);
-    console.log('expectedError', expectedError);
     if (actualError !== expectedError) {
       throw new Error(
         `Expected error message: ${expectedError}, but got: ${actualError}`,

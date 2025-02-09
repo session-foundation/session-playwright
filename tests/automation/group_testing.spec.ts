@@ -1,15 +1,6 @@
-import { createGroup } from './setup/create_group';
-import { renameGroup } from './utilities/rename_group';
-import {
-  clickOnElement,
-  clickOnMatchingText,
-  clickOnTestIdWithText,
-  typeIntoInput,
-  waitForMatchingText,
-  waitForTestIdWithText,
-} from './utilities/utils';
-// import { leaveGroup } from './utilities/leave_group';
+import { englishStrippedStr } from '../locale/localizedString';
 import { doForAll, sleepFor } from '../promise_utils';
+import { createGroup } from './setup/create_group';
 import { newUser } from './setup/new_user';
 import {
   sessionTestThreeWindows,
@@ -18,7 +9,16 @@ import {
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { leaveGroup } from './utilities/leave_group';
-import { englishStrippedStr } from '../locale/localizedString';
+import { renameGroup } from './utilities/rename_group';
+import {
+  clickOnElement,
+  clickOnMatchingText,
+  clickOnTestIdWithText,
+  grabTextFromElement,
+  typeIntoInput,
+  waitForMatchingText,
+  waitForTestIdWithText,
+} from './utilities/utils';
 
 // Note: Note using the group fixture here as we want to test it thoroughly
 sessionTestThreeWindows('Create group', async ([windowA, windowB, windowC]) => {
@@ -108,13 +108,6 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
       'module-conversation__user__profile-name',
       groupCreated.userName,
     );
-    // Update in closed group rewrite
-    //   const emptyStateGroupText = `You have no messages from ${testGroup.userName}. Send a message to start the conversation!`;
-    //   await waitForTestIdWithText(
-    //     windowD,
-    //     'empty-conversation-notification',
-    //     emptyStateGroupText,
-    //   );
   },
 );
 
@@ -122,7 +115,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Change group name',
   async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
     const newGroupName = 'New group name';
-
+    const expectedError = englishStrippedStr('groupNameEnterPlease').toString();
     // Change the name of the group and check that it syncs to all devices (config messages)
     // Click on already created group
     // Check that renaming a group is working
@@ -149,12 +142,17 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOnTestIdWithText(aliceWindow1, 'edit-group-name');
     await typeIntoInput(aliceWindow1, 'group-name-input', '     ');
     await aliceWindow1.keyboard.press('Enter');
-    await waitForMatchingText(
+    await waitForTestIdWithText(aliceWindow1, 'error-message');
+    const actualError = await grabTextFromElement(
       aliceWindow1,
-      englishStrippedStr('groupNameEnterPlease').toString(),
+      'data-testid',
+      'error-message',
     );
-    // const errorMessage = aliceWindow1.locator('.error-message');
-    // await expect(errorMessage).toContainText('Please enter a group name');
+    if (actualError !== expectedError) {
+      throw new Error(
+        `Expected error message: ${expectedError}, but got: ${actualError}`,
+      );
+    }
     await clickOnMatchingText(
       aliceWindow1,
       englishStrippedStr('cancel').toString(),
