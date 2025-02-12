@@ -142,7 +142,6 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   await clickOnTestIdWithText(aliceWindow1, 'edit-profile-icon');
   // Type in new username
   await typeIntoInput(aliceWindow1, 'profile-name-input', newUsername);
-  // await window.fill('.profile-name-input', 'new username');
   // Press enter to confirm username input
   await aliceWindow1.keyboard.press('Enter');
   // Wait for Copy button to appear to verify username change
@@ -523,5 +522,51 @@ test_Alice_1W_no_network(
       5000,
       englishStrippedStr('noteToSelf').toString(),
     );
+  },
+);
+
+test_Alice_1W_no_network('Toggle password', async ({ aliceWindow1 }) => {
+  await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    'recovery-password-settings-menu-item',
+  );
+  await waitForTestIdWithText(aliceWindow1, 'recovery-password-seed-modal');
+  await clickOnMatchingText(
+    aliceWindow1,
+    englishStrippedStr('qrView').toString(),
+  );
+  // Wait for QR code to be visible
+  await waitForTestIdWithText(aliceWindow1, 'session-recovery-password');
+  // Then toggle back to text seed password
+  await clickOnMatchingText(
+    aliceWindow1,
+    englishStrippedStr('recoveryPasswordView').toString(),
+  );
+  await waitForTestIdWithText(aliceWindow1, 'recovery-password-seed-modal');
+});
+
+test_Alice_2W(
+  'Consistent avatar colours',
+  async ({ aliceWindow1, aliceWindow2 }) => {
+    const [avatar1, avatar2] = await Promise.all([
+      aliceWindow1.locator(
+        '[data-testid="leftpane-primary-avatar"] > svg > g > circle',
+      ),
+      aliceWindow2.locator(
+        '[data-testid="leftpane-primary-avatar"] > svg > g > circle',
+      ),
+    ]);
+    const [avatar1Color, avatar2Color] = await Promise.all([
+      avatar1.getAttribute('fill'),
+      avatar2.getAttribute('fill'),
+    ]);
+
+    console.log('avatar1Color', avatar1Color);
+    console.log('avatar2Color', avatar2Color);
+
+    if (avatar1Color !== avatar2Color) {
+      throw new Error('Avatar colours are not consistent');
+    }
   },
 );
