@@ -4,17 +4,20 @@
 import { ElementHandle, Page } from '@playwright/test';
 import { sleepFor } from '../../promise_utils';
 import {
+  DMTimeOption,
   DataTestId,
+  LoaderType,
   Strategy,
   StrategyExtractionObj,
   WithMaxWait,
   WithPage,
   WithRightButton,
-  LoaderType,
-  DMTimeOption,
 } from '../types/testing';
 // eslint-disable-next-line import/no-cycle
+import fs from 'fs';
+import path from 'path';
 import { sendMessage } from './message';
+import { ElementState } from '../landing_page.spec';
 
 // WAIT FOR FUNCTIONS
 
@@ -499,4 +502,62 @@ export async function formatTimeOption(option: DMTimeOption) {
   const timePart = option.replace('time-option-', '');
   const formattedTime = timePart.replace(/-/g, ' ');
   return formattedTime;
+}
+
+export async function deleteDifferenceFile(
+  fileFolder: string,
+  fileName: string,
+) {
+  const filePath = path.join(
+    '__screenshots__',
+    `${fileFolder}`,
+    `${fileName}-difference.png`,
+  );
+
+  if (fs.existsSync(filePath)) {
+    // Delete the file if it exists
+    fs.unlinkSync(filePath);
+    console.log(`Deleted difference file at: ${filePath}`);
+  } else {
+    console.log(`No difference file found at: ${filePath}, proceeding...`);
+  }
+}
+
+export async function compareScreenshot(
+  element: ElementHandle<SVGElement | HTMLElement>,
+  testTitle: string,
+  elementState: ElementState,
+) {
+  const formattedTitle = testTitle.toLowerCase().replace(/\s+/g, '-');
+  await deleteDifferenceFile(formattedTitle, elementState);
+
+  const elementScreenshot = await element.screenshot();
+  const folderPath = path.join('__screenshots__', `${formattedTitle}`);
+
+  // If folder doesn't exist, create folder
+  if (!fs.existsSync(folderPath)) {
+    fs.mkdirSync(folderPath, { recursive: true });
+  }
+  // If screenshot does not exist, save it to the folder
+  if (!fs.existsSync(path.join(folderPath, `${elementState}.png`))) {
+    fs.writeFileSync(
+      path.join(folderPath, `${elementState}.png`),
+      elementScreenshot,
+    );
+  }
+  // If screenshot does exist, compare it to previous screenshot in the folder
+  const previousScreenshot = fs.readFileSync(
+    path.join(folderPath, `${elementState}.png`),
+  );
+  // If screenshots are different, then create a difference screenshot
+  if (!elementScreenshot.equals(previousScreenshot)) {
+    //  If elements do not match, then take the elementScreenshot and save it to same folder but with a new name of 'difference.png'
+    fs.writeFileSync(
+      path.join(folderPath, `${elementState}-difference.png`),
+      elementScreenshot,
+    );
+    throw new Error(
+      `Screenshots do not match, see __screenshots__ > ${testTitle} folder > ${elementState}-difference.png`,
+    );
+  }
 }
