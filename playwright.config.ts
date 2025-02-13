@@ -1,5 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/no-import-module-exports */
 import { defineConfig } from '@playwright/test';
 import { isEmpty, toNumber } from 'lodash';
 

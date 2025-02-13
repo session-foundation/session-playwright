@@ -6,18 +6,23 @@ export type ElementState = 'new-account' | 'restored-account';
 test_Alice_2W(
   `Landing page states`,
   async ({ aliceWindow1, aliceWindow2 }, testInfo) => {
+    const os = process.platform;
+    console.log('OS:', os);
     const [landingPage, restoredPage] = await Promise.all([
       waitForElement(aliceWindow1, 'class', 'session-conversation'),
       waitForElement(aliceWindow2, 'class', 'session-conversation'),
     ]);
-    const [result1, result2] = await Promise.allSettled([
-      compareScreenshot(landingPage, `${testInfo.title}`, 'new-account'),
-      compareScreenshot(restoredPage, `${testInfo.title}`, 'restored-account'),
+    const results = await Promise.allSettled([
+      compareScreenshot(landingPage, `${testInfo.title}`, 'new-account', os),
+      compareScreenshot(
+        restoredPage,
+        `${testInfo.title}`,
+        'restored-account',
+        os,
+      ),
     ]);
-    if (result1.status === 'rejected' || result2.status === 'rejected') {
+    if (results.some((r) => r.status === 'rejected')) {
       throw new Error('One or both screenshot comparisons failed');
-    } else {
-      console.log('Screenshots compared successfully');
     }
   },
 );
