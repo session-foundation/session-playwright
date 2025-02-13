@@ -549,23 +549,18 @@ test_Alice_1W_no_network('Toggle password', async ({ aliceWindow1 }) => {
 test_Alice_2W(
   'Consistent avatar colours',
   async ({ aliceWindow1, aliceWindow2 }) => {
-    const [avatar1, avatar2] = await Promise.all([
-      aliceWindow1.locator(
-        '[data-testid="leftpane-primary-avatar"] > svg > g > circle',
+    const avatarColors = await Promise.all(
+      [aliceWindow1, aliceWindow2].map((w) =>
+        w
+          .locator('[data-testid="leftpane-primary-avatar"] > svg > g > circle')
+          .getAttribute('fill'),
       ),
-      aliceWindow2.locator(
-        '[data-testid="leftpane-primary-avatar"] > svg > g > circle',
-      ),
-    ]);
-    const [avatar1Color, avatar2Color] = await Promise.all([
-      avatar1.getAttribute('fill'),
-      avatar2.getAttribute('fill'),
-    ]);
+    );
 
-    console.log('avatar1Color', avatar1Color);
-    console.log('avatar2Color', avatar2Color);
+    console.log('avatar1Color', avatarColors[0]);
+    console.log('avatar2Color', avatarColors[1]);
 
-    if (avatar1Color !== avatar2Color) {
+    if (avatarColors[0] !== avatarColors[1]) {
       throw new Error('Avatar colours are not consistent');
     }
   },

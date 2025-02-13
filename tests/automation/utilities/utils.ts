@@ -18,6 +18,7 @@ import fs from 'fs';
 import path from 'path';
 import { sendMessage } from './message';
 import { ElementState } from '../landing_page.spec';
+import { screenshotFolder } from '../constants/variables';
 
 // WAIT FOR FUNCTIONS
 
@@ -504,14 +505,15 @@ export async function formatTimeOption(option: DMTimeOption) {
   return formattedTime;
 }
 
-export async function deleteDifferenceFile(
+async function deleteDifferenceFile(
   fileFolder: string,
   fileName: string,
+  os: string,
 ) {
   const filePath = path.join(
-    '__screenshots__',
-    `${fileFolder}`,
-    `${fileName}-difference.png`,
+    screenshotFolder,
+    fileFolder,
+    `${fileName}-${os}-difference.png`,
   );
 
   if (fs.existsSync(filePath)) {
@@ -527,37 +529,38 @@ export async function compareScreenshot(
   element: ElementHandle<SVGElement | HTMLElement>,
   testTitle: string,
   elementState: ElementState,
+  os: string,
 ) {
   const formattedTitle = testTitle.toLowerCase().replace(/\s+/g, '-');
-  await deleteDifferenceFile(formattedTitle, elementState);
+  await deleteDifferenceFile(formattedTitle, elementState, os);
 
   const elementScreenshot = await element.screenshot();
-  const folderPath = path.join('__screenshots__', `${formattedTitle}`);
+  const folderPath = path.join(screenshotFolder, `${formattedTitle}`);
 
   // If folder doesn't exist, create folder
   if (!fs.existsSync(folderPath)) {
     fs.mkdirSync(folderPath, { recursive: true });
   }
   // If screenshot does not exist, save it to the folder
-  if (!fs.existsSync(path.join(folderPath, `${elementState}.png`))) {
+  if (!fs.existsSync(path.join(folderPath, `${elementState}-${os}.png`))) {
     fs.writeFileSync(
-      path.join(folderPath, `${elementState}.png`),
+      path.join(folderPath, `${elementState}-${os}.png`),
       elementScreenshot,
     );
   }
   // If screenshot does exist, compare it to previous screenshot in the folder
   const previousScreenshot = fs.readFileSync(
-    path.join(folderPath, `${elementState}.png`),
+    path.join(folderPath, `${elementState}-${os}.png`),
   );
   // If screenshots are different, then create a difference screenshot
   if (!elementScreenshot.equals(previousScreenshot)) {
     //  If elements do not match, then take the elementScreenshot and save it to same folder but with a new name of 'difference.png'
     fs.writeFileSync(
-      path.join(folderPath, `${elementState}-difference.png`),
+      path.join(folderPath, `${elementState}-${os}-difference.png`),
       elementScreenshot,
     );
     throw new Error(
-      `Screenshots do not match, see __screenshots__ > ${testTitle} folder > ${elementState}-difference.png`,
+      `Screenshots do not match, see ${screenshotFolder} > ${testTitle} folder > ${elementState}-${os}-difference.png`,
     );
   }
 }
