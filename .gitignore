@@ -15,4 +15,3 @@ TODO.md
 playwright.config.js
 sessionReporter.js
 .env
-eslint.config.mjs
