@@ -1,0 +1,14 @@
+*.png filter=lfs diff=lfs merge=lfs -text
+*.jpeg filter=lfs diff=lfs merge=lfs -text
+*.pdf filter=lfs diff=lfs merge=lfs -text
+*.gif filter=lfs diff=lfs merge=lfs -text
+*.mp4 filter=lfs diff=lfs merge=lfs -text
+
+__screenshots__/Change-avatar/avatar-updated-blue-darwin.jpeg filter= diff= merge= text
+__screenshots__/Change-avatar/avatar-updated-blue-linux.jpeg filter= diff= merge= text
+__screenshots__/Profile-picture-syncs/avatar-updated-blue-darwin.jpeg filter= diff= merge= text
+__screenshots__/Profile-picture-syncs/avatar-updated-blue-linux.jpeg filter= diff= merge= text
+fixtures/test-file.pdf filter= diff= merge= text
+fixtures/test-gif.gif filter= diff= merge= text
+fixtures/test-image.png filter= diff= merge= text
+fixtures/test-video.mp4 filter= diff= merge= text

@@ -178,4 +178,5 @@ export type DataTestId =
   | 'contact'
   | 'modal-heading'
   | 'call-notification-answered-a-call'
-  | 'call-notification-started-call';
+  | 'call-notification-started-call'
+  | 'session-recovery-password';
