@@ -8,22 +8,22 @@ export const screenshotFolder = '__screenshots__';
 export const mediaArray = [
   {
     mediaType: 'image',
-    path: 'fixtures/test-image.png',
+    path: 'sample_files/test-image.png',
     attachmentType: 'media' as MediaType,
   },
   {
     mediaType: 'video',
-    path: 'fixtures/test-video.mp4',
+    path: 'sample_files/test-video.mp4',
     attachmentType: 'media' as MediaType,
   },
   {
     mediaType: 'gif',
-    path: 'fixtures/test-gif.gif',
+    path: 'sample_files/test-gif.gif',
     attachmentType: 'media' as MediaType,
   },
   {
     mediaType: 'document',
-    path: 'fixtures/test-file.pdf',
+    path: 'sample_files/test-file.pdf',
     attachmentType: 'file' as MediaType,
   },
   {

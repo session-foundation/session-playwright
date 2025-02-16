@@ -8,7 +8,3 @@ __screenshots__/Change-avatar/avatar-updated-blue-darwin.jpeg filter= diff= merg
 __screenshots__/Change-avatar/avatar-updated-blue-linux.jpeg filter= diff= merge= text
 __screenshots__/Profile-picture-syncs/avatar-updated-blue-darwin.jpeg filter= diff= merge= text
 __screenshots__/Profile-picture-syncs/avatar-updated-blue-linux.jpeg filter= diff= merge= text
-fixtures/test-file.pdf filter= diff= merge= text
-fixtures/test-gif.gif filter= diff= merge= text
-fixtures/test-image.png filter= diff= merge= text
-fixtures/test-video.mp4 filter= diff= merge= text
