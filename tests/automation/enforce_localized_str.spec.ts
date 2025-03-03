@@ -218,6 +218,10 @@ function getExpectedStringFromKey(
       return 'read';
     case 'disappearingMessagesTypeSent':
       return 'sent';
+    case 'messageRequestsDelete':
+      return 'Are you sure you want to delete this message request?';
+    case 'messageRequestsClearAllExplanation':
+      return 'Are you sure you want to clear all message requests and group invites?';
     default:
       // returning nul means we don't have an expected string yet for this key.
       // This will make the test fail
