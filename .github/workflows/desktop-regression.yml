@@ -31,7 +31,7 @@ on:
         description: 'Branch to checkout on session-desktop'
         required: true
         type: string
-        default: unstable
+        default: dev
 
       PLAYWRIGHT_REPEAT_COUNT:
         description: 'Repeats of each tests (0 to only run each once)'
