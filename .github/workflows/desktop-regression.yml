@@ -25,6 +25,7 @@ on:
         options:
           - session-foundation/session-desktop
           - bilb/session-desktop
+          - yougotwill/session-desktop
         default: session-foundation/session-desktop
 
       BRANCH_TO_CHECKOUT_SESSION:
@@ -96,9 +97,10 @@ jobs:
           ref: ${{ github.event.inputs.BRANCH_TO_CHECKOUT_SESSION }}
           path: 'desktop'
 
-      - name: Calculate desktop cache key
-        run: |
-          echo "CACHE_KEY=${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('desktop/package.json', 'desktop/yarn.lock', 'desktop/patches/**') }}" >> $GITHUB_ENV
+      # Note: caching is breaking things up (app doesn't start)
+      # - name: Calculate desktop cache key
+      #   run: |
+      #     echo "CACHE_KEY=${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('desktop/package.json', 'desktop/yarn.lock', 'desktop/patches/**') }}" >> $GITHUB_ENV
 
       - name: Install node
         uses: actions/setup-node@v3
@@ -113,6 +115,7 @@ jobs:
         shell: bash
         run: python -m pip install --upgrade pip setuptools
 
+      # Note: caching is breaking things up (app doesn't start)
       # - uses: actions/cache/restore@v4
       #   id: cache-desktop-modules
       #   with:
