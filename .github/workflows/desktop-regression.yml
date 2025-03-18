@@ -45,7 +45,7 @@ on:
         type: number
         default: 0
 
-      PLAYWRIGHT_WORKER_COUNT:
+      PLAYWRIGHT_WORKERS_COUNT:
         description: 'Playwright workers to start'
         required: true
         type: number
@@ -60,14 +60,14 @@ jobs:
     name: Desktop Regression Tests
     runs-on: [self-hosted, Linux, X64, qa-desktop]
     container:
-      image: mcr.microsoft.com/playwright:v1.50.0-noble
+      image: mcr.microsoft.com/playwright:v1.51.0-noble
       options: --cpus 16
 
     env:
       PLAYWRIGHT_CUSTOM_REPORTER: 1
       PLAYWRIGHT_REPEAT_COUNT: ${{ github.event.inputs.PLAYWRIGHT_REPEAT_COUNT }}
       PLAYWRIGHT_RETRIES_COUNT: ${{ github.event.inputs.PLAYWRIGHT_RETRIES_COUNT }}
-      PLAYWRIGHT_WORKER_COUNT: ${{ github.event.inputs.PLAYWRIGHT_WORKER_COUNT }}
+      PLAYWRIGHT_WORKERS_COUNT: ${{ github.event.inputs.PLAYWRIGHT_WORKERS_COUNT }}
       DESKTOP_CACHED_FOLDER: desktop/node_modules
 
     steps:

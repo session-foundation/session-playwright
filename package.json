@@ -6,7 +6,7 @@
   "author": "Audric Ackermann <audric@loki.network>",
   "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.37.1",
+    "@playwright/test": "^1.51",
     "@types/fs-extra": "^11.0.1",
     "@types/lodash": "^4.14.196",
     "@types/uuid": "^9.0.8",
@@ -15,7 +15,7 @@
     "allure-commandline": "^2.23.1",
     "allure-playwright": "2.6.0",
     "dotenv": "^16.4.5",
-    "electron": "^25.4.0",
+    "electron": "34.2.0",
     "eslint": "^8.46.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
