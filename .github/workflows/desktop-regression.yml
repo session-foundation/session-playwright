@@ -61,7 +61,7 @@ jobs:
     name: Desktop Regression Tests
     runs-on: [self-hosted, Linux, X64, qa-desktop]
     container:
-      image: mcr.microsoft.com/playwright:v1.50.0-noble
+      image: mcr.microsoft.com/playwright:v1.51.0-noble
       options: --cpus 16
 
     env:
