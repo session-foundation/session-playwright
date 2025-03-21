@@ -34,11 +34,11 @@ export const makeVoiceCall = async (
   await clickOnTestIdWithText(receiverWindow, 'session-toast');
   await clickOnTestIdWithText(receiverWindow, 'enable-calls');
   // Getting wrong strings from locales.ts file
-  // await checkModalStrings(
-  //   receiverWindow,
-  //   englishStrippedStr('callsVoiceAndVideoBeta').toString(),
-  //   englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
-  // );
+  await checkModalStrings(
+    receiverWindow,
+    englishStrippedStr('callsVoiceAndVideoBeta').toString(),
+    englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
+  );
   await clickOnTestIdWithText(receiverWindow, 'session-confirm-ok-button');
   await clickOnMatchingText(
     receiverWindow,

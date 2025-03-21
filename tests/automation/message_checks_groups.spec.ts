@@ -355,16 +355,17 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       selector: 'session-confirm-ok-button',
     });
     // Happening too fast not sure why
-    // await waitForTestIdWithText(
-    //   aliceWindow1,
-    //   'session-toast',
-    //   englishStrippedStr('deleteMessageDeleted').withArgs({ count: 1 }).toString(),
-    // );
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'session-toast',
+      englishStrippedStr('deleteMessageDeleted')
+        .withArgs({ count: 1 })
+        .toString(),
+    );
     await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage, 5000);
     await waitForMatchingText(
       aliceWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally')
-        .toString(),
+      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
     );
     // Should still be there for user B and C
     // Currently failing see https://optf.atlassian.net/browse/SES-3167
