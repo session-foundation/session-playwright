@@ -1,17 +1,29 @@
 import { Page } from '@playwright/test';
-import { ConversationType, DisappearOptions } from '../types/testing';
 import {
+  ConversationType,
+  DataTestId,
+  DisappearOptions,
+} from '../types/testing';
+import { englishStrippedStr } from '../../locale/localizedString';
+import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
   doWhileWithMax,
+  formatTimeOption,
   waitForElement,
+  waitForTestIdWithText,
 } from './utils';
-import { englishStrippedStr } from '../../locale/localizedString';
 
 export const setDisappearingMessages = async (
   windowA: Page,
-  [conversationType, timerType, timerDuration]: DisappearOptions,
+  [
+    conversationType,
+    timerType,
+    timerDuration,
+    disappearAction,
+  ]: DisappearOptions,
   windowB?: Page,
 ) => {
   const enforcedType: ConversationType = conversationType;
@@ -50,13 +62,21 @@ export const setDisappearingMessages = async (
     // Check that 1 Day default is automatically selected (default time is only relevant to 1:1's)
     let defaultTime;
     if (timerType === 'disappear-after-read-option') {
+      // making explicit DataTestId here as `waitForElement` currently allows a string
+      // TODO: add explicit typing to waitForElement
+      const dataTestId: DataTestId = 'input-time-option-12-hours';
+      defaultTime = await waitForElement(windowA, 'data-testid', dataTestId);
+    } else {
+      // making explicit DataTestId here as `waitForElement` currently allows a string
+      // TODO: add explicit typing to waitForElement
+      const dataTestId: DataTestId = 'input-time-option-1-days';
+
       defaultTime = await waitForElement(
         windowA,
         'data-testid',
-        'input-12-hours',
+        dataTestId,
+        1000,
       );
-    } else {
-      defaultTime = await waitForElement(windowA, 'data-testid', 'input-1-day');
     }
     const checked = await defaultTime.isChecked();
     if (checked) {
@@ -77,15 +97,39 @@ export const setDisappearingMessages = async (
     strategy: 'data-testid',
     selector: 'disappear-set-button',
   });
+  await waitForTestIdWithText(windowA, 'disappear-messages-type-and-time');
   if (windowB) {
+
     await clickOnMatchingText(
       windowB,
       englishStrippedStr('disappearingMessagesFollowSetting').toString(),
+    );
+
+    let action;
+    if (disappearAction === 'read') {
+      action = englishStrippedStr('disappearingMessagesTypeRead').toString();
+    } else {
+      action = englishStrippedStr('disappearingMessagesTypeSent').toString();
+    }
+
+    const formattedTime = formatTimeOption(timerDuration);
+
+    const modalDescription = englishStrippedStr(
+      'disappearingMessagesFollowSettingOn',
+    )
+      .withArgs({ time: formattedTime, disappearing_messages_type: action })
+      .toString();
+
+    await checkModalStrings(
+      windowB,
+      englishStrippedStr('disappearingMessagesFollowSetting').toString(),
+      modalDescription,
     );
     await clickOnElement({
       window: windowB,
       strategy: 'data-testid',
       selector: 'session-confirm-ok-button',
     });
+    await waitForTestIdWithText(windowB, 'disappear-messages-type-and-time');
   }
 };

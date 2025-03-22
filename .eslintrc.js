@@ -7,11 +7,15 @@ module.exports = {
     },
   },
 
-  extends: ['airbnb-base', 'prettier', 'plugin:@typescript-eslint/recommended'],
+<<<<<<< HEAD
+  extends: ['airbnb', 'airbnb-typescript/base', 'prettier', 'plugin:@typescript-eslint/recommended'],
+=======
+  extends: ['airbnb-base', 'airbnb-typescript/base', 'prettier', 'plugin:@typescript-eslint/recommended'],
+>>>>>>> upstream/main
 
   plugins: ['mocha', 'more', '@typescript-eslint'],
   parser: '@typescript-eslint/parser',
-  parserOptions: { project: ['tsconfig.json'] },
+  parserOptions: { project: ['./tsconfig.json'] },
 
   rules: {
     'comma-dangle': [

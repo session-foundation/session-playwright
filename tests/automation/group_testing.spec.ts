@@ -1,15 +1,6 @@
+import { englishStrippedStr } from '../locale/localizedString';
+import { doForAll, sleepFor } from '../promise_utils';
 import { createGroup } from './setup/create_group';
-import { renameGroup } from './utilities/rename_group';
-import {
-  clickOnElement,
-  clickOnMatchingText,
-  clickOnTestIdWithText,
-  typeIntoInput,
-  waitForMatchingText,
-  waitForTestIdWithText,
-} from './utilities/utils';
-// import { leaveGroup } from './utilities/leave_group';
-import { sleepFor } from '../promise_utils';
 import { newUser } from './setup/new_user';
 import {
   sessionTestThreeWindows,
@@ -18,8 +9,16 @@ import {
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { leaveGroup } from './utilities/leave_group';
-import { shortenWithBrackets } from '../pubkey';
-import { englishStrippedStr } from '../locale/localizedString';
+import { renameGroup } from './utilities/rename_group';
+import {
+  clickOnElement,
+  clickOnMatchingText,
+  clickOnTestIdWithText,
+  grabTextFromElement,
+  typeIntoInput,
+  waitForMatchingText,
+  waitForTestIdWithText,
+} from './utilities/utils';
 
 // Note: Note using the group fixture here as we want to test it thoroughly
 sessionTestThreeWindows('Create group', async ([windowA, windowB, windowC]) => {
@@ -85,26 +84,19 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
       aliceWindow1,
       englishStrippedStr('okay').toString(),
     );
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'group-update-message',
-      englishStrippedStr('legacyGroupMemberNew')
-        .withArgs({ name: dracula.userName })
-        .toString(),
-    );
-    await waitForTestIdWithText(
-      bobWindow1,
-      'group-update-message',
-      englishStrippedStr('legacyGroupMemberNew')
-        .withArgs({ name: shortenWithBrackets(dracula.accountid) })
-        .toString(),
-    );
-    await waitForTestIdWithText(
-      charlieWindow1,
-      'group-update-message',
-      englishStrippedStr('legacyGroupMemberNew')
-        .withArgs({ name: shortenWithBrackets(dracula.accountid) })
-        .toString(),
+    // even if Bob and Charlie do not know Dracula's name,
+    // Alice sets Dracula's name in the group members that every one will use as a fallback
+    await doForAll(
+      async (w) => {
+        return waitForTestIdWithText(
+          w,
+          'group-update-message',
+          englishStrippedStr('groupMemberNew')
+            .withArgs({ name: dracula.userName })
+            .toString(),
+        );
+      },
+      [aliceWindow1, bobWindow1, charlieWindow1],
     );
     await clickOnElement({
       window: draculaWindow1,
@@ -116,13 +108,6 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
       'module-conversation__user__profile-name',
       groupCreated.userName,
     );
-    // Update in closed group rewrite
-    //   const emptyStateGroupText = `You have no messages from ${testGroup.userName}. Send a message to start the conversation!`;
-    //   await waitForTestIdWithText(
-    //     windowD,
-    //     'empty-conversation-notification',
-    //     emptyStateGroupText,
-    //   );
   },
 );
 
@@ -130,7 +115,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Change group name',
   async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
     const newGroupName = 'New group name';
-
+    const expectedError = englishStrippedStr('groupNameEnterPlease').toString();
     // Change the name of the group and check that it syncs to all devices (config messages)
     // Click on already created group
     // Check that renaming a group is working
@@ -157,12 +142,17 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOnTestIdWithText(aliceWindow1, 'edit-group-name');
     await typeIntoInput(aliceWindow1, 'group-name-input', '     ');
     await aliceWindow1.keyboard.press('Enter');
-    await waitForMatchingText(
+    await waitForTestIdWithText(aliceWindow1, 'error-message');
+    const actualError = await grabTextFromElement(
       aliceWindow1,
-      englishStrippedStr('groupNameEnterPlease').toString(),
+      'data-testid',
+      'error-message',
     );
-    // const errorMessage = aliceWindow1.locator('.error-message');
-    // await expect(errorMessage).toContainText('Please enter a group name');
+    if (actualError !== expectedError) {
+      throw new Error(
+        `Expected error message: ${expectedError}, but got: ${actualError}`,
+      );
+    }
     await clickOnMatchingText(
       aliceWindow1,
       englishStrippedStr('cancel').toString(),
@@ -205,6 +195,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'mentions-popup-row',
       charlie.userName,
     );
+    // ALice tags Bob
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'mentions-popup-row',
+      bob.userName,
+    );
+    await waitForMatchingText(bobWindow1, 'You');
 
     // in windowB we should be able to mentions alice and charlie
     await clickOnTestIdWithText(
@@ -225,6 +222,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'mentions-popup-row',
       charlie.userName,
     );
+    // Bob tags Charlie
+    await clickOnTestIdWithText(
+      bobWindow1,
+      'mentions-popup-row',
+      charlie.userName,
+    );
+    await waitForMatchingText(charlieWindow1, 'You');
 
     // in charlieWindow1 we should be able to mentions alice and userB
     await clickOnTestIdWithText(
@@ -245,12 +249,41 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'mentions-popup-row',
       bob.userName,
     );
+    // Charlie tags Alice
+    await clickOnTestIdWithText(
+      charlieWindow1,
+      'mentions-popup-row',
+      alice.userName,
+    );
+    await waitForMatchingText(aliceWindow1, 'You');
   },
 );
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Leave group',
-  async ({ charlieWindow1, groupCreated }) => {
+  async ({
+    aliceWindow1,
+    bobWindow1,
+    charlie,
+    charlieWindow1,
+    groupCreated,
+  }) => {
     await leaveGroup(charlieWindow1, groupCreated);
+    await Promise.all([
+      waitForTestIdWithText(
+        aliceWindow1,
+        'group-update-message',
+        englishStrippedStr('groupMemberLeft')
+          .withArgs({ name: charlie.userName })
+          .toString(),
+      ),
+      waitForTestIdWithText(
+        bobWindow1,
+        'group-update-message',
+        englishStrippedStr('groupMemberLeft')
+          .withArgs({ name: charlie.userName })
+          .toString(),
+      ),
+    ]);
   },
 );

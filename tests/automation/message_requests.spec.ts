@@ -3,6 +3,7 @@ import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
 import {
+  checkModalStrings,
   clickOnMatchingText,
   clickOnTestIdWithText,
   waitForMatchingText,
@@ -91,13 +92,18 @@ test_Alice_1W_Bob_1W(
       'module-conversation__user__profile-name',
       alice.userName,
     );
-    // Check that using the accept button has intended use
+
     await clickOnTestIdWithText(
       bobWindow1,
-      'decline-message-request',
-      englishStrippedStr('decline').toString(),
+      'delete-message-request',
+      englishStrippedStr('delete').toString(),
     );
     // Confirm decline
+    await checkModalStrings(
+      bobWindow1,
+      englishStrippedStr('delete').toString(),
+      englishStrippedStr('messageRequestsDelete').toString(),
+    );
     await clickOnTestIdWithText(
       bobWindow1,
       'session-confirm-ok-button',
@@ -125,6 +131,11 @@ test_Alice_1W_Bob_1W(
       englishStrippedStr('clearAll').toString(),
     );
     // Confirm decline
+    await checkModalStrings(
+      bobWindow1,
+      englishStrippedStr('clearAll').toString(),
+      englishStrippedStr('messageRequestsClearAllExplanation').toString(),
+    );
     await clickOnTestIdWithText(
       bobWindow1,
       'session-confirm-ok-button',
@@ -145,8 +156,3 @@ test_Alice_1W_Bob_1W(
     );
   },
 );
-
-// Clear all requests
-
-// Delete request (not a feature yet)
-// Block request (not a feature yet)

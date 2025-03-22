@@ -3,6 +3,14 @@ test-results/
 /playwright-report/
 /playwright/.cache/
 **/*.js
+/*.js
+*.js
+*.js.map
+<<<<<<< HEAD
+/*.js.map
+**/*.js.map
+=======
+>>>>>>> upstream/main
 .vscode/settings.json
 tests/automation/todo
 allure-report
@@ -12,3 +20,5 @@ TODO.md
 playwright.config.js
 sessionReporter.js
 .env
+output/
+dist/
