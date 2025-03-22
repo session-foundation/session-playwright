@@ -3,34 +3,8 @@ import { getSodiumNode, WithSodium } from '../tests/sodium';
 import { randomSnodeOnUserSwarm } from './actions/fetchSwarmOf';
 
 import { getAllSnodesFromSeed } from './requests/seedRequest';
-import { PubkeyType } from './requests/types';
 import { loadSessionTools, WithSessionTools } from './sessionTools';
 import { createRandomUser, SessionUser } from './sessionUser';
-
-function createRandomLegacyGroup({ sodium }: WithSodium) {
-  const seed = sodium.randombytes_buf(sodium.crypto_sign_ed25519_SEEDBYTES);
-  const ed25519KeyPair = sodium.crypto_sign_seed_keypair(seed);
-  const privkeyHex = sodium.to_hex(ed25519KeyPair.privateKey);
-
-  // 64 privkey + 64 pubkey
-  const publicKey = sodium.crypto_sign_ed25519_sk_to_pk(
-    sodium.from_hex(privkeyHex),
-  );
-  const x25519Pk = sodium.crypto_sign_ed25519_pk_to_curve25519(publicKey);
-
-  const encKeypair = sodium.crypto_sign_keypair();
-  const groupPubkey = new Uint8Array(33);
-  groupPubkey.set(x25519Pk, 1);
-  groupPubkey[0] = 5;
-
-  const groupPk = sodium.to_hex(groupPubkey) as PubkeyType;
-  return {
-    groupPk,
-    encPk: encKeypair.publicKey,
-    encSk: encKeypair.privateKey,
-  };
-}
-// type CreatedLegacyGroup = ReturnType<typeof createRandomLegacyGroup>;
 
 function makeFriendsAndKnown(...users: Array<SessionUser>) {
   if (users.length < 2) {
@@ -58,7 +32,7 @@ function makeFriendsAndKnown(...users: Array<SessionUser>) {
 function makeGroupWithMembers({
   members,
   groupName,
-  sodium,
+  _sodium,
 }: {
   members: Array<SessionUser>;
   groupName: string;
@@ -68,18 +42,17 @@ function makeGroupWithMembers({
     throw new Error('Excepted at least one creator/member');
   }
   const [creator, ...otherMembers] = members;
-  const { encPk, encSk, groupPk } = createRandomLegacyGroup({ sodium });
-  const legacyGroup = creator.userGroups.getOrConstructLegacyGroup(groupPk);
-  legacyGroup.name = groupName;
-  legacyGroup.encPubkey = encPk;
-  legacyGroup.encSeckey = encSk;
-  legacyGroup.insert(creator.sessionId, true);
-  otherMembers.forEach((member) => {
-    legacyGroup.insert(member.sessionId, false); // only one admin for legacy groups
-  });
+  const group03 = creator.userGroups.createGroup();
+  group03.name = groupName;
+  // group03.encPubkey = encPk;
+  // legacyGroup.encSeckey = encSk;
+  // group03.mem(creator.sessionId, true);
+  // otherMembers.forEach((member) => {
+  //   legacyGroup.insert(member.sessionId, false); // only one admin for legacy groups
+  // });
 
   [creator, ...otherMembers].forEach((member) => {
-    member.userGroups.setLegacyGroup(legacyGroup);
+    member.userGroups.setGroup(group03);
   });
 }
 
@@ -128,7 +101,11 @@ export async function prepareThreeFriendsInSharedGroup() {
         .map((u) => `"${u.userProfile.getName()}": "${u.seedPhrase}"`)
         .join('\n\t')} `,
     );
-    return users.map((m) => ({ seed: m.seed, sessionId: m.sessionId }));
+    return users.map((m) => ({
+      seed: m.seed,
+      seedPhrase: m.seedPhrase,
+      sessionId: m.sessionId,
+    }));
   } finally {
     users.map((user) => user.freeMemory());
   }

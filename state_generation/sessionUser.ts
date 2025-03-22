@@ -1,9 +1,4 @@
-import type {
-  Contacts,
-  ContactsW,
-  UserGroupsW,
-  UserProfileW,
-} from 'session-tooling';
+import type { ContactsW, UserGroupsW, UserProfileW } from 'session-tooling';
 import { WithSodium } from '../tests/sodium';
 import { PubkeyType, Snode } from './requests/types';
 import { StoreUserConfigSubRequest } from './requests/snodeRequests';
@@ -73,7 +68,7 @@ export class SessionUser {
   public readonly seedPhrase: string;
   public readonly wrappers: Array<UserProfileW | ContactsW | UserGroupsW>;
   public readonly userProfile: UserProfileW;
-  public readonly contacts: Contacts;
+  public readonly contacts: ContactsW;
   public readonly userGroups: UserGroupsW;
   public readonly userSigner: UserSigner;
 
