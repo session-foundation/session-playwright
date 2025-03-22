@@ -14,6 +14,7 @@ async function getSwarmOfUser(sessionId: PubkeyType, snode: SnodeFromSeed) {
       method: 'POST',
     },
   );
+
   const swarm = await swarmResult.json();
 
   if (isEmpty(fetchedSwarms[sessionId])) {

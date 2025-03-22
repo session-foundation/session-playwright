@@ -123,7 +123,11 @@ export async function prepareThreeFriendsInSharedGroup() {
         await user.pushChangesToSwarm(randomSnodeOnSwarm);
       }),
     );
-    console.warn(`seed of alice: "${users[0].seedPhrase}"`);
+    console.info(
+      `seed of users:\n\t${users
+        .map((u) => `"${u.userProfile.getName()}": "${u.seedPhrase}"`)
+        .join('\n\t')} `,
+    );
     return users.map((m) => ({ seed: m.seed, sessionId: m.sessionId }));
   } finally {
     users.map((user) => user.freeMemory());

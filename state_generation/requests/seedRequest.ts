@@ -1,3 +1,4 @@
+// test integration are always on testnet on desktop
 const testNet = true;
 
 const seedNode = testNet
@@ -17,7 +18,7 @@ export async function getAllSnodesFromSeed() {
     );
 
     const json = await result.json();
-    console.warn('json', json);
+    console.warn('getAllSnodesFromSeed json:', json);
 
     return json.result.service_node_states;
   } catch (e) {
