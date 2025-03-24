@@ -1,6 +1,17 @@
+import { prepareThreeFriendsInSharedGroup } from '../../state_generation';
+import { sleepFor } from '../promise_utils';
+import { recoverFromSeed } from './setup/recovery_using_seed';
+import { sessionTestThreeWindows } from './setup/sessionTest';
 import { clickOnMatchingText } from './utilities/utils';
-import { sessionTestOneWindow } from './setup/sessionTest';
 
-sessionTestOneWindow('Tiny test', async ([windowA]) => {
+sessionTestThreeWindows('Tiny test', async (windows) => {
+  const [windowA, _windowB, _windowC] = windows;
+  const prebuilt = await prepareThreeFriendsInSharedGroup('Tiny test group 1');
+
+  await Promise.all(
+    windows.map((w, index) => recoverFromSeed(w, prebuilt[index].seedPhrase)),
+  );
+
+  await sleepFor(1000000);
   await clickOnMatchingText(windowA, 'Create Session ID');
 });

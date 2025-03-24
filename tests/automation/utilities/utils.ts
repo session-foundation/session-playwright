@@ -10,8 +10,10 @@ import {
   WithMaxWait,
   WithPage,
   WithRightButton,
-  loaderType,
+  LoaderType,
+  DMTimeOption,
 } from '../types/testing';
+// eslint-disable-next-line import/no-cycle
 import { sendMessage } from './message';
 
 // WAIT FOR FUNCTIONS
@@ -30,8 +32,8 @@ export async function waitForTestIdWithText(
     const escapedText = text.replace(/"/g, '\\\"');
 
     builtSelector += `:has-text("${escapedText}")`;
-    console.warn('builtSelector:', builtSelector);
-    // console.warn('Text is tiny bubble: ', escapedText);
+    // console.info('builtSelector:', builtSelector);
+    // console.info('Text is tiny bubble: ', escapedText);
   }
   // console.info('looking for selector', builtSelector);
   const found = await window.waitForSelector(builtSelector, {
@@ -53,7 +55,21 @@ export async function waitForElement(
     ? `css=[${strategy}=${selector}]`
     : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
 
-  return window.waitForSelector(builtSelector, { timeout: maxWaitMs });
+  const start = Date.now();
+  if (!selector.includes('path-light-container')) {
+    console.log(`waitForElement: ${builtSelector} for maxMs ${maxWaitMs}`);
+  }
+
+  const el = await window.waitForSelector(builtSelector, {
+    timeout: maxWaitMs,
+  });
+  if (!selector.includes('path-light-container')) {
+    console.log(
+      `waitForElement: got ${builtSelector} after ${Date.now() - start}ms`,
+    );
+  }
+
+  return el;
 }
 
 export async function waitForTextMessage(
@@ -69,12 +85,21 @@ export async function waitForTextMessage(
     const escapedText = text.replace(/"/g, '\\\"');
 
     builtSelector += `:has-text("${escapedText}")`;
-    console.warn('builtSelector:', builtSelector);
-    // console.warn('Text is tiny bubble: ', escapedText);
+    console.info('builtSelector:', builtSelector);
   }
   const el = await window.waitForSelector(builtSelector, { timeout: maxWait });
-  console.info(`Text message found. Text: , ${text}`);
+  console.info(`Text message found. Text: "${text}"`);
   return el;
+}
+
+export async function waitForTextMessages(
+  window: Page,
+  texts: Array<string>,
+  maxWait?: number,
+) {
+  return Promise.all(
+    texts.map(async (t) => waitForTextMessage(window, t, maxWait)),
+  );
 }
 
 export async function waitForControlMessageWithText(
@@ -119,6 +144,9 @@ export async function waitForMatchingPlaceholder(
 
         found = true;
       }
+      if (!found) {
+        await sleepFor(100, true);
+      }
     } catch (e) {
       await sleepFor(1000, true);
       console.info(
@@ -135,7 +163,7 @@ export async function waitForMatchingPlaceholder(
 }
 export async function waitForLoadingAnimationToFinish(
   window: Page,
-  loader: loaderType,
+  loader: LoaderType,
   maxWait?: number,
 ) {
   let loadingAnimation: ElementHandle<SVGElement | HTMLElement> | undefined;
@@ -157,6 +185,35 @@ export async function waitForLoadingAnimationToFinish(
     }
   } while (loadingAnimation);
   console.info('Loading animation has finished');
+}
+
+export async function doWhileWithMax(
+  maxWaitMs: number,
+  waitBetweenMs: number,
+  label: string,
+  actionTodo: () => Promise<boolean>,
+) {
+  const start = Date.now();
+  let iteration = 0;
+  let wasSuccess = false;
+  do {
+    try {
+      wasSuccess = await actionTodo();
+    } catch (e) {
+      console.error(
+        `doWhileWithMax with label:"${label}" iteration:${iteration} failed with: ${e.message}`,
+        e,
+      );
+    }
+    iteration++;
+    await sleepFor(waitBetweenMs);
+  } while (!wasSuccess && Date.now() - start < maxWaitMs);
+
+  if (!wasSuccess) {
+    throw new Error(
+      `doWhileWithMax with label:"${label}" still failing after ${maxWaitMs}ms`,
+    );
+  }
 }
 
 export async function checkPathLight(window: Page, maxWait?: number) {
@@ -226,11 +283,14 @@ export async function clickOnMatchingText(
   window: Page,
   text: string,
   rightButton = false,
+  timeoutMs?: number,
 ) {
   console.info(`clickOnMatchingText: "${text}"`);
   return window.click(
     `"${text}"`,
-    rightButton ? { button: 'right' } : undefined,
+    rightButton
+      ? { button: 'right', timeout: timeoutMs }
+      : { timeout: timeoutMs },
   );
 }
 
@@ -245,7 +305,7 @@ export async function clickOnTestIdWithText(
   console.info(
     `clickOnTestIdWithText with testId:${dataTestId} and text:${
       text || 'none'
-    }`,
+    }, rightButton:${!!rightButton}`,
   );
 
   const builtSelector = !text
@@ -289,18 +349,11 @@ export async function typeIntoInput(
 ) {
   console.info(`typeIntoInput testId: ${dataTestId} : "${text}"`);
   const builtSelector = `css=[data-testid=${dataTestId}]`;
-  return window.fill(builtSelector, text);
-}
-
-export async function typeIntoInputSlow(
-  window: Page,
-  dataTestId: DataTestId,
-  text: string,
-) {
-  console.info(`typeIntoInput testId: ${dataTestId} : "${text}"`);
-  const builtSelector = `css=[data-testid=${dataTestId}]`;
-  await window.waitForSelector(builtSelector);
-  return window.type(builtSelector, text, { delay: 100 });
+  // the new input made with onboarding element needs a click to reveal the input in the DOM
+  await clickOnTestIdWithText(window, dataTestId);
+  // reset the content to be empty before typing into the input
+  await window.fill(builtSelector, '');
+  return window.type(builtSelector, text);
 }
 
 export async function doesTextIncludeString(
@@ -317,6 +370,16 @@ export async function doesTextIncludeString(
   } else {
     throw new Error(`Text not found: "${text}"`);
   }
+}
+
+export async function grabTextFromElement(
+  window: Page,
+  strategy: Strategy,
+  selector: string,
+) {
+  const builtSelector = `css=[${strategy}=${selector}]`;
+  const element = await window.waitForSelector(builtSelector);
+  return element.innerText();
 }
 
 export async function hasElementBeenDeleted(
@@ -395,6 +458,27 @@ export async function hasElementPoppedUpThatShouldnt(
   if (elVisible === true) {
     throw new Error(fakeError);
   }
+  return builtSelector;
+}
+
+export async function doesElementExist(
+  window: Page,
+  strategy: Strategy,
+  selector: string,
+  text?: string,
+) {
+  const builtSelector = !text
+    ? `css=[${strategy}=${selector}]`
+    : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
+
+  const fakeError = `Element ${selector} does not exist`;
+  const elVisible = await window.isVisible(builtSelector);
+  if (!elVisible) {
+    console.log(fakeError);
+    return undefined;
+  }
+  console.log(`Element ${selector} exists`);
+  return builtSelector;
 }
 
 export async function measureSendingTime(window: Page, messageNumber: number) {
@@ -410,31 +494,41 @@ export async function measureSendingTime(window: Page, messageNumber: number) {
   return timeMs;
 }
 
-export async function doWhileWithMax(
-  maxWaitMs: number,
-  waitBetweenMs: number,
-  label: string,
-  actionTodo: () => Promise<boolean>,
-) {
-  const start = Date.now();
-  let iteration = 0;
-  let wasSuccess = false;
-  do {
-    try {
-      wasSuccess = await actionTodo();
-    } catch (e) {
-      console.error(
-        `doWhileWithMax with label:"${label}" iteration:${iteration} failed with: ${e.message}`,
-        e,
-      );
-    }
-    iteration++;
-    await sleepFor(waitBetweenMs);
-  } while (!wasSuccess && Date.now() - start < maxWaitMs);
+export function removeNewLines(input: string): string {
+  return input.replace(/\s+/g, ' ').trim();
+}
 
-  if (!wasSuccess) {
+export async function checkModalStrings(
+  window: Page,
+  expectedHeading: string,
+  expectedDescription: string,
+) {
+  const heading = await waitForElement(window, 'data-testid', 'modal-heading');
+  const description = await waitForElement(
+    window,
+    'data-testid',
+    'modal-description',
+  );
+
+  const headingText = await heading.innerText();
+  const descriptionText = await description.innerText();
+  const formattedDescription = removeNewLines(descriptionText);
+
+  if (headingText !== expectedHeading) {
     throw new Error(
-      `doWhileWithMax with label:"${label}" still failing after ${maxWaitMs}ms`,
+      `Expected heading: ${expectedHeading}, got: ${headingText}`,
     );
   }
+
+  if (formattedDescription !== expectedDescription) {
+    throw new Error(
+      `Expected description: ${expectedDescription}, got: ${formattedDescription}`,
+    );
+  }
+}
+
+export function formatTimeOption(option: DMTimeOption) {
+  const timePart = option.replace('time-option-', '');
+  const formattedTime = timePart.replace(/-/g, ' ');
+  return formattedTime;
 }
