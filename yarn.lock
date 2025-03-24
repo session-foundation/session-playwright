@@ -94,7 +94,7 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@playwright/test@1.51":
+"@playwright/test@^1.51":
   version "1.51.1"
   resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.51.1.tgz#75357d513221a7be0baad75f01e966baf9c41a2e"
   integrity sha512-nM+kEaTSAoVlXmMPH10017vn3FSiFqr/bh4fKg9vmAdMfd9SDqRZNvPSiAHADc/itWak+qPvMPZQOPwCBW7k7Q==
