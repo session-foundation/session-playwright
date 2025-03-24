@@ -7,11 +7,10 @@ import {
 } from './setup/sessionTest';
 import { leaveGroup } from './utilities/leave_group';
 import {
-  checkModalStrings,
   clickOnMatchingText,
   clickOnTestIdWithText,
   waitForLoadingAnimationToFinish,
-  waitForTestIdWithText,
+  waitForTestIdWithText
 } from './utilities/utils';
 
 test_group_Alice_2W_Bob_1W_Charlie_1W(
@@ -167,6 +166,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOnTestIdWithText(aliceWindow2, 'session-confirm-cancel-button');
     // Delete device data on alicewindow2
     await clickOnTestIdWithText(aliceWindow2, 'settings-section');
+    // Click on clear data option
+    await clickOnTestIdWithText(aliceWindow2, 'clear-data-settings-menu-item');
     // Need test tag for description text
     // await checkModalStrings(
     //   aliceWindow2,
