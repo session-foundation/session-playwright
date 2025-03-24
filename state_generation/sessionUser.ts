@@ -23,7 +23,7 @@ function generateMnemonic(opts: WithSodium) {
   return mnEncode(hex);
 }
 
-function mnemonixToRawSeed(mnemonic: string) {
+function mnemonicToRawSeed(mnemonic: string) {
   let seedHex = mnDecode(mnemonic);
   const privKeyHexLength = 32 * 2;
   if (seedHex.length !== privKeyHexLength) {
@@ -74,7 +74,7 @@ export class SessionUser {
 
   constructor({ sessionTools, sodium }: WithSessionTools & WithSodium) {
     const mnemonic = generateMnemonic({ sodium });
-    const seed = mnemonixToRawSeed(mnemonic);
+    const seed = mnemonicToRawSeed(mnemonic);
     const userKeys = sessionGenerateKeyPair({ seed, sodium });
 
     const userProfile = new sessionTools.UserProfileW(

@@ -2,6 +2,7 @@ import { base64_variants, to_base64 } from 'libsodium-wrappers-sumo';
 import { isEmpty } from 'lodash';
 import { UserSigner } from '../signer/userSigner';
 import { GroupPubkeyType, PubkeyType, WithGetNow } from './types';
+import type { GroupAdminSigner } from '../signer/groupSigner';
 
 export class SwarmForSubRequest {
   public method = 'get_swarm' as const;
@@ -126,6 +127,76 @@ export class StoreUserConfigSubRequest {
     if (!signDetails) {
       throw new Error(
         `[StoreUserConfigSubRequest] signing returned an empty result`,
+      );
+    }
+
+    const toRet = {
+      method: this.method,
+      params: {
+        namespace: this.namespace,
+        ttl: this.ttlMs,
+        data: encryptedDataBase64,
+        ...signDetails,
+      },
+    };
+
+    return toRet;
+  }
+
+  public loggingId(): string {
+    return `${this.method}-${this.destination}-${this.namespace}`;
+  }
+
+  public getDestination() {
+    return this.destination;
+  }
+}
+
+export class StoreGroupConfigSubRequest {
+  public method = 'store' as const;
+  public readonly namespace: number;
+  public readonly ttlMs: number;
+  public readonly encryptedData: Uint8Array;
+  public readonly destination: GroupPubkeyType;
+  public readonly adminGroupSigner: GroupAdminSigner;
+
+  constructor(args: {
+    namespace: number;
+    ttlMs: number;
+    encryptedData: Uint8Array;
+    groupPk: GroupPubkeyType;
+    adminGroupSigner: GroupAdminSigner;
+  }) {
+    this.namespace = args.namespace;
+    this.ttlMs = args.ttlMs;
+    this.encryptedData = args.encryptedData;
+    this.destination = args.groupPk;
+    this.adminGroupSigner = args.adminGroupSigner;
+
+    if (isEmpty(this.encryptedData)) {
+      throw new Error('this.encryptedData cannot be empty');
+    }
+
+    if (isEmpty(this.destination)) {
+      throw new Error('this.destination cannot be empty');
+    }
+  }
+
+  public async build() {
+    const encryptedDataBase64 = to_base64(
+      this.encryptedData,
+      base64_variants.ORIGINAL,
+    );
+
+    const signDetails = await this.adminGroupSigner.getSnodeSignatureParams({
+      getNow: () => Date.now(),
+      method: this.method,
+      namespace: this.namespace,
+    });
+
+    if (!signDetails) {
+      throw new Error(
+        `[StoreGroupConfigSubRequest] signing returned an empty result`,
       );
     }
 

@@ -1,10 +1,18 @@
 import { isEmpty, sample } from 'lodash';
 import { SwarmForSubRequest } from '../requests/snodeRequests';
-import { PubkeyType, Snode, SnodeFromSeed } from '../requests/types';
+import {
+  PubkeyType,
+  Snode,
+  SnodeFromSeed,
+  type GroupPubkeyType,
+} from '../requests/types';
 
-const fetchedSwarms: Record<PubkeyType, Array<Snode>> = {};
+const fetchedSwarms: Record<PubkeyType | GroupPubkeyType, Array<Snode>> = {};
 
-async function getSwarmOfUser(sessionId: PubkeyType, snode: SnodeFromSeed) {
+async function getSwarmOfUser(
+  sessionId: PubkeyType | GroupPubkeyType,
+  snode: SnodeFromSeed,
+) {
   const swarmRequest = new SwarmForSubRequest(sessionId);
 
   const swarmResult = await fetch(
@@ -26,7 +34,7 @@ async function getSwarmOfUser(sessionId: PubkeyType, snode: SnodeFromSeed) {
 }
 
 export async function randomSnodeOnUserSwarm(
-  sessionId: PubkeyType,
+  sessionId: PubkeyType | GroupPubkeyType,
   snode: SnodeFromSeed,
 ) {
   const userSwarm =

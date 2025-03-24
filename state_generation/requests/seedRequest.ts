@@ -18,8 +18,6 @@ export async function getAllSnodesFromSeed() {
     );
 
     const json = await result.json();
-    console.warn('getAllSnodesFromSeed json:', json);
-
     return json.result.service_node_states;
   } catch (e) {
     console.warn(e);

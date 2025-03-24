@@ -5,6 +5,7 @@ import { randomSnodeOnUserSwarm } from './actions/fetchSwarmOf';
 import { getAllSnodesFromSeed } from './requests/seedRequest';
 import { loadSessionTools, WithSessionTools } from './sessionTools';
 import { createRandomUser, SessionUser } from './sessionUser';
+import { SessionGroup } from './sessionGroup';
 
 function makeFriendsAndKnown(...users: Array<SessionUser>) {
   if (users.length < 2) {
@@ -32,28 +33,12 @@ function makeFriendsAndKnown(...users: Array<SessionUser>) {
 function makeGroupWithMembers({
   members,
   groupName,
-  _sodium,
+  sessionTools,
 }: {
   members: Array<SessionUser>;
   groupName: string;
-} & WithSodium) {
-  // first one is the creator
-  if (!members.length) {
-    throw new Error('Excepted at least one creator/member');
-  }
-  const [creator, ...otherMembers] = members;
-  const group03 = creator.userGroups.createGroup();
-  group03.name = groupName;
-  // group03.encPubkey = encPk;
-  // legacyGroup.encSeckey = encSk;
-  // group03.mem(creator.sessionId, true);
-  // otherMembers.forEach((member) => {
-  //   legacyGroup.insert(member.sessionId, false); // only one admin for legacy groups
-  // });
-
-  [creator, ...otherMembers].forEach((member) => {
-    member.userGroups.setGroup(group03);
-  });
+} & WithSessionTools) {
+  return new SessionGroup({ sessionTools, groupName, members });
 }
 
 export function twoUsersFriends(opts: WithSodium & WithSessionTools) {
@@ -62,7 +47,7 @@ export function twoUsersFriends(opts: WithSodium & WithSessionTools) {
   makeFriendsAndKnown(alice, bob);
 }
 
-export async function prepareThreeFriendsInSharedGroup() {
+export async function prepareThreeFriendsInSharedGroup(groupName: string) {
   const sodium = await getSodiumNode();
   const sessionTools = await loadSessionTools();
 
@@ -78,24 +63,36 @@ export async function prepareThreeFriendsInSharedGroup() {
 
     makeFriendsAndKnown(alice, bob, charlie);
 
-    makeGroupWithMembers({
-      groupName: 'group test 1',
+    const group = makeGroupWithMembers({
+      groupName,
       members: [alice, bob, charlie],
-      sodium,
+      sessionTools,
     });
+
+    console.warn('creatorMetagroupW info:', group.metagroupW.makeInfoDumpHex());
+    console.warn(
+      'creatorMetagroupW members:',
+      group.metagroupW.makeMembersDumpHex(),
+    );
 
     const snodesInNetwork = await getAllSnodesFromSeed();
 
     const randomSnodeFromSeed = sample(snodesInNetwork);
     await Promise.all(
       users.map(async (user) => {
-        const randomSnodeOnSwarm = await randomSnodeOnUserSwarm(
+        const randomUserSnodeOnSwarm = await randomSnodeOnUserSwarm(
           user.sessionId,
           randomSnodeFromSeed,
         );
-        await user.pushChangesToSwarm(randomSnodeOnSwarm);
+        await user.pushChangesToSwarm(randomUserSnodeOnSwarm);
       }),
     );
+
+    const randomGroupSnodeOnSwarm = await randomSnodeOnUserSwarm(
+      group.groupPk,
+      randomSnodeFromSeed,
+    );
+    await group.pushChangesToSwarm(randomGroupSnodeOnSwarm);
     console.info(
       `seed of users:\n\t${users
         .map((u) => `"${u.userProfile.getName()}": "${u.seedPhrase}"`)

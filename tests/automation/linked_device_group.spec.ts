@@ -7,7 +7,6 @@ import {
 } from './setup/sessionTest';
 import { leaveGroup } from './utilities/leave_group';
 import {
-  checkModalStrings,
   clickOnMatchingText,
   clickOnTestIdWithText,
   waitForLoadingAnimationToFinish,

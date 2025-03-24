@@ -6,7 +6,7 @@ import { clickOnMatchingText } from './utilities/utils';
 
 sessionTestThreeWindows('Tiny test', async (windows) => {
   const [windowA, _windowB, _windowC] = windows;
-  const prebuilt = await prepareThreeFriendsInSharedGroup();
+  const prebuilt = await prepareThreeFriendsInSharedGroup('Tiny test group 1');
 
   await Promise.all(
     windows.map((w, index) => recoverFromSeed(w, prebuilt[index].seedPhrase)),
