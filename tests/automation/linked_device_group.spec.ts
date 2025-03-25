@@ -7,10 +7,11 @@ import {
 } from './setup/sessionTest';
 import { leaveGroup } from './utilities/leave_group';
 import {
+  checkModalStrings,
   clickOnMatchingText,
   clickOnTestIdWithText,
   waitForLoadingAnimationToFinish,
-  waitForTestIdWithText
+  waitForTestIdWithText,
 } from './utilities/utils';
 
 test_group_Alice_2W_Bob_1W_Charlie_1W(
@@ -168,23 +169,21 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOnTestIdWithText(aliceWindow2, 'settings-section');
     // Click on clear data option
     await clickOnTestIdWithText(aliceWindow2, 'clear-data-settings-menu-item');
-    // Need test tag for description text
-    // await checkModalStrings(
-    //   aliceWindow2,
-    //   englishStrippedStr('clearDataAll').toString(),
-    //   englishStrippedStr('clearDataAllDescription').toString(),
-    // );
+    await checkModalStrings(
+      aliceWindow2,
+      englishStrippedStr('clearDataAll').toString(),
+      englishStrippedStr('clearDataAllDescription').toString(),
+    );
     await clickOnTestIdWithText(
       aliceWindow2,
       'clear-data-settings-menu-item',
       englishStrippedStr('clear').toString(),
     );
-    // Need to add test tag for description text
-    // await checkModalStrings(
-    //   aliceWindow2,
-    //   englishStrippedStr('clearDataAll').toString(),
-    //   englishStrippedStr('clearDeviceDescription').toString(),
-    // );
+    await checkModalStrings(
+      aliceWindow2,
+      englishStrippedStr('clearDataAll').toString(),
+      englishStrippedStr('clearDeviceDescription').toString(),
+    );
     await clickOnMatchingText(
       aliceWindow2,
       englishStrippedStr('clear').toString(),
@@ -234,12 +233,11 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     // Delete device data on restoredWindow
     await clickOnTestIdWithText(restoredWindow, 'settings-section');
-    // Need test tag for description text
-    // await checkModalStrings(
-    //   restoredWindow,
-    //   englishStrippedStr('clearDataAll').toString(),
-    //   englishStrippedStr('clearDataAllDescription').toString(),
-    // );
+    await checkModalStrings(
+      restoredWindow,
+      englishStrippedStr('clearDataAll').toString(),
+      englishStrippedStr('clearDataAllDescription').toString(),
+    );
     await clickOnTestIdWithText(
       restoredWindow,
       'clear-data-settings-menu-item',
