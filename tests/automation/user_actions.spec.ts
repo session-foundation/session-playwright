@@ -123,7 +123,7 @@ test_Alice_1W_Bob_1W(
     // make sure the confirm dialogs shows up
     await checkModalStrings(
       aliceWindow1,
-      'modal-description',
+      englishStrippedStr('blockUnblock').toString(),
       englishStrippedStr('blockUnblockName')
         .withArgs({ name: bob.userName })
         .toString(),

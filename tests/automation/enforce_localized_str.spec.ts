@@ -199,7 +199,7 @@ function getExpectedStringFromKey(
     case 'callsVoiceAndVideoBeta':
       return 'Voice and Video Calls (Beta)';
     case 'callsVoiceAndVideoModalDescription':
-      return 'Your IP is visible to your call partner and an Oxen Foundation server while using beta calls.';
+      return 'Your IP is visible to your call partner and a Session Technology Foundation server while using beta calls.';
     case 'blockDescription':
       return 'Are you sure you want to block {name}? Blocked users cannot send you message requests, group invites or call you.';
     case 'conversationsDeleteDescription':
@@ -218,6 +218,20 @@ function getExpectedStringFromKey(
       return 'read';
     case 'disappearingMessagesTypeSent':
       return 'sent';
+    case 'messageRequestsDelete':
+      return 'Are you sure you want to delete this message request?';
+    case 'messageRequestsClearAllExplanation':
+      return 'Are you sure you want to clear all message requests and group invites?';
+    case 'groupMembers':
+      return 'Group Members';
+    case 'you':
+      return 'You';
+    case 'clearDataAll':
+      return 'Clear All Data';
+    case 'clearDataAllDescription':
+      return 'This will permanently delete your messages and contacts. Would you like to clear this device only, or delete your data from the network as well?';
+    case 'clearDeviceDescription':
+      return 'Are you sure you want to clear your device?';
     default:
       // returning nul means we don't have an expected string yet for this key.
       // This will make the test fail

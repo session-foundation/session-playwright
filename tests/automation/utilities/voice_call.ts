@@ -33,6 +33,7 @@ export const makeVoiceCall = async (
   // Enable calls in window B
   await clickOnTestIdWithText(receiverWindow, 'session-toast');
   await clickOnTestIdWithText(receiverWindow, 'enable-calls');
+  // Getting wrong strings from locales.ts file
   await checkModalStrings(
     receiverWindow,
     englishStrippedStr('callsVoiceAndVideoBeta').toString(),
