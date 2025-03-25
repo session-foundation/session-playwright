@@ -99,7 +99,6 @@ export const setDisappearingMessages = async (
   });
   await waitForTestIdWithText(windowA, 'disappear-messages-type-and-time');
   if (windowB) {
-
     await clickOnMatchingText(
       windowB,
       englishStrippedStr('disappearingMessagesFollowSetting').toString(),
