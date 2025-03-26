@@ -1,9 +1,8 @@
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable import/no-import-module-exports */
 import { defineConfig } from '@playwright/test';
 import { isEmpty, toNumber } from 'lodash';
 
 import dotenv from 'dotenv';
+import { screenshotFolder } from './tests/automation/constants/variables';
 
 dotenv.config();
 
@@ -29,5 +28,5 @@ export default defineConfig({
   reportSlowTests: null,
   fullyParallel: true, // otherwise, tests in the same file are not run in parallel
   globalSetup: './global.setup', // clean leftovers of previous test runs on start, runs only once
-  snapshotPathTemplate: '__screenshots__/{testName}/{arg}-{platform}{ext}',
+  snapshotPathTemplate:  screenshotFolder + '/{testName}/{arg}-{platform}{ext}',
 });
