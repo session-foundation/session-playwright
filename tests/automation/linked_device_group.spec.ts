@@ -243,12 +243,11 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'clear-data-settings-menu-item',
       englishStrippedStr('clear').toString(),
     );
-    // Need to add test tag for description text
-    // await checkModalStrings(
-    //   restoredWindow,
-    //   englishStrippedStr('clearDataAll').toString(),
-    //   englishStrippedStr('clearDeviceDescription').toString(),
-    // );
+    await checkModalStrings(
+      restoredWindow,
+      englishStrippedStr('clearDataAll').toString(),
+      englishStrippedStr('clearDeviceDescription').toString(),
+    );
     await clickOnMatchingText(
       restoredWindow,
       englishStrippedStr('clear').toString(),
