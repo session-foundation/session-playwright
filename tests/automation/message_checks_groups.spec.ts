@@ -253,7 +253,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Need to copy link to clipboard, as the enable link preview modal
     // doesn't pop up if manually typing link (needs to be pasted)
     // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
-    const firstCopyBtn = await aliceWindow1
+    const firstCopyBtn = aliceWindow1
       .locator(
         `[data-testid=context-menu-item]:has-text(${englishStrippedStr(
           'copy',

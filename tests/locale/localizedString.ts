@@ -67,8 +67,11 @@ class LocalizedStringBuilder<
   T extends TokenString<Dict>,
 > {
   private readonly token: T;
+
   private args?: StringArgsRecord<Dict[T]>;
+
   private isStripped = false;
+
   private isEnglishForced = false;
 
   private readonly renderStringAsToken =
