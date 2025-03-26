@@ -185,4 +185,5 @@ export type DataTestId =
   | 'link-preview-title'
   | 'error-message'
   | 'group-members'
-  | 'session-confirm-cancel-button';
+  | 'session-confirm-cancel-button'
+  | 'session-recovery-password';
