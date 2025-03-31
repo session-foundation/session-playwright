@@ -46,7 +46,7 @@ test_Alice_2W_Bob_1W(
     );
     await aliceWindow1.setInputFiles(
       "input[type='file']",
-      'fixtures/test-image.png',
+      'sample_files/test-image.png',
     );
     await typeIntoInput(
       aliceWindow1,

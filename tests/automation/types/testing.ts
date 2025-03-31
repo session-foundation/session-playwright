@@ -179,4 +179,5 @@ export type DataTestId =
   | 'modal-heading'
   | 'call-notification-answered-a-call'
   | 'call-notification-started-call'
-  | 'back-button';
+  | 'back-button'
+  | 'session-recovery-password';
