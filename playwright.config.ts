@@ -1,20 +1,15 @@
 import { defineConfig } from '@playwright/test';
-import { isEmpty, toNumber } from 'lodash';
+import { toNumber } from 'lodash';
 
 import dotenv from 'dotenv';
 import { screenshotFolder } from './tests/automation/constants/variables';
 
 dotenv.config();
 
-const useSessionReporter = !isEmpty(process.env.PLAYWRIGHT_CUSTOM_REPORTER);
-
 export default defineConfig({
   timeout: 350000,
   globalTimeout: 6000000,
-  reporter: [
-    useSessionReporter ? ['./sessionReporter.ts'] : ['list'],
-    ['allure-playwright'],
-  ],
+  reporter: [['./sessionReporter.ts'], ['allure-playwright']],
   testDir: './tests/automation',
   testIgnore: '*.js',
   outputDir: './tests/automation/test-results',
@@ -28,5 +23,5 @@ export default defineConfig({
   reportSlowTests: null,
   fullyParallel: true, // otherwise, tests in the same file are not run in parallel
   globalSetup: './global.setup', // clean leftovers of previous test runs on start, runs only once
-  snapshotPathTemplate:  screenshotFolder + '/{testName}/{arg}-{platform}{ext}',
+  snapshotPathTemplate: screenshotFolder + '/{testName}/{arg}-{platform}{ext}',
 });

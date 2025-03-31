@@ -65,7 +65,6 @@ jobs:
       options: --cpus 16
 
     env:
-      PLAYWRIGHT_CUSTOM_REPORTER: 1
       PLAYWRIGHT_REPEAT_COUNT: ${{ github.event.inputs.PLAYWRIGHT_REPEAT_COUNT }}
       PLAYWRIGHT_RETRIES_COUNT: ${{ github.event.inputs.PLAYWRIGHT_RETRIES_COUNT }}
       PLAYWRIGHT_WORKERS_COUNT: ${{ github.event.inputs.PLAYWRIGHT_WORKERS_COUNT }}
