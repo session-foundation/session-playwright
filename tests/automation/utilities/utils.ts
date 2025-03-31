@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable no-useless-escape */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-await-in-loop */
@@ -13,11 +14,10 @@ import {
   WithPage,
   WithRightButton,
 } from '../types/testing';
-// eslint-disable-next-line import/no-cycle
-import fs from 'fs';
-import path from 'path';
 import { sendMessage } from './message';
 import { ElementState } from '../landing_page.spec';
+import fs from 'fs';
+import path from 'path';
 import { screenshotFolder } from '../constants/variables';
 
 // WAIT FOR FUNCTIONS

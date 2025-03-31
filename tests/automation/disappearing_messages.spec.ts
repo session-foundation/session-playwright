@@ -1,11 +1,11 @@
 import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
+import { defaultDisappearingOptions } from './constants/variables';
 import {
   test_Alice_2W,
   test_Alice_2W_Bob_1W,
   test_group_Alice_2W_Bob_1W_Charlie_1W,
 } from './setup/sessionTest';
-import { DMTimeOption, DisappearActions } from './types/testing';
 import { createContact } from './utilities/create_contact';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -26,9 +26,8 @@ import {
 test_Alice_2W_Bob_1W(
   'Disappear after read 1:1',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
-    const disappearingMessagesType = 'disappear-after-read-option';
-    const timeOption: DMTimeOption = 'time-option-10-seconds';
-    const disappearAction: DisappearActions = 'read';
+    const { timeOption, disappearingMessagesType, disappearAction } =
+      defaultDisappearingOptions.DAR;
     const formattedTime = formatTimeOption(timeOption);
     const testMessage =
       'Testing disappearing messages timer is working correctly';
@@ -90,9 +89,8 @@ test_Alice_2W_Bob_1W(
 test_Alice_2W_Bob_1W(
   'Disappear after send 1:1',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
-    const disappearingMessagesType = 'disappear-after-send-option';
-    const timeOption: DMTimeOption = 'time-option-10-seconds';
-    const disappearAction: DisappearActions = 'sent';
+    const { timeOption, disappearingMessagesType, disappearAction } =
+      defaultDisappearingOptions.DAS;
     const formattedTime = formatTimeOption(timeOption);
     const testMessage =
       'Testing disappearing messages timer is working correctly';
@@ -149,9 +147,8 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     charlieWindow1,
     groupCreated,
   }) => {
-    const disappearingMessagesType = 'disappear-after-send-option';
-    const timeOption: DMTimeOption = 'time-option-10-seconds';
-    const disappearAction: DisappearActions = 'sent';
+    const { timeOption, disappearingMessagesType, disappearAction } =
+      defaultDisappearingOptions.group;
     const formattedTime = formatTimeOption(timeOption);
     const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
       .withArgs({
@@ -200,9 +197,8 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
 test_Alice_2W(
   'Disappear after send note to self',
   async ({ alice, aliceWindow1, aliceWindow2 }) => {
-    const disappearingMessagesType = 'disappear-after-send-option';
-    const timeOption: DMTimeOption = 'time-option-10-seconds';
-    const disappearAction: DisappearActions = 'sent';
+    const { timeOption, disappearingMessagesType, disappearAction } =
+      defaultDisappearingOptions.NTS;
     const testMessage = 'Message to test note to self';
     const testMessageDisappear = 'Message testing disappearing messages';
     const formattedTime = formatTimeOption(timeOption);
@@ -248,9 +244,8 @@ test_Alice_2W(
 test_Alice_2W_Bob_1W(
   'Disappear after send off 1:1',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
-    const disappearingMessagesType = 'disappear-after-send-option';
-    const timeOption: DMTimeOption = 'time-option-10-seconds';
-    const disappearAction: DisappearActions = 'sent';
+    const { disappearAction, disappearingMessagesType, timeOption } =
+      defaultDisappearingOptions.DAS;
     const testMessage = 'Turning disappearing messages off';
     const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);

@@ -41,7 +41,7 @@ type DisappearOpts1o1 = [
 
 type DisappearOptsGroup = [
   'group' | 'note-to-self',
-  'disappear-after-send-option',
+  DisappearGroupType,
   DMTimeOption,
   DisappearActions,
 ];
@@ -50,6 +50,11 @@ export type DisappearOptions = DisappearOpts1o1 | DisappearOptsGroup;
 export type DisappearType =
   | 'disappear-after-read-option'
   | 'disappear-after-send-option';
+
+export type DisappearGroupType = Exclude<
+  DisappearType,
+  'disappear-after-read-option'
+>;
 
 export type DisappearActions = 'read' | 'sent';
 

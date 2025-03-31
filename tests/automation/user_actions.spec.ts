@@ -412,8 +412,6 @@ test_Alice_2W(
       'session-confirm-ok-button',
       englishStrippedStr('theContinue').toString(),
     );
-    // Check second modal heading
-    // modal-description not set
     await checkModalStrings(
       aliceWindow1,
       englishStrippedStr('recoveryPasswordHidePermanently').toString(),

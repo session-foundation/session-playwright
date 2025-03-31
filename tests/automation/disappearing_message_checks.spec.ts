@@ -5,6 +5,7 @@ import {
   defaultDisappearingOptions,
   longText,
   mediaArray,
+  testLink,
 } from './constants/variables';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
@@ -32,7 +33,7 @@ import {
 import { makeVoiceCall } from './utilities/voice_call';
 
 // Disappearing time settings for all tests
-const { timeOption, disappearingMessageType, disappearAction } =
+const { timeOption, disappearingMessagesType, disappearAction } =
   defaultDisappearingOptions.DAS;
 
 mediaArray.forEach(({ mediaType, path, attachmentType }) => {
@@ -45,7 +46,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
       // Set disappearing messages
       await setDisappearingMessages(
         aliceWindow1,
-        ['1:1', disappearingMessageType, timeOption, disappearAction],
+        ['1:1', disappearingMessagesType, timeOption, disappearAction],
         bobWindow1,
       );
       await Promise.all([
@@ -103,7 +104,7 @@ test_Alice_1W_Bob_1W(
     // Set disappearing messages
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', disappearingMessageType, timeOption, disappearAction],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     await Promise.all([
@@ -147,13 +148,12 @@ test_Alice_1W_Bob_1W(
 test_Alice_1W_Bob_1W(
   `Send disappearing link preview 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const testLink = 'https://getsession.org/';
     const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Set disappearing messages
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', disappearingMessageType, timeOption, disappearAction],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     await Promise.all([
@@ -207,7 +207,7 @@ test_Alice_1W_Bob_1W(
     // Set disappearing messages
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', disappearingMessageType, timeOption, disappearAction],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     await Promise.all([
@@ -296,7 +296,7 @@ test_Alice_1W_Bob_1W(
     // Set disappearing messages
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', disappearingMessageType, timeOption, disappearAction],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     await Promise.all([
