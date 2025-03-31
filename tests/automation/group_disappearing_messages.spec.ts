@@ -1,7 +1,12 @@
 import { sleepFor } from '../promise_utils';
-import { longText, mediaArray } from './constants/variables';
+import {
+  defaultDisappearingOptions,
+  longText,
+  mediaArray,
+  testLink,
+} from './constants/variables';
 import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
-import { DMTimeOption } from './types/testing';
+import { sendMessage } from './utilities/message';
 import {
   sendLinkPreview,
   sendMedia,
@@ -13,15 +18,13 @@ import {
   hasTextMessageBeenDeleted,
   waitForElement,
   waitForLoadingAnimationToFinish,
+  waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
-import { sendMessage } from './utilities/message';
 
 // Disappearing time settings for all tests
-const timeOption: DMTimeOption = 'time-option-30-seconds';
-const disappearingMessageType = 'disappear-after-send-option';
-// Implementing in groups rebuild
-// const disappearAction = 'sent';
+const { timeOption, disappearingMessagesType, disappearAction } =
+  defaultDisappearingOptions.group;
 
 mediaArray.forEach(({ mediaType, path }) => {
   test_group_Alice_1W_Bob_1W_Charlie_1W(
@@ -36,8 +39,9 @@ mediaArray.forEach(({ mediaType, path }) => {
       const testMessage = `${alice.userName} sending ${mediaType} to ${groupCreated.userName}`;
       await setDisappearingMessages(aliceWindow1, [
         'group',
-        disappearingMessageType,
+        disappearingMessagesType,
         timeOption,
+        disappearAction,
       ]);
       // Send media
       if (mediaType === 'voice') {
@@ -51,21 +55,13 @@ mediaArray.forEach(({ mediaType, path }) => {
       ]);
       if (mediaType === 'voice') {
         await Promise.all([
-          //   waitForTestIdWithText(bobWindow1, 'audio-player'),
-          waitForElement(bobWindow1, 'class', 'rhap_progress-section'),
-          //   waitForTestIdWithText(charlieWindow1, 'audio-player'),
-          waitForElement(charlieWindow1, 'class', 'rhap_progress-section'),
+          waitForTestIdWithText(bobWindow1, 'audio-player'),
+          waitForTestIdWithText(charlieWindow1, 'audio-player'),
         ]);
         await sleepFor(30000);
         await Promise.all([
-          //   hasElementBeenDeleted(bobWindow1, 'data-testid', 'audio-player'),
-          hasElementBeenDeleted(bobWindow1, 'class', 'rhap_progress-section'),
-          //   hasElementBeenDeleted(charlieWindow1, 'data-testid', 'audio-player'),
-          hasElementBeenDeleted(
-            charlieWindow1,
-            'class',
-            'rhap_progress-section',
-          ),
+          hasElementBeenDeleted(bobWindow1, 'data-testid', 'audio-player'),
+          hasElementBeenDeleted(charlieWindow1, 'data-testid', 'audio-player'),
         ]);
       } else {
         await Promise.all([
@@ -88,8 +84,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   async ({ aliceWindow1, bobWindow1, charlieWindow1 }) => {
     await setDisappearingMessages(aliceWindow1, [
       'group',
-      disappearingMessageType,
+      disappearingMessagesType,
       timeOption,
+      disappearAction,
     ]);
     await sendMessage(aliceWindow1, longText);
     await Promise.all([
@@ -107,11 +104,11 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Send disappearing link to groups',
   async ({ aliceWindow1, bobWindow1, charlieWindow1 }) => {
-    const testLink = 'https://getsession.org/';
     await setDisappearingMessages(aliceWindow1, [
       'group',
-      disappearingMessageType,
+      disappearingMessagesType,
       timeOption,
+      disappearAction,
     ]);
     await sendLinkPreview(aliceWindow1, testLink);
     await Promise.all([

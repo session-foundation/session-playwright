@@ -1,8 +1,13 @@
 import { test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
-import { LocalizerDictionary } from '../locale/localizerType';
-import { TokenString, englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../locale/localizedString';
+import {
+  isPluralToken,
+  type MergedLocalizerTokens,
+  type PluralLocalizerTokens,
+  type SimpleLocalizerTokens,
+} from '../localization/localeTools';
 
 function readTsFiles(dir: string): Record<string, string> {
   const tsFilesContent: Record<string, string> = {};
@@ -36,23 +41,13 @@ function extractAllTokens(text: string) {
 
   const matches = [...text.matchAll(pattern)];
 
-  return matches.map((match) => match?.[1]) as Array<
-    TokenString<LocalizerDictionary>
-  >;
-}
-
-const pluralTokens = ['deleteMessageDeleted'] as const;
-type PluralToken = (typeof pluralTokens)[number];
-type NonPluralTokens = Exclude<TokenString<LocalizerDictionary>, PluralToken>;
-
-function isPluralToken(
-  token: TokenString<LocalizerDictionary>,
-): token is PluralToken {
-  return pluralTokens.includes(token as any);
+  return matches.map((match) => match?.[1]) as Array<MergedLocalizerTokens>;
 }
 
 function getExpectedStringFromKey(
-  args: { key: NonPluralTokens } | { key: PluralToken; count: number },
+  args:
+    | { key: SimpleLocalizerTokens }
+    | { key: PluralLocalizerTokens; count: number },
 ) {
   if (isPluralToken(args.key)) {
     if (!('count' in args)) {
@@ -65,6 +60,12 @@ function getExpectedStringFromKey(
     // plurals are centralized here
     case 'deleteMessageDeleted':
       return args.count === 1 ? 'Message deleted' : 'Messages deleted';
+    case 'deleteMessage':
+      return args.count === 1 ? 'Delete Message' : 'Delete Messages';
+    case 'deleteMessageConfirm':
+      return args.count === 1
+        ? 'Are you sure you want to delete this message?'
+        : 'Are you sure you want to delete these messages?';
     case 'accept':
       return 'Accept';
     case 'sessionClearData':
@@ -82,7 +83,7 @@ function getExpectedStringFromKey(
     case 'legacyGroupMemberNew':
       return '{name} joined the group.';
     case 'groupNameNew':
-      return 'Group name is now {group_name}. ';
+      return 'Group name is now {group_name}.';
     case 'groupNameEnterPlease':
       return 'Please enter a group name.';
     case 'cancel':
@@ -149,6 +150,14 @@ function getExpectedStringFromKey(
       return 'Leave';
     case 'disappearingMessagesFollowSetting':
       return 'Follow Setting';
+    case 'groupMemberNew':
+      return '{name} was invited to join the group.';
+    case 'deleteMessageDeletedGlobally':
+      return 'This message was deleted';
+    case 'groupMemberNewTwo':
+      return '{name} and {other_name} were invited to join the group.';
+    case 'groupInviteYouAndOtherNew':
+      return 'You and {other_name} were invited to join the group.';
     case 'disappearingMessagesSet':
       return '{name} has set messages to disappear {time} after they have been {disappearing_messages_type}.';
     case 'membersInvite':
@@ -157,6 +166,8 @@ function getExpectedStringFromKey(
       return 'Call in progress';
     case 'callsYouCalled':
       return 'You called {name}';
+    case 'callsCalledYou':
+      return '{name} called you';
     case 'disappearingMessagesTurnedOffYou':
       return 'You turned off disappearing messages. Messages you send will no longer disappear.';
     case 'disappearingMessagesTurnedOff':
@@ -188,7 +199,43 @@ function getExpectedStringFromKey(
     case 'callsVoiceAndVideoBeta':
       return 'Voice and Video Calls (Beta)';
     case 'callsVoiceAndVideoModalDescription':
-      return 'Your IP is visible to your call partner and an Oxen Foundation server while using beta calls.';
+      return 'Your IP is visible to your call partner and a Session Technology Foundation server while using beta calls.';
+    case 'blockDescription':
+      return 'Are you sure you want to block {name}? Blocked users cannot send you message requests, group invites or call you.';
+    case 'conversationsDeleteDescription':
+      return 'Are you sure you want to delete your conversation with {name}? New messages from {name} will start a new conversation.';
+    case 'noteToSelfHide':
+      return 'Hide Note to Self';
+    case 'noteToSelfHideDescription':
+      return 'Are you sure you want to hide Note to Self?';
+    case 'hide':
+      return 'Hide';
+    case 'accountIdCopied':
+      return 'Account ID Copied';
+    case 'shareAccountIdDescriptionCopied':
+      return 'Share with your friends wherever you usually speak with them — then move the conversation here.';
+    case 'disappearingMessagesTypeRead':
+      return 'read';
+    case 'disappearingMessagesTypeSent':
+      return 'sent';
+    case 'messageRequestsDelete':
+      return 'Are you sure you want to delete this message request?';
+    case 'messageRequestsClearAllExplanation':
+      return 'Are you sure you want to clear all message requests and group invites?';
+    case 'groupMembers':
+      return 'Group Members';
+    case 'you':
+      return 'You';
+    case 'clearDataAll':
+      return 'Clear All Data';
+    case 'clearDataAllDescription':
+      return 'This will permanently delete your messages and contacts. Would you like to clear this device only, or delete your data from the network as well?';
+    case 'clearDeviceDescription':
+      return 'Are you sure you want to clear your device?';
+    case 'qrView':
+      return 'View QR';
+    case 'recoveryPasswordView':
+      return 'View Password';
     default:
       // returning nul means we don't have an expected string yet for this key.
       // This will make the test fail
@@ -200,14 +247,14 @@ test('Enforce localized strings return expected values', async () => {
   // Example usage
   const tsFiles = readTsFiles('.');
 
-  const tokensToValidateSet: Set<TokenString<LocalizerDictionary>> = new Set();
+  const tokensToValidateSet: Set<MergedLocalizerTokens> = new Set();
   Object.entries(tsFiles).forEach(([_, content]) => {
     const tokens = extractAllTokens(content);
 
     tokens.forEach((t) => tokensToValidateSet.add(t));
   });
 
-  const unknownKeys: Array<TokenString<LocalizerDictionary>> = [];
+  const unknownKeys: Array<MergedLocalizerTokens> = [];
 
   let atLeastOneFailed = false;
 

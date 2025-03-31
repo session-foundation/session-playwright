@@ -2,7 +2,11 @@ import { Page } from '@playwright/test';
 import { englishStrippedStr } from '../../locale/localizedString';
 import { sleepFor } from '../../promise_utils';
 import { User } from '../types/testing';
-import { clickOnMatchingText, clickOnTestIdWithText } from './utils';
+import {
+  checkModalStrings,
+  clickOnMatchingText,
+  clickOnTestIdWithText,
+} from './utils';
 
 export const makeVoiceCall = async (
   callerWindow: Page,
@@ -13,12 +17,11 @@ export const makeVoiceCall = async (
   await clickOnTestIdWithText(callerWindow, 'call-button');
   await clickOnTestIdWithText(callerWindow, 'session-toast');
   await clickOnTestIdWithText(callerWindow, 'enable-calls');
-  //   Implementing in groups rebuild
-  //   await checkModalStrings(
-  //     callerWindow,
-  //     englishStrippedStr('callsVoiceAndVideoBeta').toString(),
-  //     englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
-  //   );
+  await checkModalStrings(
+    callerWindow,
+    englishStrippedStr('callsVoiceAndVideoBeta').toString(),
+    englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
+  );
   await clickOnTestIdWithText(callerWindow, 'session-confirm-ok-button');
   await clickOnTestIdWithText(callerWindow, 'message-section');
   await clickOnTestIdWithText(
@@ -30,12 +33,12 @@ export const makeVoiceCall = async (
   // Enable calls in window B
   await clickOnTestIdWithText(receiverWindow, 'session-toast');
   await clickOnTestIdWithText(receiverWindow, 'enable-calls');
-  //   Implementing in groups rebuild
-  //   await checkModalStrings(
-  //     receiverWindow,
-  //     englishStrippedStr('callsVoiceAndVideoBeta').toString(),
-  //     englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
-  //   );
+  // Getting wrong strings from locales.ts file
+  await checkModalStrings(
+    receiverWindow,
+    englishStrippedStr('callsVoiceAndVideoBeta').toString(),
+    englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
+  );
   await clickOnTestIdWithText(receiverWindow, 'session-confirm-ok-button');
   await clickOnMatchingText(
     receiverWindow,

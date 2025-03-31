@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable no-useless-escape */
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-await-in-loop */
@@ -13,11 +14,10 @@ import {
   WithPage,
   WithRightButton,
 } from '../types/testing';
-// eslint-disable-next-line import/no-cycle
-import fs from 'fs';
-import path from 'path';
 import { sendMessage } from './message';
 import { ElementState } from '../landing_page.spec';
+import fs from 'fs';
+import path from 'path';
 import { screenshotFolder } from '../constants/variables';
 
 // WAIT FOR FUNCTIONS
@@ -36,7 +36,7 @@ export async function waitForTestIdWithText(
     const escapedText = text.replace(/"/g, '\\\"');
 
     builtSelector += `:has-text("${escapedText}")`;
-    console.info('builtSelector:', builtSelector);
+    // console.info('builtSelector:', builtSelector);
     // console.info('Text is tiny bubble: ', escapedText);
   }
   // console.info('looking for selector', builtSelector);
@@ -59,7 +59,21 @@ export async function waitForElement(
     ? `css=[${strategy}=${selector}]`
     : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
 
-  return window.waitForSelector(builtSelector, { timeout: maxWaitMs });
+  const start = Date.now();
+  if (!selector.includes('path-light-container')) {
+    console.log(`waitForElement: ${builtSelector} for maxMs ${maxWaitMs}`);
+  }
+
+  const el = await window.waitForSelector(builtSelector, {
+    timeout: maxWaitMs,
+  });
+  if (!selector.includes('path-light-container')) {
+    console.log(
+      `waitForElement: got ${builtSelector} after ${Date.now() - start}ms`,
+    );
+  }
+
+  return el;
 }
 
 export async function waitForTextMessage(
@@ -78,8 +92,18 @@ export async function waitForTextMessage(
     console.info('builtSelector:', builtSelector);
   }
   const el = await window.waitForSelector(builtSelector, { timeout: maxWait });
-  console.info(`Text message found. Text: , ${text}`);
+  console.info(`Text message found. Text: "${text}"`);
   return el;
+}
+
+export async function waitForTextMessages(
+  window: Page,
+  texts: Array<string>,
+  maxWait?: number,
+) {
+  return Promise.all(
+    texts.map(async (t) => waitForTextMessage(window, t, maxWait)),
+  );
 }
 
 export async function waitForControlMessageWithText(
@@ -123,6 +147,9 @@ export async function waitForMatchingPlaceholder(
         );
 
         found = true;
+      }
+      if (!found) {
+        await sleepFor(100, true);
       }
     } catch (e) {
       await sleepFor(1000, true);
@@ -471,6 +498,10 @@ export async function measureSendingTime(window: Page, messageNumber: number) {
   return timeMs;
 }
 
+export function removeNewLines(input: string): string {
+  return input.replace(/\s+/g, ' ').trim();
+}
+
 export async function checkModalStrings(
   window: Page,
   expectedHeading: string,
@@ -485,6 +516,7 @@ export async function checkModalStrings(
 
   const headingText = await heading.innerText();
   const descriptionText = await description.innerText();
+  const formattedDescription = removeNewLines(descriptionText);
 
   if (headingText !== expectedHeading) {
     throw new Error(
@@ -492,14 +524,14 @@ export async function checkModalStrings(
     );
   }
 
-  if (descriptionText !== expectedDescription) {
+  if (formattedDescription !== expectedDescription) {
     throw new Error(
-      `Expected description: ${expectedDescription}, got: ${descriptionText}`,
+      `Expected description: ${expectedDescription}, got: ${formattedDescription}`,
     );
   }
 }
 
-export async function formatTimeOption(option: DMTimeOption) {
+export function formatTimeOption(option: DMTimeOption) {
   const timePart = option.replace('time-option-', '');
   const formattedTime = timePart.replace(/-/g, ' ');
   return formattedTime;

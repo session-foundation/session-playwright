@@ -159,6 +159,7 @@ test_Alice_2W(
         const screenshot = await leftpaneAvatarContainer.screenshot({
           type: 'jpeg',
         });
+        // This file is saved in `Profile-picture-syncs` folder
         expect(screenshot).toMatchSnapshot({
           name: 'avatar-updated-blue.jpeg',
         });
@@ -278,9 +279,7 @@ test_Alice_2W_Bob_1W(
     await hasTextMessageBeenDeleted(aliceWindow1, unsentMessage, 1000);
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('deleteMessageDeleted')
-        .withArgs({ count: 1 })
-        .toString(),
+      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
     );
     // linked device for deleted message
     await hasTextMessageBeenDeleted(aliceWindow2, unsentMessage, 1000);
@@ -306,6 +305,14 @@ test_Alice_2W_Bob_1W(
       aliceWindow2,
       'context-menu-item',
       englishStrippedStr('block').toString(),
+    );
+    // Check modal strings
+    await checkModalStrings(
+      aliceWindow2,
+      englishStrippedStr('block').toString(),
+      englishStrippedStr('blockDescription')
+        .withArgs({ name: bob.userName })
+        .toString(),
     );
     await clickOnTestIdWithText(
       aliceWindow2,
@@ -335,7 +342,7 @@ test_Alice_2W_Bob_1W(
       50000,
     );
     // Check if user B is in blocked contact list
-    await waitForMatchingText(aliceWindow2, bob.userName);
+    await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
   },
 );
 
@@ -425,7 +432,7 @@ test_Alice_2W_Bob_1W(
         aliceWindow2,
         'data-testid',
         'module-conversation__user__profile-name',
-        8000,
+        10000,
         bob.userName,
       ),
     ]);
@@ -469,6 +476,11 @@ test_Alice_2W(
       aliceWindow1,
       'context-menu-item',
       englishStrippedStr('noteToSelfHide').toString(),
+    );
+    await checkModalStrings(
+      aliceWindow1,
+      englishStrippedStr('noteToSelfHide').toString(),
+      englishStrippedStr('noteToSelfHideDescription').toString(),
     );
     await clickOnTestIdWithText(
       aliceWindow1,

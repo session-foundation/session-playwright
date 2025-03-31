@@ -1,12 +1,9 @@
 import { englishStrippedStr } from '../locale/localizedString';
-import { sleepFor } from '../promise_utils';
-import {
-  test_Alice_1W_Bob_1W,
-  test_Alice_2W_Bob_1W,
-} from './setup/sessionTest';
+import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
 import {
+  checkModalStrings,
   clickOnMatchingText,
   clickOnTestIdWithText,
   waitForMatchingText,
@@ -98,10 +95,15 @@ test_Alice_1W_Bob_1W(
 
     await clickOnTestIdWithText(
       bobWindow1,
-      'decline-message-request',
-      englishStrippedStr('decline').toString(),
+      'delete-message-request',
+      englishStrippedStr('delete').toString(),
     );
     // Confirm decline
+    await checkModalStrings(
+      bobWindow1,
+      englishStrippedStr('delete').toString(),
+      englishStrippedStr('messageRequestsDelete').toString(),
+    );
     await clickOnTestIdWithText(
       bobWindow1,
       'session-confirm-ok-button',
@@ -129,6 +131,11 @@ test_Alice_1W_Bob_1W(
       englishStrippedStr('clearAll').toString(),
     );
     // Confirm decline
+    await checkModalStrings(
+      bobWindow1,
+      englishStrippedStr('clearAll').toString(),
+      englishStrippedStr('messageRequestsClearAllExplanation').toString(),
+    );
     await clickOnTestIdWithText(
       bobWindow1,
       'session-confirm-ok-button',
@@ -147,54 +154,5 @@ test_Alice_1W_Bob_1W(
       bobWindow1,
       englishStrippedStr('messageRequestsNonePending').toString(),
     );
-  },
-);
-
-test_Alice_2W_Bob_1W(
-  'Block message request',
-  async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
-    const testMessage = `Sender: ${bob.userName}, Receiver: ${alice.userName}`;
-    // send a message to Bob to Alice
-    await sendNewMessage(bobWindow1, alice.accountid, `${testMessage}`);
-    // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(aliceWindow1, 'message-request-banner');
-    // Select message request from Bob
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'module-conversation__user__profile-name',
-      bob.userName,
-    );
-    // Block Bob
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'decline-and-block-message-request',
-    );
-    // Check modal strings
-    // Confirm block
-    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
-    // Need to wait for the blocked status to sync
-    await sleepFor(2000);
-    // Check blocked status in blocked contacts list
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'conversations-settings-menu-item',
-    );
-    await clickOnTestIdWithText(aliceWindow1, 'reveal-blocked-user-settings');
-    // await waitForTestIdWithText(aliceWindow1, 'contact', bob.userName);
-    await waitForMatchingText(aliceWindow1, bob.userName);
-    // Check that the blocked contacts is on alicewindow2
-    // Implemented in groups rebuild
-    // Check blocked status in blocked contacts list
-    await sleepFor(5000);
-    await clickOnTestIdWithText(aliceWindow2, 'settings-section');
-    await clickOnTestIdWithText(
-      aliceWindow2,
-      'conversations-settings-menu-item',
-    );
-    await clickOnTestIdWithText(aliceWindow2, 'reveal-blocked-user-settings');
-    // Implemented in groups rebuild
-    // await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
-    await waitForMatchingText(aliceWindow2, bob.userName);
   },
 );

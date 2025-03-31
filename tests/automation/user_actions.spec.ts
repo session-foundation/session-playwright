@@ -11,6 +11,7 @@ import {
 import { createContact } from './utilities/create_contact';
 import { sendMessage } from './utilities/message';
 import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
@@ -92,6 +93,14 @@ test_Alice_1W_Bob_1W(
       'context-menu-item',
       englishStrippedStr('block').toString(),
     );
+    // Check modal strings
+    await checkModalStrings(
+      aliceWindow1,
+      englishStrippedStr('block').toString(),
+      englishStrippedStr('blockDescription')
+        .withArgs({ name: bob.userName })
+        .toString(),
+    );
     await clickOnTestIdWithText(
       aliceWindow1,
       'session-confirm-ok-button',
@@ -108,18 +117,17 @@ test_Alice_1W_Bob_1W(
     // Navigate to blocked users tab'
     await clickOnTestIdWithText(aliceWindow1, 'reveal-blocked-user-settings');
     // select the contact to unblock by clicking on it by name
-    await clickOnMatchingText(aliceWindow1, bob.userName);
+    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
     // Unblock user by clicking on unblock
     await clickOnTestIdWithText(aliceWindow1, 'unblock-button-settings-screen');
     // make sure the confirm dialogs shows up
-    await clickOnTestIdWithText(
+    await checkModalStrings(
       aliceWindow1,
-      'block-unblock-modal-description',
+      englishStrippedStr('blockUnblock').toString(),
       englishStrippedStr('blockUnblockName')
-        .withArgs({ name: 'Bob' })
+        .withArgs({ name: bob.userName })
         .toString(),
     );
-
     // click on the unblock button
     await clickOnTestIdWithText(
       aliceWindow1,
@@ -170,7 +178,12 @@ test_Alice_1W_no_network(
     await clickOnTestIdWithText(aliceWindow1, 'image-upload-click');
     await clickOnTestIdWithText(aliceWindow1, 'save-button-profile-update');
     await waitForTestIdWithText(aliceWindow1, 'loading-spinner');
-
+    // if we were asked to update the snapshots, make sure we wait for the change to be received before taking a screenshot.
+    if (testInfo.config.updateSnapshots === 'all') {
+      await sleepFor(15000);
+    } else {
+      await sleepFor(2000);
+    }
     await sleepFor(500);
     const leftpaneAvatarContainer = await waitForTestIdWithText(
       aliceWindow1,
@@ -182,22 +195,16 @@ test_Alice_1W_no_network(
     let lastError: Error | undefined;
     do {
       try {
-        // if we were asked to update the snapshots, make sure we wait for the change to be received before taking a screenshot.
-        if (testInfo.config.updateSnapshots === 'all') {
-          await sleepFor(15000);
-        } else {
-          await sleepFor(500);
-        }
-
         const screenshot = await leftpaneAvatarContainer.screenshot({
           type: 'jpeg',
         });
+        // this file is saved in `Change-avatar` folder
         expect(screenshot).toMatchSnapshot({
           name: 'avatar-updated-blue.jpeg',
         });
         correctScreenshot = true;
         console.info(
-          `screenshot matching of "Check profile picture syncs" passed after "${tryNumber}" retries!`,
+          `screenshot matching of "Check profile picture" passed after "${tryNumber}" retries!`,
         );
       } catch (e) {
         lastError = e;
@@ -207,7 +214,7 @@ test_Alice_1W_no_network(
 
     if (!correctScreenshot) {
       console.info(
-        `screenshot matching of "Check profile picture syncs" try "${tryNumber}" failed with: ${lastError?.message}`,
+        `screenshot matching of "Check profile picture" try "${tryNumber}" failed with: ${lastError?.message}`,
       );
       throw new Error('waiting 20s and still the screenshot is not right');
     }
@@ -360,7 +367,13 @@ test_Alice_1W_Bob_1W(
       'context-menu-item',
       englishStrippedStr('conversationsDelete').toString(),
     );
-    // TODO add Check modal strings
+    await checkModalStrings(
+      aliceWindow1,
+      englishStrippedStr('conversationsDelete').toString(),
+      englishStrippedStr('conversationsDeleteDescription')
+        .withArgs({ name: bob.userName })
+        .toString(),
+    );
     await clickOnTestIdWithText(
       aliceWindow1,
       'session-confirm-ok-button',
@@ -386,14 +399,10 @@ test_Alice_2W(
       'recovery-password-settings-menu-item',
     );
     await clickOnTestIdWithText(aliceWindow1, 'hide-recovery-password-button');
-    // Check first modal heading
-    await waitForMatchingText(
+    // Check first modal
+    await checkModalStrings(
       aliceWindow1,
       englishStrippedStr('recoveryPasswordHidePermanently').toString(),
-    );
-    // Check first modal description
-    await waitForMatchingText(
-      aliceWindow1,
       englishStrippedStr(
         'recoveryPasswordHidePermanentlyDescription1',
       ).toString(),
@@ -403,14 +412,9 @@ test_Alice_2W(
       'session-confirm-ok-button',
       englishStrippedStr('theContinue').toString(),
     );
-    // Check second modal heading
-    await waitForMatchingText(
+    await checkModalStrings(
       aliceWindow1,
       englishStrippedStr('recoveryPasswordHidePermanently').toString(),
-    );
-    // Check second modal description
-    await waitForMatchingText(
-      aliceWindow1,
       englishStrippedStr(
         'recoveryPasswordHidePermanentlyDescription2',
       ).toString(),
@@ -435,44 +439,44 @@ test_Alice_2W(
   },
 );
 
-// test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
-//   await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
-//   await clickOnTestIdWithText(aliceWindow1, 'chooser-invite-friend');
-//   await waitForTestIdWithText(aliceWindow1, 'your-account-id', alice.accountid);
-//   await clickOnTestIdWithText(aliceWindow1, 'copy-button-account-id');
-//   // Toast
-//   await waitForTestIdWithText(
-//     aliceWindow1,
-//     'session-toast',
-//     englishStrippedStr('copied').toString(),
-//   );
-//   // Wait for copy to resolve
-//   await sleepFor(1000);
-//   await waitForMatchingText(
-//     aliceWindow1,
-//     englishStrippedStr('accountIdCopied').toString(),
-//   );
-//   await waitForMatchingText(
-//     aliceWindow1,
-//     englishStrippedStr('shareAccountIdDescriptionCopied').toString(),
-//   );
-//   // To exit invite a friend
-//   await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
-//   // To create note to self
-//   await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
-//   // New message
-//   await clickOnTestIdWithText(aliceWindow1, 'chooser-new-conversation-button');
-//   await clickOnTestIdWithText(aliceWindow1, 'new-session-conversation');
-//   const isMac = process.platform === 'darwin';
-//   await aliceWindow1.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
-//   await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
-//   // Did the copied text create note to self?
-//   await waitForTestIdWithText(
-//     aliceWindow1,
-//     'header-conversation-name',
-//     englishStrippedStr('noteToSelf').toString(),
-//   );
-// });
+test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
+  await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+  await clickOnTestIdWithText(aliceWindow1, 'chooser-invite-friend');
+  await waitForTestIdWithText(aliceWindow1, 'your-account-id', alice.accountid);
+  await clickOnTestIdWithText(aliceWindow1, 'copy-button-account-id');
+  // Toast
+  await waitForTestIdWithText(
+    aliceWindow1,
+    'session-toast',
+    englishStrippedStr('copied').toString(),
+  );
+  // Wait for copy to resolve
+  await sleepFor(1000);
+  await waitForMatchingText(
+    aliceWindow1,
+    englishStrippedStr('accountIdCopied').toString(),
+  );
+  await waitForMatchingText(
+    aliceWindow1,
+    englishStrippedStr('shareAccountIdDescriptionCopied').toString(),
+  );
+  // To exit invite a friend
+  await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+  // To create note to self
+  await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+  // New message
+  await clickOnTestIdWithText(aliceWindow1, 'chooser-new-conversation-button');
+  await clickOnTestIdWithText(aliceWindow1, 'new-session-conversation');
+  const isMac = process.platform === 'darwin';
+  await aliceWindow1.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
+  await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
+  // Did the copied text create note to self?
+  await waitForTestIdWithText(
+    aliceWindow1,
+    'header-conversation-name',
+    englishStrippedStr('noteToSelf').toString(),
+  );
+});
 
 test_Alice_1W_no_network(
   'Hide note to self',
@@ -504,12 +508,11 @@ test_Alice_1W_no_network(
       'context-menu-item',
       englishStrippedStr('noteToSelfHide').toString(),
     );
-    // Currently fails due to no test tag on description
-    // await checkModalStrings(
-    //   aliceWindow1,
-    //   englishStrippedStr('noteToSelfHide').toString(),
-    //   englishStrippedStr('noteToSelfHideDescription').toString(),
-    // );
+    await checkModalStrings(
+      aliceWindow1,
+      englishStrippedStr('noteToSelfHide').toString(),
+      englishStrippedStr('noteToSelfHideDescription').toString(),
+    );
     await clickOnTestIdWithText(
       aliceWindow1,
       'session-confirm-ok-button',

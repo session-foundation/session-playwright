@@ -1,11 +1,16 @@
 import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
-import { longText, mediaArray } from './constants/variables';
+import {
+  defaultDisappearingOptions,
+  longText,
+  mediaArray,
+  testLink,
+} from './constants/variables';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
-import { DMTimeOption } from './types/testing';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
+import { waitForSentTick } from './utilities/message';
 import {
   sendLinkPreview,
   sendMedia,
@@ -15,8 +20,8 @@ import {
 import { setDisappearingMessages } from './utilities/set_disappearing_messages';
 import {
   clickOnElement,
-  clickOnMatchingText,
   clickOnTestIdWithText,
+  formatTimeOption,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
   typeIntoInput,
@@ -28,20 +33,20 @@ import {
 import { makeVoiceCall } from './utilities/voice_call';
 
 // Disappearing time settings for all tests
-const timeOption: DMTimeOption = 'time-option-30-seconds';
-const disappearingMessageType = 'disappear-after-send-option';
-const disappearAction = 'sent';
+const { timeOption, disappearingMessagesType, disappearAction } =
+  defaultDisappearingOptions.DAS;
 
 mediaArray.forEach(({ mediaType, path, attachmentType }) => {
   test_Alice_1W_Bob_1W(
     `Send disappearing ${mediaType} 1:1`,
     async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
       const testMessage = `${alice.userName} sending disappearing ${mediaType} to ${bob.userName}`;
+      const formattedTime = formatTimeOption(timeOption);
       await createContact(aliceWindow1, bobWindow1, alice, bob);
       // Set disappearing messages
       await setDisappearingMessages(
         aliceWindow1,
-        ['1:1', disappearingMessageType, timeOption],
+        ['1:1', disappearingMessagesType, timeOption, disappearAction],
         bobWindow1,
       );
       await Promise.all([
@@ -50,7 +55,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
           'disappear-control-message',
           englishStrippedStr('disappearingMessagesSetYou')
             .withArgs({
-              time: '30 seconds',
+              time: formattedTime,
               disappearing_messages_type: disappearAction,
             })
             .toString(),
@@ -60,7 +65,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
           'disappear-control-message',
           englishStrippedStr('disappearingMessagesSet')
             .withArgs({
-              time: '30 seconds',
+              time: formattedTime,
               disappearing_messages_type: disappearAction,
               name: alice.userName,
             })
@@ -74,19 +79,13 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
         await sendMedia(aliceWindow1, path, testMessage);
       }
       // Click on untrusted attachment
-      await trustUser(bobWindow1, attachmentType);
+      await trustUser(bobWindow1, attachmentType, alice.userName);
 
       await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
       if (mediaType === 'voice') {
-        // await waitForTestIdWithText(bobWindow1, 'audio-player');
-        await waitForElement(bobWindow1, 'class', 'rhap_progress-section');
+        await waitForTestIdWithText(bobWindow1, 'audio-player');
         await sleepFor(30000);
-        // await hasElementBeenDeleted(bobWindow1, 'data-testid', 'audio-player');
-        await hasElementBeenDeleted(
-          bobWindow1,
-          'class',
-          'rhap_progress-section',
-        );
+        await hasElementBeenDeleted(bobWindow1, 'data-testid', 'audio-player');
       } else {
         await waitForTextMessage(bobWindow1, testMessage);
         // Wait 30 seconds for image to disappear
@@ -100,11 +99,12 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
 test_Alice_1W_Bob_1W(
   `Send disappearing long text 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Set disappearing messages
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', disappearingMessageType, timeOption],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     await Promise.all([
@@ -113,7 +113,7 @@ test_Alice_1W_Bob_1W(
         'disappear-control-message',
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
-            time: '30 seconds',
+            time: formattedTime,
             disappearing_messages_type: disappearAction,
           })
           .toString(),
@@ -123,7 +123,7 @@ test_Alice_1W_Bob_1W(
         'disappear-control-message',
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
-            time: '30 seconds',
+            time: formattedTime,
             disappearing_messages_type: disappearAction,
             name: alice.userName,
           })
@@ -137,8 +137,7 @@ test_Alice_1W_Bob_1W(
       strategy: 'data-testid',
       selector: 'send-message-button',
     });
-    //   Implementing in groups rebuild
-    // await waitForSentTick(aliceWindow1, longText);
+    await waitForSentTick(aliceWindow1, longText);
     await waitForTextMessage(bobWindow1, longText);
     // Wait 30 seconds for long text to disappear
     await sleepFor(30000);
@@ -149,12 +148,12 @@ test_Alice_1W_Bob_1W(
 test_Alice_1W_Bob_1W(
   `Send disappearing link preview 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const testLink = 'https://getsession.org/';
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Set disappearing messages
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', disappearingMessageType, timeOption],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     await Promise.all([
@@ -163,7 +162,7 @@ test_Alice_1W_Bob_1W(
         'disappear-control-message',
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
-            time: '30 seconds',
+            time: formattedTime,
             disappearing_messages_type: disappearAction,
           })
           .toString(),
@@ -173,7 +172,7 @@ test_Alice_1W_Bob_1W(
         'disappear-control-message',
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
-            time: '30 seconds',
+            time: formattedTime,
             disappearing_messages_type: disappearAction,
             name: alice.userName,
           })
@@ -203,11 +202,12 @@ test_Alice_1W_Bob_1W(
 test_Alice_1W_Bob_1W(
   `Send disappearing community invite 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Set disappearing messages
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', disappearingMessageType, timeOption],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     await Promise.all([
@@ -216,7 +216,7 @@ test_Alice_1W_Bob_1W(
         'disappear-control-message',
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
-            time: '30 seconds',
+            time: formattedTime,
             disappearing_messages_type: disappearAction,
           })
           .toString(),
@@ -226,7 +226,7 @@ test_Alice_1W_Bob_1W(
         'disappear-control-message',
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
-            time: '30 seconds',
+            time: formattedTime,
             disappearing_messages_type: disappearAction,
             name: alice.userName,
           })
@@ -234,23 +234,18 @@ test_Alice_1W_Bob_1W(
       ),
     ]);
     await joinCommunity(aliceWindow1);
+    // To stop the layout shift
+    await sleepFor(500);
     await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
     await clickOnTestIdWithText(aliceWindow1, 'add-user-button');
-    // Implementing in groups rebuild
-    // await waitForTestIdWithText(
-    //   aliceWindow1,
-    //   'modal-heading',
-    //   englishStrippedStr('membersInvite').toString(),
-    // );
-    // await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
-    await clickOnMatchingText(aliceWindow1, bob.userName);
-    // await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
-    await clickOnMatchingText(
+    await waitForTestIdWithText(
       aliceWindow1,
-      englishStrippedStr('okay').toString(),
+      'modal-heading',
+      englishStrippedStr('membersInvite').toString(),
     );
-    // Implementing in groups rebuild
-    // await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
+    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
     await clickOnTestIdWithText(
       aliceWindow1,
       'module-conversation__user__profile-name',
@@ -296,11 +291,12 @@ test_Alice_1W_Bob_1W(
 test_Alice_1W_Bob_1W(
   `Send disappearing call message 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Set disappearing messages
     await setDisappearingMessages(
       aliceWindow1,
-      ['1:1', disappearingMessageType, timeOption],
+      ['1:1', disappearingMessagesType, timeOption, disappearAction],
       bobWindow1,
     );
     await Promise.all([
@@ -309,7 +305,7 @@ test_Alice_1W_Bob_1W(
         'disappear-control-message',
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
-            time: '30 seconds',
+            time: formattedTime,
             disappearing_messages_type: disappearAction,
           })
           .toString(),
@@ -319,7 +315,7 @@ test_Alice_1W_Bob_1W(
         'disappear-control-message',
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
-            time: '30 seconds',
+            time: formattedTime,
             disappearing_messages_type: disappearAction,
             name: alice.userName,
           })

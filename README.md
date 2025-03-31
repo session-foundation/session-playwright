@@ -5,7 +5,7 @@ This repository holds the code to do regression testing with Playwright for Sess
 ## Setup
 
 
-`git clone https://github.com/oxen-io/session-playwright/`
+`git clone https://github.com/session-foundation/session-playwright/`
 
 Install [nvm](https://github.com/nvm-sh/nvm) or [nvm for windows](https://github.com/coreybutler/nvm-windows).
 
@@ -30,10 +30,6 @@ Create your own config from the `.env.sample` and edit the values to match your 
   - *type*: string
   - *default*: 1
   - *description*: the path to the root of session-desktop to test
-- `PLAYWRIGHT_CUSTOM_REPORTER`
-  - *type*: number
-  - *default*: undefined
-  - *description*: set to 1 to use our custom reporter, see `sessionReporter.ts`
 - `PLAYWRIGHT_REPEAT_COUNT`
   - *type*: number
   - *default*: 0

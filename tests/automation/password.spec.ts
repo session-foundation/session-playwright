@@ -40,7 +40,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   // Click Done
   await clickOnMatchingText(
     aliceWindow1,
-    englishStrippedStr('done').toString(),
+    englishStrippedStr('save').toString(),
   );
   // Check toast notification
   await waitForTestIdWithText(
@@ -112,7 +112,7 @@ test_Alice_1W_no_network(
     // Click Done
     await clickOnMatchingText(
       aliceWindow1,
-      englishStrippedStr('done').toString(),
+      englishStrippedStr('save').toString(),
     );
     // Click on recovery phrase tab
     await sleepFor(100);

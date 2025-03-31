@@ -1,5 +1,7 @@
 /* eslint-disable no-empty-pattern */
 /* eslint-disable @typescript-eslint/array-type */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Page, TestInfo, test } from '@playwright/test';
 import { Group, User } from '../types/testing';
 import { linkedDevice } from '../utilities/linked_device';
@@ -7,6 +9,7 @@ import { forceCloseAllWindows } from './closeWindows';
 import { createGroup } from './create_group';
 import { newUser } from './new_user';
 import { openApp } from './open';
+import chalk from 'chalk';
 
 // This is not ideal, most of our test needs to open a specific number of windows and close them once the test is done or failed.
 // This file contains a bunch of utility function to use to open those windows and clean them afterwards.
@@ -32,7 +35,6 @@ type WithAliceWindow1 = { aliceWindow1: Page };
 type WithAliceWindow2 = { aliceWindow2: Page };
 type WithBobWindow1 = { bobWindow1: Page };
 type WithCharlieWindow1 = { charlieWindow1: Page };
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type WithDraculaWindow1 = { draculaWindow1: Page };
 
 type WithGroupCreated = { groupCreated: Group };
@@ -148,8 +150,9 @@ function sessionTestGeneric<
         for (let index = 0; index < links.length; index++) {
           const link = links[index];
           console.info(
-            'linking a window with ',
-            users[link - 1].recoveryPassword,
+            `linking a window with "${chalk.green(
+              users[link - 1].recoveryPassword,
+            )}"`,
           );
           const linked = await linkedDevice(users[link - 1].recoveryPassword);
           linkedWindows.push(linked);
