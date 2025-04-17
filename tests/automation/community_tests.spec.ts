@@ -40,7 +40,7 @@ test_Alice_1W_Bob_1W(
       'module-conversation__user__profile-name',
       testCommunityName,
     );
-    await sendMedia(aliceWindow1, 'fixtures/test-image.png', testImageMessage);
+    await sendMedia(aliceWindow1, 'sample_files/test-image.png', testImageMessage);
     await replyTo({
       senderWindow: bobWindow1,
       textMessage: testImageMessage,

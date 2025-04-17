@@ -33,7 +33,7 @@
   },
   "scripts": {
     "build": "yarn tsc --watch",
-    "lint": "yarn prettier . --write && yarn eslint .",
+    "lint": "yarn prettier . --write --cache && yarn eslint . --cache",
     "dev": "yarn tsc --watch",
     "test": "npx playwright test",
     "watch": "tsc -w",

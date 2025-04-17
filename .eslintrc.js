@@ -7,7 +7,7 @@ module.exports = {
     },
   },
 
-  extends: ['airbnb', 'airbnb-typescript/base', 'prettier', 'plugin:@typescript-eslint/recommended'],
+  extends: ['airbnb-base', 'airbnb-typescript/base', 'prettier', 'plugin:@typescript-eslint/recommended'],
 
   plugins: ['mocha', 'more', '@typescript-eslint'],
   parser: '@typescript-eslint/parser',

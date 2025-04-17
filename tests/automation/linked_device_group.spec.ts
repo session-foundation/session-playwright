@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test';
 import { englishStrippedStr } from '../locale/localizedString';
 import { openApp } from './setup/open';
 import { recoverFromSeed } from './setup/recovery_using_seed';
@@ -124,6 +125,33 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   },
 );
 
+async function clearDataOnWindow(window: Page) {
+  await clickOnTestIdWithText(window, 'settings-section');
+  // Click on clear data option on left pane
+  await clickOnTestIdWithText(
+    window,
+    'clear-data-settings-menu-item',
+    englishStrippedStr('sessionClearData').toString(),
+  );
+  await checkModalStrings(
+    window,
+    englishStrippedStr('clearDataAll').toString(),
+    englishStrippedStr('clearDataAllDescription').toString(),
+  );
+  await clickOnTestIdWithText(
+    window,
+    'session-confirm-ok-button',
+    englishStrippedStr('clear').toString(),
+  );
+  await checkModalStrings(
+    window,
+    englishStrippedStr('clearDataAll').toString(),
+    englishStrippedStr('clearDeviceDescription').toString(),
+  );
+  await clickOnMatchingText(window, englishStrippedStr('clear').toString());
+  await waitForLoadingAnimationToFinish(window, 'loading-spinner');
+}
+
 // Delete device data > Restore account
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Delete and restore group',
@@ -165,33 +193,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     ]);
     await clickOnTestIdWithText(aliceWindow2, 'session-confirm-cancel-button');
     // Delete device data on alicewindow2
-    await clickOnTestIdWithText(aliceWindow2, 'settings-section');
-    // Need test tag for description text
-    // await checkModalStrings(
-    //   aliceWindow2,
-    //   englishStrippedStr('clearDataAll').toString(),
-    //   englishStrippedStr('clearDataAllDescription').toString(),
-    // );
-    await clickOnTestIdWithText(
-      aliceWindow2,
-      'clear-data-settings-menu-item',
-      englishStrippedStr('clear').toString(),
-    );
-    // Need to add test tag for description text
-    // await checkModalStrings(
-    //   aliceWindow2,
-    //   englishStrippedStr('clearDataAll').toString(),
-    //   englishStrippedStr('clearDeviceDescription').toString(),
-    // );
-    await clickOnMatchingText(
-      aliceWindow2,
-      englishStrippedStr('clear').toString(),
-    );
-    await clickOnMatchingText(
-      aliceWindow2,
-      englishStrippedStr('clear').toString(),
-    );
-    await waitForLoadingAnimationToFinish(aliceWindow2, 'loading-spinner');
+    await clearDataOnWindow(aliceWindow2);
     const [restoredWindow] = await openApp(1);
     await recoverFromSeed(restoredWindow, alice.recoveryPassword);
     // Does group appear?
@@ -231,33 +233,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'session-confirm-cancel-button',
     );
     // Delete device data on restoredWindow
-    await clickOnTestIdWithText(restoredWindow, 'settings-section');
-    // Need test tag for description text
-    // await checkModalStrings(
-    //   restoredWindow,
-    //   englishStrippedStr('clearDataAll').toString(),
-    //   englishStrippedStr('clearDataAllDescription').toString(),
-    // );
-    await clickOnTestIdWithText(
-      restoredWindow,
-      'clear-data-settings-menu-item',
-      englishStrippedStr('clear').toString(),
-    );
-    // Need to add test tag for description text
-    // await checkModalStrings(
-    //   restoredWindow,
-    //   englishStrippedStr('clearDataAll').toString(),
-    //   englishStrippedStr('clearDeviceDescription').toString(),
-    // );
-    await clickOnMatchingText(
-      restoredWindow,
-      englishStrippedStr('clear').toString(),
-    );
-    await clickOnMatchingText(
-      restoredWindow,
-      englishStrippedStr('clear').toString(),
-    );
-    await waitForLoadingAnimationToFinish(restoredWindow, 'loading-spinner');
+    await clearDataOnWindow(restoredWindow);
     const [restoredWindow2] = await openApp(1);
     await recoverFromSeed(restoredWindow2, alice.recoveryPassword);
     // Does group appear?

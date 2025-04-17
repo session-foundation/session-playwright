@@ -232,6 +232,10 @@ function getExpectedStringFromKey(
       return 'This will permanently delete your messages and contacts. Would you like to clear this device only, or delete your data from the network as well?';
     case 'clearDeviceDescription':
       return 'Are you sure you want to clear your device?';
+    case 'qrView':
+      return 'View QR';
+    case 'recoveryPasswordView':
+      return 'View Password';
     default:
       // returning nul means we don't have an expected string yet for this key.
       // This will make the test fail

@@ -1,7 +1,7 @@
 import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
-import { longText, mediaArray } from './constants/variables';
+import { longText, mediaArray, testLink } from './constants/variables';
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
@@ -96,7 +96,6 @@ test_Alice_1W_Bob_1W(
 test_Alice_1W_Bob_1W(
   'Send link 1:1',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const testLink = 'https://getsession.org/';
     const testReply = `${bob.userName} replying to link from ${alice.userName}`;
 
     await createContact(aliceWindow1, bobWindow1, alice, bob);
