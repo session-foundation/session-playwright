@@ -1,5 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { Page, expect } from '@playwright/test';
+import { englishStrippedStr } from '../locale/localizedString';
 import { sleepFor } from '../promise_utils';
 import { forceCloseAllWindows } from './setup/closeWindows';
 import { newUser } from './setup/new_user';
@@ -12,11 +13,13 @@ import { createContact } from './utilities/create_contact';
 import { linkedDevice } from './utilities/linked_device';
 import { sendMessage } from './utilities/message';
 import {
+  checkModalStrings,
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
   clickOnTextMessage,
   doWhileWithMax,
+  hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
   typeIntoInput,
   waitForLoadingAnimationToFinish,
@@ -30,7 +33,7 @@ sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
   let aliceWindow2: Page | undefined;
   try {
     const userA = await newUser(aliceWindow1, 'Alice');
-    aliceWindow2 = await linkedDevice(userA.recoveryPhrase); // not using fixture here as we want to check the behavior finely
+    aliceWindow2 = await linkedDevice(userA.recoveryPassword); // not using fixture here as we want to check the behavior finely
     await clickOnTestIdWithText(aliceWindow1, 'leftpane-primary-avatar');
     // Verify Username
     await waitForTestIdWithText(
@@ -42,7 +45,7 @@ sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
     await waitForTestIdWithText(
       aliceWindow1,
       'your-session-id',
-      userA.sessionid,
+      userA.accountid,
     );
     // exit profile modal
     await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
@@ -130,7 +133,7 @@ test_Alice_2W(
     await waitForTestIdWithText(
       aliceWindow1,
       'copy-button-profile-update',
-      'Copy',
+      englishStrippedStr('copy').toString(),
     );
 
     await clickOnTestIdWithText(aliceWindow1, 'image-upload-section');
@@ -153,17 +156,15 @@ test_Alice_2W(
     let lastError: Error | undefined;
     do {
       try {
-        await sleepFor(500);
-
         const screenshot = await leftpaneAvatarContainer.screenshot({
           type: 'jpeg',
-          // path: 'avatar-updated-blue',
         });
+        // This file is saved in `Profile-picture-syncs` folder
         expect(screenshot).toMatchSnapshot({
           name: 'avatar-updated-blue.jpeg',
         });
         correctScreenshot = true;
-        console.warn(
+        console.info(
           `screenshot matching of "Check profile picture syncs" passed after "${tryNumber}" retries!`,
         );
       } catch (e) {
@@ -173,7 +174,7 @@ test_Alice_2W(
     } while (Date.now() - start <= 20000 && !correctScreenshot);
 
     if (!correctScreenshot) {
-      console.warn(
+      console.info(
         `screenshot matching of "Check profile picture syncs" try "${tryNumber}" failed with: ${lastError?.message}`,
       );
       throw new Error('waited 20s and still the screenshot is not right');
@@ -212,13 +213,22 @@ test_Alice_2W_Bob_1W(
       waitForTextMessage(bobWindow1, messageToDelete),
     ]);
     await clickOnTextMessage(aliceWindow1, messageToDelete, true);
-    await clickOnMatchingText(aliceWindow1, 'Delete');
+    await clickOnMatchingText(
+      aliceWindow1,
+      englishStrippedStr('delete').toString(),
+    );
     await clickOnTestIdWithText(
       aliceWindow1,
       'session-confirm-ok-button',
-      'Delete',
+      englishStrippedStr('delete').toString(),
     );
-    await waitForTestIdWithText(aliceWindow1, 'session-toast', 'Deleted');
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'session-toast',
+      englishStrippedStr('deleteMessageDeleted')
+        .withArgs({ count: 1 })
+        .toString(),
+    );
     await hasTextMessageBeenDeleted(aliceWindow1, messageToDelete, 6000);
     // linked device for deleted message
     // Waiting for message to be removed
@@ -246,16 +256,31 @@ test_Alice_2W_Bob_1W(
       waitForTextMessage(bobWindow1, unsentMessage),
     ]);
     await clickOnTextMessage(aliceWindow1, unsentMessage, true);
-    await clickOnMatchingText(aliceWindow1, 'Delete');
-    await clickOnMatchingText(aliceWindow1, 'Delete for everyone');
+    await clickOnMatchingText(
+      aliceWindow1,
+      englishStrippedStr('delete').toString(),
+    );
+    await clickOnMatchingText(
+      aliceWindow1,
+      englishStrippedStr('clearMessagesForEveryone').toString(),
+    );
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
       selector: 'session-confirm-ok-button',
     });
-    await waitForTestIdWithText(aliceWindow1, 'session-toast', 'Deleted');
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'session-toast',
+      englishStrippedStr('deleteMessageDeleted')
+        .withArgs({ count: 1 })
+        .toString(),
+    );
     await hasTextMessageBeenDeleted(aliceWindow1, unsentMessage, 1000);
-    await waitForMatchingText(bobWindow1, 'This message has been deleted');
+    await waitForMatchingText(
+      bobWindow1,
+      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+    );
     // linked device for deleted message
     await hasTextMessageBeenDeleted(aliceWindow2, unsentMessage, 1000);
   },
@@ -276,18 +301,33 @@ test_Alice_2W_Bob_1W(
       true,
     );
     // Select block
-    await clickOnMatchingText(aliceWindow2, 'Block');
-    // Verify toast notification 'blocked'
-    await waitForTestIdWithText(aliceWindow2, 'session-toast', 'Blocked');
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      'context-menu-item',
+      englishStrippedStr('block').toString(),
+    );
+    // Check modal strings
+    await checkModalStrings(
+      aliceWindow2,
+      englishStrippedStr('block').toString(),
+      englishStrippedStr('blockDescription')
+        .withArgs({ name: bob.userName })
+        .toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      'session-confirm-ok-button',
+      englishStrippedStr('block').toString(),
+    );
     // Verify the user was moved to the blocked contact list
-    // Click on settings tab
     await waitForMatchingPlaceholder(
       aliceWindow1,
       'message-input-text-area',
-      'Unblock this contact to send a message.',
+      englishStrippedStr('blockBlockedDescription').toString(),
     );
     // reveal-blocked-user-settings is not updated once opened
     // Check linked device for blocked contact in settings screen
+    // Click on settings tab
     await clickOnTestIdWithText(aliceWindow2, 'settings-section');
     await clickOnTestIdWithText(
       aliceWindow2,
@@ -302,6 +342,168 @@ test_Alice_2W_Bob_1W(
       50000,
     );
     // Check if user B is in blocked contact list
-    await waitForMatchingText(aliceWindow2, bob.userName);
+    await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
+  },
+);
+
+test_Alice_2W_Bob_1W(
+  'Deleted conversation syncs',
+  async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
+    // Create contact and send new message
+    await createContact(aliceWindow1, bobWindow1, alice, bob);
+    // Confirm contact by checking Messages tab (name should appear in list)
+    await Promise.all([
+      clickOnTestIdWithText(aliceWindow1, 'message-section'),
+      clickOnTestIdWithText(bobWindow1, 'message-section'),
+      clickOnTestIdWithText(aliceWindow2, 'message-section'),
+    ]);
+    await Promise.all([
+      clickOnElement({
+        window: aliceWindow1,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+      clickOnElement({
+        window: bobWindow1,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+      clickOnElement({
+        window: aliceWindow2,
+        strategy: 'data-testid',
+        selector: 'new-conversation-button',
+      }),
+    ]);
+    await Promise.all([
+      waitForTestIdWithText(
+        aliceWindow1,
+        'module-conversation__user__profile-name',
+        bob.userName,
+      ),
+      waitForTestIdWithText(
+        bobWindow1,
+        'module-conversation__user__profile-name',
+        alice.userName,
+      ),
+      waitForTestIdWithText(
+        aliceWindow2,
+        'module-conversation__user__profile-name',
+        bob.userName,
+      ),
+    ]);
+    // Delete contact
+    await clickOnTestIdWithText(aliceWindow1, 'message-section');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      bob.userName,
+      true,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'context-menu-item',
+      englishStrippedStr('conversationsDelete').toString(),
+    );
+    await checkModalStrings(
+      aliceWindow1,
+      englishStrippedStr('conversationsDelete').toString(),
+      englishStrippedStr('conversationsDeleteDescription')
+        .withArgs({ name: bob.userName })
+        .toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('delete').toString(),
+    );
+    // Need to close 'New Conversation' screen
+    await clickOnTestIdWithText(aliceWindow2, 'new-conversation-button');
+    // Check if conversation is deleted
+    // Need to wait for deletion to propagate to linked device
+    await Promise.all([
+      hasElementBeenDeleted(
+        aliceWindow1,
+        'data-testid',
+        'module-conversation__user__profile-name',
+        1000,
+        bob.userName,
+      ),
+      hasElementBeenDeleted(
+        aliceWindow2,
+        'data-testid',
+        'module-conversation__user__profile-name',
+        10000,
+        bob.userName,
+      ),
+    ]);
+  },
+);
+
+test_Alice_2W(
+  'Hide note to self syncs',
+  async ({ alice, aliceWindow1, aliceWindow2 }) => {
+    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'chooser-new-conversation-button',
+    );
+    await typeIntoInput(
+      aliceWindow1,
+      'new-session-conversation',
+      alice.accountid,
+    );
+    await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'header-conversation-name',
+      englishStrippedStr('noteToSelf').toString(),
+    );
+    await sendMessage(aliceWindow1, 'Testing note to self');
+    // Check if note to self is visible in linked device
+    await sleepFor(1000);
+    await waitForTestIdWithText(
+      aliceWindow2,
+      'module-conversation__user__profile-name',
+      englishStrippedStr('noteToSelf').toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'module-conversation__user__profile-name',
+      englishStrippedStr('noteToSelf').toString(),
+      true,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'context-menu-item',
+      englishStrippedStr('noteToSelfHide').toString(),
+    );
+    await checkModalStrings(
+      aliceWindow1,
+      englishStrippedStr('noteToSelfHide').toString(),
+      englishStrippedStr('noteToSelfHideDescription').toString(),
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'session-confirm-ok-button',
+      englishStrippedStr('hide').toString(),
+    );
+    // Check linked device for hidden note to self
+    await sleepFor(1000);
+    await Promise.all([
+      hasElementBeenDeleted(
+        aliceWindow1,
+        'data-testid',
+        'module-conversation__user__profile-name',
+        5000,
+        englishStrippedStr('noteToSelf').toString(),
+      ),
+      hasElementBeenDeleted(
+        aliceWindow2,
+        'data-testid',
+        'module-conversation__user__profile-name',
+        8000,
+        englishStrippedStr('noteToSelf').toString(),
+      ),
+    ]);
   },
 );

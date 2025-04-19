@@ -1,16 +1,6 @@
-import { expect } from '@playwright/test';
+import { englishStrippedStr } from '../locale/localizedString';
+import { doForAll, sleepFor } from '../promise_utils';
 import { createGroup } from './setup/create_group';
-import { renameGroup } from './utilities/rename_group';
-import {
-  clickOnElement,
-  clickOnMatchingText,
-  clickOnTestIdWithText,
-  typeIntoInput,
-  waitForMatchingText,
-  waitForTestIdWithText,
-} from './utilities/utils';
-// import { leaveGroup } from './utilities/leave_group';
-import { sleepFor } from '../promise_utils';
 import { newUser } from './setup/new_user';
 import {
   sessionTestThreeWindows,
@@ -19,6 +9,16 @@ import {
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { leaveGroup } from './utilities/leave_group';
+import { renameGroup } from './utilities/rename_group';
+import {
+  clickOnElement,
+  clickOnMatchingText,
+  clickOnTestIdWithText,
+  grabTextFromElement,
+  typeIntoInput,
+  waitForMatchingText,
+  waitForTestIdWithText,
+} from './utilities/utils';
 
 // Note: Note using the group fixture here as we want to test it thoroughly
 sessionTestThreeWindows('Create group', async ([windowA, windowB, windowC]) => {
@@ -80,21 +80,23 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
     // Waiting for animation of right panel to appear
     await sleepFor(1000);
     await clickOnMatchingText(aliceWindow1, dracula.userName);
-    await clickOnMatchingText(aliceWindow1, 'OK');
-    await waitForTestIdWithText(
+    await clickOnMatchingText(
       aliceWindow1,
-      'group-update-message',
-      `"${dracula.userName}" joined the group.`,
+      englishStrippedStr('okay').toString(),
     );
-    await waitForTestIdWithText(
-      bobWindow1,
-      'group-update-message',
-      `${dracula.sessionid} joined the group.`,
-    );
-    await waitForTestIdWithText(
-      charlieWindow1,
-      'group-update-message',
-      `${dracula.sessionid} joined the group.`,
+    // even if Bob and Charlie do not know Dracula's name,
+    // Alice sets Dracula's name in the group members that every one will use as a fallback
+    await doForAll(
+      async (w) => {
+        return waitForTestIdWithText(
+          w,
+          'group-update-message',
+          englishStrippedStr('groupMemberNew')
+            .withArgs({ name: dracula.userName })
+            .toString(),
+        );
+      },
+      [aliceWindow1, bobWindow1, charlieWindow1],
     );
     await clickOnElement({
       window: draculaWindow1,
@@ -106,13 +108,6 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
       'module-conversation__user__profile-name',
       groupCreated.userName,
     );
-    // Update in closed group rewrite
-    //   const emptyStateGroupText = `You have no messages from ${testGroup.userName}. Send a message to start the conversation!`;
-    //   await waitForTestIdWithText(
-    //     windowD,
-    //     'empty-conversation-notification',
-    //     emptyStateGroupText,
-    //   );
   },
 );
 
@@ -120,7 +115,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Change group name',
   async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
     const newGroupName = 'New group name';
-
+    const expectedError = englishStrippedStr('groupNameEnterPlease').toString();
     // Change the name of the group and check that it syncs to all devices (config messages)
     // Click on already created group
     // Check that renaming a group is working
@@ -129,12 +124,16 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOnMatchingText(bobWindow1, newGroupName);
     await waitForMatchingText(
       bobWindow1,
-      `Group name is now '${newGroupName}'.`,
+      englishStrippedStr('groupNameNew')
+        .withArgs({ group_name: newGroupName })
+        .toString(),
     );
     await clickOnMatchingText(charlieWindow1, newGroupName);
     await waitForMatchingText(
       charlieWindow1,
-      `Group name is now '${newGroupName}'.`,
+      englishStrippedStr('groupNameNew')
+        .withArgs({ group_name: newGroupName })
+        .toString(),
     );
     // Click on conversation options
     // Check to see that you can't change group name to empty string
@@ -143,9 +142,21 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOnTestIdWithText(aliceWindow1, 'edit-group-name');
     await typeIntoInput(aliceWindow1, 'group-name-input', '     ');
     await aliceWindow1.keyboard.press('Enter');
-    const errorMessage = aliceWindow1.locator('.error-message');
-    await expect(errorMessage).toContainText('Please enter a group name');
-    await clickOnMatchingText(aliceWindow1, 'Cancel');
+    await waitForTestIdWithText(aliceWindow1, 'error-message');
+    const actualError = await grabTextFromElement(
+      aliceWindow1,
+      'data-testid',
+      'error-message',
+    );
+    if (actualError !== expectedError) {
+      throw new Error(
+        `Expected error message: ${expectedError}, but got: ${actualError}`,
+      );
+    }
+    await clickOnMatchingText(
+      aliceWindow1,
+      englishStrippedStr('cancel').toString(),
+    );
     await clickOnTestIdWithText(
       aliceWindow1,
       'back-button-conversation-options',
@@ -184,6 +195,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'mentions-popup-row',
       charlie.userName,
     );
+    // ALice tags Bob
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      'mentions-popup-row',
+      bob.userName,
+    );
+    await waitForMatchingText(bobWindow1, 'You');
 
     // in windowB we should be able to mentions alice and charlie
     await clickOnTestIdWithText(
@@ -204,6 +222,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'mentions-popup-row',
       charlie.userName,
     );
+    // Bob tags Charlie
+    await clickOnTestIdWithText(
+      bobWindow1,
+      'mentions-popup-row',
+      charlie.userName,
+    );
+    await waitForMatchingText(charlieWindow1, 'You');
 
     // in charlieWindow1 we should be able to mentions alice and userB
     await clickOnTestIdWithText(
@@ -224,12 +249,41 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       'mentions-popup-row',
       bob.userName,
     );
+    // Charlie tags Alice
+    await clickOnTestIdWithText(
+      charlieWindow1,
+      'mentions-popup-row',
+      alice.userName,
+    );
+    await waitForMatchingText(aliceWindow1, 'You');
   },
 );
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Leave group',
-  async ({ charlieWindow1, groupCreated }) => {
+  async ({
+    aliceWindow1,
+    bobWindow1,
+    charlie,
+    charlieWindow1,
+    groupCreated,
+  }) => {
     await leaveGroup(charlieWindow1, groupCreated);
+    await Promise.all([
+      waitForTestIdWithText(
+        aliceWindow1,
+        'group-update-message',
+        englishStrippedStr('groupMemberLeft')
+          .withArgs({ name: charlie.userName })
+          .toString(),
+      ),
+      waitForTestIdWithText(
+        bobWindow1,
+        'group-update-message',
+        englishStrippedStr('groupMemberLeft')
+          .withArgs({ name: charlie.userName })
+          .toString(),
+      ),
+    ]);
   },
 );

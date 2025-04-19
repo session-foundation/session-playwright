@@ -6,6 +6,7 @@ import {
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utils';
+import { englishStrippedStr } from '../../locale/localizedString';
 
 export const renameGroup = async (
   window: Page,
@@ -17,8 +18,14 @@ export const renameGroup = async (
   await clickOnTestIdWithText(window, 'edit-group-name');
   await typeIntoInput(window, 'group-name-input', newGroupName);
   await window.keyboard.press('Enter');
+  await clickOnMatchingText(window, englishStrippedStr('okay').toString());
   await waitForTestIdWithText(window, 'right-panel-group-name', newGroupName);
   await clickOnTestIdWithText(window, 'back-button-conversation-options');
   // Check config message
-  await waitForMatchingText(window, `Group name is now '${newGroupName}'.`);
+  await waitForMatchingText(
+    window,
+    englishStrippedStr('groupNameNew')
+      .withArgs({ group_name: newGroupName })
+      .toString(),
+  );
 };

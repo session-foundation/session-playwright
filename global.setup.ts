@@ -15,7 +15,7 @@ const getDirectoriesOfSessionDataPath = (source: string) =>
 
 let needsClean = isEmpty(process.env.NO_CLEAN);
 
-export default async function cleanupPreviousTests() {
+export default async function globalSetup() {
   console.log('Cleaning up all previous tests configs...');
   if (!needsClean) {
     return;
@@ -37,7 +37,7 @@ export default async function cleanupPreviousTests() {
       ? join(homedir(), '.config')
       : null;
     if (!parentFolderOfAllDataPath) {
-      throw new Error('Only macOS/linux are currrently supported ');
+      throw new Error('Only macOS/linux are currently supported');
     }
 
     if (!parentFolderOfAllDataPath || parentFolderOfAllDataPath.length < 9) {

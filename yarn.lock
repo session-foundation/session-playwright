@@ -94,15 +94,51 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@playwright/test@^1.37.1":
-  version "1.37.1"
-  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.37.1.tgz#e7f44ae0faf1be52d6360c6bbf689fd0057d9b6f"
-  integrity sha512-bq9zTli3vWJo8S3LwB91U0qDNQDpEXnw7knhxLM0nwDvexQAwx9tO8iKDZSqqneVq+URd/WIoz+BALMqUTgdSg==
+"@playwright/test@^1.51":
+  version "1.51.1"
+  resolved "https://registry.yarnpkg.com/@playwright/test/-/test-1.51.1.tgz#75357d513221a7be0baad75f01e966baf9c41a2e"
+  integrity sha512-nM+kEaTSAoVlXmMPH10017vn3FSiFqr/bh4fKg9vmAdMfd9SDqRZNvPSiAHADc/itWak+qPvMPZQOPwCBW7k7Q==
   dependencies:
-    "@types/node" "*"
-    playwright-core "1.37.1"
-  optionalDependencies:
-    fsevents "2.3.2"
+    playwright "1.51.1"
+
+"@session-foundation/basic-types@0.0.2", "@session-foundation/basic-types@^0.0.2":
+  version "0.0.2"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/basic-types/-/basic-types-0.0.2.tgz#182b086ea5d0e40b36ce9a2affde20d9d11c2e02"
+  integrity sha512-ZavLQWkoLuDRh3HQsHX1OwHoNsRu8D+jpp1z06E8XPuJgWhvCISLfs1RQ5ESZT+xE6lbSUfe4pfXYg3cRvE1+A==
+  dependencies:
+    buffer-crc32 "^1.0.0"
+
+"@session-foundation/mnemonic@^0.0.5":
+  version "0.0.5"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/mnemonic/-/mnemonic-0.0.5.tgz#c7c220d94e33f495b1469194a233f5d210874a82"
+  integrity sha512-2WcV7a9Ph8Xh0bxaHULlVZpxmCsuAkYgui3JZQDoUH2jnA7TrxiPtWCCItvEte2akhy4I2Z6XvSUZfXZBtuYgw==
+  dependencies:
+    buffer-crc32 "^1.0.0"
+
+"@session-foundation/qa-seeder@^0.0.11":
+  version "0.0.11"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/qa-seeder/-/qa-seeder-0.0.11.tgz#9307cd198569d97bee820e6ca183b574d0217705"
+  integrity sha512-YSW7j525Ue8IsZpjSUGkzD71QAkLUNVJn/V/RTMbl+91tZoQVXOP12PnTxDQYLWiC5QqpLMHx69cDegPuF1bQg==
+  dependencies:
+    "@session-foundation/basic-types" "^0.0.2"
+    "@session-foundation/mnemonic" "^0.0.5"
+    "@session-foundation/session-tooling" "^0.0.10"
+    "@session-foundation/sodium" "^0.0.2"
+    lodash "^4.17.21"
+
+"@session-foundation/session-tooling@^0.0.10":
+  version "0.0.10"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/session-tooling/-/session-tooling-0.0.10.tgz#1c66d91b2f436f14c8f411d32827130cbbe20bda"
+  integrity sha512-0kMftog2hUbsv7E34w0YOmxc3XBj04vGQ6S5UwKyQU2jemQnhVmquBHTmDWChhYAtD7Oc13Lvvxh47o2+wvynQ==
+
+"@session-foundation/sodium@^0.0.2":
+  version "0.0.2"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/sodium/-/sodium-0.0.2.tgz#24d0c232d99bce328e37928a2246bae89d969c13"
+  integrity sha512-+FfRIiqOstTzkp+vANGIRtzaCp/SCgs9w3Z6sDp6IyDkEBxTBCcGoTXPAc0o/mGv7+s91RPNJgHtiSvpfpf8pQ==
+  dependencies:
+    "@session-foundation/basic-types" "0.0.2"
+    buffer-crc32 "^1.0.0"
+    libsodium-wrappers-sumo "^0.7.15"
 
 "@sindresorhus/is@^4.0.0":
   version "4.6.0"
@@ -173,10 +209,12 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.4.8.tgz#b5dda19adaa473a9bf0ab5cbd8f30ec7d43f5c85"
   integrity sha512-0mHckf6D2DiIAzh8fM8f3HQCvMKDpK94YQ0DSVkfWTG9BZleYIWudw9cJxX8oCk9bM+vAkDyujDV6dmKHbvQpg==
 
-"@types/node@^18.11.18":
-  version "18.17.3"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-18.17.3.tgz#409febdc84478b452306a8112c692e800ad9f6fe"
-  integrity sha512-2x8HWtFk0S99zqVQABU9wTpr8wPoaDHZUcAkoTKH+nL7kPv3WUI9cRi/Kk5Mz4xdqXSqTkKP7IWNoQQYCnDsTA==
+"@types/node@^20.9.0":
+  version "20.17.24"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.17.24.tgz#2325476954e6fc8c2f11b9c61e26ba6eb7d3f5b6"
+  integrity sha512-d7fGCyB96w9BnWQrOsJtpyiSaBcAYYr75bnK6ZRjDbql2cGLj/3GsL5OYmLPNq76l7Gf2q4Rv9J2o6h5CrD9sA==
+  dependencies:
+    undici-types "~6.19.2"
 
 "@types/responselike@^1.0.0":
   version "1.0.0"
@@ -442,6 +480,11 @@ braces@^3.0.2:
   dependencies:
     fill-range "^7.0.1"
 
+buffer-crc32@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/buffer-crc32/-/buffer-crc32-1.0.0.tgz#a10993b9055081d55304bd9feb4a072de179f405"
+  integrity sha512-Db1SbgBS/fg/392AblrMJk97KggmvYhr4pB5ZIMTWtaivCPMWLkmb7m21cJvpvgK+J3nsU2CmmixNBZx4vFj/w==
+
 buffer-crc32@~0.2.3:
   version "0.2.13"
   resolved "https://registry.yarnpkg.com/buffer-crc32/-/buffer-crc32-0.2.13.tgz#0d333e3f00eac50aa1454abd30ef8c2a5d9a7242"
@@ -589,13 +632,18 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-electron@^25.4.0:
-  version "25.4.0"
-  resolved "https://registry.yarnpkg.com/electron/-/electron-25.4.0.tgz#d45b1cf3e4e96eb5bff5fee704d7aa13b532f3a5"
-  integrity sha512-VLTRxDhL4UvQbqM7pTNENnJo62cdAPZT92N+B7BZQ5Xfok1wuVPEewIjBot4K7U3EpLUuHn1veeLzho3ihiP+Q==
+dotenv@^16.4.5:
+  version "16.4.5"
+  resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-16.4.5.tgz#cdd3b3b604cb327e286b4762e13502f717cb099f"
+  integrity sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==
+
+electron@34.2.0:
+  version "34.2.0"
+  resolved "https://registry.yarnpkg.com/electron/-/electron-34.2.0.tgz#3cec06c34f47f0e86956be71629b485b290bafd1"
+  integrity sha512-SYwBJNeXBTm1q/ErybQMUBZAYqEreBUqBwTrNkw1rV4YatDZk5Aittpcus3PPeC4UoI/tqmJ946uG8AKHTd6CA==
   dependencies:
     "@electron/get" "^2.0.0"
-    "@types/node" "^18.11.18"
+    "@types/node" "^20.9.0"
     extract-zip "^2.0.1"
 
 end-of-stream@^1.1.0:
@@ -699,6 +747,13 @@ eslint-config-airbnb-base@^15.0.0:
     object.assign "^4.1.2"
     object.entries "^1.1.5"
     semver "^6.3.0"
+
+eslint-config-airbnb-typescript@^18.0.0:
+  version "18.0.0"
+  resolved "https://registry.yarnpkg.com/eslint-config-airbnb-typescript/-/eslint-config-airbnb-typescript-18.0.0.tgz#b1646db4134858d704b1d2bee47e1d72c180315f"
+  integrity sha512-oc+Lxzgzsu8FQyFVa4QFaVKiitTYiiW3frB9KYW5OWdPrqFc7FzxgB20hP4cHMlr+MBzGcLl3jnCOVOydL9mIg==
+  dependencies:
+    eslint-config-airbnb-base "^15.0.0"
 
 eslint-config-prettier@^9.0.0:
   version "9.0.0"
@@ -1412,6 +1467,18 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
+libsodium-sumo@^0.7.15:
+  version "0.7.15"
+  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.15.tgz#91c1d863fe3fbce6d6b9db1aadaa622733a1d007"
+  integrity sha512-5tPmqPmq8T8Nikpm1Nqj0hBHvsLFCXvdhBFV7SGOitQPZAA6jso8XoL0r4L7vmfKXr486fiQInvErHtEvizFMw==
+
+libsodium-wrappers-sumo@^0.7.15:
+  version "0.7.15"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.15.tgz#0ef2a99b4b17e8385aa7e6850593660dbaf5fb40"
+  integrity sha512-aSWY8wKDZh5TC7rMvEdTHoyppVq/1dTSAeAR7H6pzd6QRT3vQWcT5pGwCotLcpPEOLXX6VvqihSPkpEhYAjANA==
+  dependencies:
+    libsodium-sumo "^0.7.15"
+
 locate-path@^6.0.0:
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/locate-path/-/locate-path-6.0.0.tgz#55321eb309febbc59c4801d931a72452a681d286"
@@ -1645,10 +1712,19 @@ picomatch@^2.3.1:
   resolved "https://registry.yarnpkg.com/picomatch/-/picomatch-2.3.1.tgz#3ba3833733646d9d3e4995946c1365a67fb07a42"
   integrity sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==
 
-playwright-core@1.37.1:
-  version "1.37.1"
-  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.37.1.tgz#cb517d52e2e8cb4fa71957639f1cd105d1683126"
-  integrity sha512-17EuQxlSIYCmEMwzMqusJ2ztDgJePjrbttaefgdsiqeLWidjYz9BxXaTaZWxH1J95SHGk6tjE+dwgWILJoUZfA==
+playwright-core@1.51.1:
+  version "1.51.1"
+  resolved "https://registry.yarnpkg.com/playwright-core/-/playwright-core-1.51.1.tgz#d57f0393e02416f32a47cf82b27533656a8acce1"
+  integrity sha512-/crRMj8+j/Nq5s8QcvegseuyeZPxpQCZb6HNk3Sos3BlZyAknRjoyJPFWkpNn8v0+P3WiwqFF8P+zQo4eqiNuw==
+
+playwright@1.51.1:
+  version "1.51.1"
+  resolved "https://registry.yarnpkg.com/playwright/-/playwright-1.51.1.tgz#ae1467ee318083968ad28d6990db59f47a55390f"
+  integrity sha512-kkx+MB2KQRkyxjYPc3a0wLZZoDczmppyGJIvQ43l+aZihkaVvmu/21kiyaHeHjiFxjxNNFnUncKmcGIyOojsaw==
+  dependencies:
+    playwright-core "1.51.1"
+  optionalDependencies:
+    fsevents "2.3.2"
 
 prelude-ls@^1.2.1:
   version "1.2.1"
@@ -1984,10 +2060,10 @@ typed-array-length@^1.0.4:
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
 
-typescript@^5.1.6:
-  version "5.1.6"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.1.6.tgz#02f8ac202b6dad2c0dd5e0913745b47a37998274"
-  integrity sha512-zaWCozRZ6DLEWAWFrVDz1H6FVXzUSfTy5FUMWsQlU8Ym5JP9eO4xkTIROFCQvhQf61z6O/G6ugw3SgAnvvm+HA==
+typescript@^5.5.4:
+  version "5.5.4"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.5.4.tgz#d9852d6c82bad2d2eda4fd74a5762a8f5909e9ba"
+  integrity sha512-Mtq29sKDAEYP7aljRgtPOpTvOfbwRWlS6dPRzwjdE+C0R4brX/GUyhHSecbHMFLNBLcJIPt9nl9yG5TZ1weH+Q==
 
 unbox-primitive@^1.0.2:
   version "1.0.2"
@@ -1998,6 +2074,11 @@ unbox-primitive@^1.0.2:
     has-bigints "^1.0.2"
     has-symbols "^1.0.3"
     which-boxed-primitive "^1.0.2"
+
+undici-types@~6.19.2:
+  version "6.19.8"
+  resolved "https://registry.yarnpkg.com/undici-types/-/undici-types-6.19.8.tgz#35111c9d1437ab83a7cdc0abae2f26d88eda0a02"
+  integrity sha512-ve2KP6f/JnbPBFyobGHuerC9g1FYGn/F8n1LWTwNxCEzd6IfqTwUQcNXgEtmmQ6DlRrC1hrSrBnCZPokRrDHjw==
 
 universalify@^0.1.0:
   version "0.1.2"

@@ -1,25 +1,21 @@
 /* eslint-disable no-empty-pattern */
 /* eslint-disable @typescript-eslint/array-type */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Page, TestInfo, test } from '@playwright/test';
 import { Group, User } from '../types/testing';
 import { linkedDevice } from '../utilities/linked_device';
 import { forceCloseAllWindows } from './closeWindows';
 import { createGroup } from './create_group';
-import { newUser } from './new_user';
 import { openApp } from './open';
+import chalk from 'chalk';
+import type { Tuple } from '../../../types/tuple';
+import { newUser } from './new_user';
+import { usernames } from '@session-foundation/qa-seeder';
 
 // This is not ideal, most of our test needs to open a specific number of windows and close them once the test is done or failed.
 // This file contains a bunch of utility function to use to open those windows and clean them afterwards.
 // Note: those function only keep track (and close) the windows they open. If you open a new window or need to close and reopen an existing one, this won't take of it.
-
-type Tuple<T, N extends number> = N extends N
-  ? number extends N
-    ? T[]
-    : _TupleOf<T, N, []>
-  : never;
-type _TupleOf<T, N extends number, R extends unknown[]> = R['length'] extends N
-  ? R
-  : _TupleOf<T, N, [T, ...R]>;
 
 type CountWindows = 1 | 2 | 3 | 4 | 5;
 
@@ -32,7 +28,6 @@ type WithAliceWindow1 = { aliceWindow1: Page };
 type WithAliceWindow2 = { aliceWindow2: Page };
 type WithBobWindow1 = { bobWindow1: Page };
 type WithCharlieWindow1 = { charlieWindow1: Page };
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type WithDraculaWindow1 = { draculaWindow1: Page };
 
 type WithGroupCreated = { groupCreated: Group };
@@ -42,7 +37,7 @@ function sessionTest<T extends CountWindows, N extends Tuple<Page, T>>(
   testCallback: (windows: N, testInfo: TestInfo) => Promise<void>,
   count: T,
 ) {
-  return test(testName, async ({}, testinfo) => {
+  return test(testName, async ({}, testInfo) => {
     const windows = await openApp(count);
 
     try {
@@ -51,7 +46,7 @@ function sessionTest<T extends CountWindows, N extends Tuple<Page, T>>(
           `openApp should have opened ${count} windows but did not.`,
         );
       }
-      await testCallback(windows as N, testinfo);
+      await testCallback(windows as N, testInfo);
     } catch (e) {
       throw e;
     } finally {
@@ -80,11 +75,10 @@ export function sessionTestTwoWindows(
 
 export function sessionTestThreeWindows(
   testName: string,
-  testCallback: ([windowA, windowB, windowC]: [
-    Page,
-    Page,
-    Page,
-  ]) => Promise<void>,
+  testCallback: (
+    [windowA, windowB, windowC]: [Page, Page, Page],
+    testInfo: TestInfo,
+  ) => Promise<void>,
 ) {
   return sessionTest(testName, testCallback, 3);
 }
@@ -128,35 +122,29 @@ function sessionTestGeneric<
     testInfo: TestInfo,
   ) => Promise<void>,
 ) {
-  const userNames: Tuple<string, 4> = ['Alice', 'Bob', 'Charlie', 'Dracula'];
-
-  return test(testName, async ({}, testinfo) => {
-    const mainWindows = await openApp(userCount);
+  return test(testName, async ({}, testInfo) => {
+    let mainWindows: Array<Page> = [];
     const linkedWindows: Array<Page> = [];
 
     try {
-      if (mainWindows.length !== userCount) {
-        throw new Error(
-          `openApp should have opened ${userCount} windows but did not.`,
-        );
-      }
-      const users = (await Promise.all(
-        mainWindows.map((m, i) => newUser(m, userNames[i], waitForNetwork)),
-      )) as Tuple<User, UserCount>;
+      let groupCreated: Group | undefined;
 
+      mainWindows = await openApp(userCount);
+      const users = (await Promise.all(
+        mainWindows.map((m, i) => newUser(m, usernames[i], waitForNetwork)),
+      )) as Tuple<User, UserCount>;
       if (links?.length) {
         for (let index = 0; index < links.length; index++) {
           const link = links[index];
           console.info(
-            'linking a window with ',
-            users[link - 1].recoveryPhrase,
+            `linking a window with "${chalk.green(
+              users[link - 1].recoveryPassword,
+            )}"`,
           );
-          const linked = await linkedDevice(users[link - 1].recoveryPhrase);
+          const linked = await linkedDevice(users[link - 1].recoveryPassword);
           linkedWindows.push(linked);
         }
       }
-
-      let groupCreated: Group | undefined;
       if (grouped?.length) {
         groupCreated = await createGroup(
           testName,
@@ -179,7 +167,7 @@ function sessionTestGeneric<
             ? Group
             : undefined,
         },
-        testinfo,
+        testInfo,
       );
     } catch (e) {
       throw e;
@@ -198,14 +186,14 @@ function sessionTestGeneric<
  * Used for tests which don't need network (i.e. setting/checking passwords etc)
  */
 export function test_Alice_1W_no_network(
-  testname: string,
+  testName: string,
   testCallback: (
     details: WithAlice & WithAliceWindow1,
     testInfo: TestInfo,
   ) => Promise<void>,
 ) {
   return sessionTestGeneric(
-    testname,
+    testName,
     1,
     { waitForNetwork: false },
     ({ mainWindows, users }, testInfo) => {
@@ -225,14 +213,14 @@ export function test_Alice_1W_no_network(
  * - Alice with 2 windows.
  */
 export function test_Alice_2W(
-  testname: string,
+  testName: string,
   testCallback: (
     details: WithAlice & WithAliceWindow1 & WithAliceWindow2,
     testInfo: TestInfo,
   ) => Promise<void>,
 ) {
   return sessionTestGeneric(
-    testname,
+    testName,
     1,
     { links: [1] },
     ({ mainWindows, users, linkedWindows }, testInfo) => {
@@ -254,14 +242,14 @@ export function test_Alice_2W(
  * - Bob with 1 window.
  */
 export function test_Alice_1W_Bob_1W(
-  testname: string,
+  testName: string,
   testCallback: (
     details: WithAlice & WithAliceWindow1 & WithBob & WithBobWindow1,
     testInfo: TestInfo,
   ) => Promise<void>,
 ) {
   return sessionTestGeneric(
-    testname,
+    testName,
     2,
     {},
     ({ mainWindows, users }, testInfo) => {
@@ -284,7 +272,7 @@ export function test_Alice_1W_Bob_1W(
  * - Bob with 1 window.
  */
 export function test_Alice_2W_Bob_1W(
-  testname: string,
+  testName: string,
   testCallback: (
     details: WithAlice &
       WithAliceWindow1 &
@@ -295,7 +283,7 @@ export function test_Alice_2W_Bob_1W(
   ) => Promise<void>,
 ) {
   return sessionTestGeneric(
-    testname,
+    testName,
     2,
     { links: [1] },
     ({ mainWindows, users, linkedWindows }, testInfo) => {
@@ -320,7 +308,7 @@ export function test_Alice_2W_Bob_1W(
  * - Charlie with 1 window.
  */
 export function test_group_Alice_1W_Bob_1W_Charlie_1W(
-  testname: string,
+  testName: string,
   testCallback: (
     details: WithAlice &
       WithAliceWindow1 &
@@ -333,7 +321,7 @@ export function test_group_Alice_1W_Bob_1W_Charlie_1W(
   ) => Promise<void>,
 ) {
   return sessionTestGeneric(
-    testname,
+    testName,
     3,
     { grouped: [1, 2, 3] },
     ({ mainWindows, users, groupCreated }, testInfo) => {
@@ -360,7 +348,7 @@ export function test_group_Alice_1W_Bob_1W_Charlie_1W(
  * - Charlie with 1 window.
  */
 export function test_group_Alice_2W_Bob_1W_Charlie_1W(
-  testname: string,
+  testName: string,
   testCallback: (
     details: WithAlice &
       WithAliceWindow1 &
@@ -374,7 +362,7 @@ export function test_group_Alice_2W_Bob_1W_Charlie_1W(
   ) => Promise<void>,
 ) {
   return sessionTestGeneric(
-    testname,
+    testName,
     3,
     { grouped: [1, 2, 3], links: [1] },
     ({ mainWindows, users, groupCreated, linkedWindows }, testInfo) => {
@@ -403,7 +391,7 @@ export function test_group_Alice_2W_Bob_1W_Charlie_1W(
  * - Dracula with 1 window,
  */
 export function test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
-  testname: string,
+  testName: string,
   testCallback: (
     details: WithAlice &
       WithAliceWindow1 &
@@ -419,7 +407,7 @@ export function test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
   ) => Promise<void>,
 ) {
   return sessionTestGeneric(
-    testname,
+    testName,
     4,
     { grouped: [1, 2, 3] },
     ({ mainWindows, users, groupCreated }, testInfo) => {
