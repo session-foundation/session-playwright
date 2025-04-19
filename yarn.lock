@@ -101,6 +101,45 @@
   dependencies:
     playwright "1.51.1"
 
+"@session-foundation/basic-types@0.0.2", "@session-foundation/basic-types@^0.0.2":
+  version "0.0.2"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/basic-types/-/basic-types-0.0.2.tgz#182b086ea5d0e40b36ce9a2affde20d9d11c2e02"
+  integrity sha512-ZavLQWkoLuDRh3HQsHX1OwHoNsRu8D+jpp1z06E8XPuJgWhvCISLfs1RQ5ESZT+xE6lbSUfe4pfXYg3cRvE1+A==
+  dependencies:
+    buffer-crc32 "^1.0.0"
+
+"@session-foundation/mnemonic@^0.0.5":
+  version "0.0.5"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/mnemonic/-/mnemonic-0.0.5.tgz#c7c220d94e33f495b1469194a233f5d210874a82"
+  integrity sha512-2WcV7a9Ph8Xh0bxaHULlVZpxmCsuAkYgui3JZQDoUH2jnA7TrxiPtWCCItvEte2akhy4I2Z6XvSUZfXZBtuYgw==
+  dependencies:
+    buffer-crc32 "^1.0.0"
+
+"@session-foundation/qa-seeder@^0.0.11":
+  version "0.0.11"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/qa-seeder/-/qa-seeder-0.0.11.tgz#9307cd198569d97bee820e6ca183b574d0217705"
+  integrity sha512-YSW7j525Ue8IsZpjSUGkzD71QAkLUNVJn/V/RTMbl+91tZoQVXOP12PnTxDQYLWiC5QqpLMHx69cDegPuF1bQg==
+  dependencies:
+    "@session-foundation/basic-types" "^0.0.2"
+    "@session-foundation/mnemonic" "^0.0.5"
+    "@session-foundation/session-tooling" "^0.0.10"
+    "@session-foundation/sodium" "^0.0.2"
+    lodash "^4.17.21"
+
+"@session-foundation/session-tooling@^0.0.10":
+  version "0.0.10"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/session-tooling/-/session-tooling-0.0.10.tgz#1c66d91b2f436f14c8f411d32827130cbbe20bda"
+  integrity sha512-0kMftog2hUbsv7E34w0YOmxc3XBj04vGQ6S5UwKyQU2jemQnhVmquBHTmDWChhYAtD7Oc13Lvvxh47o2+wvynQ==
+
+"@session-foundation/sodium@^0.0.2":
+  version "0.0.2"
+  resolved "http://vps-cfbca183.vps.ovh.ca:4873/@session-foundation/sodium/-/sodium-0.0.2.tgz#24d0c232d99bce328e37928a2246bae89d969c13"
+  integrity sha512-+FfRIiqOstTzkp+vANGIRtzaCp/SCgs9w3Z6sDp6IyDkEBxTBCcGoTXPAc0o/mGv7+s91RPNJgHtiSvpfpf8pQ==
+  dependencies:
+    "@session-foundation/basic-types" "0.0.2"
+    buffer-crc32 "^1.0.0"
+    libsodium-wrappers-sumo "^0.7.15"
+
 "@sindresorhus/is@^4.0.0":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-4.6.0.tgz#3c7c9c46e678feefe7a2e5bb609d3dbd665ffb3f"
@@ -159,18 +198,6 @@
   integrity sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==
   dependencies:
     "@types/node" "*"
-
-"@types/libsodium-wrappers-sumo@^0.7.8":
-  version "0.7.8"
-  resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.8.tgz#33e32b454fb6b340758c9ffdb1f9657e1be058ff"
-  integrity sha512-N2+df4MB/A+W0RAcTw7A5oxKgzD+Vh6Ye7lfjWIi5SdTzVLfHPzxUjhwPqHLO5Ev9fv/+VHl+sUaUuTg4fUPqw==
-  dependencies:
-    "@types/libsodium-wrappers" "*"
-
-"@types/libsodium-wrappers@*":
-  version "0.7.14"
-  resolved "https://registry.yarnpkg.com/@types/libsodium-wrappers/-/libsodium-wrappers-0.7.14.tgz#f688f8d44e46ed61c401f82ff757581655fbcc42"
-  integrity sha512-5Kv68fXuXK0iDuUir1WPGw2R9fOZUlYlSAa0ztMcL0s0BfIDTqg9GXz8K30VJpPP3sxWhbolnQma2x+/TfkzDQ==
 
 "@types/lodash@^4.14.196":
   version "4.14.196"
@@ -1440,17 +1467,17 @@ levn@^0.4.1:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
 
-libsodium-sumo@^0.7.14:
-  version "0.7.14"
-  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.14.tgz#9a53e09944f092f603a1e1d4446414de0b3fb0fc"
-  integrity sha512-2nDge6qlAjcwyslAhWfVumlkeSNK5+WCfKa2/VEq9prvlT5vP2FR0m0o5hmKaYqfsZ4TQVj5czQsimZvXDB1CQ==
+libsodium-sumo@^0.7.15:
+  version "0.7.15"
+  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.15.tgz#91c1d863fe3fbce6d6b9db1aadaa622733a1d007"
+  integrity sha512-5tPmqPmq8T8Nikpm1Nqj0hBHvsLFCXvdhBFV7SGOitQPZAA6jso8XoL0r4L7vmfKXr486fiQInvErHtEvizFMw==
 
-libsodium-wrappers-sumo@^0.7.14:
-  version "0.7.14"
-  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.14.tgz#86301f14b37a77d847eb0396f2b83cdb1c47c480"
-  integrity sha512-0lm7ZwN5a95J2yUi8R1rgQeeaVDIWnvNzgVmXmZswis4mC+bQtbDrB+QpJlL4qklaKx3hVpJjoc6ubzJFiv64Q==
+libsodium-wrappers-sumo@^0.7.15:
+  version "0.7.15"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.15.tgz#0ef2a99b4b17e8385aa7e6850593660dbaf5fb40"
+  integrity sha512-aSWY8wKDZh5TC7rMvEdTHoyppVq/1dTSAeAR7H6pzd6QRT3vQWcT5pGwCotLcpPEOLXX6VvqihSPkpEhYAjANA==
   dependencies:
-    libsodium-sumo "^0.7.14"
+    libsodium-sumo "^0.7.15"
 
 locate-path@^6.0.0:
   version "6.0.0"
@@ -1855,10 +1882,6 @@ serialize-error@^7.0.1:
   integrity sha512-8I8TjW5KMOKsZQTvoxjuSIa7foAwPWGOts+6o7sgjz41/qMD9VQHEDxi6PBvK2l0MXUmqZyNpUK+T2tQaaElvw==
   dependencies:
     type-fest "^0.13.1"
-
-"session-tooling@git+https://github.com/Bi1b/session-tooling":
-  version "0.0.1"
-  resolved "git+https://github.com/Bi1b/session-tooling#ee3172848bf6106e6db27fedc9a24d1d963c32e6"
 
 shebang-command@^2.0.0:
   version "2.0.0"

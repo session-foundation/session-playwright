@@ -41,30 +41,38 @@ export const mediaArray = [
 ];
 
 type DisappearingOption = {
+  durationSeconds: number;
   timeOption: DMTimeOption;
   disappearingMessagesType: DisappearType | DisappearGroupType;
   disappearAction: DisappearActions;
 };
 
+const duration10Seconds = 10;
+const duration30Seconds = 30;
+
 export const defaultDisappearingOptions = {
   DAS: {
-    timeOption: 'time-option-30-seconds',
+    durationSeconds: duration30Seconds,
+    timeOption: `time-option-${duration30Seconds}-seconds`,
     disappearingMessagesType: 'disappear-after-send-option',
     disappearAction: 'sent',
   },
   DAR: {
-    timeOption: 'time-option-10-seconds',
+    durationSeconds: duration10Seconds,
+    timeOption: `time-option-${duration10Seconds}-seconds`,
     disappearingMessagesType: 'disappear-after-read-option',
     disappearAction: 'read',
   },
   group: {
-    timeOption: 'time-option-10-seconds',
+    durationSeconds: duration10Seconds,
+    timeOption: `time-option-${duration10Seconds}-seconds`,
     disappearingMessagesType:
       'disappear-after-send-option' satisfies DisappearGroupType,
     disappearAction: 'sent',
   },
   NTS: {
-    timeOption: 'time-option-10-seconds',
+    durationSeconds: duration10Seconds,
+    timeOption: `time-option-${duration10Seconds}-seconds`,
     disappearingMessagesType: 'disappear-after-send-option',
     disappearAction: 'sent',
   },

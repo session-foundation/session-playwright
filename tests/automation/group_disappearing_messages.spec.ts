@@ -1,3 +1,4 @@
+import { buildStateForTest } from '@session-foundation/qa-seeder';
 import { sleepFor } from '../promise_utils';
 import {
   defaultDisappearingOptions,
@@ -5,7 +6,11 @@ import {
   mediaArray,
   testLink,
 } from './constants/variables';
-import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
+import { recoverFromSeed } from './setup/recovery_using_seed';
+import {
+  sessionTestThreeWindows,
+  test_group_Alice_1W_Bob_1W_Charlie_1W,
+} from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import {
   sendLinkPreview,
@@ -23,12 +28,16 @@ import {
 } from './utilities/utils';
 
 // Disappearing time settings for all tests
-const { timeOption, disappearingMessagesType, disappearAction } =
-  defaultDisappearingOptions.group;
+const {
+  durationSeconds,
+  timeOption,
+  disappearingMessagesType,
+  disappearAction,
+} = defaultDisappearingOptions.group;
 
 mediaArray.forEach(({ mediaType, path }) => {
   test_group_Alice_1W_Bob_1W_Charlie_1W(
-    `Send disappearing ${mediaType} groups`,
+    `PLIP Send disappearing ${mediaType} groups`,
     async ({
       alice,
       aliceWindow1,
@@ -58,7 +67,7 @@ mediaArray.forEach(({ mediaType, path }) => {
           waitForTestIdWithText(bobWindow1, 'audio-player'),
           waitForTestIdWithText(charlieWindow1, 'audio-player'),
         ]);
-        await sleepFor(30000);
+        await sleepFor(durationSeconds * 1000, true);
         await Promise.all([
           hasElementBeenDeleted(bobWindow1, 'data-testid', 'audio-player'),
           hasElementBeenDeleted(charlieWindow1, 'data-testid', 'audio-player'),
@@ -68,11 +77,11 @@ mediaArray.forEach(({ mediaType, path }) => {
           waitForTextMessage(bobWindow1, testMessage),
           waitForTextMessage(charlieWindow1, testMessage),
         ]);
-        // Wait 30 seconds for image to disappear
-        await sleepFor(30000);
+        // Wait durationSeconds seconds for image to disappear
+        await sleepFor(durationSeconds * 1000, true);
         await Promise.all([
-          hasTextMessageBeenDeleted(bobWindow1, testMessage),
-          hasTextMessageBeenDeleted(charlieWindow1, testMessage),
+          hasTextMessageBeenDeleted(bobWindow1, testMessage, 1000),
+          hasTextMessageBeenDeleted(charlieWindow1, testMessage, 1000),
         ]);
       }
     },
@@ -146,3 +155,62 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     ]);
   },
 );
+
+mediaArray.forEach(({ mediaType, path }) => {
+  sessionTestThreeWindows(
+    `PLOP Send disappearing ${mediaType} groups`,
+    async (windows, testInfo) => {
+      const { group, users } = await buildStateForTest(
+        '3friendsInGroup',
+        testInfo.title,
+      );
+      await Promise.all(
+        windows.map((w, index) => recoverFromSeed(w, users[index].seedPhrase)),
+      );
+      const [aliceWindow1, bobWindow1, charlieWindow1] = windows;
+
+      const [alice] = users;
+      await sleepFor(15000);
+
+      const testMessage = `${alice.userName} sending ${mediaType} to ${group.groupName}`;
+      await setDisappearingMessages(aliceWindow1, [
+        'group',
+        disappearingMessagesType,
+        timeOption,
+        disappearAction,
+      ]);
+      // Send media
+      if (mediaType === 'voice') {
+        await sendVoiceMessage(aliceWindow1);
+      } else {
+        await sendMedia(aliceWindow1, path, testMessage);
+      }
+      await Promise.all([
+        waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation'),
+        waitForLoadingAnimationToFinish(charlieWindow1, 'loading-animation'),
+      ]);
+      if (mediaType === 'voice') {
+        await Promise.all([
+          waitForTestIdWithText(bobWindow1, 'audio-player'),
+          waitForTestIdWithText(charlieWindow1, 'audio-player'),
+        ]);
+        await sleepFor(durationSeconds * 1000, true);
+        await Promise.all([
+          hasElementBeenDeleted(bobWindow1, 'data-testid', 'audio-player'),
+          hasElementBeenDeleted(charlieWindow1, 'data-testid', 'audio-player'),
+        ]);
+      } else {
+        await Promise.all([
+          waitForTextMessage(bobWindow1, testMessage),
+          waitForTextMessage(charlieWindow1, testMessage),
+        ]);
+        // Wait durationSeconds seconds for image to disappear
+        await sleepFor(durationSeconds * 1000, true);
+        await Promise.all([
+          hasTextMessageBeenDeleted(bobWindow1, testMessage),
+          hasTextMessageBeenDeleted(charlieWindow1, testMessage),
+        ]);
+      }
+    },
+  );
+});

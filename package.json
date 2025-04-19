@@ -8,7 +8,6 @@
   "devDependencies": {
     "@playwright/test": "^1.51",
     "@types/fs-extra": "^11.0.1",
-    "@types/libsodium-wrappers-sumo": "^0.7.8",
     "@types/lodash": "^4.14.196",
     "@types/uuid": "^9.0.8",
     "@typescript-eslint/eslint-plugin": "^6.2.1",
@@ -41,8 +40,7 @@
     "allure-open": "allure open ./allure-report"
   },
   "dependencies": {
-    "buffer-crc32": "^1.0.0",
-    "libsodium-wrappers-sumo": "^0.7.14",
-    "session-tooling": "git+https://github.com/Bi1b/session-tooling"
+    "@session-foundation/qa-seeder": "^0.0.11",
+    "buffer-crc32": "^1.0.0"
   }
 }
