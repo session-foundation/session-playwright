@@ -81,16 +81,11 @@ export async function waitForTextMessage(
   text: string,
   maxWait?: number,
 ) {
-  let builtSelector = `css=[data-testid=message-content]:has-text("${text}")`;
-  if (text) {
-    // " =>  \\\"
-    /* prettier-ignore */
+  const escapedText = text.replace(/"/g, '\\"');
 
-    const escapedText = text.replace(/"/g, '\\\"');
+  const builtSelector = `css=[data-testid=message-content]:has-text("${escapedText}")`;
 
-    builtSelector += `:has-text("${escapedText}")`;
-    console.info('builtSelector:', builtSelector);
-  }
+  console.info('waitForTextMessage: builtSelector:', builtSelector);
   const el = await window.waitForSelector(builtSelector, { timeout: maxWait });
   console.info(`Text message found. Text: "${text}"`);
   return el;
@@ -573,26 +568,26 @@ export async function compareScreenshot(
   if (!fs.existsSync(folderPath)) {
     fs.mkdirSync(folderPath, { recursive: true });
   }
+  const previousScreenshotFilePath = path.join(
+    folderPath,
+    `${elementState}-${os}.png`,
+  );
   // If screenshot does not exist, save it to the folder
-  if (!fs.existsSync(path.join(folderPath, `${elementState}-${os}.png`))) {
-    fs.writeFileSync(
-      path.join(folderPath, `${elementState}-${os}.png`),
-      elementScreenshot,
-    );
+  if (!fs.existsSync(previousScreenshotFilePath)) {
+    fs.writeFileSync(previousScreenshotFilePath, elementScreenshot);
   }
   // If screenshot does exist, compare it to previous screenshot in the folder
-  const previousScreenshot = fs.readFileSync(
-    path.join(folderPath, `${elementState}-${os}.png`),
+  const previousScreenshot = fs.readFileSync(previousScreenshotFilePath);
+  const diffFilePath = path.join(
+    folderPath,
+    `${elementState}-${os}-difference.png`,
   );
   // If screenshots are different, then create a difference screenshot
   if (!elementScreenshot.equals(previousScreenshot)) {
     //  If elements do not match, then take the elementScreenshot and save it to same folder but with a new name of 'difference.png'
-    fs.writeFileSync(
-      path.join(folderPath, `${elementState}-${os}-difference.png`),
-      elementScreenshot,
-    );
+    fs.writeFileSync(diffFilePath, elementScreenshot);
     throw new Error(
-      `Screenshots do not match, see ${screenshotFolder} > ${testTitle} folder > ${elementState}-${os}-difference.png`,
+      `Screenshots do not match, see ${screenshotFolder} > ${testTitle} folder > \n\t\t diff: ${diffFilePath}\n\t\t previous: ${previousScreenshotFilePath}`,
     );
   }
 }

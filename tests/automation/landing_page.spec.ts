@@ -12,17 +12,18 @@ test_Alice_2W(
       waitForElement(aliceWindow1, 'class', 'session-conversation'),
       waitForElement(aliceWindow2, 'class', 'session-conversation'),
     ]);
-    const results = await Promise.allSettled([
-      compareScreenshot(landingPage, `${testInfo.title}`, 'new-account', os),
-      compareScreenshot(
-        restoredPage,
-        `${testInfo.title}`,
-        'restored-account',
-        os,
-      ),
-    ]);
-    if (results.some((r) => r.status === 'rejected')) {
-      throw new Error('One or both screenshot comparisons failed');
-    }
+
+    await compareScreenshot(
+      landingPage,
+      `${testInfo.title}`,
+      'new-account',
+      os,
+    );
+    await compareScreenshot(
+      restoredPage,
+      `${testInfo.title}`,
+      'restored-account',
+      os,
+    );
   },
 );

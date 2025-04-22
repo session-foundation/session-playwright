@@ -20,3 +20,4 @@ sessionReporter.js
 output/
 dist/
 .eslintcache
+*-difference.png
