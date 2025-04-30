@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 
 export const sleepFor = async (ms: number, showLog = false) => {
-  if (showLog) {
+  if (showLog || ms > 5000) {
     // eslint-disable-next-line no-console
     console.info(`sleeping for ${ms}ms...`);
   }

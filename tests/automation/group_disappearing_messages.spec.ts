@@ -49,12 +49,10 @@ mediaArray.forEach(({ mediaType, path }) => {
       } else {
         await sendMedia(aliceWindow1, path, testMessage);
       }
-      await Promise.all([
-        waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation'),
-        waitForLoadingAnimationToFinish(charlieWindow1, 'loading-animation'),
-      ]);
       if (mediaType === 'voice') {
         await Promise.all([
+          waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation'),
+          waitForLoadingAnimationToFinish(charlieWindow1, 'loading-animation'),
           waitForTestIdWithText(bobWindow1, 'audio-player'),
           waitForTestIdWithText(charlieWindow1, 'audio-player'),
         ]);
@@ -65,6 +63,8 @@ mediaArray.forEach(({ mediaType, path }) => {
         ]);
       } else {
         await Promise.all([
+          waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation'),
+          waitForLoadingAnimationToFinish(charlieWindow1, 'loading-animation'),
           waitForTextMessage(bobWindow1, testMessage),
           waitForTextMessage(charlieWindow1, testMessage),
         ]);
