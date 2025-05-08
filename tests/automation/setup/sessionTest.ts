@@ -4,6 +4,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { Page, TestInfo, test } from '@playwright/test';
 import { Group, User } from '../types/testing';
+// eslint-disable-next-line import/no-cycle
 import { linkedDevice } from '../utilities/linked_device';
 import { forceCloseAllWindows } from './closeWindows';
 import { createGroup } from './create_group';
@@ -211,6 +212,29 @@ export function test_Alice_1W_no_network(
     testname,
     1,
     { waitForNetwork: false },
+    ({ mainWindows, users }, testInfo) => {
+      return testCallback(
+        {
+          alice: users[0],
+          aliceWindow1: mainWindows[0],
+        },
+        testInfo,
+      );
+    },
+  );
+}
+// Need a test for one window with network, mainly for Network Page
+export function test_Alice_1W(
+  testname: string,
+  testCallback: (
+    details: WithAlice & WithAliceWindow1,
+    testInfo: TestInfo,
+  ) => Promise<void>,
+) {
+  return sessionTestGeneric(
+    testname,
+    1,
+    { waitForNetwork: true },
     ({ mainWindows, users }, testInfo) => {
       return testCallback(
         {

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { test_Alice_2W } from './setup/sessionTest';
 import { compareScreenshot, waitForElement } from './utilities/utils';
 

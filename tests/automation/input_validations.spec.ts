@@ -55,7 +55,6 @@ import {
 [
   {
     testName: 'No name',
-    // This currently fails - displays wrong error message
     displayName: ' ',
     expectedError: englishStrippedStr('displayNameErrorDescription').toString(),
   },

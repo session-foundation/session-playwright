@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+// eslint-disable-next-line import/no-cycle
 import {
   clickOnTestIdWithText,
   doesElementExist,
@@ -6,7 +7,11 @@ import {
   waitForLoadingAnimationToFinish,
 } from '../utilities/utils';
 
-export async function recoverFromSeed(window: Page, recoveryPhrase: string) {
+export async function recoverFromSeed(
+  window: Page,
+  recoveryPhrase: string,
+  createDisplayName?: boolean,
+) {
   await clickOnTestIdWithText(window, 'existing-account-button');
   await typeIntoInput(window, 'recovery-phrase-input', recoveryPhrase);
   await clickOnTestIdWithText(window, 'continue-button');
@@ -17,8 +22,12 @@ export async function recoverFromSeed(window: Page, recoveryPhrase: string) {
     'display-name-input',
   );
   if (displayName) {
-    throw new Error(`Display name was not found when restoring from seed`);
+    if (createDisplayName) {
+      await typeIntoInput(window, 'display-name-input', 'Alice');
+      await clickOnTestIdWithText(window, 'continue-button');
+    } else {
+      throw new Error(`Display name was not found when restoring from seed`);
+    }
   }
-
   return { window };
 }

@@ -43,7 +43,7 @@ export async function waitForTestIdWithText(
   const found = await window.waitForSelector(builtSelector, {
     timeout: maxWait,
   });
-  // console.info('found selector', builtSelector);
+  console.info('found selector', builtSelector);
 
   return found;
 }

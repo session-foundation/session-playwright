@@ -23,5 +23,6 @@ export default defineConfig({
   reportSlowTests: null,
   fullyParallel: true, // otherwise, tests in the same file are not run in parallel
   globalSetup: './global.setup', // clean leftovers of previous test runs on start, runs only once
-  snapshotPathTemplate: screenshotFolder + '/{testName}/{arg}-{platform}{ext}',
+  // eslint-disable-next-line prefer-template
+  snapshotPathTemplate: screenshotFolder + '/{testName}/{arg}-{platform}{text}',
 });
