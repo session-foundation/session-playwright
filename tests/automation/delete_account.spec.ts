@@ -16,7 +16,7 @@ import {
   waitForLoadingAnimationToFinish,
 } from './utilities/utils';
 import { recoverFromSeed } from './setup/recovery_using_seed';
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 
 sessionTestTwoWindows(
   'Delete account from swarm',

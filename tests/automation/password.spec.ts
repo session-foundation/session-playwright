@@ -9,7 +9,7 @@ import {
   typeIntoInput,
   waitForTestIdWithText,
 } from './utilities/utils';
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 
 const testPassword = '123456';
 const newTestPassword = '789101112';

@@ -1,5 +1,5 @@
 import { Page } from '@playwright/test';
-import { englishStrippedStr } from '../../locale/localizedString';
+import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import { sleepFor } from '../../promise_utils';
 import { Strategy } from '../types/testing';
 import { sendMessage } from './message';

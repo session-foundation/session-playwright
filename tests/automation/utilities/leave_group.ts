@@ -5,7 +5,7 @@ import {
   clickOnTestIdWithText,
   hasElementBeenDeleted,
 } from './utils';
-import { englishStrippedStr } from '../../locale/localizedString';
+import { englishStrippedStr } from '../../localization/englishStrippedStr';
 
 export const leaveGroup = async (window: Page, group: Group) => {
   // go to three dots menu

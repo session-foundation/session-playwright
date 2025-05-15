@@ -6,7 +6,7 @@ import {
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utils';
-import { englishStrippedStr } from '../../locale/localizedString';
+import { englishStrippedStr } from '../../localization/englishStrippedStr';
 
 export const renameGroup = async (
   window: Page,
