@@ -194,8 +194,5 @@ export type DataTestId =
   | 'session-recovery-password'
   | 'session-network-settings-menu-item'
   | 'learn-more-network-link'
-  | 'token-claim-button'
-  | 'wallet-address-input'
-  | 'submit-button'
   | 'refresh-button'
   | 'last-updated-timestamp';
