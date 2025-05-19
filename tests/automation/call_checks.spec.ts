@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { waitForTestIdWithText } from './utilities/utils';

@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { longText, mediaArray, testLink } from './constants/variables';
 import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';

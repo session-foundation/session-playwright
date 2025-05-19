@@ -1,13 +1,13 @@
 import { test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import {
   isPluralToken,
   type MergedLocalizerTokens,
   type PluralLocalizerTokens,
   type SimpleLocalizerTokens,
-} from '../localization/localeTools';
+} from '../localization/Localizer';
 
 function readTsFiles(dir: string): Record<string, string> {
   const tsFilesContent: Record<string, string> = {};

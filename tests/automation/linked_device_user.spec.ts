@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import { Page, expect } from '@playwright/test';
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { forceCloseAllWindows } from './setup/closeWindows';
 import { newUser } from './setup/new_user';

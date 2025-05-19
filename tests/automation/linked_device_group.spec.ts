@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { openApp } from './setup/open';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import {

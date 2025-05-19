@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sessionTestOneWindow } from './setup/sessionTest';
 import {
   clickOnTestIdWithText,

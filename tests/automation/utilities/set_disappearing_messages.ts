@@ -4,7 +4,7 @@ import {
   DataTestId,
   DisappearOptions,
 } from '../types/testing';
-import { englishStrippedStr } from '../../locale/localizedString';
+import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import {
   checkModalStrings,
   clickOnElement,

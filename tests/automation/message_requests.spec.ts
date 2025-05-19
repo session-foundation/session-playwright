@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';

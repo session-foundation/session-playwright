@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../locale/localizedString';
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { doForAll, sleepFor } from '../promise_utils';
 import { createGroup } from './setup/create_group';
 import { newUser } from './setup/new_user';
