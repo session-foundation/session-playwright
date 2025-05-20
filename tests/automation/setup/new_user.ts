@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 import chalk from 'chalk';
 import { User } from '../types/testing';
+// eslint-disable-next-line import/no-cycle
 import {
   checkPathLight,
   clickOnTestIdWithText,

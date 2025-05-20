@@ -191,4 +191,8 @@ export type DataTestId =
   | 'error-message'
   | 'group-members'
   | 'session-confirm-cancel-button'
-  | 'session-recovery-password';
+  | 'session-recovery-password'
+  | 'session-network-settings-menu-item'
+  | 'learn-more-network-link'
+  | 'refresh-button'
+  | 'last-updated-timestamp';

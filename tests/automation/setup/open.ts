@@ -4,7 +4,9 @@ import chalk from 'chalk';
 import { isEmpty } from 'lodash';
 import { join } from 'path';
 import { v4 } from 'uuid';
+import dotenv from 'dotenv';
 
+dotenv.config();
 export const NODE_ENV = 'production';
 export const MULTI_PREFIX = 'test-integration-';
 const multisAvailable = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
