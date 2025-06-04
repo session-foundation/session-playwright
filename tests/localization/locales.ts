@@ -559,7 +559,7 @@ export const simpleDictionary = {
     args: undefined,
   },
   blockBlockedDescription: {
-    en: 'Unblock this contact to send a message.',
+    en: 'Unblock this contact to send a message',
     args: undefined,
   },
   blockBlockedNone: {

@@ -105,7 +105,7 @@ function getExpectedStringFromKey(
     case 'block':
       return 'Block';
     case 'blockBlockedDescription':
-      return 'Unblock this contact to send a message.';
+      return 'Unblock this contact to send a message';
     case 'attachmentsClickToDownload':
       return 'Click to download {file_type}';
     case 'media':
