@@ -1,4 +1,5 @@
 import eslint from '@eslint/js';
+// eslint-disable-next-line import/no-unresolved
 import tseslint from 'typescript-eslint';
 import globals from 'globals';
 
