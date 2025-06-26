@@ -149,7 +149,6 @@ export type DataTestId =
   | 'loading-spinner'
   | 'empty-conversation-notification'
   | 'your-profile-name'
-  | 'your-session-id'
   | 'mentions-popup-row'
   | 'enable-read-receipts'
   | 'disappear-set-button'

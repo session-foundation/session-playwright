@@ -41,10 +41,10 @@ sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
       'your-profile-name',
       userA.userName,
     );
-    // Verify Session ID
+    // Verify Account ID
     await waitForTestIdWithText(
       aliceWindow1,
-      'your-session-id',
+      'your-account-id',
       userA.accountid,
     );
     // exit profile modal
