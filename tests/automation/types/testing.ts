@@ -153,7 +153,7 @@ export type DataTestId =
   | 'enable-read-receipts'
   | 'disappear-set-button'
   | 'disappear-after-read-option'
-  | 'disappearing-messages'
+  | 'disappearing-messages-menu-option'
   | 'disappear-after-send-option'
   | 'disappear-set-button'
   | 'message-content'
