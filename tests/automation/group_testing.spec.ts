@@ -75,7 +75,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
-      selector: 'add-user-button',
+      selector: 'invite-contacts-menu-option',
     });
     // Waiting for animation of right panel to appear
     await sleepFor(1000);

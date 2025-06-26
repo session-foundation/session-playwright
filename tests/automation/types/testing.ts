@@ -156,7 +156,6 @@ export type DataTestId =
   | 'disappearing-messages'
   | 'disappear-after-send-option'
   | 'disappear-set-button'
-  | 'add-user-button'
   | 'message-content'
   | 'group-update-message'
   | 'message-request-response-message'
@@ -190,4 +189,5 @@ export type DataTestId =
   | 'error-message'
   | 'group-members'
   | 'session-confirm-cancel-button'
-  | 'session-recovery-password';
+  | 'session-recovery-password'
+  | 'invite-contacts-menu-option';
