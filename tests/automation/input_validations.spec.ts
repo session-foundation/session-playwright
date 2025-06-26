@@ -38,11 +38,11 @@ import {
     await clickOnTestIdWithText(window, 'existing-account-button');
     await typeIntoInput(window, 'recovery-phrase-input', incorrectSeed);
     await clickOnTestIdWithText(window, 'continue-button');
-    await waitForTestIdWithText(window, 'session-error-message');
+    await waitForTestIdWithText(window, 'error-message');
     const actualError = await grabTextFromElement(
       window,
       'data-testid',
-      'session-error-message',
+      'error-message',
     );
     if (actualError !== expectedError) {
       throw new Error(
@@ -74,11 +74,11 @@ import {
       await clickOnTestIdWithText(window, 'create-account-button');
       await typeIntoInput(window, 'display-name-input', displayName);
       await clickOnTestIdWithText(window, 'continue-button');
-      await waitForTestIdWithText(window, 'session-error-message');
+      await waitForTestIdWithText(window, 'error-message');
       const actualError = await grabTextFromElement(
         window,
         'data-testid',
-        'session-error-message',
+        'error-message',
       );
       if (testName === 'No name') {
         console.log('Expected failure: see SES-2832');

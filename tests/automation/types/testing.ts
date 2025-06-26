@@ -166,7 +166,6 @@ export type DataTestId =
   | 'existing-account-button'
   | 'context-menu-item'
   | 'modal-description'
-  | 'session-error-message'
   | DMTimeOption
   | `input-${DMTimeOption}`
   | 'disappear-messages-type-and-time'
