@@ -248,7 +248,7 @@ test_Alice_1W_Bob_1W(
     await sleepFor(100);
     await clickOnTestIdWithText(
       aliceWindow1,
-      'confirm-nickname',
+      'set-nickname-confirm-button',
       englishStrippedStr('save').toString(),
     );
     await sleepFor(1000);

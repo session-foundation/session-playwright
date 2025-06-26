@@ -107,7 +107,7 @@ export type DataTestId =
   | 'disappearing-messages-dropdown'
   | 'session-toast'
   | 'accept-message-request'
-  | 'confirm-nickname'
+  | 'set-nickname-confirm-button'
   | 'nickname-input'
   | 'three-dots-conversation-options'
   | 'message-section'
