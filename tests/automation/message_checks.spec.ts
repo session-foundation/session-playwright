@@ -122,7 +122,7 @@ test_Alice_1W_Bob_1W(
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await joinCommunity(aliceWindow1);
     await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
-    await clickOnTestIdWithText(aliceWindow1, 'add-user-button');
+    await clickOnTestIdWithText(aliceWindow1, 'invite-contacts-menu-option');
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',

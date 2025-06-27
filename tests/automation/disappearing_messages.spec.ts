@@ -311,7 +311,7 @@ test_Alice_2W_Bob_1W(
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
-      selector: 'disappearing-messages',
+      selector: 'disappearing-messages-menu-option',
       maxWait: 100,
     });
     await clickOnElement({
