@@ -236,6 +236,8 @@ function getExpectedStringFromKey(
       return 'View Password';
     case 'deleteConversationDescription':
       return 'Are you sure you want to delete your conversation with {name}? This will permanently delete all messages and attachments.';
+    case 'manageMembers':
+      return 'Manage Members';
     default:
       // returning nul means we don't have an expected string yet for this key.
       // This will make the test fail

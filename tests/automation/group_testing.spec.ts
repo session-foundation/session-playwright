@@ -140,8 +140,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Click on edit group name
     await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
     await clickOnTestIdWithText(aliceWindow1, 'edit-group-name');
-    await typeIntoInput(aliceWindow1, 'group-name-input', '     ');
-    await aliceWindow1.keyboard.press('Enter');
+    await clickOnTestIdWithText(aliceWindow1, 'clear-group-info-name-button');
     await waitForTestIdWithText(aliceWindow1, 'error-message');
     const actualError = await grabTextFromElement(
       aliceWindow1,
@@ -157,10 +156,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       aliceWindow1,
       englishStrippedStr('cancel').toString(),
     );
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'back-button-conversation-options',
-    );
+    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
   },
 );
 

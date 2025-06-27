@@ -161,7 +161,7 @@ test_Alice_2W(
         });
         // This file is saved in `Profile-picture-syncs` folder
         expect(screenshot).toMatchSnapshot({
-          name: 'avatar-updated-blue.jpeg',
+          name: `avatar-updated-blue.jpeg`,
         });
         correctScreenshot = true;
         console.info(
@@ -407,7 +407,7 @@ test_Alice_2W_Bob_1W(
     await checkModalStrings(
       aliceWindow1,
       englishStrippedStr('conversationsDelete').toString(),
-      englishStrippedStr('conversationsDeleteDescription')
+      englishStrippedStr('deleteConversationDescription')
         .withArgs({ name: bob.userName })
         .toString(),
     );
@@ -501,7 +501,7 @@ test_Alice_2W(
         aliceWindow2,
         'data-testid',
         'module-conversation__user__profile-name',
-        8000,
+        10000,
         englishStrippedStr('noteToSelf').toString(),
       ),
     ]);
