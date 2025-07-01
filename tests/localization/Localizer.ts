@@ -171,8 +171,9 @@ class LocalizedStringBuilder<T extends MergedLocalizerTokens> extends String {
   }
 
 private postProcessStrippedString(str: string): string {
-  // First, replace <br> and <br/> with a space
-  let strippedString = str.replace(/<br\s*\/?>/gi, ' ');
+  // Normalize whitespace around <br> tags: 
+  // " <br/><br/>" and "<br/>" both become a single space
+  let strippedString = str.replace(/\s*(<br\s*\/?>[\s]*)+/gi, ' ');
   // Then, remove all other HTML tags
   strippedString = strippedString.replace(/<[^>]*>/g, '');
 
