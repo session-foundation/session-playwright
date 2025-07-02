@@ -130,6 +130,9 @@ test_Alice_1W_Bob_1W(
     );
     await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
     await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
+    // For lack of a unique ID we use native Playwright methods 
+    await aliceWindow1.getByRole('dialog').filter({ hasText: 'Invite Contacts' }).getByTestId('modal-close-button').click();
+    // Close UCS modal
     await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
     await clickOnTestIdWithText(
       aliceWindow1,
