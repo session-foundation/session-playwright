@@ -15,6 +15,7 @@ import {
   waitForElement,
   waitForTestIdWithText,
 } from './utils';
+import { isChecked } from './checked';
 
 export const setDisappearingMessages = async (
   windowA: Page,
@@ -78,7 +79,7 @@ export const setDisappearingMessages = async (
         1000,
       );
     }
-    const checked = await defaultTime.isChecked();
+    const checked = await isChecked(defaultTime);
     if (checked) {
       console.info('Timer default time is correct');
     } else {
