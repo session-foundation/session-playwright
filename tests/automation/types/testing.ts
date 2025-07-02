@@ -77,6 +77,7 @@ export type MediaType = 'image' | 'video' | 'audio' | 'file';
 export type Strategy = 'data-testid' | 'class' | ':has-text';
 
 // Would be good to find a way to sort those with prettier
+// TODO sort with eslint plugin perfectionist
 export type DataTestId =
   | 'session-id-signup'
   | 'display-name-input'
@@ -89,7 +90,6 @@ export type DataTestId =
   | 'control-message'
   | 'disappear-control-message'
   | 'disappearing-messages-indicator'
-  | 'back-button-conversation-options'
   | 'conversation-options-avatar'
   | 'settings-section'
   | 'clear-data-settings-menu-item'
@@ -107,7 +107,7 @@ export type DataTestId =
   | 'disappearing-messages-dropdown'
   | 'session-toast'
   | 'accept-message-request'
-  | 'confirm-nickname'
+  | 'set-nickname-confirm-button'
   | 'nickname-input'
   | 'three-dots-conversation-options'
   | 'message-section'
@@ -142,22 +142,20 @@ export type DataTestId =
   | 'new-closed-group-name'
   | 'create-group-button'
   | 'link-device'
-  | 'group-name-input'
-  | 'right-panel-group-name'
+  | 'update-group-info-name-input'
+  | 'group-name'
   | 'header-conversation-name'
   | 'copy-button-profile-update'
   | 'loading-spinner'
   | 'empty-conversation-notification'
   | 'your-profile-name'
-  | 'your-session-id'
   | 'mentions-popup-row'
   | 'enable-read-receipts'
   | 'disappear-set-button'
   | 'disappear-after-read-option'
-  | 'disappearing-messages'
+  | 'disappearing-messages-menu-option'
   | 'disappear-after-send-option'
   | 'disappear-set-button'
-  | 'add-user-button'
   | 'message-content'
   | 'group-update-message'
   | 'message-request-response-message'
@@ -168,7 +166,6 @@ export type DataTestId =
   | 'existing-account-button'
   | 'context-menu-item'
   | 'modal-description'
-  | 'session-error-message'
   | DMTimeOption
   | `input-${DMTimeOption}`
   | 'disappear-messages-type-and-time'
@@ -189,6 +186,8 @@ export type DataTestId =
   | 'link-preview-image'
   | 'link-preview-title'
   | 'error-message'
-  | 'group-members'
+  | 'manage-members-menu-option'
   | 'session-confirm-cancel-button'
-  | 'session-recovery-password';
+  | 'session-recovery-password'
+  | 'invite-contacts-menu-option'
+  | 'clear-group-info-name-button';

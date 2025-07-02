@@ -16,11 +16,11 @@ export const renameGroup = async (
   await clickOnMatchingText(window, oldGroupName);
   await clickOnTestIdWithText(window, 'conversation-options-avatar');
   await clickOnTestIdWithText(window, 'edit-group-name');
-  await typeIntoInput(window, 'group-name-input', newGroupName);
+  await typeIntoInput(window, 'update-group-info-name-input', newGroupName);
   await window.keyboard.press('Enter');
-  await clickOnMatchingText(window, englishStrippedStr('okay').toString());
-  await waitForTestIdWithText(window, 'right-panel-group-name', newGroupName);
-  await clickOnTestIdWithText(window, 'back-button-conversation-options');
+  await clickOnMatchingText(window, englishStrippedStr('save').toString());
+  await waitForTestIdWithText(window, 'group-name', newGroupName);
+  await clickOnTestIdWithText(window, 'modal-close-button');
   // Check config message
   await waitForMatchingText(
     window,

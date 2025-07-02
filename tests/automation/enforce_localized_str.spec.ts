@@ -202,8 +202,6 @@ function getExpectedStringFromKey(
       return 'Your IP is visible to your call partner and a Session Technology Foundation server while using beta calls.';
     case 'blockDescription':
       return 'Are you sure you want to block {name}? Blocked users cannot send you message requests, group invites or call you.';
-    case 'conversationsDeleteDescription':
-      return 'Are you sure you want to delete your conversation with {name}? New messages from {name} will start a new conversation.';
     case 'noteToSelfHide':
       return 'Hide Note to Self';
     case 'noteToSelfHideDescription':
@@ -236,6 +234,14 @@ function getExpectedStringFromKey(
       return 'View QR';
     case 'recoveryPasswordView':
       return 'View Password';
+    case 'deleteConversationDescription':
+      return 'Are you sure you want to delete your conversation with {name}? This will permanently delete all messages and attachments.';
+    case 'manageMembers':
+      return 'Manage Members';
+    case 'recoveryPasswordHidePermanentlyDescription1':
+      return 'Without your recovery password, you cannot load your account on new devices. We strongly recommend you save your recovery password in a safe and secure place before continuing.';
+    case 'recoveryPasswordHidePermanentlyDescription2':
+      return 'Are you sure you want to permanently hide your recovery password on this device? This cannot be undone.';
     default:
       // returning nul means we don't have an expected string yet for this key.
       // This will make the test fail
