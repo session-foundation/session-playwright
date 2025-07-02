@@ -33,9 +33,9 @@ export const newUser = async (
   // await clickOnTestIdWithText(window, 'modal-close-button');
   await clickOnTestIdWithText(window, 'leftpane-primary-avatar');
 
-  // Save session ID to a variable
-  let accountid = await window.innerText('[data-testid=your-session-id]');
-  accountid = accountid.replace(/(\r\n|\n|\r)/gm, ''); // remove the new line in the SessionID as it is rendered with one forced
+  // Save Account ID to a variable
+  let accountid = await window.innerText('[data-testid=your-account-id]');
+  accountid = accountid.replace(/(\r\n|\n|\r)/gm, ''); // remove the new line in the Account ID as it is rendered with one forced
 
   console.log(
     `${userName}: Account ID: "${chalk.blue(

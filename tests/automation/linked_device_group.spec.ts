@@ -106,12 +106,12 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Check for group members
     await clickOnTestIdWithText(aliceWindow2, 'conversation-options-avatar');
     // Check right panel has correct name
-    await waitForTestIdWithText(aliceWindow2, 'right-panel-group-name');
-    await clickOnTestIdWithText(aliceWindow2, 'group-members');
+    await waitForTestIdWithText(aliceWindow2, 'group-name');
+    await clickOnTestIdWithText(aliceWindow2, 'manage-members-menu-option');
     await waitForTestIdWithText(
       aliceWindow2,
       'modal-heading',
-      englishStrippedStr('groupMembers').toString(),
+      englishStrippedStr('manageMembers').toString(),
     );
     // Check for You, Bob and Charlie
     await Promise.all([
@@ -181,7 +181,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     // Check for group members
     await clickOnTestIdWithText(aliceWindow2, 'conversation-options-avatar');
-    await clickOnTestIdWithText(aliceWindow2, 'group-members');
+    await clickOnTestIdWithText(aliceWindow2, 'manage-members-menu-option');
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(
@@ -193,6 +193,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       waitForTestIdWithText(aliceWindow2, 'contact', charlie.userName),
     ]);
     await clickOnTestIdWithText(aliceWindow2, 'session-confirm-cancel-button');
+    await clickOnTestIdWithText(aliceWindow2, 'modal-close-button');
     // Delete device data on alicewindow2
     await clearDataOnWindow(aliceWindow2);
     const [restoredWindow] = await openApp(1);
@@ -217,7 +218,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     // Check for group members
     await clickOnTestIdWithText(restoredWindow, 'conversation-options-avatar');
-    await clickOnTestIdWithText(restoredWindow, 'group-members');
+    await clickOnTestIdWithText(restoredWindow, 'manage-members-menu-option');
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(
@@ -233,6 +234,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       restoredWindow,
       'session-confirm-cancel-button',
     );
+    await clickOnTestIdWithText(restoredWindow, 'modal-close-button');
     // Delete device data on restoredWindow
     await clearDataOnWindow(restoredWindow);
     const [restoredWindow2] = await openApp(1);
@@ -257,7 +259,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     // Check for group members
     await clickOnTestIdWithText(restoredWindow2, 'conversation-options-avatar');
-    await clickOnTestIdWithText(restoredWindow2, 'group-members');
+    await clickOnTestIdWithText(restoredWindow2, 'manage-members-menu-option');
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(

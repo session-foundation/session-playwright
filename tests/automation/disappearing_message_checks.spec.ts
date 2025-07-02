@@ -237,7 +237,7 @@ test_Alice_1W_Bob_1W(
     // To stop the layout shift
     await sleepFor(500);
     await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
-    await clickOnTestIdWithText(aliceWindow1, 'add-user-button');
+    await clickOnTestIdWithText(aliceWindow1, 'invite-contacts-menu-option');
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',

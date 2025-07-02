@@ -39,7 +39,7 @@ export const setDisappearingMessages = async (
       await clickOnElement({
         window: windowA,
         strategy: 'data-testid',
-        selector: 'disappearing-messages',
+        selector: 'disappearing-messages-menu-option',
         maxWait: 100,
       });
       return true;
@@ -96,6 +96,11 @@ export const setDisappearingMessages = async (
     window: windowA,
     strategy: 'data-testid',
     selector: 'disappear-set-button',
+  });
+  await clickOnElement({
+    window: windowA,
+    strategy: 'data-testid',
+    selector: 'modal-close-button',
   });
   await waitForTestIdWithText(windowA, 'disappear-messages-type-and-time');
   if (windowB) {

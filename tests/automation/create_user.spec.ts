@@ -14,8 +14,8 @@ sessionTestOneWindow('Create User', async ([window]) => {
   await sleepFor(100, true);
   // check username matches
   await waitForTestIdWithText(window, 'your-profile-name', userA.userName);
-  // check session id matches
-  await waitForTestIdWithText(window, 'your-session-id', userA.accountid);
+  // check Account ID matches
+  await waitForTestIdWithText(window, 'your-account-id', userA.accountid);
   // exit profile modal
   await clickOnTestIdWithText(window, 'modal-close-button');
   // go to settings section

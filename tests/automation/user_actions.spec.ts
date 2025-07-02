@@ -162,6 +162,12 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
 });
 
+// TODO: Normalize screenshot dimensions before comparison to handle different pixel densities (e.g. with sharp)
+// This would fix MacBook Retina (2x) vs M4 Mac Mini (1x) pixel density differences (56x56 vs 28x28)
+// Alternatives: 
+// - Try to set deviceScaleFactor: 1 in Playwright context to force consistent scaling 
+// - Record pixel density dependent screenshots 
+
 test_Alice_1W_no_network(
   'Change avatar',
   async ({ aliceWindow1 }, testInfo) => {
@@ -248,7 +254,7 @@ test_Alice_1W_Bob_1W(
     await sleepFor(100);
     await clickOnTestIdWithText(
       aliceWindow1,
-      'confirm-nickname',
+      'set-nickname-confirm-button',
       englishStrippedStr('save').toString(),
     );
     await sleepFor(1000);
@@ -370,7 +376,7 @@ test_Alice_1W_Bob_1W(
     await checkModalStrings(
       aliceWindow1,
       englishStrippedStr('conversationsDelete').toString(),
-      englishStrippedStr('conversationsDeleteDescription')
+      englishStrippedStr('deleteConversationDescription')
         .withArgs({ name: bob.userName })
         .toString(),
     );
