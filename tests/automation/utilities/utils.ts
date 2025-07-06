@@ -60,14 +60,14 @@ export async function waitForElement(
     : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
 
   const start = Date.now();
-  if (!selector.includes('path-light-container')) {
+  if (!selector.includes('path-light-svg')) {
     console.log(`waitForElement: ${builtSelector} for maxMs ${maxWaitMs}`);
   }
 
   const el = await window.waitForSelector(builtSelector, {
     timeout: maxWaitMs,
   });
-  if (!selector.includes('path-light-container')) {
+  if (!selector.includes('path-light-svg')) {
     console.log(
       `waitForElement: got ${builtSelector} after ${Date.now() - start}ms`,
     );
@@ -219,25 +219,25 @@ export async function checkPathLight(window: Page, maxWait?: number) {
   const maxWaitTime = maxWait || 500000;
   const waitPerLoop = 100;
   const start = Date.now();
-  let pathColor: string | null = null;
+  let pathFilter: string | null = null;
 
   await doWhileWithMax(maxWaitTime, waitPerLoop, 'checkPathLight', async () => {
     const pathLight = await waitForElement(
       window,
       'data-testid',
-      'path-light-container',
+      'path-light-svg',
       maxWait,
     );
-    pathColor = await pathLight.getAttribute('color');
+    pathFilter = await pathLight.getAttribute('style');
 
     if (Date.now() - start >= maxWaitTime / 10) {
       console.log('Path building...');
     }
 
-    return pathColor === 'var(--button-path-default-color)';
+    return !!pathFilter?.includes('var(--button-path-default-color)');
   });
 
-  console.log('Path built correctly, Yay!', pathColor);
+  console.log('Path built correctly, Yay!', pathFilter);
 }
 
 // ACTIONS
