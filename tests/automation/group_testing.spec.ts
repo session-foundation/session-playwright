@@ -82,7 +82,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
     await clickOnMatchingText(aliceWindow1, dracula.userName);
     await clickOnMatchingText(
       aliceWindow1,
-      englishStrippedStr('okay').toString(),
+      englishStrippedStr('membersInviteTitle').toString(),
     );
     // even if Bob and Charlie do not know Dracula's name,
     // Alice sets Dracula's name in the group members that every one will use as a fallback

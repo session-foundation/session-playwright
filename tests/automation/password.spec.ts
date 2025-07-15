@@ -154,10 +154,10 @@ test_Alice_1W_no_network(
       recoveryPassword,
     );
 
-    //  Incorrect password banner showing?
+    //  Incorrect password below input showing?
     await waitForTestIdWithText(
       aliceWindow1,
-      'session-toast',
+      'error-message',
       englishStrippedStr('passwordIncorrect').toString(),
     );
     await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
@@ -175,7 +175,7 @@ test_Alice_1W_no_network(
     //  Banner should ask for password to be entered
     await waitForTestIdWithText(
       aliceWindow1,
-      'session-toast',
+      'error-message',
       englishStrippedStr('passwordIncorrect').toString(),
     );
   },

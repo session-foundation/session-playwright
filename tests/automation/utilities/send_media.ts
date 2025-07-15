@@ -126,6 +126,6 @@ export const trustUser = async (
   await clickOnTestIdWithText(
     window,
     'session-confirm-ok-button',
-    englishStrippedStr('download').toString(),
+    englishStrippedStr('yes').toString(),
   );
 };

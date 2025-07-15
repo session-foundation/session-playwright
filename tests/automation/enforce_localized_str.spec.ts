@@ -94,6 +94,8 @@ function getExpectedStringFromKey(
       return 'You have accepted the message request from {name}.';
     case 'messageRequestsNonePending':
       return 'No pending message requests';
+    case 'membersInviteTitle':
+      return 'Invite';
     case 'decline':
       return 'Decline';
     case 'delete':
