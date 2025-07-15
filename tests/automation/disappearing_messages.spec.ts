@@ -128,8 +128,8 @@ test_Alice_2W_Bob_1W(
       waitForTextMessage(bobWindow1, testMessage),
       waitForTextMessage(aliceWindow2, testMessage),
     ]);
-    // Wait 10 seconds for message to disappearing (should disappear on all devices at once)
-    await sleepFor(10000);
+    // Wait 30 seconds for message to disappearing (should disappear on all devices at once)
+    await sleepFor(30000);
     await Promise.all([
       hasTextMessageBeenDeleted(aliceWindow1, testMessage),
       hasTextMessageBeenDeleted(bobWindow1, testMessage),

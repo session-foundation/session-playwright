@@ -26,20 +26,6 @@ const openElectronAppOnly = async (multi: string) => {
   process.env.NODE_ENV = NODE_ENV;
   process.env.SESSION_DEBUG = '1';
 
-  // if (!isEmpty(process.env.CI)) {
-  //   const sessionBinPath = getSessionDesktopBinPath();
-  //   const fakeHome = `/tmp/${process.env.NODE_APP_INSTANCE}`;
-
-  //   console.info(`   CI RUN`);
-  //   console.info(`   SESSION_BIN_PATH=${sessionBinPath}`);
-  //   console.info(`   HOME="${fakeHome}"`);
-
-  //   process.env.HOME = fakeHome;
-
-  //   return electron.launch({
-  //     executablePath: sessionBinPath,
-  //   });
-  // }
   console.info(`   NON CI RUN`);
   console.info('   NODE_ENV', process.env.NODE_ENV);
   console.info('   NODE_APP_INSTANCE', process.env.NODE_APP_INSTANCE);

@@ -588,6 +588,10 @@ export const simpleDictionary = {
       en: "Enter the Account ID of the user you are banning",
       args: undefined,
   },
+  blindedId: {
+      en: "Blinded ID",
+      args: undefined,
+  },
   block: {
       en: "Block",
       args: undefined,
@@ -2960,6 +2964,70 @@ export const simpleDictionary = {
       en: "Preview",
       args: undefined,
   },
+  proActivated: {
+      en: "Activated",
+      args: undefined,
+  },
+  proAlreadyPurchased: {
+      en: "You’ve already got",
+      args: undefined,
+  },
+  proAnimatedDisplayPicture: {
+      en: "Go ahead and upload GIFs and animated WebP images for your display picture!",
+      args: undefined,
+  },
+  proAnimatedDisplayPictureCallToActionDescription: {
+      en: "Get animated display pictures and unlock premium features with Session Pro",
+      args: undefined,
+  },
+  proAnimatedDisplayPictureModalDescription: {
+      en: "users can upload GIFs",
+      args: undefined,
+  },
+  proAnimatedDisplayPicturesNonProModalDescription: {
+      en: "Upload GIFs with",
+      args: undefined,
+  },
+  proCallToActionLongerMessages: {
+      en: "Want to send longer messages? Send more text and unlock premium features with Session Pro",
+      args: undefined,
+  },
+  proCallToActionPinnedConversations: {
+      en: "Want more pins? Organize your chats and unlock premium features with Session Pro",
+      args: undefined,
+  },
+  proCallToActionPinnedConversationsMoreThan: {
+      en: "Want more than 5 pins? Organize your chats and unlock premium features with Session Pro",
+      args: undefined,
+  },
+  proFeatureListAnimatedDisplayPicture: {
+      en: "Upload GIF and WebP display pictures",
+      args: undefined,
+  },
+  proFeatureListLargerGroups: {
+      en: "Larger group chats up to 300 members",
+      args: undefined,
+  },
+  proFeatureListLoadsMore: {
+      en: "Plus loads more exclusive features",
+      args: undefined,
+  },
+  proFeatureListLongerMessages: {
+      en: "Messages up to 10,000 characters",
+      args: undefined,
+  },
+  proFeatureListPinnedConversations: {
+      en: "Pin unlimited conversations",
+      args: undefined,
+  },
+  proSendMore: {
+      en: "Send more with",
+      args: undefined,
+  },
+  proUserProfileModalCallToAction: {
+      en: "Want to use Session to its fullest potential? Upgrade to Session Pro to gain access to exclusive perks and features",
+      args: undefined,
+  },
   profile: {
       en: "Profile",
       args: undefined,
@@ -3436,6 +3504,14 @@ export const simpleDictionary = {
       en: "Error",
       args: undefined,
   },
+  tooltipAccountIdVisible: {
+      en: "The Account ID of <b>{name}</b> is visible<br/>based on your previous interactions",
+      args: {name: "string"}
+  },
+  tooltipBlindedIdCommunities: {
+      en: "Blinded IDs are used in communities<br/>to reduce spam and increase privacy",
+      args: undefined,
+  },
   tryAgain: {
       en: "Try Again",
       args: undefined,
@@ -3515,6 +3591,10 @@ export const simpleDictionary = {
   updated: {
       en: "Last updated {relative_time} ago",
       args: {relative_time: "string"}
+  },
+  upgradeTo: {
+      en: "Upgrade to",
+      args: undefined,
   },
   uploading: {
       en: "Uploading",
@@ -3740,8 +3820,8 @@ export const pluralsDictionary = {
   },
   modalMessageCharacterDisplayDescription: {
     en:{
-      one: "Messages have a character limit of {limit} characters. You have {count} character remaining",
-      other: "Messages have a character limit of {limit} characters. You have {count} characters remaining"
+      one: "Messages have a character limit of {limit} characters. You have {count} character remaining.",
+      other: "Messages have a character limit of {limit} characters. You have {count} characters remaining."
     },
     args: {limit: "string", count: "number"}
   },
