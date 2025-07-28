@@ -164,9 +164,9 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
 
 // TODO: Normalize screenshot dimensions before comparison to handle different pixel densities (e.g. with sharp)
 // This would fix MacBook Retina (2x) vs M4 Mac Mini (1x) pixel density differences (56x56 vs 28x28)
-// Alternatives: 
-// - Try to set deviceScaleFactor: 1 in Playwright context to force consistent scaling 
-// - Record pixel density dependent screenshots 
+// Alternatives:
+// - Try to set deviceScaleFactor: 1 in Playwright context to force consistent scaling
+// - Record pixel density dependent screenshots
 
 test_Alice_1W_no_network(
   'Change avatar',
@@ -182,6 +182,8 @@ test_Alice_1W_no_network(
 
     await clickOnTestIdWithText(aliceWindow1, 'image-upload-section');
     await clickOnTestIdWithText(aliceWindow1, 'image-upload-click');
+    // allow for the image to be resized before we try to save it
+    await sleepFor(500);
     await clickOnTestIdWithText(aliceWindow1, 'save-button-profile-update');
     await waitForTestIdWithText(aliceWindow1, 'loading-spinner');
     // if we were asked to update the snapshots, make sure we wait for the change to be received before taking a screenshot.

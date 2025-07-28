@@ -25,6 +25,7 @@ const openElectronAppOnly = async (multi: string) => {
   process.env.NODE_APP_INSTANCE = `${MULTI_PREFIX}-devprod-${uniqueId}-${process.env.MULTI}`;
   process.env.NODE_ENV = NODE_ENV;
   process.env.SESSION_DEBUG = '1';
+  process.env.LOCAL_DEVNET_SEED_URL = 'http://sesh-net.local:1280';
 
   console.info(`   NON CI RUN`);
   console.info('   NODE_ENV', process.env.NODE_ENV);
