@@ -72,6 +72,9 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     'session-toast',
     englishStrippedStr('copied').toString(),
   );
+  // click on the toast and wait for it to be closed to avoid the layout shift
+  await clickOnTestIdWithText(window, 'session-toast');
+  await sleepFor(1000);
   await clickOnTestIdWithText(window, 'message-input-text-area');
   const isMac = process.platform === 'darwin';
   await window.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);

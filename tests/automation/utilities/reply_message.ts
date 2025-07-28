@@ -36,7 +36,7 @@ export const replyTo = async ({
   for (let index = 0; index < 5; index++) {
     try {
       await clickOnTextMessage(senderWindow, textMessage, true, 1000);
-      // those 2 sleepfor are to try to avoid the layout shift which happens when we click too fast in the context menu
+      // those 2 sleep for are to try to avoid the layout shift which happens when we click too fast in the context menu
       // Tried extending this as layout shift still happens sometimes
       await sleepFor(200, true);
 

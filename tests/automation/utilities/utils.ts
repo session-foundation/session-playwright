@@ -15,10 +15,10 @@ import {
   WithRightButton,
 } from '../types/testing';
 import { sendMessage } from './message';
-import { ElementState } from '../landing_page.spec';
 import fs from 'fs';
 import path from 'path';
 import { screenshotFolder } from '../constants/variables';
+import type { ElementState } from '../types/landing_page_states';
 
 // WAIT FOR FUNCTIONS
 

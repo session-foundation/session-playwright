@@ -138,6 +138,8 @@ test_Alice_2W(
 
     await clickOnTestIdWithText(aliceWindow1, 'image-upload-section');
     await clickOnTestIdWithText(aliceWindow1, 'image-upload-click');
+    // allow for the image to be resized before we try to save it
+    await sleepFor(500);
     await clickOnTestIdWithText(aliceWindow1, 'save-button-profile-update');
     await waitForTestIdWithText(aliceWindow1, 'loading-spinner');
 
