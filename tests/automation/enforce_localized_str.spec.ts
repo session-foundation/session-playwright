@@ -1,12 +1,17 @@
 import { test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import type {
+  TokenPluralWithArgs,
+  TokenSimpleNoArgs,
+  TokenSimpleWithArgs,
+} from '../localization/locales';
+
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import {
   isPluralToken,
   type MergedLocalizerTokens,
-  type PluralLocalizerTokens,
-  type SimpleLocalizerTokens,
 } from '../localization/Localizer';
 
 function readTsFiles(dir: string): Record<string, string> {
@@ -46,8 +51,8 @@ function extractAllTokens(text: string) {
 
 function getExpectedStringFromKey(
   args:
-    | { key: SimpleLocalizerTokens }
-    | { key: PluralLocalizerTokens; count: number },
+    | { key: TokenPluralWithArgs; count: number }
+    | { key: TokenSimpleNoArgs | TokenSimpleWithArgs },
 ) {
   if (isPluralToken(args.key)) {
     if (!('count' in args)) {
