@@ -1,5 +1,4 @@
 import { _electron as electron } from '@playwright/test';
-
 import chalk from 'chalk';
 import { isEmpty } from 'lodash';
 import { join } from 'path';

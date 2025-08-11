@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+
 // eslint-disable-next-line import/no-cycle
 import { clickOnElement, typeIntoInput } from './utils';
 

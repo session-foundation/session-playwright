@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { test_Alice_1W_no_network } from './setup/sessionTest';
 import {
@@ -9,7 +10,6 @@ import {
   typeIntoInput,
   waitForTestIdWithText,
 } from './utilities/utils';
-import { englishStrippedStr } from '../localization/englishStrippedStr';
 
 const testPassword = '123456';
 const newTestPassword = '789101112';

@@ -1,11 +1,12 @@
 import { Page } from '@playwright/test';
+
+import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import { Group } from '../types/testing';
 import {
   clickOnMatchingText,
   clickOnTestIdWithText,
   hasElementBeenDeleted,
 } from './utils';
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
 
 export const leaveGroup = async (window: Page, group: Group) => {
   // go to three dots menu

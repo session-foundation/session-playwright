@@ -1,8 +1,8 @@
 import {
-  DMTimeOption,
   DisappearActions,
   DisappearGroupType,
   DisappearType,
+  DMTimeOption,
   MediaType,
 } from '../types/testing';
 
@@ -42,7 +42,7 @@ export const mediaArray = [
 
 type DisappearingOption = {
   timeOption: DMTimeOption;
-  disappearingMessagesType: DisappearType | DisappearGroupType;
+  disappearingMessagesType: DisappearGroupType | DisappearType;
   disappearAction: DisappearActions;
 };
 

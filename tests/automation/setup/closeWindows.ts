@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+
 import { sleepFor } from '../../promise_utils';
 
 export const forceCloseAllWindows = async (windows: Array<Page>) => {

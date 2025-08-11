@@ -1,6 +1,9 @@
 import { Page } from '@playwright/test';
+
 import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import { sleepFor } from '../../promise_utils';
+import { MediaType } from '../types/testing';
+import { waitForSentTick } from './message';
 import {
   checkModalStrings,
   clickOnElement,
@@ -10,8 +13,6 @@ import {
   waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
 } from './utils';
-import { MediaType } from '../types/testing';
-import { waitForSentTick } from './message';
 
 export const sendMedia = async (
   window: Page,

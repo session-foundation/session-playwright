@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+
 import { User } from '../types/testing';
 import { replyTo } from './reply_message';
 import { sendNewMessage } from './send_message';

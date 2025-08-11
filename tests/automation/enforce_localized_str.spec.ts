@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
+
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import {
   isPluralToken,
@@ -46,8 +47,8 @@ function extractAllTokens(text: string) {
 
 function getExpectedStringFromKey(
   args:
-    | { key: SimpleLocalizerTokens }
-    | { key: PluralLocalizerTokens; count: number },
+    | { key: PluralLocalizerTokens; count: number }
+    | { key: SimpleLocalizerTokens },
 ) {
   if (isPluralToken(args.key)) {
     if (!('count' in args)) {

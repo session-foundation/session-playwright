@@ -1,4 +1,6 @@
 import { Page } from '@playwright/test';
+
+import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import {
   clickOnMatchingText,
   clickOnTestIdWithText,
@@ -6,7 +8,6 @@ import {
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utils';
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
 
 export const renameGroup = async (
   window: Page,

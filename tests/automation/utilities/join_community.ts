@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+
 import { testCommunityLink } from '../constants/community';
 import {
   clickOnTestIdWithText,

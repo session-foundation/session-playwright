@@ -1,9 +1,10 @@
 import { readdirSync, rm } from 'fs-extra';
+import { isEmpty } from 'lodash';
 import { homedir } from 'os';
 import { join } from 'path';
+
 import { MULTI_PREFIX, NODE_ENV } from './tests/automation/setup/open';
 import { isLinux, isMacOS } from './tests/os_utils';
-import { isEmpty } from 'lodash';
 
 const getDirectoriesOfSessionDataPath = (source: string) =>
   readdirSync(source, { withFileTypes: true })

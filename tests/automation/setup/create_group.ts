@@ -1,5 +1,7 @@
 import { Page } from '@playwright/test';
+
 import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { sortByPubkey } from '../../pubkey';
 import { Group, User } from '../types/testing';
 import { sendMessage } from '../utilities/message';
 import { sendNewMessage } from '../utilities/send_message';
@@ -10,7 +12,6 @@ import {
   waitForTestIdWithText,
   waitForTextMessages,
 } from '../utilities/utils';
-import { sortByPubkey } from '../../pubkey';
 
 export const createGroup = async (
   userName: string,
