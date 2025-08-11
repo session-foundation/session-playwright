@@ -3,10 +3,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-await-in-loop */
 import { ElementHandle, Page } from '@playwright/test';
+import fs from 'fs';
+import path from 'path';
+
+import type { ElementState } from '../types/landing_page_states';
+
 import { sleepFor } from '../../promise_utils';
+import { screenshotFolder } from '../constants/variables';
 import {
-  DMTimeOption,
   DataTestId,
+  DMTimeOption,
   LoaderType,
   Strategy,
   StrategyExtractionObj,
@@ -15,10 +21,6 @@ import {
   WithRightButton,
 } from '../types/testing';
 import { sendMessage } from './message';
-import fs from 'fs';
-import path from 'path';
-import { screenshotFolder } from '../constants/variables';
-import type { ElementState } from '../types/landing_page_states';
 
 // WAIT FOR FUNCTIONS
 
@@ -165,7 +167,7 @@ export async function waitForLoadingAnimationToFinish(
   loader: LoaderType,
   maxWait?: number,
 ) {
-  let loadingAnimation: ElementHandle<SVGElement | HTMLElement> | undefined;
+  let loadingAnimation: ElementHandle<HTMLElement | SVGElement> | undefined;
 
   await waitForElement(window, 'data-testid', `${loader}`, maxWait);
 
@@ -390,7 +392,7 @@ export async function hasElementBeenDeleted(
 ) {
   const start = Date.now();
 
-  let el: ElementHandle<SVGElement | HTMLElement> | undefined;
+  let el: ElementHandle<HTMLElement | SVGElement> | undefined;
   do {
     try {
       el = await waitForElement(window, strategy, selector, maxWait, text);
@@ -502,17 +504,48 @@ export async function checkModalStrings(
   expectedHeading: string,
   expectedDescription: string,
 ) {
-  const heading = await waitForElement(window, 'data-testid', 'modal-heading');
-  const description = await waitForElement(
-    window,
-    'data-testid',
-    'modal-description',
-  );
+  // Find the modal that contains the expected heading text
+  // Using role="dialog" as the modal selector based on your HTML
+  const targetModal = window
+    .locator('[role="dialog"]')
+    .filter({
+      has: window.locator(
+        `[data-testid="modal-heading"]:has-text("${expectedHeading}")`,
+      ),
+    })
+    .first();
+
+  // Check if we found a modal with the expected heading
+  const modalCount = await targetModal.count();
+
+  if (modalCount === 0) {
+    // Helpful error showing what modals were found
+    const allHeadings = await window
+      .locator('[data-testid="modal-heading"]')
+      .allInnerTexts();
+    throw new Error(
+      `No modal found with heading: "${expectedHeading}". Found modals with headings: ${allHeadings.join(
+        ', ',
+      )}`,
+    );
+  }
+
+  // Wait for the modal to be visible
+  await targetModal.waitFor({ state: 'visible' });
+
+  // Get the heading and description within this specific modal
+  const heading = targetModal.locator('[data-testid="modal-heading"]');
+  const description = targetModal.locator('[data-testid="modal-description"]');
+
+  // Wait for these elements to be visible
+  await heading.waitFor({ state: 'visible' });
+  await description.waitFor({ state: 'visible' });
 
   const headingText = await heading.innerText();
   const descriptionText = await description.innerText();
   const formattedDescription = removeNewLines(descriptionText);
 
+  // These checks should now pass since we found the modal by heading
   if (headingText !== expectedHeading) {
     throw new Error(
       `Expected heading: ${expectedHeading}, got: ${headingText}`,
@@ -553,7 +586,7 @@ async function deleteDifferenceFile(
 }
 
 export async function compareScreenshot(
-  element: ElementHandle<SVGElement | HTMLElement>,
+  element: ElementHandle<HTMLElement | SVGElement>,
   testTitle: string,
   elementState: ElementState,
   os: string,
@@ -588,6 +621,14 @@ export async function compareScreenshot(
     fs.writeFileSync(diffFilePath, elementScreenshot);
     throw new Error(
       `Screenshots do not match, see ${screenshotFolder} > ${testTitle} folder > \n\t\t diff: ${diffFilePath}\n\t\t previous: ${previousScreenshotFilePath}`,
+    );
+  }
+}
+export async function assertUrlIsReachable(url: string): Promise<void> {
+  const response = await fetch(url);
+  if (response.status !== 200) {
+    throw new Error(
+      `Expected status 200 but got ${response.status} for URL: ${url}`,
     );
   }
 }
