@@ -46,7 +46,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   await waitForTestIdWithText(
     aliceWindow1,
     'session-toast',
-    englishStrippedStr('passwordSetDescription').toString(),
+    englishStrippedStr('passwordSetDescriptionToast').toString(),
   );
   // Click on settings tab
   await sleepFor(300, true);
@@ -88,7 +88,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   await waitForTestIdWithText(
     aliceWindow1,
     'session-toast',
-    englishStrippedStr('passwordChangedDescription').toString(),
+    englishStrippedStr('passwordChangedDescriptionToast').toString(),
   );
 });
 

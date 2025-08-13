@@ -51,3 +51,7 @@ jobs:
       - name: Compile typescript files
         shell: bash
         run: yarn tsc
+
+      - name: Run the only test we can without a browser
+        shell: bash
+        run: PRINT_FAILED_TEST_LOGS=1 npx playwright test  -g "Enforce localized strings return expected values"

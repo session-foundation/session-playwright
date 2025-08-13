@@ -131,9 +131,9 @@ function getExpectedStringFromKey(
       return 'Message Requests';
     case 'done':
       return 'Done';
-    case 'passwordSetDescription':
+    case 'passwordSetDescriptionToast':
       return 'Your password has been set. Please keep it safe.';
-    case 'passwordChangedDescription':
+    case 'passwordChangedDescriptionToast':
       return 'Your password has been changed. Please keep it safe.';
     case 'sessionPrivacy':
       return 'Privacy';
@@ -250,7 +250,7 @@ function getExpectedStringFromKey(
     case 'recoveryPasswordHidePermanentlyDescription2':
       return 'Are you sure you want to permanently hide your recovery password on this device? This cannot be undone.';
     default:
-      // returning nul means we don't have an expected string yet for this key.
+      // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
       return null;
   }

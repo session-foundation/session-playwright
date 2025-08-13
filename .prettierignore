@@ -2,4 +2,4 @@
 .eslintrc.js
 README.md
 tests/localization/*.ts
-run/localizer/*
+tests/localization/*
