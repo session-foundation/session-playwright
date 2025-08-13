@@ -13,6 +13,7 @@ export default tseslint.config(
       'eslint.config.mjs',
       'run/**/*.js',
       'avd/',
+      'run/localizer/*',
     ],
   },
   eslint.configs.recommended,
@@ -55,6 +56,14 @@ export default tseslint.config(
           caughtErrorsIgnorePattern: '^_',
         },
       ],
+    },
+  },
+  {
+    files: ['run/localizer/*'],
+    rules: {
+      'perfectionist/sort-imports': 'off',
+      'perfectionist/sort-named-imports': 'off',
+      'perfectionist/sort-union-types': 'off',
     },
   },
 );
