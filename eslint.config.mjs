@@ -13,6 +13,7 @@ export default tseslint.config(
       'eslint.config.mjs',
       'run/**/*.js',
       'avd/',
+      'tests/localization/*',
     ],
   },
   eslint.configs.recommended,

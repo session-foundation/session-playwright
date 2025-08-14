@@ -2,3 +2,4 @@
 .eslintrc.js
 README.md
 tests/localization/*.ts
+tests/localization/*

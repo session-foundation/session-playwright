@@ -32,6 +32,7 @@
   "scripts": {
     "build": "yarn tsc --watch",
     "lint": "yarn prettier . --write --cache && yarn eslint .",
+    "lint-check": "yarn prettier . --check && yarn eslint .",
     "dev": "yarn tsc --watch",
     "test": "npx playwright test",
     "watch": "tsc -w",

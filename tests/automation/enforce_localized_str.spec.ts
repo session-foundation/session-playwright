@@ -1,12 +1,17 @@
 import { test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
+
+import type {
+  TokenPluralWithArgs,
+  TokenSimpleNoArgs,
+  TokenSimpleWithArgs,
+} from '../localization/locales';
+
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import {
   isPluralToken,
   type MergedLocalizerTokens,
-  type PluralLocalizerTokens,
-  type SimpleLocalizerTokens,
 } from '../localization/Localizer';
 
 function readTsFiles(dir: string): Record<string, string> {
@@ -46,8 +51,8 @@ function extractAllTokens(text: string) {
 
 function getExpectedStringFromKey(
   args:
-    | { key: SimpleLocalizerTokens }
-    | { key: PluralLocalizerTokens; count: number },
+    | { key: TokenPluralWithArgs; count: number }
+    | { key: TokenSimpleNoArgs | TokenSimpleWithArgs },
 ) {
   if (isPluralToken(args.key)) {
     if (!('count' in args)) {
@@ -126,9 +131,9 @@ function getExpectedStringFromKey(
       return 'Message Requests';
     case 'done':
       return 'Done';
-    case 'passwordSetDescription':
+    case 'passwordSetDescriptionToast':
       return 'Your password has been set. Please keep it safe.';
-    case 'passwordChangedDescription':
+    case 'passwordChangedDescriptionToast':
       return 'Your password has been changed. Please keep it safe.';
     case 'sessionPrivacy':
       return 'Privacy';
@@ -245,7 +250,7 @@ function getExpectedStringFromKey(
     case 'recoveryPasswordHidePermanentlyDescription2':
       return 'Are you sure you want to permanently hide your recovery password on this device? This cannot be undone.';
     default:
-      // returning nul means we don't have an expected string yet for this key.
+      // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
       return null;
   }
