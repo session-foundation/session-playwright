@@ -35,7 +35,7 @@ export const newUser = async (
 
   // Save Account ID to a variable
   let accountid = await window.innerText('[data-testid=your-account-id]');
-  accountid = accountid.replace(/(\r\n|\n|\r)/gm, ''); // remove the new line in the Account ID as it is rendered with one forced
+  accountid = accountid.replace(/[^0-9a-fA-F]/g, ''); // keep only hex characters
 
   console.log(
     `${userName}: Account ID: "${chalk.blue(
