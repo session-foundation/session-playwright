@@ -108,7 +108,7 @@ test_Alice_1W_Bob_1W(
     );
     // Verify the user was moved to the blocked contact list
     // Click on settings tab
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
     // click on settings section 'conversation'
     await clickOnTestIdWithText(
       aliceWindow1,
@@ -287,7 +287,7 @@ test_Alice_1W_Bob_1W(
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
-      selector: 'settings-section',
+      selector: 'invalid-data-testid',
     });
     await clickOnElement({
       window: aliceWindow1,
@@ -307,7 +307,7 @@ test_Alice_1W_Bob_1W(
     await clickOnElement({
       window: bobWindow1,
       strategy: 'data-testid',
-      selector: 'settings-section',
+      selector: 'invalid-data-testid',
     });
     await clickOnElement({
       window: bobWindow1,
@@ -401,7 +401,7 @@ test_Alice_1W_Bob_1W(
 test_Alice_2W(
   'Hide recovery password',
   async ({ aliceWindow1, aliceWindow2 }) => {
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
     await clickOnTestIdWithText(
       aliceWindow1,
       'recovery-password-settings-menu-item',
@@ -439,7 +439,7 @@ test_Alice_2W(
       'recovery-password-settings-menu-item',
     );
     // Check linked device if Recovery Password is still visible (it should be)
-    await clickOnTestIdWithText(aliceWindow2, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow2, 'invalid-data-testid');
     await waitForTestIdWithText(
       aliceWindow2,
       'recovery-password-settings-menu-item',
@@ -537,7 +537,7 @@ test_Alice_1W_no_network(
 );
 
 test_Alice_1W_no_network('Toggle password', async ({ aliceWindow1 }) => {
-  await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+  await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
   await clickOnTestIdWithText(
     aliceWindow1,
     'recovery-password-settings-menu-item',

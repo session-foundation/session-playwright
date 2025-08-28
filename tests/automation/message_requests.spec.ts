@@ -142,7 +142,7 @@ test_Alice_1W_Bob_1W(
       englishStrippedStr('clear').toString(),
     );
     // Navigate back to message request folder to check
-    await clickOnTestIdWithText(bobWindow1, 'settings-section');
+    await clickOnTestIdWithText(bobWindow1, 'invalid-data-testid');
 
     await clickOnTestIdWithText(
       bobWindow1,

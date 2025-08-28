@@ -134,7 +134,7 @@ test_Alice_2W_Bob_1W(
     // Need to wait for the blocked status to sync
     await sleepFor(2000);
     // Check blocked status in blocked contacts list
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
     await clickOnTestIdWithText(
       aliceWindow1,
       'conversations-settings-menu-item',
@@ -144,7 +144,7 @@ test_Alice_2W_Bob_1W(
     // Check that the blocked contacts is on alicewindow2
     // Check blocked status in blocked contacts list
     await sleepFor(5000);
-    await clickOnTestIdWithText(aliceWindow2, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow2, 'invalid-data-testid');
     await clickOnTestIdWithText(
       aliceWindow2,
       'conversations-settings-menu-item',

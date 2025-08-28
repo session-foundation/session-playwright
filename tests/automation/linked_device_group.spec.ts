@@ -127,7 +127,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 );
 
 async function clearDataOnWindow(window: Page) {
-  await clickOnTestIdWithText(window, 'settings-section');
+  await clickOnTestIdWithText(window, 'invalid-data-testid');
   // Click on clear data option on left pane
   await clickOnTestIdWithText(
     window,

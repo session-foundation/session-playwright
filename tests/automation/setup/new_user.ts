@@ -30,7 +30,7 @@ export const newUser = async (
   // const recoveryPhrase = await window.innerText(
   //   '[data-testid=recovery-password-seed-modal]',
   // );
-  // await clickOnTestIdWithText(window, 'modal-close-button');
+  await clickOnTestIdWithText(window, 'modal-close-button');
   await clickOnTestIdWithText(window, 'leftpane-primary-avatar');
 
   // Save Account ID to a variable
@@ -46,6 +46,6 @@ export const newUser = async (
   if (awaitOnionPath) {
     await checkPathLight(window);
   }
-  await clickOnTestIdWithText(window, 'message-section');
+  // await clickOnTestIdWithText(window, 'message-section');
   return { userName, accountid, recoveryPassword };
 };

@@ -19,7 +19,7 @@ sessionTestOneWindow('Create User', async ([window]) => {
   // exit profile modal
   await clickOnTestIdWithText(window, 'modal-close-button');
   // go to settings section
-  await clickOnTestIdWithText(window, 'settings-section');
+  await clickOnTestIdWithText(window, 'invalid-data-testid');
   // check recovery phrase matches
   await clickOnTestIdWithText(window, 'recovery-password-settings-menu-item');
   await waitForTestIdWithText(

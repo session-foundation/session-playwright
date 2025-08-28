@@ -28,7 +28,7 @@ async function expectRecoveryPhraseToBeVisible(
 
 test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   // Click on settings tab
-  await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+  await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
   // Click on privacy
   await clickOnTestIdWithText(aliceWindow1, 'privacy-settings-menu-item');
   // Click set password
@@ -50,7 +50,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   );
   // Click on settings tab
   await sleepFor(300, true);
-  await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+  await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
   await clickOnTestIdWithText(
     aliceWindow1,
     'recovery-password-settings-menu-item',
@@ -67,7 +67,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
 
   // check that the seed is visible now
   await expectRecoveryPhraseToBeVisible(aliceWindow1, alice.recoveryPassword);
-  await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+  await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
   // Change password
   await clickOnTestIdWithText(aliceWindow1, 'change-password-settings-button');
 
@@ -97,7 +97,7 @@ test_Alice_1W_no_network(
   async ({ alice: { recoveryPassword }, aliceWindow1 }) => {
     // Check if incorrect password works
     // Click on settings tab
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
     // Click on privacy
     await clickOnMatchingText(
       aliceWindow1,
@@ -118,7 +118,7 @@ test_Alice_1W_no_network(
     await sleepFor(100);
 
     // Click on settings tab
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
     await clickOnTestIdWithText(
       aliceWindow1,
       'recovery-password-settings-menu-item',
@@ -134,7 +134,7 @@ test_Alice_1W_no_network(
     await clickOnTestIdWithText(aliceWindow1, 'message-section');
 
     //  Click on settings tab
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
     await sleepFor(500);
     // Click on recovery phrase tab
     await clickOnTestIdWithText(

@@ -330,7 +330,7 @@ test_Alice_2W_Bob_1W(
     // reveal-blocked-user-settings is not updated once opened
     // Check linked device for blocked contact in settings screen
     // Click on settings tab
-    await clickOnTestIdWithText(aliceWindow2, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow2, 'invalid-data-testid');
     await clickOnTestIdWithText(
       aliceWindow2,
       'conversations-settings-menu-item',

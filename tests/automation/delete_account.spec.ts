@@ -36,7 +36,7 @@ sessionTestTwoWindows(
       ]);
       // Delete all data from device
       // Click on settings tab
-      await clickOnTestIdWithText(windowA, 'settings-section');
+      await clickOnTestIdWithText(windowA, 'invalid-data-testid');
       // Click on clear all data
       await clickOnTestIdWithText(
         windowA,
@@ -126,7 +126,7 @@ sessionTestTwoWindows(
       await createContact(windowA, windowB, userA, userB);
       // Delete all data from device
       // Click on settings tab
-      await clickOnTestIdWithText(windowA, 'settings-section');
+      await clickOnTestIdWithText(windowA, 'invalid-data-testid');
       // Click on clear all data
       await clickOnTestIdWithText(
         windowA,
