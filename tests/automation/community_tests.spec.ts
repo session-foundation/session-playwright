@@ -5,15 +5,19 @@ import { sendMessage } from './utilities/message';
 import { replyTo } from './utilities/reply_message';
 import { sendMedia } from './utilities/send_media';
 import { clickOnTestIdWithText } from './utilities/utils';
+import { Conversation, HomeScreen } from './locators';
 
 test_Alice_2W('Join community', async ({ aliceWindow1, aliceWindow2 }) => {
   await joinCommunity(aliceWindow1);
-  await clickOnTestIdWithText(aliceWindow1, 'scroll-to-bottom-button');
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    Conversation.scrollToBottomButton.selector,
+  );
   await sendMessage(aliceWindow1, 'Hello, community!');
   // Check linked device for community
   await clickOnTestIdWithText(
     aliceWindow2,
-    'module-conversation__user__profile-name',
+    HomeScreen.conversationItem.selector,
     testCommunityName,
   );
 });
@@ -29,15 +33,19 @@ test_Alice_1W_Bob_1W(
     //   waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner'),
     //   waitForLoadingAnimationToFinish(bobWindow1, 'loading-spinner'),
     // ]);
-    await Promise.all([
-      clickOnTestIdWithText(aliceWindow1, 'scroll-to-bottom-button'),
-      clickOnTestIdWithText(bobWindow1, 'scroll-to-bottom-button'),
-    ]);
+    await Promise.all(
+      [aliceWindow1, bobWindow1].map((window) =>
+        clickOnTestIdWithText(
+          window,
+          Conversation.scrollToBottomButton.selector,
+        ),
+      ),
+    );
     await sendMessage(aliceWindow1, testMessage);
     // Check linked device for community
     await clickOnTestIdWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItem.selector,
       testCommunityName,
     );
     await sendMedia(

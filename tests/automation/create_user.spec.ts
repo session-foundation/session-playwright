@@ -5,26 +5,27 @@ import {
   clickOnTestIdWithText,
   waitForTestIdWithText,
 } from './utilities/utils';
+import { Global, LeftPane, Settings } from './locators';
 
 sessionTestOneWindow('Create User', async ([window]) => {
   // Create User
   const userA = await newUser(window, 'Alice', false);
   // Open profile tab
-  await clickOnTestIdWithText(window, 'leftpane-primary-avatar');
+  await clickOnTestIdWithText(window, LeftPane.profileButton.selector);
   await sleepFor(100, true);
   // check username matches
-  await waitForTestIdWithText(window, 'your-profile-name', userA.userName);
+  await waitForTestIdWithText(window, Settings.displayName.selector, userA.userName);
   // check Account ID matches
-  await waitForTestIdWithText(window, 'your-account-id', userA.accountid);
+  await waitForTestIdWithText(window, Settings.accountId.selector, userA.accountid);
   // exit profile modal
-  await clickOnTestIdWithText(window, 'modal-close-button');
+  await clickOnTestIdWithText(window, Global.modalCloseButton.selector);
   // go to settings section
-  await clickOnTestIdWithText(window, 'invalid-data-testid');
+  await clickOnTestIdWithText(window, LeftPane.settingsButton.selector);
   // check recovery phrase matches
-  await clickOnTestIdWithText(window, 'recovery-password-settings-menu-item');
+  await clickOnTestIdWithText(window, Settings.recoveryPasswordMenuItem.selector);
   await waitForTestIdWithText(
     window,
-    'recovery-password-seed-modal',
+    Settings.recoveryPasswordContainer.selector,
     userA.recoveryPassword,
   );
 });
