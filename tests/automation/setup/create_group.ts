@@ -83,11 +83,6 @@ export const createGroup = async (
       .withArgs({ name: firstUser, other_name: secondUser })
       .toString(),
   );
-  // Click on message section
-  await Promise.all([
-    clickOnTestIdWithText(windowB, 'message-section'),
-    clickOnTestIdWithText(windowC, 'message-section'),
-  ]);
   // Click on test group
   await Promise.all([
     clickOnTestIdWithText(
