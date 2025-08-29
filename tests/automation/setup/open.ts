@@ -1,22 +1,11 @@
 import { _electron as electron } from '@playwright/test';
 
 import chalk from 'chalk';
-import { isEmpty } from 'lodash';
-import { join } from 'path';
 import { v4 } from 'uuid';
 
 export const NODE_ENV = 'production';
 export const MULTI_PREFIX = 'test-integration-';
 const multisAvailable = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-export function getAppRootPath() {
-  if (isEmpty(process.env.SESSION_DESKTOP_ROOT)) {
-    throw new Error(
-      "You need to set the 'config.SESSION_DESKTOP_ROOT' in your .env file",
-    );
-  }
-  return process.env.SESSION_DESKTOP_ROOT as string;
-}
 
 const openElectronAppOnly = async (multi: string) => {
   process.env.MULTI = `${multi}`;
@@ -26,19 +15,17 @@ const openElectronAppOnly = async (multi: string) => {
   process.env.NODE_ENV = NODE_ENV;
   process.env.SESSION_DEBUG = '1';
   process.env.LOCAL_DEVNET_SEED_URL = 'http://sesh-net.local:1280';
+  const sessionBinPath = './extracted-deb/opt/Session/session-desktop';
 
   console.info(`   NON CI RUN`);
   console.info('   NODE_ENV', process.env.NODE_ENV);
   console.info('   NODE_APP_INSTANCE', process.env.NODE_APP_INSTANCE);
 
   try {
-    const electronApp = await electron.launch({
-      args: [
-        join(getAppRootPath(), 'ts', 'mains', 'main_node.js'),
-        '--disable-gpu',
-      ],
+    return await electron.launch({
+      executablePath: sessionBinPath,
+      args: ['--no-sandbox', '--disable-gpu'],
     });
-    return electronApp;
   } catch (e) {
     console.info(
       chalk.redBright(
