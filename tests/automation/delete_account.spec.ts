@@ -17,6 +17,7 @@ import {
 } from './utilities/utils';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { Global, HomeScreen, LeftPane, Onboarding, Settings } from './locators';
 
 sessionTestTwoWindows(
   'Delete account from swarm',
@@ -36,17 +37,17 @@ sessionTestTwoWindows(
       ]);
       // Delete all data from device
       // Click on settings tab
-      await clickOnTestIdWithText(windowA, 'invalid-data-testid');
+      await clickOnTestIdWithText(windowA, LeftPane.settingsButton.selector);
       // Click on clear all data
       await clickOnTestIdWithText(
         windowA,
-        'clear-data-settings-menu-item',
+        Settings.clearDataMenuItem.selector,
         englishStrippedStr('sessionClearData').toString(),
       );
       // Select entire account
       await clickOnTestIdWithText(
         windowA,
-        'label-device_and_network',
+        Settings.clearDeviceAndNetworkRadial.selector,
         englishStrippedStr('clearDeviceAndNetwork').toString(),
       );
       // Confirm deletion by clicking Clear, twice
@@ -66,15 +67,15 @@ sessionTestTwoWindows(
       restoringWindows = await openApp(1); // not using sessionTest here as we need to close and reopen one of the window
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
-      await clickOnTestIdWithText(restoringWindow, 'existing-account-button');
+      await clickOnTestIdWithText(restoringWindow, Onboarding.iHaveAnAccountButton.selector);
       // Fill in recovery phrase
       await typeIntoInput(
         restoringWindow,
-        'recovery-phrase-input',
+        Onboarding.recoveryPhraseInput.selector,
         userA.recoveryPassword,
       );
       // Enter display name
-      await clickOnTestIdWithText(restoringWindow, 'continue-button');
+      await clickOnTestIdWithText(restoringWindow, Global.continueButton.selector);
       await waitForLoadingAnimationToFinish(
         restoringWindow,
         'loading-animation',
@@ -82,11 +83,11 @@ sessionTestTwoWindows(
 
       await typeIntoInput(
         restoringWindow,
-        'display-name-input',
+        Onboarding.displayNameInput.selector,
         userA.userName,
       );
       // Click continue
-      await clickOnTestIdWithText(restoringWindow, 'continue-button');
+      await clickOnTestIdWithText(restoringWindow, Global.continueButton.selector);
       await sleepFor(5000, true); // just to allow any messages from our swarm to show up
 
       // Need to verify that no conversation is found at all
@@ -94,15 +95,15 @@ sessionTestTwoWindows(
       await hasElementBeenDeleted(
         restoringWindow,
         'data-testid',
-        'conversation-list-item',
+        HomeScreen.conversationItemName.selector,
       );
 
-      await clickOnTestIdWithText(restoringWindow, 'new-conversation-button'); // Expect contacts list to be empty
+      await clickOnTestIdWithText(restoringWindow, HomeScreen.newConversationButton.selector); // Expect contacts list to be empty
 
       await hasElementBeenDeleted(
         restoringWindow,
         'data-testid',
-        'module-conversation__user_profile',
+        HomeScreen.contactItemName.selector,
         10000,
       );
     } finally {
@@ -126,11 +127,11 @@ sessionTestTwoWindows(
       await createContact(windowA, windowB, userA, userB);
       // Delete all data from device
       // Click on settings tab
-      await clickOnTestIdWithText(windowA, 'invalid-data-testid');
+      await clickOnTestIdWithText(windowA, LeftPane.settingsButton.selector);
       // Click on clear all data
       await clickOnTestIdWithText(
         windowA,
-        'clear-data-settings-menu-item',
+        Settings.clearDataMenuItem.selector,
         englishStrippedStr('sessionClearData').toString(),
       );
       // Keep 'Clear Device only' selection
@@ -155,7 +156,7 @@ sessionTestTwoWindows(
       await waitForElement(
         restoringWindow,
         'data-testid',
-        'module-conversation__user__profile-name',
+        HomeScreen.conversationItemName.selector,
         10000,
         userB.userName,
       );
@@ -163,12 +164,12 @@ sessionTestTwoWindows(
       await clickOnElement({
         window: restoringWindow,
         strategy: 'data-testid',
-        selector: 'new-conversation-button',
+        selector: HomeScreen.newConversationButton.selector,
       });
       await waitForElement(
         restoringWindow,
         'data-testid',
-        'module-conversation__user__profile-name',
+        HomeScreen.contactItemName.selector,
         1000,
         userB.userName,
       );

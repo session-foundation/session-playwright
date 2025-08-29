@@ -17,7 +17,7 @@ test_Alice_2W('Join community', async ({ aliceWindow1, aliceWindow2 }) => {
   // Check linked device for community
   await clickOnTestIdWithText(
     aliceWindow2,
-    HomeScreen.conversationItem.selector,
+    HomeScreen.conversationItemName.selector,
     testCommunityName,
   );
 });
@@ -45,7 +45,7 @@ test_Alice_1W_Bob_1W(
     // Check linked device for community
     await clickOnTestIdWithText(
       aliceWindow1,
-      HomeScreen.conversationItem.selector,
+      HomeScreen.conversationItemName.selector,
       testCommunityName,
     );
     await sendMedia(

@@ -191,4 +191,6 @@ export type DataTestId =
   | 'session-confirm-cancel-button'
   | 'session-recovery-password'
   | 'invite-contacts-menu-option'
-  | 'clear-group-info-name-button';
+  | 'clear-group-info-name-button'
+  | 'module-contact-name__profile-name'
+  | 'set-password-settings-button';

@@ -249,6 +249,8 @@ function getExpectedStringFromKey(
       return 'Without your recovery password, you cannot load your account on new devices. We strongly recommend you save your recovery password in a safe and secure place before continuing.';
     case 'recoveryPasswordHidePermanentlyDescription2':
       return 'Are you sure you want to permanently hide your recovery password on this device? This cannot be undone.';
+    case 'enter':
+      return 'Enter';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
