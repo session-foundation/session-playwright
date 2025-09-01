@@ -2,37 +2,11 @@ name: Run desktop regression tests
 on:
   workflow_dispatch:
     inputs:
-      PLAYWRIGHT_REPO:
-        description: 'Playwright repo to checkout'
-        required: true
-        type: choice
-        options:
-          - session-foundation/session-playwright
-          - burtonemily/session-playwright
-          - bilb/session-playwright
-        default: session-foundation/session-playwright
-
-      BRANCH_TO_CHECKOUT_PW:
-        description: 'branch to checkout on session-playwright'
+      DESKTOP_JOB_URL:
+        description: 'The url of the session-desktop job'
         required: true
         type: string
-        default: regression-tests-groups
-
-      SESSION_DESKTOP_REPO:
-        description: 'Session desktop repo to checkout'
-        required: true
-        type: choice
-        options:
-          - session-foundation/session-desktop
-          - bilb/session-desktop
-          - yougotwill/session-desktop
-        default: session-foundation/session-desktop
-
-      BRANCH_TO_CHECKOUT_SESSION:
-        description: 'Branch to checkout on session-desktop'
-        required: true
-        type: string
-        default: dev
+        default: https://github.com/session-foundation/session-desktop/actions/runs/17312227704
 
       PLAYWRIGHT_REPEAT_COUNT:
         description: 'Repeats of each tests (0 to only run each once)'
@@ -59,116 +33,94 @@ concurrency:
 jobs:
   desktop-regression:
     name: Desktop Regression Tests
-    runs-on: [self-hosted, Linux, X64, qa-desktop]
-    container:
-      image: mcr.microsoft.com/playwright:v1.51.0-noble
-      options: --cpus 16
+    runs-on: [self-hosted, qa-android]
 
     env:
+      PAT_TOKEN: ${{ secrets.PAT_TOKEN }}
       PLAYWRIGHT_REPEAT_COUNT: ${{ github.event.inputs.PLAYWRIGHT_REPEAT_COUNT }}
       PLAYWRIGHT_RETRIES_COUNT: ${{ github.event.inputs.PLAYWRIGHT_RETRIES_COUNT }}
       PLAYWRIGHT_WORKERS_COUNT: ${{ github.event.inputs.PLAYWRIGHT_WORKERS_COUNT }}
-      DESKTOP_CACHED_FOLDER: desktop/node_modules
+      DESKTOP_JOB_URL: ${{ github.event.inputs.DESKTOP_JOB_URL }}
+      ARTIFACT_NAME: 'Linux-X64-deb-qa-production'
+      CI: true
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
+
       - name: Runner Details
         run: |
-          echo "PLAYWRIGHT_REPO ${{ github.event.inputs.PLAYWRIGHT_REPO }}"
-          echo "BRANCH_TO_CHECKOUT_PW ${{ github.event.inputs.BRANCH_TO_CHECKOUT_PW }}"
-          echo "SESSION_DESKTOP_REPO ${{ github.event.inputs.SESSION_DESKTOP_REPO }}"
-          echo "BRANCH_TO_CHECKOUT_SESSION ${{ github.event.inputs.BRANCH_TO_CHECKOUT_SESSION }}"
+          echo "DESKTOP_JOB_URL ${{ github.event.inputs.DESKTOP_JOB_URL }}"
+          echo "PLAYWRIGHT_REPEAT_COUNT ${{ github.event.inputs.PLAYWRIGHT_REPEAT_COUNT }}"
+          echo "PLAYWRIGHT_RETRIES_COUNT ${{ github.event.inputs.PLAYWRIGHT_RETRIES_COUNT }}"
+          echo "PLAYWRIGHT_WORKERS_COUNT ${{ github.event.inputs.PLAYWRIGHT_WORKERS_COUNT }}"
 
-      - uses: actions/checkout@v4
-        name: 'Checkout playwright'
-        with:
-          repository: ${{ github.event.inputs.PLAYWRIGHT_REPO }}
-          ref: ${{ github.event.inputs.BRANCH_TO_CHECKOUT_PW }}
-          path: 'playwright'
+      - name: 'Download prebuilt session-desktop'
+        run: |
+          RUN_ID=$(echo "$DESKTOP_JOB_URL" | sed -E 's|.*/runs/([0-9]+).*|\1|')
+          echo "Run ID: $RUN_ID"
 
-      - name: Install system deps
-        run: apt update && apt install -y git g++ build-essential cmake
 
-      - uses: actions/checkout@v4
-        name: 'Checkout Session desktop'
-        with:
-          repository: ${{ github.event.inputs.SESSION_DESKTOP_REPO }}
-          ref: ${{ github.event.inputs.BRANCH_TO_CHECKOUT_SESSION }}
-          path: 'desktop'
+          response=$(curl -s -H "Authorization: Bearer $PAT_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/session-foundation/session-desktop/actions/runs/$RUN_ID/artifacts")
+          echo "response: $response"
 
-      # Note: caching is breaking things up (app doesn't start)
-      # - name: Calculate desktop cache key
-      #   run: |
-      #     echo "CACHE_KEY=${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('desktop/package.json', 'desktop/yarn.lock', 'desktop/patches/**') }}" >> $GITHUB_ENV
+
+          artifact_url=$(echo "$response" | jq -r \
+            --arg name "$ARTIFACT_NAME" \
+            '.artifacts[] | select(.name == $name) | .archive_download_url')
+
+
+
+          echo "Session desktop Artifact URL: $artifact_url"
+
+          curl -L \
+            -H "Authorization: token $PAT_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            -o artifact.zip \
+            $artifact_url
+
+          unzip artifact.zip
+
+      - name: 'print files'
+        run: |
+          ls -l
+
+      - name: 'Extract deb package'
+        run: |
+          dpkg-deb -x *.deb extracted-deb
+          ls ./extracted-deb
+          ls -l ./extracted-deb/opt/Session/session-desktop
 
       - name: Install node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version-file: 'desktop/.nvmrc'
-
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-
-      - name: Install setuptools for python 3.12
-        shell: bash
-        run: python -m pip install --upgrade pip setuptools
-
-      # Note: caching is breaking things up (app doesn't start)
-      # - uses: actions/cache/restore@v4
-      #   id: cache-desktop-modules
-      #   with:
-      #     path: ${{ env.DESKTOP_CACHED_FOLDER }}
-      #     key: ${{ env.CACHE_KEY }}
+          node-version-file: '.nvmrc'
 
       - name: Install yarn
         run: |
           npm install -g yarn
 
-      - name: List desktop folder
+      - name: Install dependencies
         run: |
-          pwd
-          ls -la desktop
-
-      - name: List playwright folder
-        run: |
-          pwd
-          ls -la playwright
-
-      - name: Install desktop dependencies
-        shell: bash
-        # if: steps.cache-desktop-modules.outputs.cache-hit != 'true'
-        run: cd $GITHUB_WORKSPACE/desktop && yarn install --frozen-lockfile --network-timeout 600000
-
-      # Note: caching is breaking things up (app doesn't start)
-      # - uses: actions/cache/save@v4
-      #   if: always()
-      #   with:
-      #     path: ${{ env.DESKTOP_CACHED_FOLDER }}
-      #     key: ${{ env.CACHE_KEY }}
-
-      - name: Build desktop
-        shell: bash
-        run: cd $GITHUB_WORKSPACE/desktop && yarn build-everything
-
-      - name: Install playwright dependencies
-        run: |
-          cd $GITHUB_WORKSPACE/playwright && yarn install --frozen-lockfile
+          yarn install --frozen-lockfile
 
       - name: Build the Desktop tests
         run: |
-          cd  $GITHUB_WORKSPACE/playwright
-          yarn tsc
+          cd  $GITHUB_WORKSPACE
+           yarn tsc
 
       - name: Run the Desktop tests
         run: |
-          cd $GITHUB_WORKSPACE/playwright
-          SESSION_DESKTOP_ROOT=$GITHUB_WORKSPACE/desktop nice ionice xvfb-run --auto-servernum --server-num=1 --server-args='-screen 0, 1920x1080x24' yarn test
-          # DEBUG="pw:*"
+          PRINT_ONGOING_TEST_LOGS= nice ionice xvfb-run --auto-servernum --server-num=1 --server-args='-screen 0, 1920x1080x24' yarn test
+        #  DEBUG="pw:*"
+        #
 
       - name: Kill all running electron app
         if: always()
-        continue-on-error: true # just so we don't fail
+        continue-on-error: true
         shell: bash
         run: |
           killall electron;
