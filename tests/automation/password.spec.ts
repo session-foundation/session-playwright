@@ -111,10 +111,7 @@ test_Alice_1W_no_network(
     await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordButton.selector)
     // Click on recovery phrase tab
     await sleepFor(5000);
-
-    // Click on settings tab
-    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
-    await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector); 
+    await clickOnTestIdWithText(aliceWindow1, Global.modalBackButton.selector )
     await clickOnTestIdWithText(
       aliceWindow1,
       Settings.recoveryPasswordMenuItem.selector,
@@ -126,9 +123,7 @@ test_Alice_1W_no_network(
     // this should print the recovery phrase
     await expectRecoveryPhraseToBeVisible(aliceWindow1, recoveryPassword);
 
-    //  Click on settings tab
-    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
-    await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector); 
+    await clickOnTestIdWithText(aliceWindow1, Global.modalBackButton.selector )
     await sleepFor(500);
     // Click on recovery phrase tab
     await clickOnTestIdWithText(

@@ -179,6 +179,8 @@ export type DataTestId =
   | 'modal-heading'
   | 'call-notification-answered-a-call'
   | 'call-notification-started-call'
+  | 'modal-back-button'
+  | 'back-button'
   | 'audio-player'
   | 'chooser-invite-friend'
   | 'your-account-id'

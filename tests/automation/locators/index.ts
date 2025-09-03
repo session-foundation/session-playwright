@@ -37,6 +37,7 @@ export class LeftPane extends Locator {
 
 export class HomeScreen extends Locator {
   static readonly newConversationButton = this.testId('new-conversation-button');
+  static readonly messageRequestBanner = this.testId('message-request-banner');
   static readonly conversationItemName = this.testId(
     'module-conversation__user__profile-name',
   );
@@ -44,6 +45,10 @@ export class HomeScreen extends Locator {
 }
 
 export class Conversation extends Locator {
+  static readonly acceptMessageRequestButton = this.testId('accept-message-request');
+  static readonly deleteMessageRequestButton = this.testId('delete-message-request')
+  static readonly blockMessageRequestButton = this.testId('decline-and-block-message-request');
+  static readonly messageRequestAcceptControlMessage = this.testId('message-request-response-message')
   static readonly scrollToBottomButton = this.testId('scroll-to-bottom-button');
 }
 
@@ -53,6 +58,7 @@ export class Settings extends Locator {
     static readonly accountId = this.testId('your-account-id');
     // Menu items
     static readonly privacyMenuItem = this.testId('privacy-settings-menu-item');
+    static readonly conversationsMenuItem = this.testId('conversations-settings-menu-item');
     static readonly recoveryPasswordMenuItem = this.testId('recovery-password-settings-menu-item');
     static readonly clearDataMenuItem = this.testId('clear-data-settings-menu-item');
     // Privacy
@@ -62,6 +68,8 @@ export class Settings extends Locator {
     static readonly passwordInput = this.testId('password-input');
     static readonly confirmPasswordInput = this.testId('password-input-confirm');
     static readonly reConfirmPasswordInput = this.testId('password-input-reconfirm');
+    // Conversations
+    static readonly blockedContactsButton = this.testId('reveal-blocked-user-settings');
     // Recovery Password
     static readonly recoveryPasswordContainer = this.testId('recovery-password-seed-modal');
     // Clear Data
@@ -70,7 +78,9 @@ export class Settings extends Locator {
 
 export class Global extends Locator {
     static readonly modalCloseButton = this.testId('modal-close-button');
+    static readonly modalBackButton = this.testId('modal-back-button');
     static readonly continueButton = this.testId('continue-button');
+    static readonly backButton = this.testId('back-button')
     static readonly toast = this.testId('session-toast');
     static readonly confirmButton = this.testId('session-confirm-ok-button');
     static readonly errorMessage = this.testId('error-message');
