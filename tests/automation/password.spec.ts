@@ -33,13 +33,12 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   // Click on privacy
   await clickOnTestIdWithText(aliceWindow1, Settings.privacyMenuItem.selector);
   // Click set password
-  await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordButton.selector);
+  await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordSettingsButton.selector);
   // Enter password
   await typeIntoInput(aliceWindow1, Settings.passwordInput.selector, testPassword);
   // Confirm password
   await typeIntoInput(aliceWindow1, Settings.confirmPasswordInput.selector, testPassword);
-  // NOTE make this click the button once SES-4504 is resolved 
-  await aliceWindow1.keyboard.press('Enter');
+  await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordButton.selector)
   // Check toast notification
   await waitForTestIdWithText(
     aliceWindow1,
@@ -70,7 +69,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector);
   await clickOnTestIdWithText(aliceWindow1, Settings.privacyMenuItem.selector)
   // Change password
-  await clickOnTestIdWithText(aliceWindow1, Settings.changePasswordButton.selector);
+  await clickOnTestIdWithText(aliceWindow1, Settings.changePasswordSettingsButton.selector);
 
   // Enter old password
   await typeIntoInput(aliceWindow1, Settings.passwordInput.selector, testPassword);
@@ -104,14 +103,12 @@ test_Alice_1W_no_network(
       Settings.privacyMenuItem.selector,
     );
     // Click set password
-    await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordButton.selector);
+    await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordSettingsButton.selector);
     // Enter password
     await typeIntoInput(aliceWindow1, Settings.passwordInput.selector, testPassword);
     // Confirm password
     await typeIntoInput(aliceWindow1, Settings.confirmPasswordInput.selector, testPassword);
-    // Click Done
-    // NOTE make this click the button once SES-4504 is resolved 
-    await aliceWindow1.keyboard.press('Enter');
+    await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordButton.selector)
     // Click on recovery phrase tab
     await sleepFor(5000);
 

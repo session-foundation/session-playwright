@@ -56,8 +56,9 @@ export class Settings extends Locator {
     static readonly recoveryPasswordMenuItem = this.testId('recovery-password-settings-menu-item');
     static readonly clearDataMenuItem = this.testId('clear-data-settings-menu-item');
     // Privacy
-    static readonly setPasswordButton = this.testId('set-password-settings-button');
-    static readonly changePasswordButton = this.testId('change-password-settings-button')
+    static readonly setPasswordSettingsButton = this.testId('set-password-settings-button');
+    static readonly changePasswordSettingsButton = this.testId('change-password-settings-button')
+    static readonly setPasswordButton = this.testId('set-password-button');
     static readonly passwordInput = this.testId('password-input');
     static readonly confirmPasswordInput = this.testId('password-input-confirm');
     static readonly reConfirmPasswordInput = this.testId('password-input-reconfirm');
