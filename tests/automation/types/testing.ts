@@ -91,7 +91,6 @@ export type DataTestId =
   | 'disappear-control-message'
   | 'disappearing-messages-indicator'
   | 'conversation-options-avatar'
-  | 'invalid-data-testid'
   | 'clear-data-settings-menu-item'
   | 'message-requests-settings-menu-item'
   | 'restore-using-recovery'
@@ -147,7 +146,7 @@ export type DataTestId =
   | 'header-conversation-name'
   | 'copy-button-profile-update'
   | 'loading-spinner'
-  | 'invalid-data-testid' // SES-4499, temporary fix to make the tests run again
+  | 'settings-section'
   | 'empty-conversation-notification'
   | 'your-profile-name'
   | 'mentions-popup-row'

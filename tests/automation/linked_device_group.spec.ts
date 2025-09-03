@@ -14,6 +14,7 @@ import {
   waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
 } from './utilities/utils';
+import { LeftPane } from './locators';
 
 test_group_Alice_2W_Bob_1W_Charlie_1W(
   'Leaving group syncs',
@@ -127,7 +128,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 );
 
 async function clearDataOnWindow(window: Page) {
-  await clickOnTestIdWithText(window, 'invalid-data-testid');
+  await clickOnTestIdWithText(window, LeftPane.settingsButton.selector);
   // Click on clear data option on left pane
   await clickOnTestIdWithText(
     window,

@@ -1,5 +1,6 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
+import { LeftPane } from './locators';
 import { test_Alice_2W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -134,7 +135,7 @@ test_Alice_2W_Bob_1W(
     // Need to wait for the blocked status to sync
     await sleepFor(2000);
     // Check blocked status in blocked contacts list
-    await clickOnTestIdWithText(aliceWindow1, 'invalid-data-testid');
+    await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector);
     await clickOnTestIdWithText(
       aliceWindow1,
       'conversations-settings-menu-item',
@@ -144,7 +145,7 @@ test_Alice_2W_Bob_1W(
     // Check that the blocked contacts is on alicewindow2
     // Check blocked status in blocked contacts list
     await sleepFor(5000);
-    await clickOnTestIdWithText(aliceWindow2, 'invalid-data-testid');
+    await clickOnTestIdWithText(aliceWindow2, LeftPane.settingsButton.selector);
     await clickOnTestIdWithText(
       aliceWindow2,
       'conversations-settings-menu-item',

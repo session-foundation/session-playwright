@@ -28,6 +28,7 @@ import {
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
+import { LeftPane } from './locators';
 
 sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
   let aliceWindow2: Page | undefined;
@@ -330,7 +331,7 @@ test_Alice_2W_Bob_1W(
     // reveal-blocked-user-settings is not updated once opened
     // Check linked device for blocked contact in settings screen
     // Click on settings tab
-    await clickOnTestIdWithText(aliceWindow2, 'invalid-data-testid');
+    await clickOnTestIdWithText(aliceWindow2, LeftPane.settingsButton.selector);
     await clickOnTestIdWithText(
       aliceWindow2,
       'conversations-settings-menu-item',

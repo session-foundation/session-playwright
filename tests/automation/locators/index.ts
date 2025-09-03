@@ -32,7 +32,7 @@ export class Onboarding extends Locator {
 
 export class LeftPane extends Locator {
   static readonly profileButton = this.testId('leftpane-primary-avatar');
-  static readonly settingsButton = this.testId('invalid-data-testid'); // SES--4499
+  static readonly settingsButton = this.testId('settings-section');
 }
 
 export class HomeScreen extends Locator {

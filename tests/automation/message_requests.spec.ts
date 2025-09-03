@@ -1,4 +1,5 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { LeftPane } from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -142,7 +143,7 @@ test_Alice_1W_Bob_1W(
       englishStrippedStr('clear').toString(),
     );
     // Navigate back to message request folder to check
-    await clickOnTestIdWithText(bobWindow1, 'invalid-data-testid');
+    await clickOnTestIdWithText(bobWindow1, LeftPane.settingsButton.selector);
 
     await clickOnTestIdWithText(
       bobWindow1,
