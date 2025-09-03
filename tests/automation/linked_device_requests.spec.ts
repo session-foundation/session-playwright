@@ -1,6 +1,12 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
-import { Conversation, Global, HomeScreen, LeftPane, Settings } from './locators';
+import {
+  Conversation,
+  Global,
+  HomeScreen,
+  LeftPane,
+  Settings,
+} from './locators';
 import { test_Alice_2W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -19,14 +25,23 @@ test_Alice_2W_Bob_1W(
     const testReply = `${alice.userName} accepting message request from ${bob.userName}`;
     await sendNewMessage(bobWindow1, alice.accountid, testMessage);
     // Accept request in aliceWindow1
-    await clickOnTestIdWithText(aliceWindow1, HomeScreen.messageRequestBanner.selector);
-    await clickOnTestIdWithText(aliceWindow2, HomeScreen.messageRequestBanner.selector);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      HomeScreen.messageRequestBanner.selector,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      HomeScreen.messageRequestBanner.selector,
+    );
     await clickOnTestIdWithText(
       aliceWindow1,
       HomeScreen.conversationItemName.selector,
       bob.userName,
     );
-    await clickOnTestIdWithText(aliceWindow1, Conversation.acceptMessageRequestButton.selector);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Conversation.acceptMessageRequestButton.selector,
+    );
     await waitForTestIdWithText(
       aliceWindow1,
       Conversation.messageRequestAcceptControlMessage.selector,
@@ -46,11 +61,14 @@ test_Alice_2W_Bob_1W(
     );
     await sendMessage(aliceWindow1, testReply);
     await waitForTextMessage(bobWindow1, testReply);
-    await clickOnTestIdWithText(aliceWindow2, Global.backButton.selector)
-    await clickOnTestIdWithText(aliceWindow2, HomeScreen.newConversationButton.selector);
+    await clickOnTestIdWithText(aliceWindow2, Global.backButton.selector);
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      HomeScreen.newConversationButton.selector,
+    );
     await waitForTestIdWithText(
       aliceWindow2,
-      HomeScreen.contactItemName.selector,
+      Global.contactItem.selector,
       bob.userName,
     );
   },
@@ -62,13 +80,19 @@ test_Alice_2W_Bob_1W(
     const testMessage = `${bob.userName} sending message request to ${alice.userName}`;
     await sendNewMessage(bobWindow1, alice.accountid, testMessage);
     // Decline request in aliceWindow1
-    await clickOnTestIdWithText(aliceWindow1, HomeScreen.messageRequestBanner.selector);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      HomeScreen.messageRequestBanner.selector,
+    );
     await clickOnTestIdWithText(
       aliceWindow1,
       HomeScreen.conversationItemName.selector,
       bob.userName,
     );
-    await clickOnTestIdWithText(aliceWindow2, HomeScreen.messageRequestBanner.selector);
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      HomeScreen.messageRequestBanner.selector,
+    );
     await waitForTestIdWithText(
       aliceWindow2,
       HomeScreen.conversationItemName.selector,
@@ -103,7 +127,10 @@ test_Alice_2W_Bob_1W(
     // send a message to Bob to Alice
     await sendNewMessage(bobWindow1, alice.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(aliceWindow1, HomeScreen.messageRequestBanner.selector);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      HomeScreen.messageRequestBanner.selector,
+    );
     // Select message request from Bob
     await clickOnTestIdWithText(
       aliceWindow1,
@@ -133,7 +160,10 @@ test_Alice_2W_Bob_1W(
       aliceWindow1,
       Settings.conversationsMenuItem.selector,
     );
-    await clickOnTestIdWithText(aliceWindow1, Settings.blockedContactsButton.selector);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.blockedContactsButton.selector,
+    );
     await waitForTestIdWithText(aliceWindow1, 'contact', bob.userName);
     // Check that the blocked contacts is on alicewindow2
     // Check blocked status in blocked contacts list
@@ -143,7 +173,10 @@ test_Alice_2W_Bob_1W(
       aliceWindow2,
       Settings.conversationsMenuItem.selector,
     );
-    await clickOnTestIdWithText(aliceWindow2, Settings.blockedContactsButton.selector);
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      Settings.blockedContactsButton.selector,
+    );
     await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
     await waitForMatchingText(aliceWindow2, bob.userName);
   },

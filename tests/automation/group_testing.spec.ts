@@ -1,5 +1,6 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { doForAll, sleepFor } from '../promise_utils';
+import { Global, HomeScreen } from './locators';
 import { createGroup } from './setup/create_group';
 import { newUser } from './setup/new_user';
 import {
@@ -54,17 +55,10 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
     draculaWindow1,
     groupCreated,
   }) => {
-    // Check config messages in all windows
-    await sleepFor(1000);
     await createContact(aliceWindow1, draculaWindow1, alice, dracula);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'message-section',
-    });
     await clickOnTestIdWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
     await clickOnElement({
@@ -98,14 +92,10 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
       },
       [aliceWindow1, bobWindow1, charlieWindow1],
     );
-    await clickOnElement({
-      window: draculaWindow1,
-      strategy: 'data-testid',
-      selector: 'message-section',
-    });
+    await clickOnTestIdWithText(draculaWindow1, Global.backButton.selector);
     await clickOnTestIdWithText(
       draculaWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
   },

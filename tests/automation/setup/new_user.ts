@@ -46,6 +46,5 @@ export const newUser = async (
   if (awaitOnionPath) {
     await checkPathLight(window);
   }
-  // await clickOnTestIdWithText(window, 'message-section');
   return { userName, accountid, recoveryPassword };
 };

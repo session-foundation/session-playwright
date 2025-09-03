@@ -108,10 +108,7 @@ export type DataTestId =
   | 'accept-message-request'
   | 'set-nickname-confirm-button'
   | 'nickname-input'
-  | 'three-dots-conversation-options'
-  | 'message-section'
   | 'conversations-settings-menu-item'
-  | 'reveal-blocked-user-settings'
   | 'unblock-button-settings-screen'
   | 'leftpane-primary-avatar'
   | 'edit-profile-icon'
@@ -183,6 +180,7 @@ export type DataTestId =
   | 'back-button'
   | 'audio-player'
   | 'chooser-invite-friend'
+  | 'blocked-contacts-settings-row'
   | 'your-account-id'
   | 'copy-button-account-id'
   | 'link-preview-image'
@@ -194,4 +192,7 @@ export type DataTestId =
   | 'invite-contacts-menu-option'
   | 'clear-group-info-name-button'
   | 'module-contact-name__profile-name'
+  | 'update-profile-info-name-input'
   | 'set-password-settings-button';
+
+export type ModalId = 'blockOrUnblockModal' | 'userSettingsModal';

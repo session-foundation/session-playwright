@@ -505,22 +505,22 @@ export async function checkModalStrings(
   modalId?: ModalId,
 ) {
   let modalSelector = '[data-modal-id]'; // Base selector for modals
-  
+
   // If a specific modal ID is provided, target that one
   if (modalId) {
     modalSelector = `[data-modal-id="${modalId}"]`;
   }
-  
+
   // Find the target modal
   const targetModal = window.locator(modalSelector).first();
-  
+
   // Wait for the modal to be visible
   await targetModal.waitFor({ state: 'visible' });
 
   // Get elements within this specific modal
   const heading = targetModal.locator('[data-testid="modal-heading"]');
   const description = targetModal.locator('[data-testid="modal-description"]');
-  
+
   // Wait for these elements to be visible
   await heading.waitFor({ state: 'visible' });
   await description.waitFor({ state: 'visible' });

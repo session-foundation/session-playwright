@@ -28,7 +28,13 @@ import {
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
-import { LeftPane } from './locators';
+import {
+  Conversation,
+  Global,
+  HomeScreen,
+  LeftPane,
+  Settings,
+} from './locators';
 
 sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
   let aliceWindow2: Page | undefined;
@@ -299,14 +305,14 @@ test_Alice_2W_Bob_1W(
     // Navigate to conversation on linked device and check for message from user A to user B
     await clickOnTestIdWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       bob.userName,
       true,
     );
     // Select block
     await clickOnTestIdWithText(
       aliceWindow2,
-      'context-menu-item',
+      Global.contextMenuItem.selector,
       englishStrippedStr('block').toString(),
     );
     // Check modal strings
@@ -319,33 +325,36 @@ test_Alice_2W_Bob_1W(
     );
     await clickOnTestIdWithText(
       aliceWindow2,
-      'session-confirm-ok-button',
+      Global.confirmButton.selector,
       englishStrippedStr('block').toString(),
     );
     // Verify the user was moved to the blocked contact list
     await waitForMatchingPlaceholder(
       aliceWindow1,
-      'message-input-text-area',
+      Conversation.messageInput.selector,
       englishStrippedStr('blockBlockedDescription').toString(),
     );
-    // reveal-blocked-user-settings is not updated once opened
     // Check linked device for blocked contact in settings screen
     // Click on settings tab
     await clickOnTestIdWithText(aliceWindow2, LeftPane.settingsButton.selector);
     await clickOnTestIdWithText(
       aliceWindow2,
-      'conversations-settings-menu-item',
+      Settings.conversationsMenuItem.selector,
     );
     // a conf sync job can take 30s (if the last one failed) +  10s polling to show a change on a linked device.
     await clickOnTestIdWithText(
       aliceWindow2,
-      'reveal-blocked-user-settings',
+      Settings.blockedContactsButton.selector,
       undefined,
       undefined,
       50000,
     );
     // Check if user B is in blocked contact list
-    await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
+    await waitForTestIdWithText(
+      aliceWindow2,
+      Global.contactItem.selector,
+      bob.userName,
+    );
   },
 );
 
@@ -354,12 +363,6 @@ test_Alice_2W_Bob_1W(
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    // Confirm contact by checking Messages tab (name should appear in list)
-    await Promise.all([
-      clickOnTestIdWithText(aliceWindow1, 'message-section'),
-      clickOnTestIdWithText(bobWindow1, 'message-section'),
-      clickOnTestIdWithText(aliceWindow2, 'message-section'),
-    ]);
     await Promise.all([
       clickOnElement({
         window: aliceWindow1,
@@ -395,7 +398,6 @@ test_Alice_2W_Bob_1W(
       ),
     ]);
     // Delete contact
-    await clickOnTestIdWithText(aliceWindow1, 'message-section');
     await clickOnTestIdWithText(
       aliceWindow1,
       'module-conversation__user__profile-name',

@@ -23,7 +23,6 @@ export const makeVoiceCall = async (
     englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
   );
   await clickOnTestIdWithText(callerWindow, 'session-confirm-ok-button');
-  await clickOnTestIdWithText(callerWindow, 'message-section');
   await clickOnTestIdWithText(
     callerWindow,
     'module-conversation__user__profile-name',
@@ -44,7 +43,6 @@ export const makeVoiceCall = async (
     receiverWindow,
     englishStrippedStr('accept').toString(),
   );
-  await clickOnTestIdWithText(receiverWindow, 'message-section');
   await clickOnTestIdWithText(
     receiverWindow,
     'module-conversation__user__profile-name',

@@ -33,12 +33,26 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   // Click on privacy
   await clickOnTestIdWithText(aliceWindow1, Settings.privacyMenuItem.selector);
   // Click set password
-  await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordSettingsButton.selector);
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    Settings.setPasswordSettingsButton.selector,
+  );
   // Enter password
-  await typeIntoInput(aliceWindow1, Settings.passwordInput.selector, testPassword);
+  await typeIntoInput(
+    aliceWindow1,
+    Settings.passwordInput.selector,
+    testPassword,
+  );
   // Confirm password
-  await typeIntoInput(aliceWindow1, Settings.confirmPasswordInput.selector, testPassword);
-  await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordButton.selector)
+  await typeIntoInput(
+    aliceWindow1,
+    Settings.confirmPasswordInput.selector,
+    testPassword,
+  );
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    Settings.setPasswordButton.selector,
+  );
   // Check toast notification
   await waitForTestIdWithText(
     aliceWindow1,
@@ -56,7 +70,11 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   await sleepFor(300, true);
 
   // Type password into input field and validate it
-  await typeIntoInput(aliceWindow1, Settings.passwordInput.selector, testPassword);
+  await typeIntoInput(
+    aliceWindow1,
+    Settings.passwordInput.selector,
+    testPassword,
+  );
   // Click Done
   await clickOnMatchingText(
     aliceWindow1,
@@ -67,14 +85,25 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   await expectRecoveryPhraseToBeVisible(aliceWindow1, alice.recoveryPassword);
   await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
   await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector);
-  await clickOnTestIdWithText(aliceWindow1, Settings.privacyMenuItem.selector)
+  await clickOnTestIdWithText(aliceWindow1, Settings.privacyMenuItem.selector);
   // Change password
-  await clickOnTestIdWithText(aliceWindow1, Settings.changePasswordSettingsButton.selector);
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    Settings.changePasswordSettingsButton.selector,
+  );
 
   // Enter old password
-  await typeIntoInput(aliceWindow1, Settings.passwordInput.selector, testPassword);
+  await typeIntoInput(
+    aliceWindow1,
+    Settings.passwordInput.selector,
+    testPassword,
+  );
   // Enter new password
-  await typeIntoInput(aliceWindow1, Settings.confirmPasswordInput.selector, newTestPassword);
+  await typeIntoInput(
+    aliceWindow1,
+    Settings.confirmPasswordInput.selector,
+    newTestPassword,
+  );
   // Confirm new password
   await typeIntoInput(
     aliceWindow1,
@@ -103,27 +132,45 @@ test_Alice_1W_no_network(
       Settings.privacyMenuItem.selector,
     );
     // Click set password
-    await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordSettingsButton.selector);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.setPasswordSettingsButton.selector,
+    );
     // Enter password
-    await typeIntoInput(aliceWindow1, Settings.passwordInput.selector, testPassword);
+    await typeIntoInput(
+      aliceWindow1,
+      Settings.passwordInput.selector,
+      testPassword,
+    );
     // Confirm password
-    await typeIntoInput(aliceWindow1, Settings.confirmPasswordInput.selector, testPassword);
-    await clickOnTestIdWithText(aliceWindow1, Settings.setPasswordButton.selector)
+    await typeIntoInput(
+      aliceWindow1,
+      Settings.confirmPasswordInput.selector,
+      testPassword,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.setPasswordButton.selector,
+    );
     // Click on recovery phrase tab
     await sleepFor(5000);
-    await clickOnTestIdWithText(aliceWindow1, Global.modalBackButton.selector )
+    await clickOnTestIdWithText(aliceWindow1, Global.modalBackButton.selector);
     await clickOnTestIdWithText(
       aliceWindow1,
       Settings.recoveryPasswordMenuItem.selector,
     );
     // Type password into input field
-    await typeIntoInput(aliceWindow1, Settings.passwordInput.selector, testPassword);
+    await typeIntoInput(
+      aliceWindow1,
+      Settings.passwordInput.selector,
+      testPassword,
+    );
     // Confirm the password
     await clickOnTestIdWithText(aliceWindow1, Global.confirmButton.selector);
     // this should print the recovery phrase
     await expectRecoveryPhraseToBeVisible(aliceWindow1, recoveryPassword);
 
-    await clickOnTestIdWithText(aliceWindow1, Global.modalBackButton.selector )
+    await clickOnTestIdWithText(aliceWindow1, Global.modalBackButton.selector);
     await sleepFor(500);
     // Click on recovery phrase tab
     await clickOnTestIdWithText(
@@ -131,7 +178,11 @@ test_Alice_1W_no_network(
       Settings.recoveryPasswordMenuItem.selector,
     );
     // Try with incorrect password
-    await typeIntoInput(aliceWindow1, Settings.passwordInput.selector, newTestPassword);
+    await typeIntoInput(
+      aliceWindow1,
+      Settings.passwordInput.selector,
+      newTestPassword,
+    );
     // Confirm the password
     await clickOnTestIdWithText(aliceWindow1, Global.confirmButton.selector);
     // this should NOT print the recovery phrase

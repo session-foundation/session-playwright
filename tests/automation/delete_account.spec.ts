@@ -67,7 +67,10 @@ sessionTestTwoWindows(
       restoringWindows = await openApp(1); // not using sessionTest here as we need to close and reopen one of the window
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
-      await clickOnTestIdWithText(restoringWindow, Onboarding.iHaveAnAccountButton.selector);
+      await clickOnTestIdWithText(
+        restoringWindow,
+        Onboarding.iHaveAnAccountButton.selector,
+      );
       // Fill in recovery phrase
       await typeIntoInput(
         restoringWindow,
@@ -75,7 +78,10 @@ sessionTestTwoWindows(
         userA.recoveryPassword,
       );
       // Enter display name
-      await clickOnTestIdWithText(restoringWindow, Global.continueButton.selector);
+      await clickOnTestIdWithText(
+        restoringWindow,
+        Global.continueButton.selector,
+      );
       await waitForLoadingAnimationToFinish(
         restoringWindow,
         'loading-animation',
@@ -87,7 +93,10 @@ sessionTestTwoWindows(
         userA.userName,
       );
       // Click continue
-      await clickOnTestIdWithText(restoringWindow, Global.continueButton.selector);
+      await clickOnTestIdWithText(
+        restoringWindow,
+        Global.continueButton.selector,
+      );
       await sleepFor(5000, true); // just to allow any messages from our swarm to show up
 
       // Need to verify that no conversation is found at all
@@ -98,12 +107,15 @@ sessionTestTwoWindows(
         HomeScreen.conversationItemName.selector,
       );
 
-      await clickOnTestIdWithText(restoringWindow, HomeScreen.newConversationButton.selector); // Expect contacts list to be empty
+      await clickOnTestIdWithText(
+        restoringWindow,
+        HomeScreen.newConversationButton.selector,
+      ); // Expect contacts list to be empty
 
       await hasElementBeenDeleted(
         restoringWindow,
         'data-testid',
-        HomeScreen.contactItemName.selector,
+        Global.contactItem.selector,
         10000,
       );
     } finally {
@@ -169,7 +181,7 @@ sessionTestTwoWindows(
       await waitForElement(
         restoringWindow,
         'data-testid',
-        HomeScreen.contactItemName.selector,
+        Global.contactItem.selector,
         1000,
         userB.userName,
       );

@@ -18,10 +18,11 @@ import {
   doesElementExist,
   hasElementBeenDeleted,
   typeIntoInput,
+  waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utilities/utils';
-import { LeftPane } from './locators';
+import { Global, HomeScreen, LeftPane, Settings } from './locators';
 
 // Send message in one to one conversation with new contact
 sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
@@ -73,18 +74,21 @@ test_Alice_1W_Bob_1W(
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Check to see if User B is a contact
-    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      HomeScreen.newConversationButton.selector,
+    );
     await waitForTestIdWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      Global.contactItem.selector,
       bob.userName,
     );
     // he is a contact, close the new conversation button tab as there is no right click allowed on it
-    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+    await clickOnTestIdWithText(aliceWindow1, Global.backButton.selector);
     // then right click on the contact conversation list item to show the menu
     await clickOnTestIdWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       bob.userName,
       true,
     );
@@ -104,7 +108,7 @@ test_Alice_1W_Bob_1W(
     );
     await clickOnTestIdWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton.selector,
       englishStrippedStr('block').toString(),
     );
     // Verify the user was moved to the blocked contact list
@@ -113,14 +117,21 @@ test_Alice_1W_Bob_1W(
     // click on settings section 'conversation'
     await clickOnTestIdWithText(
       aliceWindow1,
-      'conversations-settings-menu-item',
+      Settings.conversationsMenuItem.selector,
     );
     // Navigate to blocked users tab'
-    await clickOnTestIdWithText(aliceWindow1, 'reveal-blocked-user-settings');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.blockedContactsButton.selector,
+    );
     // select the contact to unblock by clicking on it by name
-    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Global.contactItem.selector,
+      bob.userName,
+    );
     // Unblock user by clicking on unblock
-    await clickOnTestIdWithText(aliceWindow1, 'unblock-button-settings-screen');
+    await clickOnTestIdWithText(aliceWindow1, Settings.unblockButton.selector);
     // make sure the confirm dialogs shows up
     await checkModalStrings(
       aliceWindow1,
@@ -128,11 +139,12 @@ test_Alice_1W_Bob_1W(
       englishStrippedStr('blockUnblockName')
         .withArgs({ name: bob.userName })
         .toString(),
+      'blockOrUnblockModal',
     );
     // click on the unblock button
     await clickOnTestIdWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton.selector,
       englishStrippedStr('blockUnblock').toString(),
     );
     // make sure no blocked contacts are listed
@@ -146,21 +158,20 @@ test_Alice_1W_Bob_1W(
 test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   const newUsername = 'Tiny bubble';
   // Open Profile
-  await clickOnTestIdWithText(aliceWindow1, 'leftpane-primary-avatar');
+  await clickOnTestIdWithText(aliceWindow1, LeftPane.profileButton.selector);
   // Click on current username to open edit field
-  await clickOnTestIdWithText(aliceWindow1, 'edit-profile-icon');
+  await clickOnTestIdWithText(aliceWindow1, Settings.displayName.selector);
   // Type in new username
-  await typeIntoInput(aliceWindow1, 'profile-name-input', newUsername);
-  // Press enter to confirm username input
-  await aliceWindow1.keyboard.press('Enter');
+  await typeIntoInput(aliceWindow1, Settings.displayNameInput.selector, newUsername);
+  await clickOnMatchingText(aliceWindow1, englishStrippedStr('save').toString());
   // Wait for Copy button to appear to verify username change
   await aliceWindow1.isVisible(`'${englishStrippedStr('copy').toString()}'`);
   // verify name change
-  expect(await aliceWindow1.innerText('[data-testid=your-profile-name]')).toBe(
+  expect(await aliceWindow1.innerText(`[data-testid=${Settings.displayName.selector}]`)).toBe(
     newUsername,
   );
   // Exit profile modal
-  await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+  await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
 });
 
 // TODO: Normalize screenshot dimensions before comparison to handle different pixel densities (e.g. with sharp)
@@ -173,20 +184,18 @@ test_Alice_1W_no_network(
   'Change avatar',
   async ({ aliceWindow1 }, testInfo) => {
     // Open profile
-    await clickOnTestIdWithText(aliceWindow1, 'leftpane-primary-avatar');
+    await clickOnTestIdWithText(aliceWindow1, LeftPane.profileButton.selector);
     // Click on current profile picture
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'copy-button-profile-update',
-      englishStrippedStr('copy').toString(),
-    );
+    await clickOnTestIdWithText(aliceWindow1, Settings.displayName.selector);
 
     await clickOnTestIdWithText(aliceWindow1, 'image-upload-section');
     await clickOnTestIdWithText(aliceWindow1, 'image-upload-click');
     // allow for the image to be resized before we try to save it
     await sleepFor(500);
     await clickOnTestIdWithText(aliceWindow1, 'save-button-profile-update');
-    await waitForTestIdWithText(aliceWindow1, 'loading-spinner');
+    await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
+    await clickOnMatchingText(aliceWindow1, englishStrippedStr('save').toString());
+    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector)
     // if we were asked to update the snapshots, make sure we wait for the change to be received before taking a screenshot.
     if (testInfo.config.updateSnapshots === 'all') {
       await sleepFor(15000);
@@ -236,11 +245,6 @@ test_Alice_1W_Bob_1W(
     const nickname = 'new nickname for Bob';
 
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'message-section',
-    });
     await clickOnTestIdWithText(
       aliceWindow1,
       'module-conversation__user__profile-name',
@@ -295,11 +299,6 @@ test_Alice_1W_Bob_1W(
       strategy: 'data-testid',
       selector: 'enable-read-receipts',
     });
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'message-section',
-    });
     await clickOnTestIdWithText(
       aliceWindow1,
       'module-conversation__user__profile-name',
@@ -314,11 +313,6 @@ test_Alice_1W_Bob_1W(
       window: bobWindow1,
       strategy: 'data-testid',
       selector: 'enable-read-receipts',
-    });
-    await clickOnElement({
-      window: bobWindow1,
-      strategy: 'data-testid',
-      selector: 'message-section',
     });
     await clickOnTestIdWithText(
       bobWindow1,
@@ -335,10 +329,6 @@ test_Alice_1W_Bob_1W(
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Confirm contact by checking Messages tab (name should appear in list)
-    await Promise.all([
-      clickOnTestIdWithText(aliceWindow1, 'message-section'),
-      clickOnTestIdWithText(bobWindow1, 'message-section'),
-    ]);
     await Promise.all([
       clickOnElement({
         window: aliceWindow1,
@@ -364,7 +354,6 @@ test_Alice_1W_Bob_1W(
       ),
     ]);
     // Delete contact
-    await clickOnTestIdWithText(aliceWindow1, 'message-section');
     await clickOnTestIdWithText(
       aliceWindow1,
       'module-conversation__user__profile-name',

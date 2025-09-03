@@ -25,9 +25,10 @@ const openElectronAppOnly = async (multi: string) => {
   process.env.NODE_APP_INSTANCE = `${MULTI_PREFIX}-devprod-${uniqueId}-${process.env.MULTI}`;
   process.env.NODE_ENV = NODE_ENV;
   process.env.SESSION_DEBUG = '1';
-  process.env.LOCAL_DEVNET_SEED_URL = 'http://seed2.getsession.org:38157/'
+  process.env.LOCAL_DEVNET_SEED_URL = 'http://seed2.getsession.org:38157/';
+  // process.env.LOCAL_DEVNET_SEED_URL = 'http://sesh-net:1280'
 
-  console.info(`.  ${process.env.LOCAL_DEVNET_SEED_URL}`);
+  console.info(`   ${process.env.LOCAL_DEVNET_SEED_URL}`);
   console.info(`   NON CI RUN`);
   console.info('   NODE_ENV', process.env.NODE_ENV);
   console.info('   NODE_APP_INSTANCE', process.env.NODE_APP_INSTANCE);

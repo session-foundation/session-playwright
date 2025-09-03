@@ -33,7 +33,6 @@ export const sendVoiceMessage = async (window: Page) => {
   await clickOnTestIdWithText(window, 'microphone-button');
   await clickOnTestIdWithText(window, 'session-toast');
   await clickOnTestIdWithText(window, 'enable-microphone');
-  await clickOnTestIdWithText(window, 'message-section');
   await clickOnTestIdWithText(window, 'microphone-button');
   await sleepFor(5000);
   await clickOnTestIdWithText(window, 'end-voice-message');
