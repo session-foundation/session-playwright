@@ -1,6 +1,8 @@
 import { expect } from '@playwright/test';
+
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
+import { Global, HomeScreen, LeftPane, Settings } from './locators';
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
@@ -22,7 +24,6 @@ import {
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utilities/utils';
-import { Global, HomeScreen, LeftPane, Settings } from './locators';
 
 // Send message in one to one conversation with new contact
 sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
@@ -162,14 +163,23 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   // Click on current username to open edit field
   await clickOnTestIdWithText(aliceWindow1, Settings.displayName.selector);
   // Type in new username
-  await typeIntoInput(aliceWindow1, Settings.displayNameInput.selector, newUsername);
-  await clickOnMatchingText(aliceWindow1, englishStrippedStr('save').toString());
+  await typeIntoInput(
+    aliceWindow1,
+    Settings.displayNameInput.selector,
+    newUsername,
+  );
+  await clickOnMatchingText(
+    aliceWindow1,
+    englishStrippedStr('save').toString(),
+  );
   // Wait for Copy button to appear to verify username change
   await aliceWindow1.isVisible(`'${englishStrippedStr('copy').toString()}'`);
   // verify name change
-  expect(await aliceWindow1.innerText(`[data-testid=${Settings.displayName.selector}]`)).toBe(
-    newUsername,
-  );
+  expect(
+    await aliceWindow1.innerText(
+      `[data-testid=${Settings.displayName.selector}]`,
+    ),
+  ).toBe(newUsername);
   // Exit profile modal
   await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
 });
@@ -194,8 +204,11 @@ test_Alice_1W_no_network(
     await sleepFor(500);
     await clickOnTestIdWithText(aliceWindow1, 'save-button-profile-update');
     await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
-    await clickOnMatchingText(aliceWindow1, englishStrippedStr('save').toString());
-    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector)
+    await clickOnMatchingText(
+      aliceWindow1,
+      englishStrippedStr('save').toString(),
+    );
+    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
     // if we were asked to update the snapshots, make sure we wait for the change to be received before taking a screenshot.
     if (testInfo.config.updateSnapshots === 'all') {
       await sleepFor(15000);

@@ -1,11 +1,11 @@
 import { testCommunityName } from './constants/community';
+import { Conversation, HomeScreen } from './locators';
 import { test_Alice_1W_Bob_1W, test_Alice_2W } from './setup/sessionTest';
 import { joinCommunity } from './utilities/join_community';
 import { sendMessage } from './utilities/message';
 import { replyTo } from './utilities/reply_message';
 import { sendMedia } from './utilities/send_media';
 import { clickOnTestIdWithText } from './utilities/utils';
-import { Conversation, HomeScreen } from './locators';
 
 test_Alice_2W('Join community', async ({ aliceWindow1, aliceWindow2 }) => {
   await joinCommunity(aliceWindow1);

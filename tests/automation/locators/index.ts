@@ -70,7 +70,9 @@ export class Settings extends Locator {
   static readonly displayName = this.testId('your-profile-name');
   static readonly accountId = this.testId('your-account-id');
   // Update Profile Information
-  static readonly displayNameInput = this.testId('update-profile-info-name-input')
+  static readonly displayNameInput = this.testId(
+    'update-profile-info-name-input',
+  );
   // Menu items
   static readonly privacyMenuItem = this.testId('privacy-settings-menu-item');
   static readonly conversationsMenuItem = this.testId(

@@ -7,6 +7,7 @@ import type {
   TestError,
   TestResult,
 } from '@playwright/test/reporter';
+
 import chalk from 'chalk';
 import { Dictionary, groupBy, isString, mean, sortBy } from 'lodash';
 
@@ -220,9 +221,9 @@ class SessionReporter implements Reporter {
   }
 
   onStdOut?(
-    chunk: string | Buffer,
-    test: void | TestCase,
-    _result: void | TestResult,
+    chunk: Buffer | string,
+    test: TestCase | void,
+    _result: TestResult | void,
   ) {
     if (printOngoingTestLogs()) {
       process.stdout.write(
@@ -234,9 +235,9 @@ class SessionReporter implements Reporter {
   }
 
   onStdErr?(
-    chunk: string | Buffer,
-    test: void | TestCase,
-    _result: void | TestResult,
+    chunk: Buffer | string,
+    test: TestCase | void,
+    _result: TestResult | void,
   ) {
     if (printOngoingTestLogs()) {
       process.stdout.write(

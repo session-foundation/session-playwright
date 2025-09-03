@@ -1,8 +1,12 @@
 import { Page } from '@playwright/test';
+
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
+import { Global, HomeScreen, LeftPane, Onboarding, Settings } from './locators';
 import { forceCloseAllWindows } from './setup/closeWindows';
 import { newUser } from './setup/new_user';
 import { openApp } from './setup/open';
+import { recoverFromSeed } from './setup/recovery_using_seed';
 import { sessionTestTwoWindows } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { sendNewMessage } from './utilities/send_message';
@@ -15,9 +19,6 @@ import {
   waitForElement,
   waitForLoadingAnimationToFinish,
 } from './utilities/utils';
-import { recoverFromSeed } from './setup/recovery_using_seed';
-import { englishStrippedStr } from '../localization/englishStrippedStr';
-import { Global, HomeScreen, LeftPane, Onboarding, Settings } from './locators';
 
 sessionTestTwoWindows(
   'Delete account from swarm',

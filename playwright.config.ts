@@ -1,7 +1,7 @@
 import { defineConfig } from '@playwright/test';
+import dotenv from 'dotenv';
 import { toNumber } from 'lodash';
 
-import dotenv from 'dotenv';
 import { screenshotFolder } from './tests/automation/constants/variables';
 
 dotenv.config();

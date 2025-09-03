@@ -3,10 +3,16 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-await-in-loop */
 import { ElementHandle, Page } from '@playwright/test';
+import fs from 'fs';
+import path from 'path';
+
+import type { ElementState } from '../types/landing_page_states';
+
 import { sleepFor } from '../../promise_utils';
+import { screenshotFolder } from '../constants/variables';
 import {
-  DMTimeOption,
   DataTestId,
+  DMTimeOption,
   LoaderType,
   ModalId,
   Strategy,
@@ -16,10 +22,6 @@ import {
   WithRightButton,
 } from '../types/testing';
 import { sendMessage } from './message';
-import fs from 'fs';
-import path from 'path';
-import { screenshotFolder } from '../constants/variables';
-import type { ElementState } from '../types/landing_page_states';
 
 // WAIT FOR FUNCTIONS
 
@@ -166,7 +168,7 @@ export async function waitForLoadingAnimationToFinish(
   loader: LoaderType,
   maxWait?: number,
 ) {
-  let loadingAnimation: ElementHandle<SVGElement | HTMLElement> | undefined;
+  let loadingAnimation: ElementHandle<HTMLElement | SVGElement> | undefined;
 
   await waitForElement(window, 'data-testid', `${loader}`, maxWait);
 
@@ -391,7 +393,7 @@ export async function hasElementBeenDeleted(
 ) {
   const start = Date.now();
 
-  let el: ElementHandle<SVGElement | HTMLElement> | undefined;
+  let el: ElementHandle<HTMLElement | SVGElement> | undefined;
   do {
     try {
       el = await waitForElement(window, strategy, selector, maxWait, text);
@@ -569,7 +571,7 @@ async function deleteDifferenceFile(
 }
 
 export async function compareScreenshot(
-  element: ElementHandle<SVGElement | HTMLElement>,
+  element: ElementHandle<HTMLElement | SVGElement>,
   testTitle: string,
   elementState: ElementState,
   os: string,

@@ -1,10 +1,12 @@
 import { Page } from '@playwright/test';
+
+import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import {
   ConversationType,
   DataTestId,
   DisappearOptions,
 } from '../types/testing';
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { isChecked } from './checked';
 import {
   checkModalStrings,
   clickOnElement,
@@ -15,7 +17,6 @@ import {
   waitForElement,
   waitForTestIdWithText,
 } from './utils';
-import { isChecked } from './checked';
 
 export const setDisappearingMessages = async (
   windowA: Page,

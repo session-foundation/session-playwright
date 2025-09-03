@@ -1,7 +1,15 @@
 /* eslint-disable no-await-in-loop */
-import { Page, expect } from '@playwright/test';
+import { expect, Page } from '@playwright/test';
+
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
+import {
+  Conversation,
+  Global,
+  HomeScreen,
+  LeftPane,
+  Settings,
+} from './locators';
 import { forceCloseAllWindows } from './setup/closeWindows';
 import { newUser } from './setup/new_user';
 import {
@@ -28,13 +36,6 @@ import {
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
-import {
-  Conversation,
-  Global,
-  HomeScreen,
-  LeftPane,
-  Settings,
-} from './locators';
 
 sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
   let aliceWindow2: Page | undefined;

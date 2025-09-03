@@ -1,5 +1,7 @@
 import type { Page } from '@playwright/test';
+
 import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { LeftPane } from './locators';
 import { openApp } from './setup/open';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import {
@@ -14,7 +16,6 @@ import {
   waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
 } from './utilities/utils';
-import { LeftPane } from './locators';
 
 test_group_Alice_2W_Bob_1W_Charlie_1W(
   'Leaving group syncs',

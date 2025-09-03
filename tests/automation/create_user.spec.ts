@@ -1,11 +1,11 @@
 import { sleepFor } from '../promise_utils';
+import { Global, LeftPane, Settings } from './locators';
 import { newUser } from './setup/new_user';
 import { sessionTestOneWindow } from './setup/sessionTest';
 import {
   clickOnTestIdWithText,
   waitForTestIdWithText,
 } from './utilities/utils';
-import { Global, LeftPane, Settings } from './locators';
 
 sessionTestOneWindow('Create User', async ([window]) => {
   // Create User
