@@ -206,7 +206,7 @@ function getExpectedStringFromKey(
     case 'callsVoiceAndVideoBeta':
       return 'Voice and Video Calls (Beta)';
     case 'callsVoiceAndVideoModalDescription':
-      return 'Your IP is visible to your call partner and a Session Technology Foundation server while using beta calls.';
+      return 'Your IP is visible to your call partner and a Session Foundation server while using beta calls.';
     case 'blockDescription':
       return 'Are you sure you want to block {name}? Blocked users cannot send you message requests, group invites or call you.';
     case 'noteToSelfHide':
