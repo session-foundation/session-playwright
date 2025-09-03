@@ -47,6 +47,8 @@ export class HomeScreen extends Locator {
 
 export class Conversation extends Locator {
   static readonly messageInput = this.testId('message-input-text-area');
+  static readonly microphoneButton = this.testId('microphone-button');
+  static readonly endVoiceMessageButton = this.testId('end-voice-message');
   static readonly acceptMessageRequestButton = this.testId(
     'accept-message-request',
   );
@@ -59,6 +61,7 @@ export class Conversation extends Locator {
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
   );
+  static readonly callButton = this.testId('call-button')
   static readonly conversationSettingsIcon = this.testId(
     'conversation-options-avatar',
   );
@@ -85,6 +88,8 @@ export class Settings extends Locator {
     'clear-data-settings-menu-item',
   );
   // Privacy
+  static readonly enableCalls = this.testId('enable-calls-settings-row');
+  static readonly enableMicrophone = this.testId('enable-microphone-settings-row')
   static readonly setPasswordSettingsButton = this.testId(
     'set-password-settings-button',
   );

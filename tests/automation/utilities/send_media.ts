@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 
 import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import { sleepFor } from '../../promise_utils';
+import { Conversation, Global, Settings } from '../locators';
 import { MediaType } from '../types/testing';
 import { waitForSentTick } from './message';
 import {
@@ -31,12 +32,13 @@ export const sendMedia = async (
 };
 
 export const sendVoiceMessage = async (window: Page) => {
-  await clickOnTestIdWithText(window, 'microphone-button');
-  await clickOnTestIdWithText(window, 'session-toast');
-  await clickOnTestIdWithText(window, 'enable-microphone');
-  await clickOnTestIdWithText(window, 'microphone-button');
+  await clickOnTestIdWithText(window, Conversation.microphoneButton.selector);
+  await clickOnTestIdWithText(window, Global.toast.selector);
+  await clickOnTestIdWithText(window, Settings.enableMicrophone.selector);
+  await clickOnTestIdWithText(window, Global.modalCloseButton.selector);
+  await clickOnTestIdWithText(window, Conversation.microphoneButton.selector);
   await sleepFor(5000);
-  await clickOnTestIdWithText(window, 'end-voice-message');
+  await clickOnTestIdWithText(window, Conversation.endVoiceMessageButton.selector);
   await sleepFor(4000);
   await clickOnElement({
     window,

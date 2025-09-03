@@ -121,8 +121,8 @@ export type DataTestId =
   | 'edit-group-name'
   | 'edit-profile-icon'
   | 'empty-conversation-notification'
-  | 'enable-calls'
-  | 'enable-microphone'
+  | 'enable-calls-settings-row'
+  | 'enable-microphone-settings-row'
   | 'enable-read-receipts'
   | 'end-call'
   | 'end-voice-message'
@@ -195,4 +195,4 @@ export type DataTestId =
   | 'your-profile-name'
   | `input-${DMTimeOption}`;
 
-export type ModalId = 'blockOrUnblockModal' | 'userSettingsModal';
+export type ModalId = 'blockOrUnblockModal' | 'confirmModal' | 'userSettingsModal';

@@ -327,7 +327,7 @@ test_Alice_1W_Bob_1W(
           .toString(),
       ),
     ]);
-    await makeVoiceCall(aliceWindow1, bobWindow1, alice, bob);
+    await makeVoiceCall(aliceWindow1, bobWindow1);
     // In the receivers window, the message is 'Call in progress'
     await Promise.all([
       waitForTestIdWithText(
