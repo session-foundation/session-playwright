@@ -8,6 +8,7 @@ import {
   DMTimeOption,
   DataTestId,
   LoaderType,
+  ModalId,
   Strategy,
   StrategyExtractionObj,
   WithMaxWait,
@@ -501,13 +502,28 @@ export async function checkModalStrings(
   window: Page,
   expectedHeading: string,
   expectedDescription: string,
+  modalId?: ModalId,
 ) {
-  const heading = await waitForElement(window, 'data-testid', 'modal-heading');
-  const description = await waitForElement(
-    window,
-    'data-testid',
-    'modal-description',
-  );
+  let modalSelector = '[data-modal-id]'; // Base selector for modals
+  
+  // If a specific modal ID is provided, target that one
+  if (modalId) {
+    modalSelector = `[data-modal-id="${modalId}"]`;
+  }
+  
+  // Find the target modal
+  const targetModal = window.locator(modalSelector).first();
+  
+  // Wait for the modal to be visible
+  await targetModal.waitFor({ state: 'visible' });
+
+  // Get elements within this specific modal
+  const heading = targetModal.locator('[data-testid="modal-heading"]');
+  const description = targetModal.locator('[data-testid="modal-description"]');
+  
+  // Wait for these elements to be visible
+  await heading.waitFor({ state: 'visible' });
+  await description.waitFor({ state: 'visible' });
 
   const headingText = await heading.innerText();
   const descriptionText = await description.innerText();
