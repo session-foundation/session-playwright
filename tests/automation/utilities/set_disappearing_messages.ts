@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { Conversation, ConversationSettings } from '../locators';
 import {
   ConversationType,
   DataTestId,
@@ -12,7 +13,6 @@ import {
   clickOnElement,
   clickOnMatchingText,
   clickOnTestIdWithText,
-  doWhileWithMax,
   formatTimeOption,
   waitForElement,
   waitForTestIdWithText,
@@ -29,30 +29,18 @@ export const setDisappearingMessages = async (
   windowB?: Page,
 ) => {
   const enforcedType: ConversationType = conversationType;
-  await doWhileWithMax(5000, 1000, 'setDisappearingMessages', async () => {
-    try {
-      await clickOnTestIdWithText(
-        windowA,
-        'conversation-options-avatar',
-        undefined,
-        undefined,
-        1000,
-      );
-      await clickOnElement({
-        window: windowA,
-        strategy: 'data-testid',
-        selector: 'disappearing-messages-menu-option',
-        maxWait: 100,
-      });
-      return true;
-    } catch (e) {
-      console.log(
-        'setDisappearingMessages doWhileWithMax action threw:',
-        e.message,
-      );
-
-      return false;
-    }
+  await clickOnTestIdWithText(
+    windowA,
+    Conversation.conversationSettingsIcon.selector,
+    undefined,
+    undefined,
+    5_000,
+  );
+  await clickOnElement({
+    window: windowA,
+    strategy: 'data-testid',
+    selector: ConversationSettings.disappearingMessagesOption.selector,
+    maxWait: 5_000,
   });
 
   if (enforcedType === '1:1') {

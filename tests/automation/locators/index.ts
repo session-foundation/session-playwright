@@ -74,16 +74,26 @@ export class Conversation extends Locator {
   static readonly deleteMessageRequestButton = this.testId(
     'delete-message-request',
   );
-  static readonly endVoiceMessageButton = this.testId('end-voice-message');
-  static readonly manageMembersOption = this.testId(
-    'manage-members-menu-option',
+  static readonly disappearingControlMessage = this.testId(
+    'disappear-control-message',
   );
+  static readonly endVoiceMessageButton = this.testId('end-voice-message');
+
   static readonly messageInput = this.testId('message-input-text-area');
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
   );
   static readonly microphoneButton = this.testId('microphone-button');
   static readonly scrollToBottomButton = this.testId('scroll-to-bottom-button');
+}
+
+export class ConversationSettings extends Locator {
+  static readonly disappearingMessagesOption = this.testId(
+    'disappearing-messages-menu-option',
+  );
+  static readonly manageMembersOption = this.testId(
+    'manage-members-menu-option',
+  );
 }
 
 export class Settings extends Locator {

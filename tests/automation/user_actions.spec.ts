@@ -335,7 +335,11 @@ test_Alice_1W_Bob_1W(
     await clickOnTestIdWithText(bobWindow1, Global.modalCloseButton.selector);
     await sendMessage(aliceWindow1, 'Testing read receipts');
     await clickOnTestIdWithText(bobWindow1, Global.backButton.selector);
-    await clickOnTestIdWithText(bobWindow1, HomeScreen.conversationItemName.selector, alice.userName);
+    await clickOnTestIdWithText(
+      bobWindow1,
+      HomeScreen.conversationItemName.selector,
+      alice.userName,
+    );
     await waitForReadTick(aliceWindow1, 'Testing read receipts');
   },
 );

@@ -3,6 +3,7 @@ import type { Page } from '@playwright/test';
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import {
   Conversation,
+  ConversationSettings,
   Global,
   HomeScreen,
   LeftPane,
@@ -95,23 +96,26 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Does group appear?
     await waitForTestIdWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
     await clickOnTestIdWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
     // Check header name
     await waitForTestIdWithText(
       aliceWindow2,
-      'header-conversation-name',
+      Conversation.conversationHeader.selector,
       groupCreated.userName,
     );
     // Check for group members
-    await clickOnTestIdWithText(aliceWindow2, 'conversation-options-avatar');
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      Conversation.conversationSettingsIcon.selector,
+    );
     // Check right panel has correct name
     await waitForTestIdWithText(aliceWindow2, 'group-name');
     await clickOnTestIdWithText(aliceWindow2, 'manage-members-menu-option');
@@ -124,11 +128,19 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow2,
-        'contact',
+        Global.contactItem.selector,
         englishStrippedStr('you').toString(),
       ),
-      waitForTestIdWithText(aliceWindow2, 'contact', bob.userName),
-      waitForTestIdWithText(aliceWindow2, 'contact', charlie.userName),
+      waitForTestIdWithText(
+        aliceWindow2,
+        Global.contactItem.selector,
+        bob.userName,
+      ),
+      waitForTestIdWithText(
+        aliceWindow2,
+        Global.contactItem.selector,
+        charlie.userName,
+      ),
     ]);
   },
 );
@@ -194,7 +206,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     await clickOnTestIdWithText(
       aliceWindow2,
-      Conversation.manageMembersOption.selector,
+      ConversationSettings.manageMembersOption.selector,
     );
     // Check for You, Bob and Charlie
     await Promise.all([
@@ -245,7 +257,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     await clickOnTestIdWithText(
       restoredWindow,
-      Conversation.manageMembersOption.selector,
+      ConversationSettings.manageMembersOption.selector,
     );
     // Check for You, Bob and Charlie
     await Promise.all([
@@ -300,7 +312,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     await clickOnTestIdWithText(
       restoredWindow2,
-      Conversation.manageMembersOption.selector,
+      ConversationSettings.manageMembersOption.selector,
     );
     // Check for You, Bob and Charlie
     await Promise.all([

@@ -7,6 +7,7 @@ import {
   mediaArray,
   testLink,
 } from './constants/variables';
+import { Conversation, Global } from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
@@ -52,7 +53,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
       await Promise.all([
         waitForTestIdWithText(
           aliceWindow1,
-          'disappear-control-message',
+          Conversation.disappearingControlMessage.selector,
           englishStrippedStr('disappearingMessagesSetYou')
             .withArgs({
               time: formattedTime,
@@ -62,7 +63,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
         ),
         waitForTestIdWithText(
           bobWindow1,
-          'disappear-control-message',
+          Conversation.disappearingControlMessage.selector,
           englishStrippedStr('disappearingMessagesSet')
             .withArgs({
               time: formattedTime,
@@ -110,7 +111,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
             time: formattedTime,
@@ -120,7 +121,7 @@ test_Alice_1W_Bob_1W(
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
             time: formattedTime,
@@ -159,7 +160,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
             time: formattedTime,
@@ -169,7 +170,7 @@ test_Alice_1W_Bob_1W(
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
             time: formattedTime,
@@ -213,7 +214,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
             time: formattedTime,
@@ -223,7 +224,7 @@ test_Alice_1W_Bob_1W(
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
             time: formattedTime,
@@ -243,7 +244,11 @@ test_Alice_1W_Bob_1W(
       'modal-heading',
       englishStrippedStr('membersInvite').toString(),
     );
-    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Global.contactItem.selector,
+      bob.userName,
+    );
     await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
     // For lack of a unique ID we use native Playwright methods
     await aliceWindow1
