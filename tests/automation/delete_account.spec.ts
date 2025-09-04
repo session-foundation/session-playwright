@@ -110,7 +110,7 @@ sessionTestTwoWindows(
 
       await clickOnTestIdWithText(
         restoringWindow,
-        HomeScreen.newConversationButton.selector,
+        HomeScreen.plusButton.selector,
       ); // Expect contacts list to be empty
 
       await hasElementBeenDeleted(
@@ -177,7 +177,7 @@ sessionTestTwoWindows(
       await clickOnElement({
         window: restoringWindow,
         strategy: 'data-testid',
-        selector: HomeScreen.newConversationButton.selector,
+        selector: HomeScreen.plusButton.selector,
       });
       await waitForElement(
         restoringWindow,

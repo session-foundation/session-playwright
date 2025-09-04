@@ -1,30 +1,31 @@
 /* eslint-disable @typescript-eslint/lines-between-class-members */
 import { DataTestId, StrategyExtractionObj } from '../types/testing';
 
-export abstract class Locator {
+abstract class Locator {
   protected static className(selector: string): StrategyExtractionObj {
     return {
       strategy: 'class',
       selector,
-    };
+    } as const;
   }
 
   protected static hasText(selector: string): StrategyExtractionObj {
     return {
       strategy: ':has-text',
       selector,
-    };
+    } as const;
   }
 
   protected static testId(selector: DataTestId) {
     return {
       strategy: 'data-testid',
       selector,
-    };
+    } as const;
   }
 }
 
 export class Onboarding extends Locator {
+  static readonly createAccountButton = this.testId('create-account-button');
   static readonly displayNameInput = this.testId('display-name-input');
   static readonly iHaveAnAccountButton = this.testId('existing-account-button');
   static readonly recoveryPhraseInput = this.testId('recovery-phrase-input');
@@ -33,6 +34,7 @@ export class Onboarding extends Locator {
 export class LeftPane extends Locator {
   static readonly profileButton = this.testId('leftpane-primary-avatar');
   static readonly settingsButton = this.testId('settings-section');
+  static readonly themeButton = this.testId('theme-section');
 }
 
 export class HomeScreen extends Locator {
@@ -40,26 +42,43 @@ export class HomeScreen extends Locator {
   static readonly createGroupOption = this.testId('chooser-new-group');
   static readonly inviteAFriendOption = this.testId('chooser-invite-friend');
   static readonly joinCommunityOption = this.testId('chooser-new-community');
+  static readonly newMessageOption = this.testId(
+    'chooser-new-conversation-button',
+  );
+  // New Message
   static readonly newMessageAccountIDInput = this.testId(
     'new-session-conversation',
   );
   static readonly newMessageNextButton = this.testId(
     'next-new-conversation-button',
   );
-  static readonly newMessageOption = this.testId(
-    'chooser-new-conversation-button',
+  // Create Group
+  static readonly createGroupCreateButton = this.testId('create-group-button');
+  static readonly createGroupGroupName = this.testId('new-closed-group-name');
+  // Invite A Friend
+  static readonly inviteAFriendCopyButton = this.testId(
+    'copy-button-account-id',
+  );
+  // Join Community
+  static readonly joinCommunityButton = this.testId('join-community-button');
+  static readonly joinCommunityInput = this.testId(
+    'join-community-conversation',
   );
   // Home Screen items
   static readonly conversationItemName = this.testId(
     'module-conversation__user__profile-name',
   );
   static readonly messageRequestBanner = this.testId('message-request-banner');
-  static readonly newConversationButton = this.testId(
+  static readonly plusButton = this.testId(
     'new-conversation-button',
+  );
+  static readonly revealRecoveryPhraseButton = this.testId(
+    'reveal-recovery-phrase',
   );
 }
 
 export class Conversation extends Locator {
+  static readonly messageContent = this.testId('message-content')
   static readonly acceptMessageRequestButton = this.testId(
     'accept-message-request',
   );
@@ -83,13 +102,21 @@ export class Conversation extends Locator {
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
   );
+  static readonly endCallButton = this.testId('end-call')
   static readonly microphoneButton = this.testId('microphone-button');
   static readonly scrollToBottomButton = this.testId('scroll-to-bottom-button');
 }
 
 export class ConversationSettings extends Locator {
+  static readonly clearGroupNameButton = this.testId(
+    'clear-group-info-name-button',
+  );
   static readonly disappearingMessagesOption = this.testId(
     'disappearing-messages-menu-option',
+  );
+  static readonly editGroupButton = this.testId('edit-group-name');
+  static readonly inviteContactsOption = this.testId(
+    'invite-contacts-menu-option',
   );
   static readonly manageMembersOption = this.testId(
     'manage-members-menu-option',
@@ -103,6 +130,11 @@ export class Settings extends Locator {
   // Update Profile Information
   static readonly displayNameInput = this.testId(
     'update-profile-info-name-input',
+  );
+  static readonly imageUploadClick = this.testId('image-upload-click');
+  static readonly imageUploadSection = this.testId('image-upload-section');
+  static readonly saveProfileUpdateButton = this.testId(
+    'save-button-profile-update',
   );
   // Menu items
   static readonly clearDataMenuItem = this.testId(
@@ -141,8 +173,14 @@ export class Settings extends Locator {
   );
   static readonly unblockButton = this.testId('unblock-button-settings-screen');
   // Recovery Password
+  static readonly hideRecoveryPasswordButton = this.testId(
+    'hide-recovery-password-button',
+  );
   static readonly recoveryPasswordContainer = this.testId(
     'recovery-password-seed-modal',
+  );
+  static readonly recoveryPasswordQRCode = this.testId(
+    'session-recovery-password',
   );
   // Clear Data
   static readonly clearDeviceAndNetworkRadial = this.testId(

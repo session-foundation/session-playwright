@@ -61,7 +61,7 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     strategy: 'data-testid',
     selector: 'send-message-button',
   });
-  await clickOnTestIdWithText(window, 'message-content', testLink, true);
+  await clickOnTestIdWithText(window, Conversation.messageContent.selector, testLink, true);
   // Need to copy link to clipboard, as the enable link preview modal
   // doesn't pop up if manually typing link (needs to be pasted)
   // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
@@ -78,9 +78,9 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     englishStrippedStr('copied').toString(),
   );
   // click on the toast and wait for it to be closed to avoid the layout shift
-  await clickOnTestIdWithText(window, 'session-toast');
+  await clickOnTestIdWithText(window, Global.toast.selector);
   await sleepFor(1000);
-  await clickOnTestIdWithText(window, 'message-input-text-area');
+  await clickOnTestIdWithText(window, Conversation.messageInput.selector);
   const isMac = process.platform === 'darwin';
   await window.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
   await checkModalStrings(

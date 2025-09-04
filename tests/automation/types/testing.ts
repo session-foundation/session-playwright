@@ -199,4 +199,5 @@ export type ModalId =
   | 'blockOrUnblockModal'
   | 'confirmModal'
   | 'deleteAccountModal'
+  | 'hideRecoveryPasswordModal'
   | 'userSettingsModal';

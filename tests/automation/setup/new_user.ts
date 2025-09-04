@@ -1,6 +1,13 @@
 import { Page } from '@playwright/test';
 import chalk from 'chalk';
 
+import {
+  Global,
+  HomeScreen,
+  LeftPane,
+  Onboarding,
+  Settings,
+} from '../locators';
 import { User } from '../types/testing';
 import {
   checkPathLight,
@@ -16,13 +23,19 @@ export const newUser = async (
   awaitOnionPath = true,
 ): Promise<User> => {
   // Create User
-  await clickOnTestIdWithText(window, 'create-account-button');
+  await clickOnTestIdWithText(window, Onboarding.createAccountButton.selector);
   // Input username = testuser
-  await typeIntoInput(window, 'display-name-input', userName);
-  await clickOnTestIdWithText(window, 'continue-button');
+  await typeIntoInput(window, Onboarding.displayNameInput.selector, userName);
+  await clickOnTestIdWithText(window, Global.continueButton.selector);
   // save recovery phrase
-  await clickOnTestIdWithText(window, 'reveal-recovery-phrase');
-  await waitForTestIdWithText(window, 'recovery-password-seed-modal');
+  await clickOnTestIdWithText(
+    window,
+    HomeScreen.revealRecoveryPhraseButton.selector,
+  );
+  await waitForTestIdWithText(
+    window,
+    Settings.recoveryPasswordContainer.selector,
+  );
   const recoveryPassword = await grabTextFromElement(
     window,
     'data-testid',
@@ -31,11 +44,13 @@ export const newUser = async (
   // const recoveryPhrase = await window.innerText(
   //   '[data-testid=recovery-password-seed-modal]',
   // );
-  await clickOnTestIdWithText(window, 'modal-close-button');
-  await clickOnTestIdWithText(window, 'leftpane-primary-avatar');
+  await clickOnTestIdWithText(window, Global.modalCloseButton.selector);
+  await clickOnTestIdWithText(window, LeftPane.profileButton.selector);
 
   // Save Account ID to a variable
-  let accountid = await window.innerText('[data-testid=your-account-id]');
+  let accountid = await window.innerText(
+    `[data-testid=${Settings.accountId.selector}]`,
+  );
   accountid = accountid.replace(/[^0-9a-fA-F]/g, ''); // keep only hex characters
 
   console.log(
@@ -43,7 +58,7 @@ export const newUser = async (
       accountid,
     )}" and Recovery password: "${chalk.green(recoveryPassword)}"`,
   );
-  await clickOnTestIdWithText(window, 'modal-close-button');
+  await clickOnTestIdWithText(window, Global.modalCloseButton.selector);
   if (awaitOnionPath) {
     await checkPathLight(window);
   }

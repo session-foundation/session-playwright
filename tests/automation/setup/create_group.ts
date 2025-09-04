@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 
 import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import { sortByPubkey } from '../../pubkey';
+import { HomeScreen } from '../locators';
 import { Group, User } from '../types/testing';
 import { sendMessage } from '../utilities/message';
 import { sendNewMessage } from '../utilities/send_message';
@@ -51,21 +52,27 @@ export const createGroup = async (
     userOne.accountid,
     `${messageCA} Time: ${Date.now()}`,
   );
-  // Focus screen on window C to allow user C to become contact
-  await clickOnTestIdWithText(windowC, 'messages-container');
-  // wait for user C to be contact before moving to create group
-  // Create group with existing contact and session ID (of non-contact)
   // Click new closed group tab
-  await clickOnTestIdWithText(windowA, 'new-conversation-button');
-  await clickOnTestIdWithText(windowA, 'chooser-new-group');
+  await clickOnTestIdWithText(
+    windowA,
+    HomeScreen.plusButton.selector,
+  );
+  await clickOnTestIdWithText(windowA, HomeScreen.createGroupOption.selector);
   // Enter group name
-  await typeIntoInput(windowA, 'new-closed-group-name', group.userName);
+  await typeIntoInput(
+    windowA,
+    HomeScreen.createGroupGroupName.selector,
+    group.userName,
+  );
   // Select user B
   await clickOnMatchingText(windowA, userTwo.userName);
   // Select user C
   await clickOnMatchingText(windowA, userThree.userName);
   // Click Next
-  await clickOnTestIdWithText(windowA, 'create-group-button');
+  await clickOnTestIdWithText(
+    windowA,
+    HomeScreen.createGroupCreateButton.selector,
+  );
   // Check group was successfully created
   await clickOnMatchingText(windowB, group.userName);
   await waitForTestIdWithText(
@@ -137,9 +144,6 @@ export const createGroup = async (
 
   // windowC must see the message from A and the message from B
   await waitForTextMessages(windowC, [msgAToGroup, msgBToGroup]);
-
-  // Focus screen
-  // await clickOnTestIdWithText(windowB, 'scroll-to-bottom-button');
 
   return { userName, userOne, userTwo, userThree };
 };

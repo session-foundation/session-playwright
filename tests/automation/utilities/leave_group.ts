@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { Conversation, Global } from '../locators';
 import { Group } from '../types/testing';
 import {
   clickOnMatchingText,
@@ -10,7 +11,10 @@ import {
 
 export const leaveGroup = async (window: Page, group: Group) => {
   // go to three dots menu
-  await clickOnTestIdWithText(window, 'conversation-options-avatar');
+  await clickOnTestIdWithText(
+    window,
+    Conversation.conversationSettingsIcon.selector,
+  );
   // Select Leave Group
   await clickOnMatchingText(
     window,
@@ -19,7 +23,7 @@ export const leaveGroup = async (window: Page, group: Group) => {
   // Confirm leave group
   await clickOnTestIdWithText(
     window,
-    'session-confirm-ok-button',
+    Global.confirmButton.selector,
     englishStrippedStr('leave').toString(),
   );
   // check config message

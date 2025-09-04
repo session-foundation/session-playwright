@@ -23,6 +23,11 @@ import {
 } from '../types/testing';
 import { sendMessage } from './message';
 
+type ElementOptions = {
+  maxWait?: number;
+  rightButton?: boolean;
+};
+
 // WAIT FOR FUNCTIONS
 
 export async function waitForTestIdWithText(
@@ -245,19 +250,59 @@ export async function checkPathLight(window: Page, maxWait?: number) {
 
 // ACTIONS
 
+export async function clickOn(
+  window: Page,
+  locator: StrategyExtractionObj,
+  options?: ElementOptions,
+) {
+  let builtSelector: string;
+
+  if (locator.strategy === 'class') {
+    builtSelector = `css=.${locator.selector}`;
+  } else {
+    builtSelector = `css=[${locator.strategy}=${locator.selector}]`;
+  }
+
+  const sharedOpts = { timeout: options?.maxWait, strict: true };
+  await window.click(
+    builtSelector,
+    options?.rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
+  );
+}
+
+export async function clickOnWithText(
+  window: Page,
+  locator: StrategyExtractionObj,
+  text: string,
+  options?: ElementOptions,
+) {
+  let builtSelector: string;
+
+  if (locator.strategy === 'class') {
+    builtSelector = `css=.${locator.selector}:has-text("${text.replace(
+      /"/g,
+      '\\"',
+    )}")`;
+  } else {
+    builtSelector = `css=[${locator.strategy}=${
+      locator.selector
+    }]:has-text("${text.replace(/"/g, '\\"')}")`;
+  }
+
+  const sharedOpts = { timeout: options?.maxWait, strict: true };
+  await window.click(
+    builtSelector,
+    options?.rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
+  );
+}
+// Legacy wrapper for backwards compatibility
 export async function clickOnElement({
   window,
   maxWait,
   rightButton,
   ...obj
 }: WithPage & StrategyExtractionObj & WithMaxWait & WithRightButton) {
-  const builtSelector = `css=[${obj.strategy}=${obj.selector}]`;
-  console.info(`clickOnElement: looking for selector ${builtSelector}`);
-  const sharedOpts = { timeout: maxWait };
-  await window.click(
-    builtSelector,
-    rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
-  );
+  return clickOn(window, obj, { maxWait, rightButton });
 }
 
 export async function lookForPartialTestId(
@@ -279,8 +324,6 @@ export async function lookForPartialTestId(
   return builtSelector;
 }
 
-//
-
 export async function clickOnMatchingText(
   window: Page,
   text: string,
@@ -296,6 +339,7 @@ export async function clickOnMatchingText(
   );
 }
 
+// Legacy wrapper for backwards compatibility
 export async function clickOnTestIdWithText(
   window: Page,
   dataTestId: DataTestId,
@@ -303,26 +347,12 @@ export async function clickOnTestIdWithText(
   rightButton?: boolean,
   maxWait?: number,
 ) {
-  const sharedOpts = { timeout: maxWait, strict: true };
-  console.info(
-    `clickOnTestIdWithText with testId:${dataTestId} and text:${
-      text || 'none'
-    }, rightButton:${!!rightButton}`,
-  );
+  const locator = { strategy: 'data-testid' as const, selector: dataTestId };
 
-  const builtSelector = !text
-    ? `css=[data-testid=${dataTestId}]`
-    : `css=[data-testid=${dataTestId}]:has-text("${text}")`;
-
-  await window.click(
-    builtSelector,
-    rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
-  );
-  console.info(
-    `clickOnTestIdWithText:clicked! testId:${dataTestId} and text:${
-      text || 'none'
-    }`,
-  );
+  if (text) {
+    return clickOnWithText(window, locator, text, { rightButton, maxWait });
+  }
+  return clickOn(window, locator, { rightButton, maxWait });
 }
 
 export async function clickOnTextMessage(

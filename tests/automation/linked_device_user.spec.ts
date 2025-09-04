@@ -42,21 +42,21 @@ sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
   try {
     const userA = await newUser(aliceWindow1, 'Alice');
     aliceWindow2 = await linkedDevice(userA.recoveryPassword); // not using fixture here as we want to check the behavior finely
-    await clickOnTestIdWithText(aliceWindow1, 'leftpane-primary-avatar');
+    await clickOnTestIdWithText(aliceWindow1, LeftPane.profileButton.selector);
     // Verify Username
     await waitForTestIdWithText(
       aliceWindow1,
-      'your-profile-name',
+      Settings.displayName.selector,
       userA.userName,
     );
     // Verify Account ID
     await waitForTestIdWithText(
       aliceWindow1,
-      'your-account-id',
+      Settings.accountId.selector,
       userA.accountid,
     );
     // exit profile modal
-    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
     // You're almost finished isn't displayed
     const errorDesc = 'Should not be found';
     try {
@@ -143,11 +143,20 @@ test_Alice_2W(
     await clickOnTestIdWithText(aliceWindow1, LeftPane.profileButton.selector);
     // Click on current profile picture
     await clickOnTestIdWithText(aliceWindow1, Settings.displayName.selector);
-    await clickOnTestIdWithText(aliceWindow1, 'image-upload-section');
-    await clickOnTestIdWithText(aliceWindow1, 'image-upload-click');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.imageUploadSection.selector,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.imageUploadClick.selector,
+    );
     // allow for the image to be resized before we try to save it
     await sleepFor(500);
-    await clickOnTestIdWithText(aliceWindow1, 'save-button-profile-update');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.saveProfileUpdateButton.selector,
+    );
     await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
     await clickOnMatchingText(
       aliceWindow1,
@@ -443,17 +452,23 @@ test_Alice_2W_Bob_1W(
 test_Alice_2W(
   'Hide note to self syncs',
   async ({ alice, aliceWindow1, aliceWindow2 }) => {
-    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
     await clickOnTestIdWithText(
       aliceWindow1,
-      'chooser-new-conversation-button',
+      HomeScreen.plusButton.selector,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      HomeScreen.newMessageOption.selector,
     );
     await typeIntoInput(
       aliceWindow1,
-      'new-session-conversation',
+      HomeScreen.newMessageAccountIDInput.selector,
       alice.accountid,
     );
-    await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      HomeScreen.newMessageNextButton.selector,
+    );
     await waitForTestIdWithText(
       aliceWindow1,
       'header-conversation-name',
@@ -464,18 +479,18 @@ test_Alice_2W(
     await sleepFor(1000);
     await waitForTestIdWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       englishStrippedStr('noteToSelf').toString(),
     );
     await clickOnTestIdWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       englishStrippedStr('noteToSelf').toString(),
       true,
     );
     await clickOnTestIdWithText(
       aliceWindow1,
-      'context-menu-item',
+      Global.contextMenuItem.selector,
       englishStrippedStr('noteToSelfHide').toString(),
     );
     await checkModalStrings(
@@ -485,7 +500,7 @@ test_Alice_2W(
     );
     await clickOnTestIdWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton.selector,
       englishStrippedStr('hide').toString(),
     );
     // Check linked device for hidden note to self
@@ -494,14 +509,14 @@ test_Alice_2W(
       hasElementBeenDeleted(
         aliceWindow1,
         'data-testid',
-        'module-conversation__user__profile-name',
+        HomeScreen.conversationItemName.selector,
         5000,
         englishStrippedStr('noteToSelf').toString(),
       ),
       hasElementBeenDeleted(
         aliceWindow2,
         'data-testid',
-        'module-conversation__user__profile-name',
+        HomeScreen.conversationItemName.selector,
         15_000,
         englishStrippedStr('noteToSelf').toString(),
       ),

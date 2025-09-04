@@ -7,7 +7,12 @@ import {
   mediaArray,
   testLink,
 } from './constants/variables';
-import { Conversation, Global } from './locators';
+import {
+  Conversation,
+  ConversationSettings,
+  Global,
+  HomeScreen,
+} from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
@@ -237,8 +242,14 @@ test_Alice_1W_Bob_1W(
     await joinCommunity(aliceWindow1);
     // To stop the layout shift
     await sleepFor(500);
-    await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
-    await clickOnTestIdWithText(aliceWindow1, 'invite-contacts-menu-option');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Conversation.conversationSettingsIcon.selector,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      ConversationSettings.inviteContactsOption.selector,
+    );
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',
@@ -249,16 +260,16 @@ test_Alice_1W_Bob_1W(
       Global.contactItem.selector,
       bob.userName,
     );
-    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
+    await clickOnTestIdWithText(aliceWindow1, Global.confirmButton.selector);
     // For lack of a unique ID we use native Playwright methods
     await aliceWindow1
       .getByTestId('invite-contacts-dialog')
       .getByTestId('modal-close-button')
       .click();
-    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
     await clickOnTestIdWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       bob.userName,
     );
     await Promise.all([
@@ -312,7 +323,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
             time: formattedTime,
@@ -322,7 +333,7 @@ test_Alice_1W_Bob_1W(
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
             time: formattedTime,

@@ -64,7 +64,7 @@ test_Alice_2W_Bob_1W(
     await clickOnTestIdWithText(aliceWindow2, Global.backButton.selector);
     await clickOnTestIdWithText(
       aliceWindow2,
-      HomeScreen.newConversationButton.selector,
+      HomeScreen.plusButton.selector,
     );
     await waitForTestIdWithText(
       aliceWindow2,

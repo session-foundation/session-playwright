@@ -1,5 +1,5 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
-import { LeftPane } from './locators';
+import { Conversation, HomeScreen, LeftPane } from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -19,15 +19,21 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(bobWindow1, 'message-request-banner');
+    await clickOnTestIdWithText(
+      bobWindow1,
+      HomeScreen.messageRequestBanner.selector,
+    );
     // Select message request from User A
     await clickOnTestIdWithText(
       bobWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       alice.userName,
     );
     // Check that using the accept button has intended use
-    await clickOnTestIdWithText(bobWindow1, 'accept-message-request');
+    await clickOnTestIdWithText(
+      bobWindow1,
+      Conversation.acceptMessageRequestButton.selector,
+    );
     // Check config message of message request acceptance
     await waitForTestIdWithText(
       bobWindow1,
@@ -53,11 +59,14 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(bobWindow1, 'message-request-banner');
+    await clickOnTestIdWithText(
+      bobWindow1,
+      HomeScreen.messageRequestBanner.selector,
+    );
     // Select message request from User A
     await clickOnTestIdWithText(
       bobWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       alice.userName,
     );
     await sendMessage(bobWindow1, testReply);
@@ -86,11 +95,14 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(bobWindow1, 'message-request-banner');
+    await clickOnTestIdWithText(
+      bobWindow1,
+      HomeScreen.messageRequestBanner.selector,
+    );
     // Select message request from User A
     await clickOnTestIdWithText(
       bobWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       alice.userName,
     );
 
@@ -125,7 +137,10 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(bobWindow1, 'message-request-banner');
+    await clickOnTestIdWithText(
+      bobWindow1,
+      HomeScreen.messageRequestBanner.selector,
+    );
     // Select 'Clear All' button
     await clickOnMatchingText(
       bobWindow1,

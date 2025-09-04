@@ -118,7 +118,10 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     // Check right panel has correct name
     await waitForTestIdWithText(aliceWindow2, 'group-name');
-    await clickOnTestIdWithText(aliceWindow2, 'manage-members-menu-option');
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      ConversationSettings.manageMembersOption.selector,
+    );
     await waitForTestIdWithText(
       aliceWindow2,
       'modal-heading',

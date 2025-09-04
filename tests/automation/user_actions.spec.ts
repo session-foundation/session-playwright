@@ -76,7 +76,7 @@ test_Alice_1W_Bob_1W(
     // Check to see if User B is a contact
     await clickOnTestIdWithText(
       aliceWindow1,
-      HomeScreen.newConversationButton.selector,
+      HomeScreen.plusButton.selector,
     );
     await waitForTestIdWithText(
       aliceWindow1,
@@ -196,11 +196,20 @@ test_Alice_1W_no_network(
     // Click on current profile picture
     await clickOnTestIdWithText(aliceWindow1, Settings.displayName.selector);
 
-    await clickOnTestIdWithText(aliceWindow1, 'image-upload-section');
-    await clickOnTestIdWithText(aliceWindow1, 'image-upload-click');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.imageUploadSection.selector,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.imageUploadClick.selector,
+    );
     // allow for the image to be resized before we try to save it
     await sleepFor(500);
-    await clickOnTestIdWithText(aliceWindow1, 'save-button-profile-update');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.saveProfileUpdateButton.selector,
+    );
     await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
     await clickOnMatchingText(
       aliceWindow1,
@@ -414,12 +423,15 @@ test_Alice_1W_Bob_1W(
 test_Alice_2W(
   'Hide recovery password',
   async ({ aliceWindow1, aliceWindow2 }) => {
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector);
     await clickOnTestIdWithText(
       aliceWindow1,
-      'recovery-password-settings-menu-item',
+      Settings.recoveryPasswordMenuItem.selector,
     );
-    await clickOnTestIdWithText(aliceWindow1, 'hide-recovery-password-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Settings.hideRecoveryPasswordButton.selector,
+    );
     // Check first modal
     await checkModalStrings(
       aliceWindow1,
@@ -427,10 +439,11 @@ test_Alice_2W(
       englishStrippedStr(
         'recoveryPasswordHidePermanentlyDescription1',
       ).toString(),
+      'hideRecoveryPasswordModal',
     );
     await clickOnTestIdWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton.selector,
       englishStrippedStr('theContinue').toString(),
     );
     await checkModalStrings(
@@ -439,23 +452,24 @@ test_Alice_2W(
       englishStrippedStr(
         'recoveryPasswordHidePermanentlyDescription2',
       ).toString(),
+      'hideRecoveryPasswordModal',
     );
     // Click yes
     await clickOnTestIdWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton.selector,
       englishStrippedStr('yes').toString(),
     );
     await doesElementExist(
       aliceWindow1,
       'data-testid',
-      'recovery-password-settings-menu-item',
+      Settings.recoveryPasswordMenuItem.selector,
     );
     // Check linked device if Recovery Password is still visible (it should be)
-    await clickOnTestIdWithText(aliceWindow2, 'settings-section');
+    await clickOnTestIdWithText(aliceWindow2, LeftPane.settingsButton.selector);
     await waitForTestIdWithText(
       aliceWindow2,
-      'recovery-password-settings-menu-item',
+      Settings.recoveryPasswordMenuItem.selector,
     );
   },
 );
@@ -463,14 +477,17 @@ test_Alice_2W(
 test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   await clickOnTestIdWithText(
     aliceWindow1,
-    HomeScreen.newConversationButton.selector,
+    HomeScreen.plusButton.selector,
   );
   await clickOnTestIdWithText(
     aliceWindow1,
     HomeScreen.inviteAFriendOption.selector,
   );
   await waitForTestIdWithText(aliceWindow1, 'your-account-id', alice.accountid);
-  await clickOnTestIdWithText(aliceWindow1, 'copy-button-account-id');
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    HomeScreen.inviteAFriendCopyButton.selector,
+  );
   // Toast
   await waitForTestIdWithText(
     aliceWindow1,
@@ -515,20 +532,26 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
 test_Alice_1W_no_network(
   'Hide note to self',
   async ({ aliceWindow1, alice }) => {
-    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
     await clickOnTestIdWithText(
       aliceWindow1,
-      'chooser-new-conversation-button',
+      HomeScreen.plusButton.selector,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      HomeScreen.newMessageOption.selector,
     );
     await typeIntoInput(
       aliceWindow1,
       'new-session-conversation',
       alice.accountid,
     );
-    await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      HomeScreen.newMessageNextButton.selector,
+    );
     await waitForTestIdWithText(
       aliceWindow1,
-      'header-conversation-name',
+      Conversation.conversationHeader.selector,
       englishStrippedStr('noteToSelf').toString(),
     );
     await clickOnTestIdWithText(
@@ -563,24 +586,33 @@ test_Alice_1W_no_network(
 );
 
 test_Alice_1W_no_network('Toggle password', async ({ aliceWindow1 }) => {
-  await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+  await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector);
   await clickOnTestIdWithText(
     aliceWindow1,
-    'recovery-password-settings-menu-item',
+    Settings.recoveryPasswordMenuItem.selector,
   );
-  await waitForTestIdWithText(aliceWindow1, 'recovery-password-seed-modal');
+  await waitForTestIdWithText(
+    aliceWindow1,
+    Settings.recoveryPasswordContainer.selector,
+  );
   await clickOnMatchingText(
     aliceWindow1,
     englishStrippedStr('qrView').toString(),
   );
   // Wait for QR code to be visible
-  await waitForTestIdWithText(aliceWindow1, 'session-recovery-password');
+  await waitForTestIdWithText(
+    aliceWindow1,
+    Settings.recoveryPasswordQRCode.selector,
+  );
   // Then toggle back to text seed password
   await clickOnMatchingText(
     aliceWindow1,
     englishStrippedStr('recoveryPasswordView').toString(),
   );
-  await waitForTestIdWithText(aliceWindow1, 'recovery-password-seed-modal');
+  await waitForTestIdWithText(
+    aliceWindow1,
+    Settings.recoveryPasswordContainer.selector,
+  );
 });
 
 test_Alice_2W(

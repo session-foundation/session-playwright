@@ -1,6 +1,11 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { doForAll, sleepFor } from '../promise_utils';
-import { Global, HomeScreen } from './locators';
+import {
+  Conversation,
+  ConversationSettings,
+  Global,
+  HomeScreen,
+} from './locators';
 import { createGroup } from './setup/create_group';
 import { newUser } from './setup/new_user';
 import {
@@ -128,14 +133,23 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Click on conversation options
     // Check to see that you can't change group name to empty string
     // Click on edit group name
-    await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
-    await clickOnTestIdWithText(aliceWindow1, 'edit-group-name');
-    await clickOnTestIdWithText(aliceWindow1, 'clear-group-info-name-button');
-    await waitForTestIdWithText(aliceWindow1, 'error-message');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Conversation.conversationSettingsIcon.selector,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      ConversationSettings.editGroupButton.selector,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      ConversationSettings.clearGroupNameButton.selector,
+    );
+    await waitForTestIdWithText(aliceWindow1, Global.errorMessage.selector);
     const actualError = await grabTextFromElement(
       aliceWindow1,
       'data-testid',
-      'error-message',
+      Global.errorMessage.selector,
     );
     if (actualError !== expectedError) {
       throw new Error(
@@ -146,7 +160,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       aliceWindow1,
       englishStrippedStr('cancel').toString(),
     );
-    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
   },
 );
 

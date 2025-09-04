@@ -2,7 +2,12 @@ import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
 import { longText, mediaArray, testLink } from './constants/variables';
-import { Conversation, Global, HomeScreen } from './locators';
+import {
+  Conversation,
+  ConversationSettings,
+  Global,
+  HomeScreen,
+} from './locators';
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
@@ -126,7 +131,10 @@ test_Alice_1W_Bob_1W(
       aliceWindow1,
       Conversation.conversationSettingsIcon.selector,
     );
-    await clickOnTestIdWithText(aliceWindow1, 'invite-contacts-menu-option');
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      ConversationSettings.inviteContactsOption.selector,
+    );
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',

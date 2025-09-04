@@ -1,5 +1,6 @@
 import { Page } from '@playwright/test';
 
+import { Global, Onboarding } from '../locators';
 import {
   clickOnTestIdWithText,
   doesElementExist,
@@ -8,9 +9,9 @@ import {
 } from '../utilities/utils';
 
 export async function recoverFromSeed(window: Page, recoveryPhrase: string) {
-  await clickOnTestIdWithText(window, 'existing-account-button');
+  await clickOnTestIdWithText(window, Onboarding.iHaveAnAccountButton.selector);
   await typeIntoInput(window, 'recovery-phrase-input', recoveryPhrase);
-  await clickOnTestIdWithText(window, 'continue-button');
+  await clickOnTestIdWithText(window, Global.continueButton.selector);
   await waitForLoadingAnimationToFinish(window, 'loading-animation');
   const displayName = await doesElementExist(
     window,
