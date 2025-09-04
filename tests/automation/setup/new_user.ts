@@ -11,7 +11,7 @@ import {
 import { User } from '../types/testing';
 import {
   checkPathLight,
-  clickOnTestIdWithText,
+  clickOn,
   grabTextFromElement,
   typeIntoInput,
   waitForTestIdWithText,
@@ -23,15 +23,12 @@ export const newUser = async (
   awaitOnionPath = true,
 ): Promise<User> => {
   // Create User
-  await clickOnTestIdWithText(window, Onboarding.createAccountButton.selector);
+  await clickOn(window, Onboarding.createAccountButton);
   // Input username = testuser
   await typeIntoInput(window, Onboarding.displayNameInput.selector, userName);
-  await clickOnTestIdWithText(window, Global.continueButton.selector);
+  await clickOn(window, Global.continueButton);
   // save recovery phrase
-  await clickOnTestIdWithText(
-    window,
-    HomeScreen.revealRecoveryPhraseButton.selector,
-  );
+  await clickOn(window, HomeScreen.revealRecoveryPhraseButton);
   await waitForTestIdWithText(
     window,
     Settings.recoveryPasswordContainer.selector,
@@ -44,8 +41,8 @@ export const newUser = async (
   // const recoveryPhrase = await window.innerText(
   //   '[data-testid=recovery-password-seed-modal]',
   // );
-  await clickOnTestIdWithText(window, Global.modalCloseButton.selector);
-  await clickOnTestIdWithText(window, LeftPane.profileButton.selector);
+  await clickOn(window, Global.modalCloseButton);
+  await clickOn(window, LeftPane.profileButton);
 
   // Save Account ID to a variable
   let accountid = await window.innerText(
@@ -58,7 +55,7 @@ export const newUser = async (
       accountid,
     )}" and Recovery password: "${chalk.green(recoveryPassword)}"`,
   );
-  await clickOnTestIdWithText(window, Global.modalCloseButton.selector);
+  await clickOn(window, Global.modalCloseButton);
   if (awaitOnionPath) {
     await checkPathLight(window);
   }

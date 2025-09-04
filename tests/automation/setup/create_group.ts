@@ -7,8 +7,9 @@ import { Group, User } from '../types/testing';
 import { sendMessage } from '../utilities/message';
 import { sendNewMessage } from '../utilities/send_message';
 import {
+  clickOn,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   typeIntoInput,
   waitForTestIdWithText,
   waitForTextMessages,
@@ -53,8 +54,8 @@ export const createGroup = async (
     `${messageCA} Time: ${Date.now()}`,
   );
   // Click new closed group tab
-  await clickOnTestIdWithText(windowA, HomeScreen.plusButton.selector);
-  await clickOnTestIdWithText(windowA, HomeScreen.createGroupOption.selector);
+  await clickOn(windowA, HomeScreen.plusButton);
+  await clickOn(windowA, HomeScreen.createGroupOption);
   // Enter group name
   await typeIntoInput(
     windowA,
@@ -66,10 +67,7 @@ export const createGroup = async (
   // Select user C
   await clickOnMatchingText(windowA, userThree.userName);
   // Click Next
-  await clickOnTestIdWithText(
-    windowA,
-    HomeScreen.createGroupCreateButton.selector,
-  );
+  await clickOn(windowA, HomeScreen.createGroupCreateButton);
   // Check group was successfully created
   await clickOnMatchingText(windowB, group.userName);
   await waitForTestIdWithText(
@@ -89,18 +87,11 @@ export const createGroup = async (
       .toString(),
   );
   // Click on test group
-  await Promise.all([
-    clickOnTestIdWithText(
-      windowB,
-      'module-conversation__user__profile-name',
-      group.userName,
+  await Promise.all(
+    [windowB, windowC].map((w) =>
+      clickOnWithText(w, HomeScreen.conversationItemName, group.userName),
     ),
-    clickOnTestIdWithText(
-      windowC,
-      'module-conversation__user__profile-name',
-      group.userName,
-    ),
-  ]);
+  );
   // Make sure the empty state is in windowB & windowC
   await Promise.all([
     waitForTestIdWithText(

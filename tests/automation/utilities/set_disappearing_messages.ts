@@ -10,9 +10,9 @@ import {
 import { isChecked } from './checked';
 import {
   checkModalStrings,
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
   formatTimeOption,
   waitForElement,
   waitForTestIdWithText,
@@ -29,13 +29,9 @@ export const setDisappearingMessages = async (
   windowB?: Page,
 ) => {
   const enforcedType: ConversationType = conversationType;
-  await clickOnTestIdWithText(
-    windowA,
-    Conversation.conversationSettingsIcon.selector,
-    undefined,
-    undefined,
-    5_000,
-  );
+  await clickOn(windowA, Conversation.conversationSettingsIcon, {
+    maxWait: 5_000,
+  });
   await clickOnElement({
     window: windowA,
     strategy: 'data-testid',

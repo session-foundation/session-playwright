@@ -4,26 +4,24 @@ import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import { Conversation, Global } from '../locators';
 import { Group } from '../types/testing';
 import {
+  clickOn,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   hasElementBeenDeleted,
 } from './utils';
 
 export const leaveGroup = async (window: Page, group: Group) => {
   // go to three dots menu
-  await clickOnTestIdWithText(
-    window,
-    Conversation.conversationSettingsIcon.selector,
-  );
+  await clickOn(window, Conversation.conversationSettingsIcon);
   // Select Leave Group
   await clickOnMatchingText(
     window,
     englishStrippedStr('groupLeave').toString(),
   );
   // Confirm leave group
-  await clickOnTestIdWithText(
+  await clickOnWithText(
     window,
-    Global.confirmButton.selector,
+    Global.confirmButton,
     englishStrippedStr('leave').toString(),
   );
   // check config message

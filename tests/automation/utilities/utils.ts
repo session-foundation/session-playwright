@@ -250,6 +250,12 @@ export async function checkPathLight(window: Page, maxWait?: number) {
 
 // ACTIONS
 
+/**
+ * Clicks on an element using a locator object
+ * @param window - Playwright page instance
+ * @param locator - Element locator with strategy and selector
+ * @param options - Optional element interaction configuration
+ */
 export async function clickOn(
   window: Page,
   locator: StrategyExtractionObj,
@@ -270,6 +276,13 @@ export async function clickOn(
   );
 }
 
+/**
+ * Clicks on an element that contains specific text
+ * @param window - Playwright page instance
+ * @param locator - Element locator with strategy and selector
+ * @param text - Text content to match within the element
+ * @param options - Optional element interaction configuration
+ */
 export async function clickOnWithText(
   window: Page,
   locator: StrategyExtractionObj,
@@ -339,22 +352,6 @@ export async function clickOnMatchingText(
   );
 }
 
-// Legacy wrapper for backwards compatibility
-export async function clickOnTestIdWithText(
-  window: Page,
-  dataTestId: DataTestId,
-  text?: string,
-  rightButton?: boolean,
-  maxWait?: number,
-) {
-  const locator = { strategy: 'data-testid' as const, selector: dataTestId };
-
-  if (text) {
-    return clickOnWithText(window, locator, text, { rightButton, maxWait });
-  }
-  return clickOn(window, locator, { rightButton, maxWait });
-}
-
 export async function clickOnTextMessage(
   window: Page,
   text: string,
@@ -382,7 +379,9 @@ export async function typeIntoInput(
   console.info(`typeIntoInput testId: ${dataTestId} : "${text}"`);
   const builtSelector = `css=[data-testid=${dataTestId}]`;
   // the new input made with onboarding element needs a click to reveal the input in the DOM
-  await clickOnTestIdWithText(window, dataTestId);
+  // Convert DataTestId to locator object for clickOn
+  const locator = { strategy: 'data-testid' as const, selector: dataTestId };
+  await clickOn(window, locator);
   // reset the content to be empty before typing into the input
   await window.fill(builtSelector, '');
   return window.type(builtSelector, text);

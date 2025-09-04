@@ -7,9 +7,10 @@ import { MediaType } from '../types/testing';
 import { waitForSentTick } from './message';
 import {
   checkModalStrings,
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   typeIntoInput,
   waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
@@ -32,16 +33,13 @@ export const sendMedia = async (
 };
 
 export const sendVoiceMessage = async (window: Page) => {
-  await clickOnTestIdWithText(window, Conversation.microphoneButton.selector);
-  await clickOnTestIdWithText(window, Global.toast.selector);
-  await clickOnTestIdWithText(window, Settings.enableMicrophone.selector);
-  await clickOnTestIdWithText(window, Global.modalCloseButton.selector);
-  await clickOnTestIdWithText(window, Conversation.microphoneButton.selector);
+  await clickOn(window, Conversation.microphoneButton);
+  await clickOn(window, Global.toast);
+  await clickOn(window, Settings.enableMicrophone);
+  await clickOn(window, Global.modalCloseButton);
+  await clickOn(window, Conversation.microphoneButton);
   await sleepFor(5000);
-  await clickOnTestIdWithText(
-    window,
-    Conversation.endVoiceMessageButton.selector,
-  );
+  await clickOn(window, Conversation.endVoiceMessageButton);
   await sleepFor(4000);
   await clickOnElement({
     window,
@@ -61,12 +59,9 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     strategy: 'data-testid',
     selector: 'send-message-button',
   });
-  await clickOnTestIdWithText(
-    window,
-    Conversation.messageContent.selector,
-    testLink,
-    true,
-  );
+  await clickOnWithText(window, Conversation.messageContent, testLink, {
+    rightButton: true,
+  });
   // Need to copy link to clipboard, as the enable link preview modal
   // doesn't pop up if manually typing link (needs to be pasted)
   // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
@@ -83,9 +78,9 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     englishStrippedStr('copied').toString(),
   );
   // click on the toast and wait for it to be closed to avoid the layout shift
-  await clickOnTestIdWithText(window, Global.toast.selector);
+  await clickOn(window, Global.toast);
   await sleepFor(1000);
-  await clickOnTestIdWithText(window, Conversation.messageInput.selector);
+  await clickOn(window, Conversation.messageInput);
   const isMac = process.platform === 'darwin';
   await window.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
   await checkModalStrings(
@@ -93,9 +88,9 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     englishStrippedStr('linkPreviewsEnable').toString(),
     englishStrippedStr('linkPreviewsFirstDescription').toString(),
   );
-  await clickOnTestIdWithText(
+  await clickOnWithText(
     window,
-    'session-confirm-ok-button',
+    Global.confirmButton,
     englishStrippedStr('enable').toString(),
   );
   await waitForLoadingAnimationToFinish(window, 'loading-spinner');
@@ -136,9 +131,9 @@ export const trustUser = async (
       })
       .toString(),
   );
-  await clickOnTestIdWithText(
+  await clickOnWithText(
     window,
-    'session-confirm-ok-button',
+    Global.confirmButton,
     englishStrippedStr('yes').toString(),
   );
 };
