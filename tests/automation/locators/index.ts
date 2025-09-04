@@ -46,6 +46,7 @@ export class HomeScreen extends Locator {
 }
 
 export class Conversation extends Locator {
+  static readonly conversationHeader = this.testId('header-conversation-name');
   static readonly messageInput = this.testId('message-input-text-area');
   static readonly microphoneButton = this.testId('microphone-button');
   static readonly endVoiceMessageButton = this.testId('end-voice-message');
@@ -61,9 +62,12 @@ export class Conversation extends Locator {
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
   );
-  static readonly callButton = this.testId('call-button')
+  static readonly callButton = this.testId('call-button');
   static readonly conversationSettingsIcon = this.testId(
     'conversation-options-avatar',
+  );
+  static readonly manageMembersOption = this.testId(
+    'manage-members-menu-option',
   );
   static readonly scrollToBottomButton = this.testId('scroll-to-bottom-button');
 }
@@ -89,7 +93,9 @@ export class Settings extends Locator {
   );
   // Privacy
   static readonly enableCalls = this.testId('enable-calls-settings-row');
-  static readonly enableMicrophone = this.testId('enable-microphone-settings-row')
+  static readonly enableMicrophone = this.testId(
+    'enable-microphone-settings-row',
+  );
   static readonly setPasswordSettingsButton = this.testId(
     'set-password-settings-button',
   );
@@ -124,6 +130,7 @@ export class Global extends Locator {
   static readonly backButton = this.testId('back-button');
   static readonly toast = this.testId('session-toast');
   static readonly confirmButton = this.testId('session-confirm-ok-button');
+  static readonly cancelButton = this.testId('session-confirm-cancel-button');
   static readonly errorMessage = this.testId('error-message');
   static readonly contactItem = this.testId(
     'module-contact-name__profile-name',

@@ -2,7 +2,13 @@ import { expect } from '@playwright/test';
 
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
-import { Global, HomeScreen, LeftPane, Settings } from './locators';
+import {
+  Conversation,
+  Global,
+  HomeScreen,
+  LeftPane,
+  Settings,
+} from './locators';
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
@@ -36,13 +42,14 @@ sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
   // Navigate to contacts tab in User B's window
   await waitForTestIdWithText(
     windowB,
-    'message-request-response-message',
+    Conversation.messageRequestAcceptControlMessage.selector,
     englishStrippedStr('messageRequestYouHaveAccepted')
       .withArgs({
         name: userA.userName,
       })
       .toString(),
   );
+  await clickOnTestIdWithText(windowB, Global.backButton.selector);
   await Promise.all([
     clickOnElement({
       window: windowA,
@@ -56,16 +63,8 @@ sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
     }),
   ]);
   await Promise.all([
-    waitForTestIdWithText(
-      windowA,
-      'module-conversation__user__profile-name',
-      userB.userName,
-    ),
-    waitForTestIdWithText(
-      windowB,
-      'module-conversation__user__profile-name',
-      userA.userName,
-    ),
+    waitForTestIdWithText(windowA, Global.contactItem.selector, userB.userName),
+    waitForTestIdWithText(windowB, Global.contactItem.selector, userA.userName),
   ]);
 });
 
@@ -172,8 +171,7 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
     aliceWindow1,
     englishStrippedStr('save').toString(),
   );
-  // Wait for Copy button to appear to verify username change
-  await aliceWindow1.isVisible(`'${englishStrippedStr('copy').toString()}'`);
+  await sleepFor(1000);
   // verify name change
   expect(
     await aliceWindow1.innerText(
@@ -341,41 +339,43 @@ test_Alice_1W_Bob_1W(
   async ({ aliceWindow1, bobWindow1, alice, bob }) => {
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    // Confirm contact by checking Messages tab (name should appear in list)
-    await Promise.all([
-      clickOnElement({
-        window: aliceWindow1,
-        strategy: 'data-testid',
-        selector: 'new-conversation-button',
-      }),
-      clickOnElement({
-        window: bobWindow1,
-        strategy: 'data-testid',
-        selector: 'new-conversation-button',
-      }),
-    ]);
+    await clickOnTestIdWithText(bobWindow1, Global.backButton.selector);
+    await Promise.all(
+      [aliceWindow1, bobWindow1].map((w) =>
+        clickOnElement({
+          window: w,
+          strategy: 'data-testid',
+          selector: 'new-conversation-button',
+        }),
+      ),
+    );
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'module-conversation__user__profile-name',
+        Global.contactItem.selector,
         bob.userName,
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'module-conversation__user__profile-name',
+        Global.contactItem.selector,
         alice.userName,
       ),
     ]);
+    await Promise.all(
+      [aliceWindow1, bobWindow1].map((w) =>
+        clickOnTestIdWithText(w, Global.backButton.selector),
+      ),
+    );
     // Delete contact
     await clickOnTestIdWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       bob.userName,
       true,
     );
     await clickOnTestIdWithText(
       aliceWindow1,
-      'context-menu-item',
+      Global.contextMenuItem.selector,
       englishStrippedStr('conversationsDelete').toString(),
     );
     await checkModalStrings(
@@ -387,14 +387,14 @@ test_Alice_1W_Bob_1W(
     );
     await clickOnTestIdWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton.selector,
       englishStrippedStr('delete').toString(),
     );
     // Check if conversation is deleted
     await hasElementBeenDeleted(
       aliceWindow1,
       'data-testid',
-      'module-conversation__user__profile-name',
+      Global.contactItem.selector,
       1000,
       bob.userName,
     );

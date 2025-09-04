@@ -195,4 +195,8 @@ export type DataTestId =
   | 'your-profile-name'
   | `input-${DMTimeOption}`;
 
-export type ModalId = 'blockOrUnblockModal' | 'confirmModal' | 'userSettingsModal';
+export type ModalId =
+  | 'blockOrUnblockModal'
+  | 'confirmModal'
+  | 'deleteAccountModal'
+  | 'userSettingsModal';

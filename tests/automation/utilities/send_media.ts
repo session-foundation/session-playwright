@@ -38,7 +38,10 @@ export const sendVoiceMessage = async (window: Page) => {
   await clickOnTestIdWithText(window, Global.modalCloseButton.selector);
   await clickOnTestIdWithText(window, Conversation.microphoneButton.selector);
   await sleepFor(5000);
-  await clickOnTestIdWithText(window, Conversation.endVoiceMessageButton.selector);
+  await clickOnTestIdWithText(
+    window,
+    Conversation.endVoiceMessageButton.selector,
+  );
   await sleepFor(4000);
   await clickOnElement({
     window,

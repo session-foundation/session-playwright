@@ -30,7 +30,6 @@ import {
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
   typeIntoInput,
-  waitForLoadingAnimationToFinish,
   waitForMatchingPlaceholder,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -86,19 +85,20 @@ test_Alice_2W(
   'Changed username syncs',
   async ({ aliceWindow1, aliceWindow2 }) => {
     const newUsername = 'Tiny bubble';
-    await clickOnTestIdWithText(aliceWindow1, 'leftpane-primary-avatar');
+    await clickOnTestIdWithText(aliceWindow1, LeftPane.profileButton.selector);
     // Click on pencil icon
-    await clickOnTestIdWithText(aliceWindow1, 'edit-profile-icon');
+    await clickOnTestIdWithText(aliceWindow1, Settings.displayName.selector);
     // Replace old username with new username
-    await typeIntoInput(aliceWindow1, 'profile-name-input', newUsername);
+    await typeIntoInput(
+      aliceWindow1,
+      Settings.displayNameInput.selector,
+      newUsername,
+    );
     // Press enter to confirm change
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'save-button-profile-update',
-    });
-    // Wait for loading animation
-    await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
+    await clickOnMatchingText(
+      aliceWindow1,
+      englishStrippedStr('save').toString(),
+    );
 
     // Check username change in window B
     // Click on profile settings in window B
@@ -108,12 +108,15 @@ test_Alice_2W(
       500,
       'waiting for updated username in profile dialog',
       async () => {
-        await clickOnTestIdWithText(aliceWindow2, 'leftpane-primary-avatar');
+        await clickOnTestIdWithText(
+          aliceWindow2,
+          LeftPane.profileButton.selector,
+        );
         // Verify username has changed to new username
         try {
           await waitForTestIdWithText(
             aliceWindow2,
-            'your-profile-name',
+            Settings.displayName.selector,
             newUsername,
             100,
           );

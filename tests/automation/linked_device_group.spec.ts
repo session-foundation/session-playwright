@@ -1,7 +1,13 @@
 import type { Page } from '@playwright/test';
 
 import { englishStrippedStr } from '../localization/englishStrippedStr';
-import { LeftPane } from './locators';
+import {
+  Conversation,
+  Global,
+  HomeScreen,
+  LeftPane,
+  Settings,
+} from './locators';
 import { openApp } from './setup/open';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import {
@@ -13,7 +19,6 @@ import {
   checkModalStrings,
   clickOnMatchingText,
   clickOnTestIdWithText,
-  waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
 } from './utilities/utils';
 
@@ -133,26 +138,27 @@ async function clearDataOnWindow(window: Page) {
   // Click on clear data option on left pane
   await clickOnTestIdWithText(
     window,
-    'clear-data-settings-menu-item',
+    Settings.clearDataMenuItem.selector,
     englishStrippedStr('sessionClearData').toString(),
   );
   await checkModalStrings(
     window,
     englishStrippedStr('clearDataAll').toString(),
     englishStrippedStr('clearDataAllDescription').toString(),
+    'deleteAccountModal',
   );
   await clickOnTestIdWithText(
     window,
-    'session-confirm-ok-button',
+    Global.confirmButton.selector,
     englishStrippedStr('clear').toString(),
   );
   await checkModalStrings(
     window,
     englishStrippedStr('clearDataAll').toString(),
     englishStrippedStr('clearDeviceDescription').toString(),
+    'deleteAccountModal',
   );
   await clickOnMatchingText(window, englishStrippedStr('clear').toString());
-  await waitForLoadingAnimationToFinish(window, 'loading-spinner');
 }
 
 // Delete device data > Restore account
@@ -166,36 +172,50 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Does group appear?
     await waitForTestIdWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
     await clickOnTestIdWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
     // Check header name
     await waitForTestIdWithText(
       aliceWindow2,
-      'header-conversation-name',
+      Conversation.conversationHeader.selector,
       groupCreated.userName,
     );
     // Check for group members
-    await clickOnTestIdWithText(aliceWindow2, 'conversation-options-avatar');
-    await clickOnTestIdWithText(aliceWindow2, 'manage-members-menu-option');
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      Conversation.conversationSettingsIcon.selector,
+    );
+    await clickOnTestIdWithText(
+      aliceWindow2,
+      Conversation.manageMembersOption.selector,
+    );
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow2,
-        'contact',
+        Global.contactItem.selector,
         englishStrippedStr('you').toString(),
       ),
-      waitForTestIdWithText(aliceWindow2, 'contact', bob.userName),
-      waitForTestIdWithText(aliceWindow2, 'contact', charlie.userName),
+      waitForTestIdWithText(
+        aliceWindow2,
+        Global.contactItem.selector,
+        bob.userName,
+      ),
+      waitForTestIdWithText(
+        aliceWindow2,
+        Global.contactItem.selector,
+        charlie.userName,
+      ),
     ]);
-    await clickOnTestIdWithText(aliceWindow2, 'session-confirm-cancel-button');
-    await clickOnTestIdWithText(aliceWindow2, 'modal-close-button');
+    await clickOnTestIdWithText(aliceWindow2, Global.cancelButton.selector);
+    await clickOnTestIdWithText(aliceWindow2, Global.modalCloseButton.selector);
     // Delete device data on alicewindow2
     await clearDataOnWindow(aliceWindow2);
     const [restoredWindow] = await openApp(1);
@@ -203,40 +223,54 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Does group appear?
     await waitForTestIdWithText(
       restoredWindow,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
     await clickOnTestIdWithText(
       restoredWindow,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
     // Check header name
     await waitForTestIdWithText(
       restoredWindow,
-      'header-conversation-name',
+      Conversation.conversationHeader.selector,
       groupCreated.userName,
     );
     // Check for group members
-    await clickOnTestIdWithText(restoredWindow, 'conversation-options-avatar');
-    await clickOnTestIdWithText(restoredWindow, 'manage-members-menu-option');
+    await clickOnTestIdWithText(
+      restoredWindow,
+      Conversation.conversationSettingsIcon.selector,
+    );
+    await clickOnTestIdWithText(
+      restoredWindow,
+      Conversation.manageMembersOption.selector,
+    );
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(
         restoredWindow,
-        'contact',
+        Global.contactItem.selector,
         englishStrippedStr('you').toString(),
       ),
-      waitForTestIdWithText(restoredWindow, 'contact', bob.userName),
-      waitForTestIdWithText(restoredWindow, 'contact', charlie.userName),
+      waitForTestIdWithText(
+        restoredWindow,
+        Global.contactItem.selector,
+        bob.userName,
+      ),
+      waitForTestIdWithText(
+        restoredWindow,
+        Global.contactItem.selector,
+        charlie.userName,
+      ),
     ]);
     // Do it all again
+    await clickOnTestIdWithText(restoredWindow, Global.cancelButton.selector);
     await clickOnTestIdWithText(
       restoredWindow,
-      'session-confirm-cancel-button',
+      Global.modalCloseButton.selector,
     );
-    await clickOnTestIdWithText(restoredWindow, 'modal-close-button');
     // Delete device data on restoredWindow
     await clearDataOnWindow(restoredWindow);
     const [restoredWindow2] = await openApp(1);
@@ -244,33 +278,47 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Does group appear?
     await waitForTestIdWithText(
       restoredWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
     await clickOnTestIdWithText(
       restoredWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName.selector,
       groupCreated.userName,
     );
     // Check header name
     await waitForTestIdWithText(
       restoredWindow2,
-      'header-conversation-name',
+      Conversation.conversationHeader.selector,
       groupCreated.userName,
     );
     // Check for group members
-    await clickOnTestIdWithText(restoredWindow2, 'conversation-options-avatar');
-    await clickOnTestIdWithText(restoredWindow2, 'manage-members-menu-option');
+    await clickOnTestIdWithText(
+      restoredWindow2,
+      Conversation.conversationSettingsIcon.selector,
+    );
+    await clickOnTestIdWithText(
+      restoredWindow2,
+      Conversation.manageMembersOption.selector,
+    );
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(
         restoredWindow2,
-        'contact',
+        Global.contactItem.selector,
         englishStrippedStr('you').toString(),
       ),
-      waitForTestIdWithText(restoredWindow2, 'contact', bob.userName),
-      waitForTestIdWithText(restoredWindow2, 'contact', charlie.userName),
+      waitForTestIdWithText(
+        restoredWindow2,
+        Global.contactItem.selector,
+        bob.userName,
+      ),
+      waitForTestIdWithText(
+        restoredWindow2,
+        Global.contactItem.selector,
+        charlie.userName,
+      ),
     ]);
   },
 );

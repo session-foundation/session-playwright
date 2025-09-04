@@ -122,14 +122,21 @@ test_Alice_1W_Bob_1W(
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await joinCommunity(aliceWindow1);
-    await clickOnTestIdWithText(aliceWindow1, Conversation.conversationSettingsIcon.selector);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Conversation.conversationSettingsIcon.selector,
+    );
     await clickOnTestIdWithText(aliceWindow1, 'invite-contacts-menu-option');
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',
       englishStrippedStr('membersInvite').toString(),
     );
-    await clickOnTestIdWithText(aliceWindow1, Global.contactItem.selector, bob.userName);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      Global.contactItem.selector,
+      bob.userName,
+    );
     await clickOnTestIdWithText(aliceWindow1, Global.confirmButton.selector);
     // For lack of a unique ID we use native Playwright methods
     await aliceWindow1
