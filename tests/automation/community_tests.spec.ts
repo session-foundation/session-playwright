@@ -9,10 +9,7 @@ import { clickOn, clickOnWithText } from './utilities/utils';
 
 test_Alice_2W('Join community', async ({ aliceWindow1, aliceWindow2 }) => {
   await joinCommunity(aliceWindow1);
-  await clickOn(
-    aliceWindow1,
-    Conversation.scrollToBottomButton,
-  );
+  await clickOn(aliceWindow1, Conversation.scrollToBottomButton);
   await sendMessage(aliceWindow1, 'Hello, community!');
   // Check linked device for community
   await clickOnWithText(
@@ -35,10 +32,7 @@ test_Alice_1W_Bob_1W(
     // ]);
     await Promise.all(
       [aliceWindow1, bobWindow1].map((window) =>
-        clickOn(
-          window,
-          Conversation.scrollToBottomButton,
-        ),
+        clickOn(window, Conversation.scrollToBottomButton),
       ),
     );
     await sendMessage(aliceWindow1, testMessage);

@@ -134,18 +134,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Click on conversation options
     // Check to see that you can't change group name to empty string
     // Click on edit group name
-    await clickOn(
-      aliceWindow1,
-      Conversation.conversationSettingsIcon,
-    );
-    await clickOn(
-      aliceWindow1,
-      ConversationSettings.editGroupButton,
-    );
-    await clickOn(
-      aliceWindow1,
-      ConversationSettings.clearGroupNameButton,
-    );
+    await clickOn(aliceWindow1, Conversation.conversationSettingsIcon);
+    await clickOn(aliceWindow1, ConversationSettings.editGroupButton);
+    await clickOn(aliceWindow1, ConversationSettings.clearGroupNameButton);
     await waitForTestIdWithText(aliceWindow1, Global.errorMessage.selector);
     const actualError = await grabTextFromElement(
       aliceWindow1,

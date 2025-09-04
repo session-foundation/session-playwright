@@ -61,7 +61,12 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     strategy: 'data-testid',
     selector: 'send-message-button',
   });
-  await clickOnTestIdWithText(window, Conversation.messageContent.selector, testLink, true);
+  await clickOnTestIdWithText(
+    window,
+    Conversation.messageContent.selector,
+    testLink,
+    true,
+  );
   // Need to copy link to clipboard, as the enable link preview modal
   // doesn't pop up if manually typing link (needs to be pasted)
   // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused

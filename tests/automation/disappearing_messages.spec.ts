@@ -303,11 +303,9 @@ test_Alice_2W_Bob_1W(
       waitForTextMessage(bobWindow1, testMessage),
       waitForTextMessage(aliceWindow2, testMessage),
     ]);
-    await clickOn(
-      aliceWindow1,
-      Conversation.conversationSettingsIcon,
-      {maxWait: 1_000}, 
-    );
+    await clickOn(aliceWindow1, Conversation.conversationSettingsIcon, {
+      maxWait: 1_000,
+    });
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',

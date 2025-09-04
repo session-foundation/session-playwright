@@ -72,10 +72,7 @@ import {
   sessionTestOneWindow(
     `Display name validation: "${testName}"`,
     async ([window]) => {
-      await clickOn(
-        window,
-        Onboarding.createAccountButton,
-      );
+      await clickOn(window, Onboarding.createAccountButton);
       await typeIntoInput(window, 'display-name-input', displayName);
       await clickOn(window, Global.continueButton);
       await waitForTestIdWithText(window, Global.errorMessage.selector);

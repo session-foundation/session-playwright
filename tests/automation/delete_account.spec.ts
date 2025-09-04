@@ -69,10 +69,7 @@ sessionTestTwoWindows(
       restoringWindows = await openApp(1); // not using sessionTest here as we need to close and reopen one of the window
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
-      await clickOn(
-        restoringWindow,
-        Onboarding.iHaveAnAccountButton,
-      );
+      await clickOn(restoringWindow, Onboarding.iHaveAnAccountButton);
       // Fill in recovery phrase
       await typeIntoInput(
         restoringWindow,
@@ -80,10 +77,7 @@ sessionTestTwoWindows(
         userA.recoveryPassword,
       );
       // Enter display name
-      await clickOn(
-        restoringWindow,
-        Global.continueButton,
-      );
+      await clickOn(restoringWindow, Global.continueButton);
       await waitForLoadingAnimationToFinish(
         restoringWindow,
         'loading-animation',
@@ -95,10 +89,7 @@ sessionTestTwoWindows(
         userA.userName,
       );
       // Click continue
-      await clickOn(
-        restoringWindow,
-        Global.continueButton,
-      );
+      await clickOn(restoringWindow, Global.continueButton);
       await sleepFor(5000, true); // just to allow any messages from our swarm to show up
 
       // Need to verify that no conversation is found at all
@@ -109,10 +100,7 @@ sessionTestTwoWindows(
         HomeScreen.conversationItemName.selector,
       );
 
-      await clickOn(
-        restoringWindow,
-        HomeScreen.plusButton,
-      ); // Expect contacts list to be empty
+      await clickOn(restoringWindow, HomeScreen.plusButton); // Expect contacts list to be empty
 
       await hasElementBeenDeleted(
         restoringWindow,

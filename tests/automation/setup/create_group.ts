@@ -53,10 +53,7 @@ export const createGroup = async (
     `${messageCA} Time: ${Date.now()}`,
   );
   // Click new closed group tab
-  await clickOnTestIdWithText(
-    windowA,
-    HomeScreen.plusButton.selector,
-  );
+  await clickOnTestIdWithText(windowA, HomeScreen.plusButton.selector);
   await clickOnTestIdWithText(windowA, HomeScreen.createGroupOption.selector);
   // Enter group name
   await typeIntoInput(

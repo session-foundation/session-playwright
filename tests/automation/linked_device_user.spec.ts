@@ -110,10 +110,7 @@ test_Alice_2W(
       500,
       'waiting for updated username in profile dialog',
       async () => {
-        await clickOn(
-          aliceWindow2,
-          LeftPane.profileButton,
-        );
+        await clickOn(aliceWindow2, LeftPane.profileButton);
         // Verify username has changed to new username
         try {
           await waitForTestIdWithText(
@@ -144,20 +141,11 @@ test_Alice_2W(
     await clickOn(aliceWindow1, LeftPane.profileButton);
     // Click on current profile picture
     await clickOn(aliceWindow1, Settings.displayName);
-    await clickOn(
-      aliceWindow1,
-      Settings.imageUploadSection,
-    );
-    await clickOn(
-      aliceWindow1,
-      Settings.imageUploadClick,
-    );
+    await clickOn(aliceWindow1, Settings.imageUploadSection);
+    await clickOn(aliceWindow1, Settings.imageUploadClick);
     // allow for the image to be resized before we try to save it
     await sleepFor(500);
-    await clickOn(
-      aliceWindow1,
-      Settings.saveProfileUpdateButton,
-    );
+    await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
     await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
     await clickOnMatchingText(
       aliceWindow1,
@@ -322,7 +310,7 @@ test_Alice_2W_Bob_1W(
       aliceWindow2,
       HomeScreen.conversationItemName,
       bob.userName,
-      {rightButton: true},
+      { rightButton: true },
     );
     // Select block
     await clickOnWithText(
@@ -352,16 +340,11 @@ test_Alice_2W_Bob_1W(
     // Check linked device for blocked contact in settings screen
     // Click on settings tab
     await clickOn(aliceWindow2, LeftPane.settingsButton);
-    await clickOn(
-      aliceWindow2,
-      Settings.conversationsMenuItem,
-    );
+    await clickOn(aliceWindow2, Settings.conversationsMenuItem);
     // a conf sync job can take 30s (if the last one failed) +  10s polling to show a change on a linked device.
-    await clickOn(
-      aliceWindow2,
-      Settings.blockedContactsButton,
-      {maxWait: 50_000},
-    );
+    await clickOn(aliceWindow2, Settings.blockedContactsButton, {
+      maxWait: 50_000,
+    });
     // Check if user B is in blocked contact list
     await waitForTestIdWithText(
       aliceWindow2,
@@ -413,7 +396,7 @@ test_Alice_2W_Bob_1W(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
-      {rightButton: true},
+      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,
@@ -451,23 +434,14 @@ test_Alice_2W_Bob_1W(
 test_Alice_2W(
   'Hide note to self syncs',
   async ({ alice, aliceWindow1, aliceWindow2 }) => {
-    await clickOn(
-      aliceWindow1,
-      HomeScreen.plusButton,
-    );
-    await clickOn(
-      aliceWindow1,
-      HomeScreen.newMessageOption,
-    );
+    await clickOn(aliceWindow1, HomeScreen.plusButton);
+    await clickOn(aliceWindow1, HomeScreen.newMessageOption);
     await typeIntoInput(
       aliceWindow1,
       HomeScreen.newMessageAccountIDInput.selector,
       alice.accountid,
     );
-    await clickOn(
-      aliceWindow1,
-      HomeScreen.newMessageNextButton,
-    );
+    await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
     await waitForTestIdWithText(
       aliceWindow1,
       'header-conversation-name',
@@ -485,7 +459,7 @@ test_Alice_2W(
       aliceWindow1,
       HomeScreen.conversationItemName,
       englishStrippedStr('noteToSelf').toString(),
-      {rightButton: true},
+      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,

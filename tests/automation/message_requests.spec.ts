@@ -1,5 +1,11 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
-import { Conversation, Global, HomeScreen, LeftPane, Settings } from './locators';
+import {
+  Conversation,
+  Global,
+  HomeScreen,
+  LeftPane,
+  Settings,
+} from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -20,10 +26,7 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOn(
-      bobWindow1,
-      HomeScreen.messageRequestBanner,
-    );
+    await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select message request from User A
     await clickOnWithText(
       bobWindow1,
@@ -31,10 +34,7 @@ test_Alice_1W_Bob_1W(
       alice.userName,
     );
     // Check that using the accept button has intended use
-    await clickOn(
-      bobWindow1,
-      Conversation.acceptMessageRequestButton,
-    );
+    await clickOn(bobWindow1, Conversation.acceptMessageRequestButton);
     // Check config message of message request acceptance
     await waitForTestIdWithText(
       bobWindow1,
@@ -60,10 +60,7 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOn(
-      bobWindow1,
-      HomeScreen.messageRequestBanner,
-    );
+    await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select message request from User A
     await clickOnWithText(
       bobWindow1,
@@ -96,10 +93,7 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOn(
-      bobWindow1,
-      HomeScreen.messageRequestBanner,
-    );
+    await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select message request from User A
     await clickOnWithText(
       bobWindow1,
@@ -138,10 +132,7 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOn(
-      bobWindow1,
-      HomeScreen.messageRequestBanner,
-    );
+    await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select 'Clear All' button
     await clickOnMatchingText(
       bobWindow1,

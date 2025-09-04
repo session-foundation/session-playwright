@@ -2,10 +2,7 @@ import { sleepFor } from '../promise_utils';
 import { Global, LeftPane, Settings } from './locators';
 import { newUser } from './setup/new_user';
 import { sessionTestOneWindow } from './setup/sessionTest';
-import {
-  clickOn,
-  waitForTestIdWithText,
-} from './utilities/utils';
+import { clickOn, waitForTestIdWithText } from './utilities/utils';
 
 sessionTestOneWindow('Create User', async ([window]) => {
   // Create User
@@ -30,10 +27,7 @@ sessionTestOneWindow('Create User', async ([window]) => {
   // go to settings section
   await clickOn(window, LeftPane.settingsButton);
   // check recovery phrase matches
-  await clickOn(
-    window,
-    Settings.recoveryPasswordMenuItem,
-  );
+  await clickOn(window, Settings.recoveryPasswordMenuItem);
   await waitForTestIdWithText(
     window,
     Settings.recoveryPasswordContainer.selector,

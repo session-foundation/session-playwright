@@ -113,16 +113,10 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check for group members
-    await clickOn(
-      aliceWindow2,
-      Conversation.conversationSettingsIcon,
-    );
+    await clickOn(aliceWindow2, Conversation.conversationSettingsIcon);
     // Check right panel has correct name
     await waitForTestIdWithText(aliceWindow2, 'group-name');
-    await clickOn(
-      aliceWindow2,
-      ConversationSettings.manageMembersOption,
-    );
+    await clickOn(aliceWindow2, ConversationSettings.manageMembersOption);
     await waitForTestIdWithText(
       aliceWindow2,
       'modal-heading',
@@ -204,14 +198,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check for group members
-    await clickOn(
-      aliceWindow2,
-      Conversation.conversationSettingsIcon,
-    );
-    await clickOn(
-      aliceWindow2,
-      ConversationSettings.manageMembersOption,
-    );
+    await clickOn(aliceWindow2, Conversation.conversationSettingsIcon);
+    await clickOn(aliceWindow2, ConversationSettings.manageMembersOption);
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(
@@ -255,14 +243,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check for group members
-    await clickOn(
-      restoredWindow,
-      Conversation.conversationSettingsIcon,
-    );
-    await clickOn(
-      restoredWindow,
-      ConversationSettings.manageMembersOption,
-    );
+    await clickOn(restoredWindow, Conversation.conversationSettingsIcon);
+    await clickOn(restoredWindow, ConversationSettings.manageMembersOption);
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(
@@ -283,10 +265,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     ]);
     // Do it all again
     await clickOn(restoredWindow, Global.cancelButton);
-    await clickOn(
-      restoredWindow,
-      Global.modalCloseButton,
-    );
+    await clickOn(restoredWindow, Global.modalCloseButton);
     // Delete device data on restoredWindow
     await clearDataOnWindow(restoredWindow);
     const [restoredWindow2] = await openApp(1);
@@ -310,14 +289,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check for group members
-    await clickOn(
-      restoredWindow2,
-      Conversation.conversationSettingsIcon,
-    );
-    await clickOn(
-      restoredWindow2,
-      ConversationSettings.manageMembersOption,
-    );
+    await clickOn(restoredWindow2, Conversation.conversationSettingsIcon);
+    await clickOn(restoredWindow2, ConversationSettings.manageMembersOption);
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(

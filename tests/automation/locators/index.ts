@@ -69,11 +69,12 @@ export class HomeScreen extends Locator {
     'module-conversation__user__profile-name',
   );
   static readonly messageRequestBanner = this.testId('message-request-banner');
-  static readonly plusButton = this.testId(
-    'new-conversation-button',
-  );
+  static readonly plusButton = this.testId('new-conversation-button');
   static readonly revealRecoveryPhraseButton = this.testId(
     'reveal-recovery-phrase',
+  );
+  static readonly setNicknameButton = this.testId(
+    'set-nickname-confirm-button',
   );
 }
 
@@ -95,11 +96,11 @@ export class Conversation extends Locator {
   static readonly disappearingControlMessage = this.testId(
     'disappear-control-message',
   );
-  static readonly endCallButton = this.testId('end-call')
+  static readonly endCallButton = this.testId('end-call');
   static readonly endVoiceMessageButton = this.testId('end-voice-message');
-  static readonly mentionsPopup = this.testId('mentions-popup-row')
+  static readonly mentionsPopup = this.testId('mentions-popup-row');
 
-  static readonly messageContent = this.testId('message-content')
+  static readonly messageContent = this.testId('message-content');
   static readonly messageInput = this.testId('message-input-text-area');
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
@@ -144,7 +145,9 @@ export class Settings extends Locator {
   static readonly conversationsMenuItem = this.testId(
     'conversations-settings-menu-item',
   );
-  static readonly messageRequestsMenuItem = this.testId('message-requests-settings-menu-item')
+  static readonly messageRequestsMenuItem = this.testId(
+    'message-requests-settings-menu-item',
+  );
   static readonly privacyMenuItem = this.testId('privacy-settings-menu-item');
   static readonly recoveryPasswordMenuItem = this.testId(
     'recovery-password-settings-menu-item',

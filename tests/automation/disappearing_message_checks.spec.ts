@@ -243,24 +243,14 @@ test_Alice_1W_Bob_1W(
     await joinCommunity(aliceWindow1);
     // To stop the layout shift
     await sleepFor(500);
-    await clickOn(
-      aliceWindow1,
-      Conversation.conversationSettingsIcon,
-    );
-    await clickOn(
-      aliceWindow1,
-      ConversationSettings.inviteContactsOption,
-    );
+    await clickOn(aliceWindow1, Conversation.conversationSettingsIcon);
+    await clickOn(aliceWindow1, ConversationSettings.inviteContactsOption);
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',
       englishStrippedStr('membersInvite').toString(),
     );
-    await clickOnWithText(
-      aliceWindow1,
-      Global.contactItem,
-      bob.userName,
-    );
+    await clickOnWithText(aliceWindow1, Global.contactItem, bob.userName);
     await clickOn(aliceWindow1, Global.confirmButton);
     // For lack of a unique ID we use native Playwright methods
     await aliceWindow1

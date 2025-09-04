@@ -41,5 +41,8 @@ export const makeVoiceCall = async (
   );
   await clickOnTestIdWithText(receiverWindow, Global.modalCloseButton.selector);
   await sleepFor(5000);
-  await clickOnTestIdWithText(callerWindow, Conversation.endCallButton.selector);
+  await clickOnTestIdWithText(
+    callerWindow,
+    Conversation.endCallButton.selector,
+  );
 };

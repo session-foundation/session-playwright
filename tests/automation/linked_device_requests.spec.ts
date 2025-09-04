@@ -26,23 +26,14 @@ test_Alice_2W_Bob_1W(
     const testReply = `${alice.userName} accepting message request from ${bob.userName}`;
     await sendNewMessage(bobWindow1, alice.accountid, testMessage);
     // Accept request in aliceWindow1
-    await clickOn(
-      aliceWindow1,
-      HomeScreen.messageRequestBanner,
-    );
-    await clickOn(
-      aliceWindow2,
-      HomeScreen.messageRequestBanner,
-    );
+    await clickOn(aliceWindow1, HomeScreen.messageRequestBanner);
+    await clickOn(aliceWindow2, HomeScreen.messageRequestBanner);
     await clickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
     );
-    await clickOn(
-      aliceWindow1,
-      Conversation.acceptMessageRequestButton,
-    );
+    await clickOn(aliceWindow1, Conversation.acceptMessageRequestButton);
     await waitForTestIdWithText(
       aliceWindow1,
       Conversation.messageRequestAcceptControlMessage.selector,
@@ -63,10 +54,7 @@ test_Alice_2W_Bob_1W(
     await sendMessage(aliceWindow1, testReply);
     await waitForTextMessage(bobWindow1, testReply);
     await clickOn(aliceWindow2, Global.backButton);
-    await clickOn(
-      aliceWindow2,
-      HomeScreen.plusButton,
-    );
+    await clickOn(aliceWindow2, HomeScreen.plusButton);
     await waitForTestIdWithText(
       aliceWindow2,
       Global.contactItem.selector,
@@ -81,19 +69,13 @@ test_Alice_2W_Bob_1W(
     const testMessage = `${bob.userName} sending message request to ${alice.userName}`;
     await sendNewMessage(bobWindow1, alice.accountid, testMessage);
     // Decline request in aliceWindow1
-    await clickOn(
-      aliceWindow1,
-      HomeScreen.messageRequestBanner,
-    );
+    await clickOn(aliceWindow1, HomeScreen.messageRequestBanner);
     await clickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
     );
-    await clickOn(
-      aliceWindow2,
-      HomeScreen.messageRequestBanner,
-    );
+    await clickOn(aliceWindow2, HomeScreen.messageRequestBanner);
     await waitForTestIdWithText(
       aliceWindow2,
       HomeScreen.conversationItemName.selector,
@@ -128,10 +110,7 @@ test_Alice_2W_Bob_1W(
     // send a message to Bob to Alice
     await sendNewMessage(bobWindow1, alice.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOn(
-      aliceWindow1,
-      HomeScreen.messageRequestBanner,
-    );
+    await clickOn(aliceWindow1, HomeScreen.messageRequestBanner);
     // Select message request from Bob
     await clickOnWithText(
       aliceWindow1,
@@ -139,10 +118,7 @@ test_Alice_2W_Bob_1W(
       bob.userName,
     );
     // Block Bob
-    await clickOn(
-      aliceWindow1,
-      Conversation.blockMessageRequestButton,
-    );
+    await clickOn(aliceWindow1, Conversation.blockMessageRequestButton);
     // Check modal strings
     await checkModalStrings(
       aliceWindow1,
@@ -157,14 +133,8 @@ test_Alice_2W_Bob_1W(
     await sleepFor(2000);
     // Check blocked status in blocked contacts list
     await clickOn(aliceWindow1, LeftPane.settingsButton);
-    await clickOn(
-      aliceWindow1,
-      Settings.conversationsMenuItem,
-    );
-    await clickOn(
-      aliceWindow1,
-      Settings.blockedContactsButton,
-    );
+    await clickOn(aliceWindow1, Settings.conversationsMenuItem);
+    await clickOn(aliceWindow1, Settings.blockedContactsButton);
     await waitForTestIdWithText(
       aliceWindow1,
       Global.contactItem.selector,
@@ -174,14 +144,8 @@ test_Alice_2W_Bob_1W(
     // Check blocked status in blocked contacts list
     await sleepFor(5000);
     await clickOn(aliceWindow2, LeftPane.settingsButton);
-    await clickOn(
-      aliceWindow2,
-      Settings.conversationsMenuItem,
-    );
-    await clickOn(
-      aliceWindow2,
-      Settings.blockedContactsButton,
-    );
+    await clickOn(aliceWindow2, Settings.conversationsMenuItem);
+    await clickOn(aliceWindow2, Settings.blockedContactsButton);
     await waitForTestIdWithText(
       aliceWindow2,
       Global.contactItem.selector,

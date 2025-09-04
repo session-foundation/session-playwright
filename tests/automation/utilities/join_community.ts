@@ -9,10 +9,7 @@ import {
 } from './utils';
 
 export const joinCommunity = async (window: Page) => {
-  await clickOnTestIdWithText(
-    window,
-    HomeScreen.plusButton.selector,
-  );
+  await clickOnTestIdWithText(window, HomeScreen.plusButton.selector);
   await clickOnTestIdWithText(window, HomeScreen.joinCommunityOption.selector);
   //   The follow two test tags are pending implementation
   await typeIntoInput(
