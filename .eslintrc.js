@@ -56,6 +56,12 @@ module.exports = {
 
      'perfectionist/sort-imports': 'error',
       'perfectionist/sort-named-imports': 'error',
+      'perfectionist/sort-classes': [
+        'error', 
+        {
+          partitionByComment: true,
+        },
+      ],
       'perfectionist/sort-union-types': [
         'error',
         {
