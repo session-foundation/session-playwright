@@ -3,7 +3,7 @@ import { Global, LeftPane, Settings } from './locators';
 import { newUser } from './setup/new_user';
 import { sessionTestOneWindow } from './setup/sessionTest';
 import {
-  clickOnTestIdWithText,
+  clickOn,
   waitForTestIdWithText,
 } from './utilities/utils';
 
@@ -11,7 +11,7 @@ sessionTestOneWindow('Create User', async ([window]) => {
   // Create User
   const userA = await newUser(window, 'Alice', false);
   // Open profile tab
-  await clickOnTestIdWithText(window, LeftPane.profileButton.selector);
+  await clickOn(window, LeftPane.profileButton);
   await sleepFor(100, true);
   // check username matches
   await waitForTestIdWithText(
@@ -26,13 +26,13 @@ sessionTestOneWindow('Create User', async ([window]) => {
     userA.accountid,
   );
   // exit profile modal
-  await clickOnTestIdWithText(window, Global.modalCloseButton.selector);
+  await clickOn(window, Global.modalCloseButton);
   // go to settings section
-  await clickOnTestIdWithText(window, LeftPane.settingsButton.selector);
+  await clickOn(window, LeftPane.settingsButton);
   // check recovery phrase matches
-  await clickOnTestIdWithText(
+  await clickOn(
     window,
-    Settings.recoveryPasswordMenuItem.selector,
+    Settings.recoveryPasswordMenuItem,
   );
   await waitForTestIdWithText(
     window,

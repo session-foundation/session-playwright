@@ -24,10 +24,11 @@ import {
   trustUser,
 } from './utilities/send_media';
 import {
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
   clickOnTextMessage,
+  clickOnWithText,
   hasTextMessageBeenDeleted,
   measureSendingTime,
   typeIntoInput,
@@ -127,35 +128,35 @@ test_Alice_1W_Bob_1W(
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await joinCommunity(aliceWindow1);
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Conversation.conversationSettingsIcon.selector,
+      Conversation.conversationSettingsIcon,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      ConversationSettings.inviteContactsOption.selector,
+      ConversationSettings.inviteContactsOption,
     );
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',
       englishStrippedStr('membersInvite').toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      Global.contactItem.selector,
+      Global.contactItem,
       bob.userName,
     );
-    await clickOnTestIdWithText(aliceWindow1, Global.confirmButton.selector);
+    await clickOn(aliceWindow1, Global.confirmButton);
     // For lack of a unique ID we use native Playwright methods
     await aliceWindow1
       .getByTestId('invite-contacts-dialog')
       .getByTestId(Global.modalCloseButton.selector)
       .click();
     // Close UCS modal
-    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
-    await clickOnTestIdWithText(
+    await clickOn(aliceWindow1, Global.modalCloseButton);
+    await clickOnWithText(
       aliceWindow1,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       bob.userName,
     );
     await Promise.all([

@@ -3,7 +3,6 @@ import { Global, Onboarding } from './locators';
 import { sessionTestOneWindow } from './setup/sessionTest';
 import {
   clickOn,
-  clickOnTestIdWithText,
   grabTextFromElement,
   typeIntoInput,
   waitForTestIdWithText,
@@ -73,12 +72,12 @@ import {
   sessionTestOneWindow(
     `Display name validation: "${testName}"`,
     async ([window]) => {
-      await clickOnTestIdWithText(
+      await clickOn(
         window,
-        Onboarding.createAccountButton.selector,
+        Onboarding.createAccountButton,
       );
       await typeIntoInput(window, 'display-name-input', displayName);
-      await clickOnTestIdWithText(window, Global.continueButton.selector);
+      await clickOn(window, Global.continueButton);
       await waitForTestIdWithText(window, Global.errorMessage.selector);
       const actualError = await grabTextFromElement(
         window,

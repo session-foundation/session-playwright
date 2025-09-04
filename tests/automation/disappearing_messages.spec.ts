@@ -1,6 +1,7 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { defaultDisappearingOptions } from './constants/variables';
+import { Conversation, HomeScreen } from './locators';
 import {
   test_Alice_2W,
   test_Alice_2W_Bob_1W,
@@ -11,9 +12,10 @@ import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
 import { setDisappearingMessages } from './utilities/set_disappearing_messages';
 import {
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   doesTextIncludeString,
   formatTimeOption,
   hasElementBeenDeleted,
@@ -42,9 +44,9 @@ test_Alice_2W_Bob_1W(
     // Create Contact
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Click on conversation in linked device
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
     );
 
@@ -106,9 +108,9 @@ test_Alice_2W_Bob_1W(
     await createContact(aliceWindow1, bobWindow1, alice, bob);
 
     // Click on conversation in linked device
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
     );
     await setDisappearingMessages(
@@ -160,9 +162,9 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
       .toString();
     const testMessage = 'Testing disappearing messages in groups';
 
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     await setDisappearingMessages(aliceWindow1, [
@@ -213,9 +215,9 @@ test_Alice_2W(
     // Open Note to self conversation
     await sendNewMessage(aliceWindow1, alice.accountid, testMessage);
     // Check messages are syncing across linked devices
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       englishStrippedStr('noteToSelf').toString(),
     );
     await waitForTextMessage(aliceWindow2, testMessage);
@@ -250,9 +252,9 @@ test_Alice_2W_Bob_1W(
     const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Click on conversation on linked device
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
     );
     // Set disappearing messages to on
@@ -301,12 +303,10 @@ test_Alice_2W_Bob_1W(
       waitForTextMessage(bobWindow1, testMessage),
       waitForTextMessage(aliceWindow2, testMessage),
     ]);
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      'conversation-options-avatar',
-      undefined,
-      undefined,
-      1000,
+      Conversation.conversationSettingsIcon,
+      {maxWait: 1_000}, 
     );
     await clickOnElement({
       window: aliceWindow1,

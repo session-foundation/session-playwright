@@ -25,8 +25,9 @@ import {
 } from './utilities/send_media';
 import { setDisappearingMessages } from './utilities/set_disappearing_messages';
 import {
+  clickOn,
   clickOnElement,
-  clickOnTestIdWithText,
+  clickOnWithText,
   formatTimeOption,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
@@ -242,34 +243,34 @@ test_Alice_1W_Bob_1W(
     await joinCommunity(aliceWindow1);
     // To stop the layout shift
     await sleepFor(500);
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Conversation.conversationSettingsIcon.selector,
+      Conversation.conversationSettingsIcon,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      ConversationSettings.inviteContactsOption.selector,
+      ConversationSettings.inviteContactsOption,
     );
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',
       englishStrippedStr('membersInvite').toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      Global.contactItem.selector,
+      Global.contactItem,
       bob.userName,
     );
-    await clickOnTestIdWithText(aliceWindow1, Global.confirmButton.selector);
+    await clickOn(aliceWindow1, Global.confirmButton);
     // For lack of a unique ID we use native Playwright methods
     await aliceWindow1
       .getByTestId('invite-contacts-dialog')
       .getByTestId('modal-close-button')
       .click();
-    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
-    await clickOnTestIdWithText(
+    await clickOn(aliceWindow1, Global.modalCloseButton);
+    await clickOnWithText(
       aliceWindow1,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       bob.userName,
     );
     await Promise.all([

@@ -11,9 +11,10 @@ import { sessionTestTwoWindows } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { sendNewMessage } from './utilities/send_message';
 import {
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   hasElementBeenDeleted,
   typeIntoInput,
   waitForElement,
@@ -38,17 +39,17 @@ sessionTestTwoWindows(
       ]);
       // Delete all data from device
       // Click on settings tab
-      await clickOnTestIdWithText(windowA, LeftPane.settingsButton.selector);
+      await clickOn(windowA, LeftPane.settingsButton);
       // Click on clear all data
-      await clickOnTestIdWithText(
+      await clickOnWithText(
         windowA,
-        Settings.clearDataMenuItem.selector,
+        Settings.clearDataMenuItem,
         englishStrippedStr('sessionClearData').toString(),
       );
       // Select entire account
-      await clickOnTestIdWithText(
+      await clickOnWithText(
         windowA,
-        Settings.clearDeviceAndNetworkRadial.selector,
+        Settings.clearDeviceAndNetworkRadial,
         englishStrippedStr('clearDeviceAndNetwork').toString(),
       );
       // Confirm deletion by clicking Clear, twice
@@ -68,9 +69,9 @@ sessionTestTwoWindows(
       restoringWindows = await openApp(1); // not using sessionTest here as we need to close and reopen one of the window
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
-      await clickOnTestIdWithText(
+      await clickOn(
         restoringWindow,
-        Onboarding.iHaveAnAccountButton.selector,
+        Onboarding.iHaveAnAccountButton,
       );
       // Fill in recovery phrase
       await typeIntoInput(
@@ -79,9 +80,9 @@ sessionTestTwoWindows(
         userA.recoveryPassword,
       );
       // Enter display name
-      await clickOnTestIdWithText(
+      await clickOn(
         restoringWindow,
-        Global.continueButton.selector,
+        Global.continueButton,
       );
       await waitForLoadingAnimationToFinish(
         restoringWindow,
@@ -94,9 +95,9 @@ sessionTestTwoWindows(
         userA.userName,
       );
       // Click continue
-      await clickOnTestIdWithText(
+      await clickOn(
         restoringWindow,
-        Global.continueButton.selector,
+        Global.continueButton,
       );
       await sleepFor(5000, true); // just to allow any messages from our swarm to show up
 
@@ -108,9 +109,9 @@ sessionTestTwoWindows(
         HomeScreen.conversationItemName.selector,
       );
 
-      await clickOnTestIdWithText(
+      await clickOn(
         restoringWindow,
-        HomeScreen.plusButton.selector,
+        HomeScreen.plusButton,
       ); // Expect contacts list to be empty
 
       await hasElementBeenDeleted(
@@ -140,11 +141,11 @@ sessionTestTwoWindows(
       await createContact(windowA, windowB, userA, userB);
       // Delete all data from device
       // Click on settings tab
-      await clickOnTestIdWithText(windowA, LeftPane.settingsButton.selector);
+      await clickOn(windowA, LeftPane.settingsButton);
       // Click on clear all data
-      await clickOnTestIdWithText(
+      await clickOnWithText(
         windowA,
-        Settings.clearDataMenuItem.selector,
+        Settings.clearDataMenuItem,
         englishStrippedStr('sessionClearData').toString(),
       );
       // Keep 'Clear Device only' selection

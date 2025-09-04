@@ -17,9 +17,10 @@ import { createContact } from './utilities/create_contact';
 import { leaveGroup } from './utilities/leave_group';
 import { renameGroup } from './utilities/rename_group';
 import {
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   grabTextFromElement,
   typeIntoInput,
   waitForMatchingText,
@@ -61,9 +62,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
     groupCreated,
   }) => {
     await createContact(aliceWindow1, draculaWindow1, alice, dracula);
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     await clickOnElement({
@@ -97,10 +98,10 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
       },
       [aliceWindow1, bobWindow1, charlieWindow1],
     );
-    await clickOnTestIdWithText(draculaWindow1, Global.backButton.selector);
-    await clickOnTestIdWithText(
+    await clickOn(draculaWindow1, Global.backButton);
+    await clickOnWithText(
       draculaWindow1,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
   },
@@ -133,17 +134,17 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Click on conversation options
     // Check to see that you can't change group name to empty string
     // Click on edit group name
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Conversation.conversationSettingsIcon.selector,
+      Conversation.conversationSettingsIcon,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      ConversationSettings.editGroupButton.selector,
+      ConversationSettings.editGroupButton,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      ConversationSettings.clearGroupNameButton.selector,
+      ConversationSettings.clearGroupNameButton,
     );
     await waitForTestIdWithText(aliceWindow1, Global.errorMessage.selector);
     const actualError = await grabTextFromElement(
@@ -160,7 +161,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       aliceWindow1,
       englishStrippedStr('cancel').toString(),
     );
-    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
+    await clickOn(aliceWindow1, Global.modalCloseButton);
   },
 );
 
@@ -177,9 +178,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   }) => {
     // in windowA we should be able to mentions bob and userC
 
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     await typeIntoInput(aliceWindow1, 'message-input-text-area', '@');
@@ -196,17 +197,17 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       charlie.userName,
     );
     // ALice tags Bob
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'mentions-popup-row',
+      Conversation.mentionsPopup,
       bob.userName,
     );
     await waitForMatchingText(bobWindow1, 'You');
 
     // in windowB we should be able to mentions alice and charlie
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       bobWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     await typeIntoInput(bobWindow1, 'message-input-text-area', '@');
@@ -223,17 +224,17 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       charlie.userName,
     );
     // Bob tags Charlie
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       bobWindow1,
-      'mentions-popup-row',
+      Conversation.mentionsPopup,
       charlie.userName,
     );
     await waitForMatchingText(charlieWindow1, 'You');
 
     // in charlieWindow1 we should be able to mentions alice and userB
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       charlieWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     await typeIntoInput(charlieWindow1, 'message-input-text-area', '@');
@@ -250,9 +251,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       bob.userName,
     );
     // Charlie tags Alice
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       charlieWindow1,
-      'mentions-popup-row',
+      Conversation.mentionsPopup,
       alice.userName,
     );
     await waitForMatchingText(aliceWindow1, 'You');

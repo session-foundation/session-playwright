@@ -22,10 +22,11 @@ import { linkedDevice } from './utilities/linked_device';
 import { sendMessage } from './utilities/message';
 import {
   checkModalStrings,
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
   clickOnTextMessage,
+  clickOnWithText,
   doWhileWithMax,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
@@ -42,7 +43,7 @@ sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
   try {
     const userA = await newUser(aliceWindow1, 'Alice');
     aliceWindow2 = await linkedDevice(userA.recoveryPassword); // not using fixture here as we want to check the behavior finely
-    await clickOnTestIdWithText(aliceWindow1, LeftPane.profileButton.selector);
+    await clickOn(aliceWindow1, LeftPane.profileButton);
     // Verify Username
     await waitForTestIdWithText(
       aliceWindow1,
@@ -56,7 +57,7 @@ sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
       userA.accountid,
     );
     // exit profile modal
-    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
+    await clickOn(aliceWindow1, Global.modalCloseButton);
     // You're almost finished isn't displayed
     const errorDesc = 'Should not be found';
     try {
@@ -86,9 +87,9 @@ test_Alice_2W(
   'Changed username syncs',
   async ({ aliceWindow1, aliceWindow2 }) => {
     const newUsername = 'Tiny bubble';
-    await clickOnTestIdWithText(aliceWindow1, LeftPane.profileButton.selector);
+    await clickOn(aliceWindow1, LeftPane.profileButton);
     // Click on pencil icon
-    await clickOnTestIdWithText(aliceWindow1, Settings.displayName.selector);
+    await clickOn(aliceWindow1, Settings.displayName);
     // Replace old username with new username
     await typeIntoInput(
       aliceWindow1,
@@ -109,9 +110,9 @@ test_Alice_2W(
       500,
       'waiting for updated username in profile dialog',
       async () => {
-        await clickOnTestIdWithText(
+        await clickOn(
           aliceWindow2,
-          LeftPane.profileButton.selector,
+          LeftPane.profileButton,
         );
         // Verify username has changed to new username
         try {
@@ -140,29 +141,29 @@ test_Alice_2W(
 test_Alice_2W(
   'Profile picture syncs',
   async ({ aliceWindow1, aliceWindow2 }, testinfo) => {
-    await clickOnTestIdWithText(aliceWindow1, LeftPane.profileButton.selector);
+    await clickOn(aliceWindow1, LeftPane.profileButton);
     // Click on current profile picture
-    await clickOnTestIdWithText(aliceWindow1, Settings.displayName.selector);
-    await clickOnTestIdWithText(
+    await clickOn(aliceWindow1, Settings.displayName);
+    await clickOn(
       aliceWindow1,
-      Settings.imageUploadSection.selector,
+      Settings.imageUploadSection,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Settings.imageUploadClick.selector,
+      Settings.imageUploadClick,
     );
     // allow for the image to be resized before we try to save it
     await sleepFor(500);
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Settings.saveProfileUpdateButton.selector,
+      Settings.saveProfileUpdateButton,
     );
     await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
     await clickOnMatchingText(
       aliceWindow1,
       englishStrippedStr('save').toString(),
     );
-    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
+    await clickOn(aliceWindow1, Global.modalCloseButton);
 
     if (testinfo.config.updateSnapshots === 'all') {
       await sleepFor(15000, true); // long time to be sure a poll happened when we want to update the snapshot
@@ -226,9 +227,9 @@ test_Alice_2W_Bob_1W(
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await sendMessage(aliceWindow1, messageToDelete);
     // Navigate to conversation on linked device and for message from user A to user B
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
     );
     await Promise.all([
@@ -240,9 +241,9 @@ test_Alice_2W_Bob_1W(
       aliceWindow1,
       englishStrippedStr('delete').toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton,
       englishStrippedStr('delete').toString(),
     );
     await waitForTestIdWithText(
@@ -269,9 +270,9 @@ test_Alice_2W_Bob_1W(
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await sendMessage(aliceWindow1, unsentMessage);
     // Navigate to conversation on linked device and for message from user A to user B
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
     );
     await Promise.all([
@@ -317,16 +318,16 @@ test_Alice_2W_Bob_1W(
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await sendMessage(aliceWindow1, testMessage);
     // Navigate to conversation on linked device and check for message from user A to user B
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       bob.userName,
-      true,
+      {rightButton: true},
     );
     // Select block
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      Global.contextMenuItem.selector,
+      Global.contextMenuItem,
       englishStrippedStr('block').toString(),
     );
     // Check modal strings
@@ -337,9 +338,9 @@ test_Alice_2W_Bob_1W(
         .withArgs({ name: bob.userName })
         .toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      Global.confirmButton.selector,
+      Global.confirmButton,
       englishStrippedStr('block').toString(),
     );
     // Verify the user was moved to the blocked contact list
@@ -350,18 +351,16 @@ test_Alice_2W_Bob_1W(
     );
     // Check linked device for blocked contact in settings screen
     // Click on settings tab
-    await clickOnTestIdWithText(aliceWindow2, LeftPane.settingsButton.selector);
-    await clickOnTestIdWithText(
+    await clickOn(aliceWindow2, LeftPane.settingsButton);
+    await clickOn(
       aliceWindow2,
-      Settings.conversationsMenuItem.selector,
+      Settings.conversationsMenuItem,
     );
     // a conf sync job can take 30s (if the last one failed) +  10s polling to show a change on a linked device.
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow2,
-      Settings.blockedContactsButton.selector,
-      undefined,
-      undefined,
-      50000,
+      Settings.blockedContactsButton,
+      {maxWait: 50_000},
     );
     // Check if user B is in blocked contact list
     await waitForTestIdWithText(
@@ -377,7 +376,7 @@ test_Alice_2W_Bob_1W(
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await clickOnTestIdWithText(bobWindow1, Global.backButton.selector);
+    await clickOn(bobWindow1, Global.backButton);
     await Promise.all(
       [aliceWindow1, aliceWindow2, bobWindow1].map((w) =>
         clickOnElement({
@@ -406,19 +405,19 @@ test_Alice_2W_Bob_1W(
     ]);
     await Promise.all(
       [aliceWindow1, aliceWindow2, bobWindow1].map((w) =>
-        clickOnTestIdWithText(w, Global.backButton.selector),
+        clickOn(w, Global.backButton),
       ),
     );
     // Delete contact
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       bob.userName,
-      true,
+      {rightButton: true},
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      Global.contextMenuItem.selector,
+      Global.contextMenuItem,
       englishStrippedStr('conversationsDelete').toString(),
     );
     await checkModalStrings(
@@ -428,9 +427,9 @@ test_Alice_2W_Bob_1W(
         .withArgs({ name: bob.userName })
         .toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      Global.confirmButton.selector,
+      Global.confirmButton,
       englishStrippedStr('delete').toString(),
     );
     // Check if conversation is deleted
@@ -452,22 +451,22 @@ test_Alice_2W_Bob_1W(
 test_Alice_2W(
   'Hide note to self syncs',
   async ({ alice, aliceWindow1, aliceWindow2 }) => {
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      HomeScreen.plusButton.selector,
+      HomeScreen.plusButton,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      HomeScreen.newMessageOption.selector,
+      HomeScreen.newMessageOption,
     );
     await typeIntoInput(
       aliceWindow1,
       HomeScreen.newMessageAccountIDInput.selector,
       alice.accountid,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      HomeScreen.newMessageNextButton.selector,
+      HomeScreen.newMessageNextButton,
     );
     await waitForTestIdWithText(
       aliceWindow1,
@@ -482,15 +481,15 @@ test_Alice_2W(
       HomeScreen.conversationItemName.selector,
       englishStrippedStr('noteToSelf').toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       englishStrippedStr('noteToSelf').toString(),
-      true,
+      {rightButton: true},
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      Global.contextMenuItem.selector,
+      Global.contextMenuItem,
       englishStrippedStr('noteToSelfHide').toString(),
     );
     await checkModalStrings(
@@ -498,9 +497,9 @@ test_Alice_2W(
       englishStrippedStr('noteToSelfHide').toString(),
       englishStrippedStr('noteToSelfHideDescription').toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      Global.confirmButton.selector,
+      Global.confirmButton,
       englishStrippedStr('hide').toString(),
     );
     // Check linked device for hidden note to self

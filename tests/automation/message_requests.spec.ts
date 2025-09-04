@@ -1,12 +1,13 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
-import { Conversation, HomeScreen, LeftPane } from './locators';
+import { Conversation, Global, HomeScreen, LeftPane, Settings } from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
 import {
   checkModalStrings,
+  clickOn,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utilities/utils';
@@ -19,20 +20,20 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(
+    await clickOn(
       bobWindow1,
-      HomeScreen.messageRequestBanner.selector,
+      HomeScreen.messageRequestBanner,
     );
     // Select message request from User A
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       bobWindow1,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       alice.userName,
     );
     // Check that using the accept button has intended use
-    await clickOnTestIdWithText(
+    await clickOn(
       bobWindow1,
-      Conversation.acceptMessageRequestButton.selector,
+      Conversation.acceptMessageRequestButton,
     );
     // Check config message of message request acceptance
     await waitForTestIdWithText(
@@ -59,14 +60,14 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(
+    await clickOn(
       bobWindow1,
-      HomeScreen.messageRequestBanner.selector,
+      HomeScreen.messageRequestBanner,
     );
     // Select message request from User A
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       bobWindow1,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       alice.userName,
     );
     await sendMessage(bobWindow1, testReply);
@@ -95,20 +96,20 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(
+    await clickOn(
       bobWindow1,
-      HomeScreen.messageRequestBanner.selector,
+      HomeScreen.messageRequestBanner,
     );
     // Select message request from User A
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       bobWindow1,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       alice.userName,
     );
 
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       bobWindow1,
-      'delete-message-request',
+      Conversation.deleteMessageRequestButton,
       englishStrippedStr('delete').toString(),
     );
     // Confirm decline
@@ -117,9 +118,9 @@ test_Alice_1W_Bob_1W(
       englishStrippedStr('delete').toString(),
       englishStrippedStr('messageRequestsDelete').toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       bobWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton,
       englishStrippedStr('delete').toString(),
     );
     // Check config message of message request acceptance
@@ -137,9 +138,9 @@ test_Alice_1W_Bob_1W(
     // send a message to User B from User A
     await sendNewMessage(aliceWindow1, bob.accountid, `${testMessage}`);
     // Check the message request banner appears and click on it
-    await clickOnTestIdWithText(
+    await clickOn(
       bobWindow1,
-      HomeScreen.messageRequestBanner.selector,
+      HomeScreen.messageRequestBanner,
     );
     // Select 'Clear All' button
     await clickOnMatchingText(
@@ -152,17 +153,17 @@ test_Alice_1W_Bob_1W(
       englishStrippedStr('clearAll').toString(),
       englishStrippedStr('messageRequestsClearAllExplanation').toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       bobWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton,
       englishStrippedStr('clear').toString(),
     );
     // Navigate back to message request folder to check
-    await clickOnTestIdWithText(bobWindow1, LeftPane.settingsButton.selector);
+    await clickOn(bobWindow1, LeftPane.settingsButton);
 
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       bobWindow1,
-      'message-requests-settings-menu-item',
+      Settings.messageRequestsMenuItem,
       englishStrippedStr('sessionMessageRequests').toString(),
     );
     // Check config message of message request acceptance

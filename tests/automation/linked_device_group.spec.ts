@@ -18,8 +18,9 @@ import {
 import { leaveGroup } from './utilities/leave_group';
 import {
   checkModalStrings,
+  clickOn,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   waitForTestIdWithText,
 } from './utilities/utils';
 
@@ -44,9 +45,9 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     // Check for user A for control message that userC left group
     // await sleepFor(1000);
     // Click on group
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     await waitForTestIdWithText(
@@ -59,9 +60,9 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
         .toString(),
     );
     // Check for linked device (userA)
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     await waitForTestIdWithText(
@@ -100,9 +101,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     // Check header name
@@ -112,15 +113,15 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check for group members
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow2,
-      Conversation.conversationSettingsIcon.selector,
+      Conversation.conversationSettingsIcon,
     );
     // Check right panel has correct name
     await waitForTestIdWithText(aliceWindow2, 'group-name');
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow2,
-      ConversationSettings.manageMembersOption.selector,
+      ConversationSettings.manageMembersOption,
     );
     await waitForTestIdWithText(
       aliceWindow2,
@@ -149,11 +150,11 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 );
 
 async function clearDataOnWindow(window: Page) {
-  await clickOnTestIdWithText(window, LeftPane.settingsButton.selector);
+  await clickOn(window, LeftPane.settingsButton);
   // Click on clear data option on left pane
-  await clickOnTestIdWithText(
+  await clickOnWithText(
     window,
-    Settings.clearDataMenuItem.selector,
+    Settings.clearDataMenuItem,
     englishStrippedStr('sessionClearData').toString(),
   );
   await checkModalStrings(
@@ -162,9 +163,9 @@ async function clearDataOnWindow(window: Page) {
     englishStrippedStr('clearDataAllDescription').toString(),
     'deleteAccountModal',
   );
-  await clickOnTestIdWithText(
+  await clickOnWithText(
     window,
-    Global.confirmButton.selector,
+    Global.confirmButton,
     englishStrippedStr('clear').toString(),
   );
   await checkModalStrings(
@@ -191,9 +192,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow2,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     // Check header name
@@ -203,13 +204,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check for group members
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow2,
-      Conversation.conversationSettingsIcon.selector,
+      Conversation.conversationSettingsIcon,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow2,
-      ConversationSettings.manageMembersOption.selector,
+      ConversationSettings.manageMembersOption,
     );
     // Check for You, Bob and Charlie
     await Promise.all([
@@ -229,8 +230,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
         charlie.userName,
       ),
     ]);
-    await clickOnTestIdWithText(aliceWindow2, Global.cancelButton.selector);
-    await clickOnTestIdWithText(aliceWindow2, Global.modalCloseButton.selector);
+    await clickOn(aliceWindow2, Global.cancelButton);
+    await clickOn(aliceWindow2, Global.modalCloseButton);
     // Delete device data on alicewindow2
     await clearDataOnWindow(aliceWindow2);
     const [restoredWindow] = await openApp(1);
@@ -242,9 +243,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       restoredWindow,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     // Check header name
@@ -254,13 +255,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check for group members
-    await clickOnTestIdWithText(
+    await clickOn(
       restoredWindow,
-      Conversation.conversationSettingsIcon.selector,
+      Conversation.conversationSettingsIcon,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       restoredWindow,
-      ConversationSettings.manageMembersOption.selector,
+      ConversationSettings.manageMembersOption,
     );
     // Check for You, Bob and Charlie
     await Promise.all([
@@ -281,10 +282,10 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       ),
     ]);
     // Do it all again
-    await clickOnTestIdWithText(restoredWindow, Global.cancelButton.selector);
-    await clickOnTestIdWithText(
+    await clickOn(restoredWindow, Global.cancelButton);
+    await clickOn(
       restoredWindow,
-      Global.modalCloseButton.selector,
+      Global.modalCloseButton,
     );
     // Delete device data on restoredWindow
     await clearDataOnWindow(restoredWindow);
@@ -297,9 +298,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       restoredWindow2,
-      HomeScreen.conversationItemName.selector,
+      HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     // Check header name
@@ -309,13 +310,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check for group members
-    await clickOnTestIdWithText(
+    await clickOn(
       restoredWindow2,
-      Conversation.conversationSettingsIcon.selector,
+      Conversation.conversationSettingsIcon,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       restoredWindow2,
-      ConversationSettings.manageMembersOption.selector,
+      ConversationSettings.manageMembersOption,
     );
     // Check for You, Bob and Charlie
     await Promise.all([

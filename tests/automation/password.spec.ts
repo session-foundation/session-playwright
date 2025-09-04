@@ -5,8 +5,8 @@ import { sleepFor } from '../promise_utils';
 import { Global, LeftPane, Settings } from './locators';
 import { test_Alice_1W_no_network } from './setup/sessionTest';
 import {
+  clickOn,
   clickOnMatchingText,
-  clickOnTestIdWithText,
   hasElementPoppedUpThatShouldnt,
   typeIntoInput,
   waitForTestIdWithText,
@@ -29,13 +29,13 @@ async function expectRecoveryPhraseToBeVisible(
 
 test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   // Click on settings tab
-  await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector);
+  await clickOn(aliceWindow1, LeftPane.settingsButton);
   // Click on privacy
-  await clickOnTestIdWithText(aliceWindow1, Settings.privacyMenuItem.selector);
+  await clickOn(aliceWindow1, Settings.privacyMenuItem);
   // Click set password
-  await clickOnTestIdWithText(
+  await clickOn(
     aliceWindow1,
-    Settings.setPasswordSettingsButton.selector,
+    Settings.setPasswordSettingsButton,
   );
   // Enter password
   await typeIntoInput(
@@ -49,9 +49,9 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
     Settings.confirmPasswordInput.selector,
     testPassword,
   );
-  await clickOnTestIdWithText(
+  await clickOn(
     aliceWindow1,
-    Settings.setPasswordButton.selector,
+    Settings.setPasswordButton,
   );
   // Check toast notification
   await waitForTestIdWithText(
@@ -61,11 +61,11 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   );
   // Click on settings tab
   await sleepFor(300, true);
-  await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
-  await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector);
-  await clickOnTestIdWithText(
+  await clickOn(aliceWindow1, Global.modalCloseButton);
+  await clickOn(aliceWindow1, LeftPane.settingsButton);
+  await clickOn(
     aliceWindow1,
-    Settings.recoveryPasswordMenuItem.selector,
+    Settings.recoveryPasswordMenuItem,
   );
   await sleepFor(300, true);
 
@@ -83,13 +83,13 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
 
   // check that the seed is visible now
   await expectRecoveryPhraseToBeVisible(aliceWindow1, alice.recoveryPassword);
-  await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
-  await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector);
-  await clickOnTestIdWithText(aliceWindow1, Settings.privacyMenuItem.selector);
+  await clickOn(aliceWindow1, Global.modalCloseButton);
+  await clickOn(aliceWindow1, LeftPane.settingsButton);
+  await clickOn(aliceWindow1, Settings.privacyMenuItem);
   // Change password
-  await clickOnTestIdWithText(
+  await clickOn(
     aliceWindow1,
-    Settings.changePasswordSettingsButton.selector,
+    Settings.changePasswordSettingsButton,
   );
 
   // Enter old password
@@ -125,16 +125,16 @@ test_Alice_1W_no_network(
   async ({ alice: { recoveryPassword }, aliceWindow1 }) => {
     // Check if incorrect password works
     // Click on settings tab
-    await clickOnTestIdWithText(aliceWindow1, LeftPane.settingsButton.selector);
+    await clickOn(aliceWindow1, LeftPane.settingsButton);
     // Click on privacy
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Settings.privacyMenuItem.selector,
+      Settings.privacyMenuItem,
     );
     // Click set password
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Settings.setPasswordSettingsButton.selector,
+      Settings.setPasswordSettingsButton,
     );
     // Enter password
     await typeIntoInput(
@@ -148,16 +148,16 @@ test_Alice_1W_no_network(
       Settings.confirmPasswordInput.selector,
       testPassword,
     );
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Settings.setPasswordButton.selector,
+      Settings.setPasswordButton,
     );
     // Click on recovery phrase tab
     await sleepFor(5000);
-    await clickOnTestIdWithText(aliceWindow1, Global.modalBackButton.selector);
-    await clickOnTestIdWithText(
+    await clickOn(aliceWindow1, Global.modalBackButton);
+    await clickOn(
       aliceWindow1,
-      Settings.recoveryPasswordMenuItem.selector,
+      Settings.recoveryPasswordMenuItem,
     );
     // Type password into input field
     await typeIntoInput(
@@ -166,16 +166,16 @@ test_Alice_1W_no_network(
       testPassword,
     );
     // Confirm the password
-    await clickOnTestIdWithText(aliceWindow1, Global.confirmButton.selector);
+    await clickOn(aliceWindow1, Global.confirmButton);
     // this should print the recovery phrase
     await expectRecoveryPhraseToBeVisible(aliceWindow1, recoveryPassword);
 
-    await clickOnTestIdWithText(aliceWindow1, Global.modalBackButton.selector);
+    await clickOn(aliceWindow1, Global.modalBackButton);
     await sleepFor(500);
     // Click on recovery phrase tab
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Settings.recoveryPasswordMenuItem.selector,
+      Settings.recoveryPasswordMenuItem,
     );
     // Try with incorrect password
     await typeIntoInput(
@@ -184,7 +184,7 @@ test_Alice_1W_no_network(
       newTestPassword,
     );
     // Confirm the password
-    await clickOnTestIdWithText(aliceWindow1, Global.confirmButton.selector);
+    await clickOn(aliceWindow1, Global.confirmButton);
     // this should NOT print the recovery phrase
 
     await hasElementPoppedUpThatShouldnt(
@@ -200,15 +200,15 @@ test_Alice_1W_no_network(
       Global.errorMessage.selector,
       englishStrippedStr('passwordIncorrect').toString(),
     );
-    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
+    await clickOn(aliceWindow1, Global.modalCloseButton);
     await sleepFor(100);
     // Click on recovery phrase tab
-    await clickOnTestIdWithText(
+    await clickOn(
       aliceWindow1,
-      Settings.recoveryPasswordMenuItem.selector,
+      Settings.recoveryPasswordMenuItem,
     );
     //  No password entered
-    await clickOnTestIdWithText(aliceWindow1, Global.confirmButton.selector);
+    await clickOn(aliceWindow1, Global.confirmButton);
     //  Banner should ask for password to be entered
     await waitForTestIdWithText(
       aliceWindow1,
