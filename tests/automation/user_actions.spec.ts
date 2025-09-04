@@ -17,7 +17,7 @@ import {
   test_Alice_2W,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
-import { sendMessage } from './utilities/message';
+import { sendMessage, waitForReadTick } from './utilities/message';
 import {
   checkModalStrings,
   clickOnElement,
@@ -216,7 +216,7 @@ test_Alice_1W_no_network(
     await sleepFor(500);
     const leftpaneAvatarContainer = await waitForTestIdWithText(
       aliceWindow1,
-      'leftpane-primary-avatar',
+      LeftPane.profileButton.selector,
     );
     const start = Date.now();
     let correctScreenshot = false;
@@ -303,34 +303,40 @@ test_Alice_1W_Bob_1W(
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
-      selector: 'settings-section',
-    });
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'enable-read-receipts',
+      selector: LeftPane.settingsButton.selector,
     });
     await clickOnTestIdWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      Settings.privacyMenuItem.selector,
+    );
+    await clickOnElement({
+      window: aliceWindow1,
+      strategy: 'data-testid',
+      selector: Settings.enableReadReceipts.selector,
+    });
+    await clickOnTestIdWithText(aliceWindow1, Global.modalCloseButton.selector);
+    await clickOnTestIdWithText(
+      aliceWindow1,
+      HomeScreen.conversationItemName.selector,
       bob.userName,
     );
     await clickOnElement({
       window: bobWindow1,
       strategy: 'data-testid',
-      selector: 'settings-section',
+      selector: LeftPane.settingsButton.selector,
     });
+    await clickOnTestIdWithText(bobWindow1, Settings.privacyMenuItem.selector);
+
     await clickOnElement({
       window: bobWindow1,
       strategy: 'data-testid',
-      selector: 'enable-read-receipts',
+      selector: Settings.enableReadReceipts.selector,
     });
-    await clickOnTestIdWithText(
-      bobWindow1,
-      'module-conversation__user__profile-name',
-      alice.userName,
-    );
+    await clickOnTestIdWithText(bobWindow1, Global.modalCloseButton.selector);
     await sendMessage(aliceWindow1, 'Testing read receipts');
+    await clickOnTestIdWithText(bobWindow1, Global.backButton.selector);
+    await clickOnTestIdWithText(bobWindow1, HomeScreen.conversationItemName.selector, alice.userName);
+    await waitForReadTick(aliceWindow1, 'Testing read receipts');
   },
 );
 
@@ -451,14 +457,20 @@ test_Alice_2W(
 );
 
 test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
-  await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
-  await clickOnTestIdWithText(aliceWindow1, 'chooser-invite-friend');
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    HomeScreen.newConversationButton.selector,
+  );
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    HomeScreen.inviteAFriendOption.selector,
+  );
   await waitForTestIdWithText(aliceWindow1, 'your-account-id', alice.accountid);
   await clickOnTestIdWithText(aliceWindow1, 'copy-button-account-id');
   // Toast
   await waitForTestIdWithText(
     aliceWindow1,
-    'session-toast',
+    Global.toast.selector,
     englishStrippedStr('copied').toString(),
   );
   // Wait for copy to resolve
@@ -472,19 +484,26 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
     englishStrippedStr('shareAccountIdDescriptionCopied').toString(),
   );
   // To exit invite a friend
-  await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
-  // To create note to self
-  await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+  await clickOnTestIdWithText(aliceWindow1, Global.backButton.selector);
   // New message
-  await clickOnTestIdWithText(aliceWindow1, 'chooser-new-conversation-button');
-  await clickOnTestIdWithText(aliceWindow1, 'new-session-conversation');
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    HomeScreen.newMessageOption.selector,
+  );
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    HomeScreen.newMessageAccountIDInput.selector,
+  );
   const isMac = process.platform === 'darwin';
   await aliceWindow1.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
-  await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
+  await clickOnTestIdWithText(
+    aliceWindow1,
+    HomeScreen.newMessageNextButton.selector,
+  );
   // Did the copied text create note to self?
   await waitForTestIdWithText(
     aliceWindow1,
-    'header-conversation-name',
+    Conversation.conversationHeader.selector,
     englishStrippedStr('noteToSelf').toString(),
   );
 });

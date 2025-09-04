@@ -123,7 +123,7 @@ export type DataTestId =
   | 'empty-conversation-notification'
   | 'enable-calls-settings-row'
   | 'enable-microphone-settings-row'
-  | 'enable-read-receipts'
+  | 'enable-read-receipts-settings-row'
   | 'end-call'
   | 'end-voice-message'
   | 'error-message'

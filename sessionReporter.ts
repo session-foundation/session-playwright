@@ -75,13 +75,13 @@ function printFailedTestLogs() {
 }
 
 class SessionReporter implements Reporter {
-  private startTime = 0;
+  private allResults: Array<TestAndResult> = [];
 
   private allTestsCount = 0;
 
-  private allResults: Array<TestAndResult> = [];
-
   private countWorkers = 1;
+
+  private startTime = 0;
 
   onBegin(config: FullConfig, suite: Suite) {
     this.allTestsCount = suite.allTests().length;
@@ -91,6 +91,56 @@ class SessionReporter implements Reporter {
       `\t\tStarting the run with ${this.allTestsCount} tests, with ${this.countWorkers} workers, ${config.projects[0].retries} retries and ${config.projects[0].repeatEach} repeats`,
     );
     this.startTime = Date.now();
+  }
+
+  onEnd(result: FullResult) {
+    console.log(
+      chalk.bgWhiteBright.black(
+        `\n\n\n\t\tFinished the run: ${result.status}, count of tests run: ${
+          this.allResults.length
+        }, took ${Math.floor(
+          (Date.now() - this.startTime) / (60 * 1000),
+        )} minute(s)`,
+      ),
+    );
+    const { allFailedSoFar, allPassedSoFar, partiallyPassed } =
+      this.groupResultsByTestName();
+
+    sortByTitle(allPassedSoFar).forEach((m) => formatGroupedByResults(m));
+    sortByTitle(partiallyPassed).forEach((m) => formatGroupedByResults(m));
+    sortByTitle(allFailedSoFar).forEach((m) => formatGroupedByResults(m));
+  }
+
+  onError?(error: TestError) {
+    console.info('global error:', error);
+  }
+
+  onStdErr?(
+    chunk: Buffer | string,
+    test: TestCase | void,
+    _result: TestResult | void,
+  ) {
+    if (printOngoingTestLogs()) {
+      process.stdout.write(
+        `"${test ? `${chalk.cyanBright(test.title)}` : ''}":err: ${
+          isString(chunk) ? chunk : chunk.toString('utf-8')
+        }`,
+      );
+    }
+  }
+
+  onStdOut?(
+    chunk: Buffer | string,
+    test: TestCase | void,
+    _result: TestResult | void,
+  ) {
+    if (printOngoingTestLogs()) {
+      process.stdout.write(
+        `"${test ? `${chalk.cyanBright(test.title)}` : ''}": ${
+          isString(chunk) ? chunk : chunk.toString('utf-8')
+        }`,
+      );
+    }
   }
 
   onTestBegin(test: TestCase, result: TestResult) {
@@ -200,56 +250,6 @@ class SessionReporter implements Reporter {
         (m) => m.test.title,
       ),
     };
-  }
-
-  onEnd(result: FullResult) {
-    console.log(
-      chalk.bgWhiteBright.black(
-        `\n\n\n\t\tFinished the run: ${result.status}, count of tests run: ${
-          this.allResults.length
-        }, took ${Math.floor(
-          (Date.now() - this.startTime) / (60 * 1000),
-        )} minute(s)`,
-      ),
-    );
-    const { allFailedSoFar, allPassedSoFar, partiallyPassed } =
-      this.groupResultsByTestName();
-
-    sortByTitle(allPassedSoFar).forEach((m) => formatGroupedByResults(m));
-    sortByTitle(partiallyPassed).forEach((m) => formatGroupedByResults(m));
-    sortByTitle(allFailedSoFar).forEach((m) => formatGroupedByResults(m));
-  }
-
-  onStdOut?(
-    chunk: Buffer | string,
-    test: TestCase | void,
-    _result: TestResult | void,
-  ) {
-    if (printOngoingTestLogs()) {
-      process.stdout.write(
-        `"${test ? `${chalk.cyanBright(test.title)}` : ''}": ${
-          isString(chunk) ? chunk : chunk.toString('utf-8')
-        }`,
-      );
-    }
-  }
-
-  onStdErr?(
-    chunk: Buffer | string,
-    test: TestCase | void,
-    _result: TestResult | void,
-  ) {
-    if (printOngoingTestLogs()) {
-      process.stdout.write(
-        `"${test ? `${chalk.cyanBright(test.title)}` : ''}":err: ${
-          isString(chunk) ? chunk : chunk.toString('utf-8')
-        }`,
-      );
-    }
-  }
-
-  onError?(error: TestError) {
-    console.info('global error:', error);
   }
 }
 

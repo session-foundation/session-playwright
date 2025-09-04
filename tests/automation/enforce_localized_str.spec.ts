@@ -240,7 +240,7 @@ function getExpectedStringFromKey(
     case 'qrView':
       return 'View QR';
     case 'recoveryPasswordView':
-      return 'View Password';
+      return 'View Recovery Password';
     case 'deleteConversationDescription':
       return 'Are you sure you want to delete your conversation with {name}? This will permanently delete all messages and attachments.';
     case 'manageMembers':

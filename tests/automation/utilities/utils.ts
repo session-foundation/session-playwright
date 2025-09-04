@@ -424,7 +424,7 @@ export async function hasTextMessageBeenDeleted(
   maxWait: number = 5000,
 ) {
   await doWhileWithMax(
-    15000,
+    maxWait,
     500,
     'waiting for text message to be deleted',
     async () => {
@@ -592,7 +592,7 @@ export async function compareScreenshot(
   );
   // If screenshot does not exist, save it to the folder
   if (!fs.existsSync(previousScreenshotFilePath)) {
-    fs.writeFileSync(previousScreenshotFilePath, elementScreenshot);
+    fs.writeFileSync(previousScreenshotFilePath, elementScreenshot as any); // TS really hates this unless its cast as any
   }
   // If screenshot does exist, compare it to previous screenshot in the folder
   const previousScreenshot = fs.readFileSync(previousScreenshotFilePath);
@@ -601,9 +601,11 @@ export async function compareScreenshot(
     `${elementState}-${os}-difference.png`,
   );
   // If screenshots are different, then create a difference screenshot
-  if (!elementScreenshot.equals(previousScreenshot)) {
+  if (
+    Buffer.compare(elementScreenshot as any, previousScreenshot as any) !== 0
+  ) {
     //  If elements do not match, then take the elementScreenshot and save it to same folder but with a new name of 'difference.png'
-    fs.writeFileSync(diffFilePath, elementScreenshot);
+    fs.writeFileSync(diffFilePath, elementScreenshot as any);
     throw new Error(
       `Screenshots do not match, see ${screenshotFolder} > ${testTitle} folder > \n\t\t diff: ${diffFilePath}\n\t\t previous: ${previousScreenshotFilePath}`,
     );

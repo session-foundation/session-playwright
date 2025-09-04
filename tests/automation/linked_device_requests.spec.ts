@@ -164,7 +164,11 @@ test_Alice_2W_Bob_1W(
       aliceWindow1,
       Settings.blockedContactsButton.selector,
     );
-    await waitForTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await waitForTestIdWithText(
+      aliceWindow1,
+      Global.contactItem.selector,
+      bob.userName,
+    );
     // Check that the blocked contacts is on alicewindow2
     // Check blocked status in blocked contacts list
     await sleepFor(5000);
@@ -177,7 +181,11 @@ test_Alice_2W_Bob_1W(
       aliceWindow2,
       Settings.blockedContactsButton.selector,
     );
-    await waitForTestIdWithText(aliceWindow2, 'contact', bob.userName);
+    await waitForTestIdWithText(
+      aliceWindow2,
+      Global.contactItem.selector,
+      bob.userName,
+    );
     await waitForMatchingText(aliceWindow2, bob.userName);
   },
 );
