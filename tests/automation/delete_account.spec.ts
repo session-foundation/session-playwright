@@ -12,7 +12,6 @@ import { createContact } from './utilities/create_contact';
 import { sendNewMessage } from './utilities/send_message';
 import {
   clickOn,
-  clickOnElement,
   clickOnMatchingText,
   clickOnWithText,
   hasElementBeenDeleted,
@@ -163,11 +162,7 @@ sessionTestTwoWindows(
         userB.userName,
       );
       // Check if contact is available in contacts section
-      await clickOnElement({
-        window: restoringWindow,
-        strategy: 'data-testid',
-        selector: HomeScreen.plusButton.selector,
-      });
+      await clickOn(restoringWindow, HomeScreen.plusButton);
       await waitForElement(
         restoringWindow,
         'data-testid',

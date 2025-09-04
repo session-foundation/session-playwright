@@ -28,6 +28,9 @@ type ElementOptions = {
   rightButton?: boolean;
 };
 
+// TODO Unify element interaction functions to use locator objects the way clickOn and clickOnWithText do
+// Remaining functions to migrate: waitForElement, typeIntoInput, grabTextFromElement etc.
+
 // WAIT FOR FUNCTIONS
 
 export async function waitForTestIdWithText(

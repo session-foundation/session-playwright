@@ -26,7 +26,6 @@ import {
 import { setDisappearingMessages } from './utilities/set_disappearing_messages';
 import {
   clickOn,
-  clickOnElement,
   clickOnWithText,
   formatTimeOption,
   hasElementBeenDeleted,
@@ -139,11 +138,7 @@ test_Alice_1W_Bob_1W(
     ]);
     await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
     await sleepFor(100);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
+    await clickOn(aliceWindow1, Conversation.sendMessageButton);
     await waitForSentTick(aliceWindow1, longText);
     await waitForTextMessage(bobWindow1, longText);
     // Wait 30 seconds for long text to disappear

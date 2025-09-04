@@ -78,11 +78,7 @@ test_Alice_2W_Bob_1W(
     const message = 'Forcing window to front';
     await typeIntoInput(bobWindow1, 'message-input-text-area', message);
     // click up arrow (send)
-    await clickOnElement({
-      window: bobWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
+    await clickOn(bobWindow1, Conversation.sendMessageButton);
     await sleepFor(10000);
     await hasTextMessageBeenDeleted(bobWindow1, testMessage);
   },

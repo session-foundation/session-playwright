@@ -99,14 +99,15 @@ export class Conversation extends Locator {
   static readonly endCallButton = this.testId('end-call');
   static readonly endVoiceMessageButton = this.testId('end-voice-message');
   static readonly mentionsPopup = this.testId('mentions-popup-row');
-
   static readonly messageContent = this.testId('message-content');
+
   static readonly messageInput = this.testId('message-input-text-area');
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
   );
   static readonly microphoneButton = this.testId('microphone-button');
   static readonly scrollToBottomButton = this.testId('scroll-to-bottom-button');
+  static readonly sendMessageButton = this.testId('send-message-button');
 }
 
 export class ConversationSettings extends Locator {
