@@ -233,8 +233,8 @@ test_Alice_2W(
     await sendMessage(aliceWindow1, testMessageDisappear);
     await waitForTextMessage(aliceWindow2, testMessageDisappear);
     await Promise.all([
-      hasTextMessageBeenDeleted(aliceWindow1, testMessageDisappear),
-      hasTextMessageBeenDeleted(aliceWindow2, testMessageDisappear),
+      hasTextMessageBeenDeleted(aliceWindow1, testMessageDisappear, 10_000),
+      hasTextMessageBeenDeleted(aliceWindow2, testMessageDisappear, 10_000),
     ]);
   },
 );

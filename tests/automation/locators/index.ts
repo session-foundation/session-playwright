@@ -180,7 +180,7 @@ export class Settings extends Locator {
   static readonly unblockButton = this.testId('unblock-button-settings-screen');
   // Recovery Password
   static readonly hideRecoveryPasswordButton = this.testId(
-    'hide-recovery-password-button',
+    'hide-recovery-password-settings-button',
   );
   static readonly recoveryPasswordContainer = this.testId(
     'recovery-password-seed-modal',

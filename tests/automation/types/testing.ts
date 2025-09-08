@@ -76,8 +76,6 @@ export type LoaderType = 'loading-animation' | 'loading-spinner';
 export type MediaType = 'audio' | 'file' | 'image' | 'video';
 export type Strategy = ':has-text' | 'class' | 'data-testid';
 
-// Would be good to find a way to sort those with prettier
-// TODO sort with eslint plugin perfectionist
 export type DataTestId =
   | DMTimeOption
   | 'accept-message-request'
@@ -131,7 +129,7 @@ export type DataTestId =
   | 'group-name'
   | 'group-update-message'
   | 'header-conversation-name'
-  | 'hide-recovery-password-button'
+  | 'hide-recovery-password-settings-button'
   | 'image-upload-click'
   | 'image-upload-section'
   | 'invite-contacts-menu-option'
