@@ -145,9 +145,6 @@ sessionTestTwoWindows(
         windowA,
         englishStrippedStr('clear').toString(),
       );
-      await waitForLoadingAnimationToFinish(windowA, 'loading-spinner');
-      // Wait for window to close and reopen
-      // await windowA.close();
       restoringWindows = await openApp(1);
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
