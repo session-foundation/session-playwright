@@ -37,6 +37,7 @@ const openElectronAppOnly = async (multi: string) => {
       args: [
         join(getAppRootPath(), 'ts', 'mains', 'main_node.js'),
         '--disable-gpu',
+        '--force-device-scale-factor=1', // Normalizes Retina and non-Retina mac screens
       ],
     });
     return electronApp;
