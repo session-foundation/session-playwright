@@ -56,7 +56,7 @@ mediaArray.forEach(({ mediaType, path }) => {
           waitForTestIdWithText(bobWindow1, 'audio-player'),
           waitForTestIdWithText(charlieWindow1, 'audio-player'),
         ]);
-        await sleepFor(30000);
+        await sleepFor(10000);
         await Promise.all([
           hasElementBeenDeleted(bobWindow1, 'data-testid', 'audio-player'),
           hasElementBeenDeleted(charlieWindow1, 'data-testid', 'audio-player'),
@@ -68,8 +68,8 @@ mediaArray.forEach(({ mediaType, path }) => {
           waitForTextMessage(bobWindow1, testMessage),
           waitForTextMessage(charlieWindow1, testMessage),
         ]);
-        // Wait 30 seconds for image to disappear
-        await sleepFor(30000);
+        // Wait 10 seconds for image to disappear
+        await sleepFor(10000);
         await Promise.all([
           hasTextMessageBeenDeleted(bobWindow1, testMessage),
           hasTextMessageBeenDeleted(charlieWindow1, testMessage),
