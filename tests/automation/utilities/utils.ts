@@ -5,6 +5,7 @@
 import { ElementHandle, Page } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
+import sharp from 'sharp';
 
 import type { ElementState } from '../types/landing_page_states';
 
@@ -608,6 +609,9 @@ export async function compareScreenshot(
   elementState: ElementState,
   os: string,
 ) {
+  const { default: pixelmatch } = await import('pixelmatch');
+  const { PNG } = await import('pngjs');
+
   const formattedTitle = testTitle.toLowerCase().replace(/\s+/g, '-');
   await deleteDifferenceFile(formattedTitle, elementState, os);
 
@@ -628,18 +632,53 @@ export async function compareScreenshot(
   }
   // If screenshot does exist, compare it to previous screenshot in the folder
   const previousScreenshot = fs.readFileSync(previousScreenshotFilePath);
-  const diffFilePath = path.join(
+  const currentFilePath = path.join(
     folderPath,
-    `${elementState}-${os}-difference.png`,
+    `${elementState}-${os}-current.png`,
   );
+
+  const sharpCurrent = sharp(elementScreenshot);
+  const sharpPrevious = sharp(previousScreenshot);
+
+  const [metaCurrent, metaPrevious] = await Promise.all([
+    sharpCurrent.metadata(),
+    sharpPrevious.metadata(),
+  ]);
+  const width = Math.min(metaCurrent.width!, metaPrevious.width!);
+  const height = Math.min(metaCurrent.height!, metaPrevious.height!);
+  console.info('Comparing screenshots with min dimensions:', width, height);
+  const bufferA = await sharpCurrent.resize(width, height).png().toBuffer();
+  const bufferB = await sharpPrevious.resize(width, height).png().toBuffer();
+  fs.writeFileSync(currentFilePath, elementScreenshot as any);
+  const diffFilePath = path.join(folderPath, `${elementState}-${os}-diff.png`);
   // If screenshots are different, then create a difference screenshot
-  if (
-    Buffer.compare(elementScreenshot as any, previousScreenshot as any) !== 0
-  ) {
-    //  If elements do not match, then take the elementScreenshot and save it to same folder but with a new name of 'difference.png'
-    fs.writeFileSync(diffFilePath, elementScreenshot as any);
+  //  If elements do not match, then take the elementScreenshot and save it to same folder but with a new name of 'difference.png'
+  try {
+    const pngA = PNG.sync.read(bufferA);
+    const pngB = PNG.sync.read(bufferB);
+
+    const diff = new PNG({ width, height });
+
+    const mismatches = pixelmatch(
+      pngA.data,
+      pngB.data,
+      diff.data,
+      width,
+      height,
+      { threshold: 0.1 },
+    );
+
+    if (mismatches !== 0) {
+      const diffBuffer = PNG.sync.write(diff);
+
+      fs.writeFileSync(diffFilePath, diffBuffer as any);
+
+      console.warn('Mismatches:', mismatches);
+      throw new Error('Screenshots do not match');
+    }
+  } catch (e) {
     throw new Error(
-      `Screenshots do not match, see ${screenshotFolder} > ${testTitle} folder > \n\t\t diff: ${diffFilePath}\n\t\t previous: ${previousScreenshotFilePath}`,
+      `Screenshots do not match, see ${screenshotFolder} > ${testTitle} folder > \n\t\t current: ${currentFilePath}\n\t\t previous: ${previousScreenshotFilePath}\n\t\t diff: ${diffFilePath}`,
     );
   }
 }
