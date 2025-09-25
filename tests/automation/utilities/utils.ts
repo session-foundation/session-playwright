@@ -3,14 +3,8 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-await-in-loop */
 import { ElementHandle, Page } from '@playwright/test';
-import fs from 'fs';
-import path from 'path';
-import sharp from 'sharp';
-
-import type { ElementState } from '../types/landing_page_states';
 
 import { sleepFor } from '../../promise_utils';
-import { screenshotFolder } from '../constants/variables';
 import {
   DataTestId,
   DMTimeOption,
@@ -581,104 +575,4 @@ export function formatTimeOption(option: DMTimeOption) {
   const timePart = option.replace('time-option-', '');
   const formattedTime = timePart.replace(/-/g, ' ');
   return formattedTime;
-}
-
-async function deleteDifferenceFile(
-  fileFolder: string,
-  fileName: string,
-  os: string,
-) {
-  const filePath = path.join(
-    screenshotFolder,
-    fileFolder,
-    `${fileName}-${os}-difference.png`,
-  );
-
-  if (fs.existsSync(filePath)) {
-    // Delete the file if it exists
-    fs.unlinkSync(filePath);
-    console.log(`Deleted difference file at: ${filePath}`);
-  } else {
-    console.log(`No difference file found at: ${filePath}, proceeding...`);
-  }
-}
-
-export async function compareScreenshot(
-  element: ElementHandle<HTMLElement | SVGElement>,
-  testTitle: string,
-  elementState: ElementState,
-  os: string,
-) {
-  const { default: pixelmatch } = await import('pixelmatch');
-  const { PNG } = await import('pngjs');
-
-  const formattedTitle = testTitle.toLowerCase().replace(/\s+/g, '-');
-  await deleteDifferenceFile(formattedTitle, elementState, os);
-
-  const elementScreenshot = await element.screenshot();
-  const folderPath = path.join(screenshotFolder, `${formattedTitle}`);
-
-  // If folder doesn't exist, create folder
-  if (!fs.existsSync(folderPath)) {
-    fs.mkdirSync(folderPath, { recursive: true });
-  }
-  const previousScreenshotFilePath = path.join(
-    folderPath,
-    `${elementState}-${os}.png`,
-  );
-  // If screenshot does not exist, save it to the folder
-  if (!fs.existsSync(previousScreenshotFilePath)) {
-    fs.writeFileSync(previousScreenshotFilePath, elementScreenshot as any); // TS really hates this unless its cast as any
-  }
-  // If screenshot does exist, compare it to previous screenshot in the folder
-  const previousScreenshot = fs.readFileSync(previousScreenshotFilePath);
-  const currentFilePath = path.join(
-    folderPath,
-    `${elementState}-${os}-current.png`,
-  );
-
-  const sharpCurrent = sharp(elementScreenshot);
-  const sharpPrevious = sharp(previousScreenshot);
-
-  const [metaCurrent, metaPrevious] = await Promise.all([
-    sharpCurrent.metadata(),
-    sharpPrevious.metadata(),
-  ]);
-  const width = Math.min(metaCurrent.width!, metaPrevious.width!);
-  const height = Math.min(metaCurrent.height!, metaPrevious.height!);
-  console.info('Comparing screenshots with min dimensions:', width, height);
-  const bufferA = await sharpCurrent.resize(width, height).png().toBuffer();
-  const bufferB = await sharpPrevious.resize(width, height).png().toBuffer();
-  fs.writeFileSync(currentFilePath, elementScreenshot as any);
-  const diffFilePath = path.join(folderPath, `${elementState}-${os}-diff.png`);
-  // If screenshots are different, then create a difference screenshot
-  //  If elements do not match, then take the elementScreenshot and save it to same folder but with a new name of 'difference.png'
-  try {
-    const pngA = PNG.sync.read(bufferA);
-    const pngB = PNG.sync.read(bufferB);
-
-    const diff = new PNG({ width, height });
-
-    const mismatches = pixelmatch(
-      pngA.data,
-      pngB.data,
-      diff.data,
-      width,
-      height,
-      { threshold: 0.1 },
-    );
-
-    if (mismatches !== 0) {
-      const diffBuffer = PNG.sync.write(diff);
-
-      fs.writeFileSync(diffFilePath, diffBuffer as any);
-
-      console.warn('Mismatches:', mismatches);
-      throw new Error('Screenshots do not match');
-    }
-  } catch (e) {
-    throw new Error(
-      `Screenshots do not match, see ${screenshotFolder} > ${testTitle} folder > \n\t\t current: ${currentFilePath}\n\t\t previous: ${previousScreenshotFilePath}\n\t\t diff: ${diffFilePath}`,
-    );
-  }
 }
