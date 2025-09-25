@@ -251,6 +251,15 @@ function getExpectedStringFromKey(
       return 'Are you sure you want to permanently hide your recovery password on this device? This cannot be undone.';
     case 'enter':
       return 'Enter';
+    case 'onboardingAccountCreated':
+      return 'Account Created';
+    case 'onboardingBubbleWelcomeToSession':
+      return 'Welcome to Session {emoji}';
+    case 'conversationsNone':
+      return "You don't have any conversations yet";
+    case 'onboardingHitThePlusButton':
+      return 'Hit the plus button to start a chat, create a group, or join an official community!';
+
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
