@@ -8,8 +8,6 @@ import {
 test_Alice_2W(
   `Landing page states`,
   async ({ aliceWindow1, aliceWindow2 }, _testInfo) => {
-    const os = process.platform;
-    console.log('OS:', os);
     await Promise.all([
       waitForElement(aliceWindow1, 'class', 'session-conversation'),
       waitForElement(aliceWindow2, 'class', 'session-conversation'),
