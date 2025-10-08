@@ -1,22 +1,24 @@
 import { Page } from '@playwright/test';
+
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
+import { Global, HomeScreen, LeftPane, Onboarding, Settings } from './locators';
 import { forceCloseAllWindows } from './setup/closeWindows';
 import { newUser } from './setup/new_user';
 import { openApp } from './setup/open';
+import { recoverFromSeed } from './setup/recovery_using_seed';
 import { sessionTestTwoWindows } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { sendNewMessage } from './utilities/send_message';
 import {
-  clickOnElement,
+  clickOn,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   hasElementBeenDeleted,
   typeIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
 } from './utilities/utils';
-import { recoverFromSeed } from './setup/recovery_using_seed';
-import { englishStrippedStr } from '../localization/englishStrippedStr';
 
 sessionTestTwoWindows(
   'Delete account from swarm',
@@ -36,17 +38,17 @@ sessionTestTwoWindows(
       ]);
       // Delete all data from device
       // Click on settings tab
-      await clickOnTestIdWithText(windowA, 'settings-section');
+      await clickOn(windowA, LeftPane.settingsButton);
       // Click on clear all data
-      await clickOnTestIdWithText(
+      await clickOnWithText(
         windowA,
-        'clear-data-settings-menu-item',
+        Settings.clearDataMenuItem,
         englishStrippedStr('sessionClearData').toString(),
       );
       // Select entire account
-      await clickOnTestIdWithText(
+      await clickOnWithText(
         windowA,
-        'label-device_and_network',
+        Settings.clearDeviceAndNetworkRadial,
         englishStrippedStr('clearDeviceAndNetwork').toString(),
       );
       // Confirm deletion by clicking Clear, twice
@@ -66,15 +68,15 @@ sessionTestTwoWindows(
       restoringWindows = await openApp(1); // not using sessionTest here as we need to close and reopen one of the window
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
-      await clickOnTestIdWithText(restoringWindow, 'existing-account-button');
+      await clickOn(restoringWindow, Onboarding.iHaveAnAccountButton);
       // Fill in recovery phrase
       await typeIntoInput(
         restoringWindow,
-        'recovery-phrase-input',
+        Onboarding.recoveryPhraseInput.selector,
         userA.recoveryPassword,
       );
       // Enter display name
-      await clickOnTestIdWithText(restoringWindow, 'continue-button');
+      await clickOn(restoringWindow, Global.continueButton);
       await waitForLoadingAnimationToFinish(
         restoringWindow,
         'loading-animation',
@@ -82,11 +84,11 @@ sessionTestTwoWindows(
 
       await typeIntoInput(
         restoringWindow,
-        'display-name-input',
+        Onboarding.displayNameInput.selector,
         userA.userName,
       );
       // Click continue
-      await clickOnTestIdWithText(restoringWindow, 'continue-button');
+      await clickOn(restoringWindow, Global.continueButton);
       await sleepFor(5000, true); // just to allow any messages from our swarm to show up
 
       // Need to verify that no conversation is found at all
@@ -94,15 +96,15 @@ sessionTestTwoWindows(
       await hasElementBeenDeleted(
         restoringWindow,
         'data-testid',
-        'conversation-list-item',
+        HomeScreen.conversationItemName.selector,
       );
 
-      await clickOnTestIdWithText(restoringWindow, 'new-conversation-button'); // Expect contacts list to be empty
+      await clickOn(restoringWindow, HomeScreen.plusButton); // Expect contacts list to be empty
 
       await hasElementBeenDeleted(
         restoringWindow,
         'data-testid',
-        'module-conversation__user_profile',
+        Global.contactItem.selector,
         10000,
       );
     } finally {
@@ -126,11 +128,11 @@ sessionTestTwoWindows(
       await createContact(windowA, windowB, userA, userB);
       // Delete all data from device
       // Click on settings tab
-      await clickOnTestIdWithText(windowA, 'settings-section');
+      await clickOn(windowA, LeftPane.settingsButton);
       // Click on clear all data
-      await clickOnTestIdWithText(
+      await clickOnWithText(
         windowA,
-        'clear-data-settings-menu-item',
+        Settings.clearDataMenuItem,
         englishStrippedStr('sessionClearData').toString(),
       );
       // Keep 'Clear Device only' selection
@@ -143,9 +145,6 @@ sessionTestTwoWindows(
         windowA,
         englishStrippedStr('clear').toString(),
       );
-      await waitForLoadingAnimationToFinish(windowA, 'loading-spinner');
-      // Wait for window to close and reopen
-      // await windowA.close();
       restoringWindows = await openApp(1);
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
@@ -155,20 +154,16 @@ sessionTestTwoWindows(
       await waitForElement(
         restoringWindow,
         'data-testid',
-        'module-conversation__user__profile-name',
+        HomeScreen.conversationItemName.selector,
         10000,
         userB.userName,
       );
       // Check if contact is available in contacts section
-      await clickOnElement({
-        window: restoringWindow,
-        strategy: 'data-testid',
-        selector: 'new-conversation-button',
-      });
+      await clickOn(restoringWindow, HomeScreen.plusButton);
       await waitForElement(
         restoringWindow,
         'data-testid',
-        'module-conversation__user__profile-name',
+        Global.contactItem.selector,
         1000,
         userB.userName,
       );

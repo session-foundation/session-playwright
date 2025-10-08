@@ -1,7 +1,8 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { Global, Onboarding } from './locators';
 import { sessionTestOneWindow } from './setup/sessionTest';
 import {
-  clickOnTestIdWithText,
+  clickOn,
   grabTextFromElement,
   typeIntoInput,
   waitForTestIdWithText,
@@ -35,9 +36,9 @@ import {
   },
 ].forEach(({ testName, incorrectSeed, expectedError }) => {
   sessionTestOneWindow(`Seed validation: "${testName}"`, async ([window]) => {
-    await clickOnTestIdWithText(window, 'existing-account-button');
+    await clickOn(window, Onboarding.iHaveAnAccountButton);
     await typeIntoInput(window, 'recovery-phrase-input', incorrectSeed);
-    await clickOnTestIdWithText(window, 'continue-button');
+    await clickOn(window, Global.continueButton);
     await waitForTestIdWithText(window, 'error-message');
     const actualError = await grabTextFromElement(
       window,
@@ -71,14 +72,14 @@ import {
   sessionTestOneWindow(
     `Display name validation: "${testName}"`,
     async ([window]) => {
-      await clickOnTestIdWithText(window, 'create-account-button');
+      await clickOn(window, Onboarding.createAccountButton);
       await typeIntoInput(window, 'display-name-input', displayName);
-      await clickOnTestIdWithText(window, 'continue-button');
-      await waitForTestIdWithText(window, 'error-message');
+      await clickOn(window, Global.continueButton);
+      await waitForTestIdWithText(window, Global.errorMessage.selector);
       const actualError = await grabTextFromElement(
         window,
         'data-testid',
-        'error-message',
+        Global.errorMessage.selector,
       );
       if (testName === 'No name') {
         console.log('Expected failure: see SES-2832');

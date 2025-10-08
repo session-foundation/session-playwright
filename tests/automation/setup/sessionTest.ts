@@ -2,14 +2,15 @@
 /* eslint-disable @typescript-eslint/array-type */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Page, TestInfo, test } from '@playwright/test';
+import { Page, test, TestInfo } from '@playwright/test';
+import chalk from 'chalk';
+
 import { Group, User } from '../types/testing';
 import { linkedDevice } from '../utilities/linked_device';
 import { forceCloseAllWindows } from './closeWindows';
 import { createGroup } from './create_group';
 import { newUser } from './new_user';
 import { openApp } from './open';
-import chalk from 'chalk';
 
 // This is not ideal, most of our test needs to open a specific number of windows and close them once the test is done or failed.
 // This file contains a bunch of utility function to use to open those windows and clean them afterwards.
@@ -105,8 +106,8 @@ type LessThan<
  * This type can cause type checking performance issues, so only use it with small values.
  */
 type NumericRange<TStart extends number, TEnd extends number> =
-  | Exclude<TEnd, LessThan<TStart, []>>
-  | Exclude<LessThan<TEnd, []>, LessThan<TStart, []>>;
+  | Exclude<LessThan<TEnd, []>, LessThan<TStart, []>>
+  | Exclude<TEnd, LessThan<TStart, []>>;
 
 function sessionTestGeneric<
   UserCount extends 1 | 2 | 3 | 4,

@@ -1,6 +1,7 @@
+import { Onboarding } from './locators';
 import { sessionTestOneWindow } from './setup/sessionTest';
-import { clickOnTestIdWithText } from './utilities/utils';
+import { clickOn } from './utilities/utils';
 
 sessionTestOneWindow('Tiny test', async ([windowA]) => {
-  await clickOnTestIdWithText(windowA, 'create-account-button');
+  await clickOn(windowA, Onboarding.createAccountButton);
 });

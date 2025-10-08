@@ -2,6 +2,12 @@ import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
 import { longText, mediaArray, testLink } from './constants/variables';
+import {
+  Conversation,
+  ConversationSettings,
+  Global,
+  HomeScreen,
+} from './locators';
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
@@ -18,10 +24,11 @@ import {
   trustUser,
 } from './utilities/send_media';
 import {
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
   clickOnTextMessage,
+  clickOnWithText,
   hasTextMessageBeenDeleted,
   measureSendingTime,
   typeIntoInput,
@@ -121,25 +128,25 @@ test_Alice_1W_Bob_1W(
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await joinCommunity(aliceWindow1);
-    await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
-    await clickOnTestIdWithText(aliceWindow1, 'invite-contacts-menu-option');
+    await clickOn(aliceWindow1, Conversation.conversationSettingsIcon);
+    await clickOn(aliceWindow1, ConversationSettings.inviteContactsOption);
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',
       englishStrippedStr('membersInvite').toString(),
     );
-    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
-    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
+    await clickOnWithText(aliceWindow1, Global.contactItem, bob.userName);
+    await clickOn(aliceWindow1, Global.confirmButton);
     // For lack of a unique ID we use native Playwright methods
     await aliceWindow1
       .getByTestId('invite-contacts-dialog')
-      .getByTestId('modal-close-button')
+      .getByTestId(Global.modalCloseButton.selector)
       .click();
     // Close UCS modal
-    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
-    await clickOnTestIdWithText(
+    await clickOn(aliceWindow1, Global.modalCloseButton);
+    await clickOnWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
     );
     await Promise.all([

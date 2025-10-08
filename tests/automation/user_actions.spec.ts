@@ -1,6 +1,14 @@
 import { expect } from '@playwright/test';
+
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
+import {
+  Conversation,
+  Global,
+  HomeScreen,
+  LeftPane,
+  Settings,
+} from './locators';
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
@@ -9,15 +17,17 @@ import {
   test_Alice_2W,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
-import { sendMessage } from './utilities/message';
+import { sendMessage, waitForReadTick } from './utilities/message';
 import {
   checkModalStrings,
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTestIdWithText,
+  clickOnWithText,
   doesElementExist,
   hasElementBeenDeleted,
   typeIntoInput,
+  waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utilities/utils';
@@ -33,13 +43,14 @@ sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
   // Navigate to contacts tab in User B's window
   await waitForTestIdWithText(
     windowB,
-    'message-request-response-message',
+    Conversation.messageRequestAcceptControlMessage.selector,
     englishStrippedStr('messageRequestYouHaveAccepted')
       .withArgs({
         name: userA.userName,
       })
       .toString(),
   );
+  await clickOn(windowB, Global.backButton);
   await Promise.all([
     clickOnElement({
       window: windowA,
@@ -53,16 +64,8 @@ sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
     }),
   ]);
   await Promise.all([
-    waitForTestIdWithText(
-      windowA,
-      'module-conversation__user__profile-name',
-      userB.userName,
-    ),
-    waitForTestIdWithText(
-      windowB,
-      'module-conversation__user__profile-name',
-      userA.userName,
-    ),
+    waitForTestIdWithText(windowA, Global.contactItem.selector, userB.userName),
+    waitForTestIdWithText(windowB, Global.contactItem.selector, userA.userName),
   ]);
 });
 
@@ -72,25 +75,25 @@ test_Alice_1W_Bob_1W(
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Check to see if User B is a contact
-    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+    await clickOn(aliceWindow1, HomeScreen.plusButton);
     await waitForTestIdWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      Global.contactItem.selector,
       bob.userName,
     );
     // he is a contact, close the new conversation button tab as there is no right click allowed on it
-    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+    await clickOn(aliceWindow1, Global.backButton);
     // then right click on the contact conversation list item to show the menu
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
-      true,
+      { rightButton: true },
     );
     // Select block
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'context-menu-item',
+      Global.contextMenuItem,
       englishStrippedStr('block').toString(),
     );
     // Check modal strings
@@ -101,25 +104,22 @@ test_Alice_1W_Bob_1W(
         .withArgs({ name: bob.userName })
         .toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton,
       englishStrippedStr('block').toString(),
     );
     // Verify the user was moved to the blocked contact list
     // Click on settings tab
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
+    await clickOn(aliceWindow1, LeftPane.settingsButton);
     // click on settings section 'conversation'
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'conversations-settings-menu-item',
-    );
+    await clickOn(aliceWindow1, Settings.conversationsMenuItem);
     // Navigate to blocked users tab'
-    await clickOnTestIdWithText(aliceWindow1, 'reveal-blocked-user-settings');
+    await clickOn(aliceWindow1, Settings.blockedContactsButton);
     // select the contact to unblock by clicking on it by name
-    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
+    await clickOnWithText(aliceWindow1, Global.contactItem, bob.userName);
     // Unblock user by clicking on unblock
-    await clickOnTestIdWithText(aliceWindow1, 'unblock-button-settings-screen');
+    await clickOn(aliceWindow1, Settings.unblockButton);
     // make sure the confirm dialogs shows up
     await checkModalStrings(
       aliceWindow1,
@@ -127,11 +127,12 @@ test_Alice_1W_Bob_1W(
       englishStrippedStr('blockUnblockName')
         .withArgs({ name: bob.userName })
         .toString(),
+      'blockOrUnblockModal',
     );
     // click on the unblock button
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton,
       englishStrippedStr('blockUnblock').toString(),
     );
     // make sure no blocked contacts are listed
@@ -145,47 +146,49 @@ test_Alice_1W_Bob_1W(
 test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   const newUsername = 'Tiny bubble';
   // Open Profile
-  await clickOnTestIdWithText(aliceWindow1, 'leftpane-primary-avatar');
+  await clickOn(aliceWindow1, LeftPane.profileButton);
   // Click on current username to open edit field
-  await clickOnTestIdWithText(aliceWindow1, 'edit-profile-icon');
+  await clickOn(aliceWindow1, Settings.displayName);
   // Type in new username
-  await typeIntoInput(aliceWindow1, 'profile-name-input', newUsername);
-  // Press enter to confirm username input
-  await aliceWindow1.keyboard.press('Enter');
-  // Wait for Copy button to appear to verify username change
-  await aliceWindow1.isVisible(`'${englishStrippedStr('copy').toString()}'`);
-  // verify name change
-  expect(await aliceWindow1.innerText('[data-testid=your-profile-name]')).toBe(
+  await typeIntoInput(
+    aliceWindow1,
+    Settings.displayNameInput.selector,
     newUsername,
   );
+  await clickOnMatchingText(
+    aliceWindow1,
+    englishStrippedStr('save').toString(),
+  );
+  await sleepFor(1000);
+  // verify name change
+  expect(
+    await aliceWindow1.innerText(
+      `[data-testid=${Settings.displayName.selector}]`,
+    ),
+  ).toBe(newUsername);
   // Exit profile modal
-  await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
+  await clickOn(aliceWindow1, Global.modalCloseButton);
 });
-
-// TODO: Normalize screenshot dimensions before comparison to handle different pixel densities (e.g. with sharp)
-// This would fix MacBook Retina (2x) vs M4 Mac Mini (1x) pixel density differences (56x56 vs 28x28)
-// Alternatives:
-// - Try to set deviceScaleFactor: 1 in Playwright context to force consistent scaling
-// - Record pixel density dependent screenshots
 
 test_Alice_1W_no_network(
   'Change avatar',
   async ({ aliceWindow1 }, testInfo) => {
     // Open profile
-    await clickOnTestIdWithText(aliceWindow1, 'leftpane-primary-avatar');
+    await clickOn(aliceWindow1, LeftPane.profileButton);
     // Click on current profile picture
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'copy-button-profile-update',
-      englishStrippedStr('copy').toString(),
-    );
+    await clickOn(aliceWindow1, Settings.displayName);
 
-    await clickOnTestIdWithText(aliceWindow1, 'image-upload-section');
-    await clickOnTestIdWithText(aliceWindow1, 'image-upload-click');
+    await clickOn(aliceWindow1, Settings.imageUploadSection);
+    await clickOn(aliceWindow1, Settings.imageUploadClick);
     // allow for the image to be resized before we try to save it
     await sleepFor(500);
-    await clickOnTestIdWithText(aliceWindow1, 'save-button-profile-update');
-    await waitForTestIdWithText(aliceWindow1, 'loading-spinner');
+    await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
+    await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
+    await clickOnMatchingText(
+      aliceWindow1,
+      englishStrippedStr('save').toString(),
+    );
+    await clickOn(aliceWindow1, Global.modalCloseButton);
     // if we were asked to update the snapshots, make sure we wait for the change to be received before taking a screenshot.
     if (testInfo.config.updateSnapshots === 'all') {
       await sleepFor(15000);
@@ -195,7 +198,7 @@ test_Alice_1W_no_network(
     await sleepFor(500);
     const leftpaneAvatarContainer = await waitForTestIdWithText(
       aliceWindow1,
-      'leftpane-primary-avatar',
+      LeftPane.profileButton.selector,
     );
     const start = Date.now();
     let correctScreenshot = false;
@@ -235,16 +238,11 @@ test_Alice_1W_Bob_1W(
     const nickname = 'new nickname for Bob';
 
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'message-section',
-    });
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
-      true,
+      { rightButton: true },
     );
     await clickOnMatchingText(
       aliceWindow1,
@@ -254,9 +252,9 @@ test_Alice_1W_Bob_1W(
 
     await typeIntoInput(aliceWindow1, 'nickname-input', nickname);
     await sleepFor(100);
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'set-nickname-confirm-button',
+      HomeScreen.setNicknameButton,
       englishStrippedStr('save').toString(),
     );
     await sleepFor(1000);
@@ -287,44 +285,41 @@ test_Alice_1W_Bob_1W(
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
-      selector: 'settings-section',
+      selector: LeftPane.settingsButton.selector,
     });
+    await clickOn(aliceWindow1, Settings.privacyMenuItem);
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
-      selector: 'enable-read-receipts',
+      selector: Settings.enableReadReceipts.selector,
     });
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'message-section',
-    });
-    await clickOnTestIdWithText(
+    await clickOn(aliceWindow1, Global.modalCloseButton);
+    await clickOnWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
     );
     await clickOnElement({
       window: bobWindow1,
       strategy: 'data-testid',
-      selector: 'settings-section',
+      selector: LeftPane.settingsButton.selector,
     });
+    await clickOn(bobWindow1, Settings.privacyMenuItem);
+
     await clickOnElement({
       window: bobWindow1,
       strategy: 'data-testid',
-      selector: 'enable-read-receipts',
+      selector: Settings.enableReadReceipts.selector,
     });
-    await clickOnElement({
-      window: bobWindow1,
-      strategy: 'data-testid',
-      selector: 'message-section',
-    });
-    await clickOnTestIdWithText(
+    await clickOn(bobWindow1, Global.modalCloseButton);
+    await sendMessage(aliceWindow1, 'Testing read receipts');
+    await clickOn(bobWindow1, Global.backButton);
+    await clickOnWithText(
       bobWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       alice.userName,
     );
-    await sendMessage(aliceWindow1, 'Testing read receipts');
+    await waitForReadTick(aliceWindow1, 'Testing read receipts');
   },
 );
 
@@ -333,46 +328,41 @@ test_Alice_1W_Bob_1W(
   async ({ aliceWindow1, bobWindow1, alice, bob }) => {
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    // Confirm contact by checking Messages tab (name should appear in list)
-    await Promise.all([
-      clickOnTestIdWithText(aliceWindow1, 'message-section'),
-      clickOnTestIdWithText(bobWindow1, 'message-section'),
-    ]);
-    await Promise.all([
-      clickOnElement({
-        window: aliceWindow1,
-        strategy: 'data-testid',
-        selector: 'new-conversation-button',
-      }),
-      clickOnElement({
-        window: bobWindow1,
-        strategy: 'data-testid',
-        selector: 'new-conversation-button',
-      }),
-    ]);
+    await clickOn(bobWindow1, Global.backButton);
+    await Promise.all(
+      [aliceWindow1, bobWindow1].map((w) =>
+        clickOnElement({
+          window: w,
+          strategy: 'data-testid',
+          selector: 'new-conversation-button',
+        }),
+      ),
+    );
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'module-conversation__user__profile-name',
+        Global.contactItem.selector,
         bob.userName,
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'module-conversation__user__profile-name',
+        Global.contactItem.selector,
         alice.userName,
       ),
     ]);
-    // Delete contact
-    await clickOnTestIdWithText(aliceWindow1, 'message-section');
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'module-conversation__user__profile-name',
-      bob.userName,
-      true,
+    await Promise.all(
+      [aliceWindow1, bobWindow1].map((w) => clickOn(w, Global.backButton)),
     );
-    await clickOnTestIdWithText(
+    // Delete contact
+    await clickOnWithText(
       aliceWindow1,
-      'context-menu-item',
+      HomeScreen.conversationItemName,
+      bob.userName,
+      { rightButton: true },
+    );
+    await clickOnWithText(
+      aliceWindow1,
+      Global.contextMenuItem,
       englishStrippedStr('conversationsDelete').toString(),
     );
     await checkModalStrings(
@@ -382,16 +372,16 @@ test_Alice_1W_Bob_1W(
         .withArgs({ name: bob.userName })
         .toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton,
       englishStrippedStr('delete').toString(),
     );
     // Check if conversation is deleted
     await hasElementBeenDeleted(
       aliceWindow1,
       'data-testid',
-      'module-conversation__user__profile-name',
+      Global.contactItem.selector,
       1000,
       bob.userName,
     );
@@ -401,12 +391,9 @@ test_Alice_1W_Bob_1W(
 test_Alice_2W(
   'Hide recovery password',
   async ({ aliceWindow1, aliceWindow2 }) => {
-    await clickOnTestIdWithText(aliceWindow1, 'settings-section');
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'recovery-password-settings-menu-item',
-    );
-    await clickOnTestIdWithText(aliceWindow1, 'hide-recovery-password-button');
+    await clickOn(aliceWindow1, LeftPane.settingsButton);
+    await clickOn(aliceWindow1, Settings.recoveryPasswordMenuItem);
+    await clickOn(aliceWindow1, Settings.hideRecoveryPasswordButton);
     // Check first modal
     await checkModalStrings(
       aliceWindow1,
@@ -414,10 +401,11 @@ test_Alice_2W(
       englishStrippedStr(
         'recoveryPasswordHidePermanentlyDescription1',
       ).toString(),
+      'hideRecoveryPasswordModal',
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton,
       englishStrippedStr('theContinue').toString(),
     );
     await checkModalStrings(
@@ -426,36 +414,37 @@ test_Alice_2W(
       englishStrippedStr(
         'recoveryPasswordHidePermanentlyDescription2',
       ).toString(),
+      'hideRecoveryPasswordModal',
     );
     // Click yes
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton,
       englishStrippedStr('yes').toString(),
     );
     await doesElementExist(
       aliceWindow1,
       'data-testid',
-      'recovery-password-settings-menu-item',
+      Settings.recoveryPasswordMenuItem.selector,
     );
     // Check linked device if Recovery Password is still visible (it should be)
-    await clickOnTestIdWithText(aliceWindow2, 'settings-section');
+    await clickOn(aliceWindow2, LeftPane.settingsButton);
     await waitForTestIdWithText(
       aliceWindow2,
-      'recovery-password-settings-menu-item',
+      Settings.recoveryPasswordMenuItem.selector,
     );
   },
 );
 
 test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
-  await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
-  await clickOnTestIdWithText(aliceWindow1, 'chooser-invite-friend');
+  await clickOn(aliceWindow1, HomeScreen.plusButton);
+  await clickOn(aliceWindow1, HomeScreen.inviteAFriendOption);
   await waitForTestIdWithText(aliceWindow1, 'your-account-id', alice.accountid);
-  await clickOnTestIdWithText(aliceWindow1, 'copy-button-account-id');
+  await clickOn(aliceWindow1, HomeScreen.inviteAFriendCopyButton);
   // Toast
   await waitForTestIdWithText(
     aliceWindow1,
-    'session-toast',
+    Global.toast.selector,
     englishStrippedStr('copied').toString(),
   );
   // Wait for copy to resolve
@@ -469,19 +458,17 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
     englishStrippedStr('shareAccountIdDescriptionCopied').toString(),
   );
   // To exit invite a friend
-  await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
-  // To create note to self
-  await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
+  await clickOn(aliceWindow1, Global.backButton);
   // New message
-  await clickOnTestIdWithText(aliceWindow1, 'chooser-new-conversation-button');
-  await clickOnTestIdWithText(aliceWindow1, 'new-session-conversation');
+  await clickOn(aliceWindow1, HomeScreen.newMessageOption);
+  await clickOn(aliceWindow1, HomeScreen.newMessageAccountIDInput);
   const isMac = process.platform === 'darwin';
   await aliceWindow1.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
-  await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
+  await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
   // Did the copied text create note to self?
   await waitForTestIdWithText(
     aliceWindow1,
-    'header-conversation-name',
+    Conversation.conversationHeader.selector,
     englishStrippedStr('noteToSelf').toString(),
   );
 });
@@ -489,31 +476,28 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
 test_Alice_1W_no_network(
   'Hide note to self',
   async ({ aliceWindow1, alice }) => {
-    await clickOnTestIdWithText(aliceWindow1, 'new-conversation-button');
-    await clickOnTestIdWithText(
-      aliceWindow1,
-      'chooser-new-conversation-button',
-    );
+    await clickOn(aliceWindow1, HomeScreen.plusButton);
+    await clickOn(aliceWindow1, HomeScreen.newMessageOption);
     await typeIntoInput(
       aliceWindow1,
       'new-session-conversation',
       alice.accountid,
     );
-    await clickOnTestIdWithText(aliceWindow1, 'next-new-conversation-button');
+    await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
     await waitForTestIdWithText(
       aliceWindow1,
-      'header-conversation-name',
+      Conversation.conversationHeader.selector,
       englishStrippedStr('noteToSelf').toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       englishStrippedStr('noteToSelf').toString(),
-      true,
+      { rightButton: true },
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'context-menu-item',
+      Global.contextMenuItem,
       englishStrippedStr('noteToSelfHide').toString(),
     );
     await checkModalStrings(
@@ -521,9 +505,9 @@ test_Alice_1W_no_network(
       englishStrippedStr('noteToSelfHide').toString(),
       englishStrippedStr('noteToSelfHideDescription').toString(),
     );
-    await clickOnTestIdWithText(
+    await clickOnWithText(
       aliceWindow1,
-      'session-confirm-ok-button',
+      Global.confirmButton,
       englishStrippedStr('hide').toString(),
     );
     await hasElementBeenDeleted(
@@ -537,24 +521,30 @@ test_Alice_1W_no_network(
 );
 
 test_Alice_1W_no_network('Toggle password', async ({ aliceWindow1 }) => {
-  await clickOnTestIdWithText(aliceWindow1, 'settings-section');
-  await clickOnTestIdWithText(
+  await clickOn(aliceWindow1, LeftPane.settingsButton);
+  await clickOn(aliceWindow1, Settings.recoveryPasswordMenuItem);
+  await waitForTestIdWithText(
     aliceWindow1,
-    'recovery-password-settings-menu-item',
+    Settings.recoveryPasswordContainer.selector,
   );
-  await waitForTestIdWithText(aliceWindow1, 'recovery-password-seed-modal');
   await clickOnMatchingText(
     aliceWindow1,
     englishStrippedStr('qrView').toString(),
   );
   // Wait for QR code to be visible
-  await waitForTestIdWithText(aliceWindow1, 'session-recovery-password');
+  await waitForTestIdWithText(
+    aliceWindow1,
+    Settings.recoveryPasswordQRCode.selector,
+  );
   // Then toggle back to text seed password
   await clickOnMatchingText(
     aliceWindow1,
     englishStrippedStr('recoveryPasswordView').toString(),
   );
-  await waitForTestIdWithText(aliceWindow1, 'recovery-password-seed-modal');
+  await waitForTestIdWithText(
+    aliceWindow1,
+    Settings.recoveryPasswordContainer.selector,
+  );
 });
 
 test_Alice_2W(

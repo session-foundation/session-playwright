@@ -8,7 +8,7 @@ test_Alice_1W_Bob_1W(
   'Voice calls',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await makeVoiceCall(aliceWindow1, bobWindow1, alice, bob);
+    await makeVoiceCall(aliceWindow1, bobWindow1);
     // In the receivers window, the message is 'Call in progress'
     await waitForTestIdWithText(
       bobWindow1,

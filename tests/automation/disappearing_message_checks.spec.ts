@@ -7,6 +7,12 @@ import {
   mediaArray,
   testLink,
 } from './constants/variables';
+import {
+  Conversation,
+  ConversationSettings,
+  Global,
+  HomeScreen,
+} from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
@@ -19,8 +25,8 @@ import {
 } from './utilities/send_media';
 import { setDisappearingMessages } from './utilities/set_disappearing_messages';
 import {
-  clickOnElement,
-  clickOnTestIdWithText,
+  clickOn,
+  clickOnWithText,
   formatTimeOption,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
@@ -52,7 +58,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
       await Promise.all([
         waitForTestIdWithText(
           aliceWindow1,
-          'disappear-control-message',
+          Conversation.disappearingControlMessage.selector,
           englishStrippedStr('disappearingMessagesSetYou')
             .withArgs({
               time: formattedTime,
@@ -62,7 +68,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
         ),
         waitForTestIdWithText(
           bobWindow1,
-          'disappear-control-message',
+          Conversation.disappearingControlMessage.selector,
           englishStrippedStr('disappearingMessagesSet')
             .withArgs({
               time: formattedTime,
@@ -110,7 +116,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
             time: formattedTime,
@@ -120,7 +126,7 @@ test_Alice_1W_Bob_1W(
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
             time: formattedTime,
@@ -132,11 +138,7 @@ test_Alice_1W_Bob_1W(
     ]);
     await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
     await sleepFor(100);
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'send-message-button',
-    });
+    await clickOn(aliceWindow1, Conversation.sendMessageButton);
     await waitForSentTick(aliceWindow1, longText);
     await waitForTextMessage(bobWindow1, longText);
     // Wait 30 seconds for long text to disappear
@@ -159,7 +161,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
             time: formattedTime,
@@ -169,7 +171,7 @@ test_Alice_1W_Bob_1W(
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
             time: formattedTime,
@@ -213,7 +215,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
             time: formattedTime,
@@ -223,7 +225,7 @@ test_Alice_1W_Bob_1W(
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
             time: formattedTime,
@@ -236,24 +238,24 @@ test_Alice_1W_Bob_1W(
     await joinCommunity(aliceWindow1);
     // To stop the layout shift
     await sleepFor(500);
-    await clickOnTestIdWithText(aliceWindow1, 'conversation-options-avatar');
-    await clickOnTestIdWithText(aliceWindow1, 'invite-contacts-menu-option');
+    await clickOn(aliceWindow1, Conversation.conversationSettingsIcon);
+    await clickOn(aliceWindow1, ConversationSettings.inviteContactsOption);
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',
       englishStrippedStr('membersInvite').toString(),
     );
-    await clickOnTestIdWithText(aliceWindow1, 'contact', bob.userName);
-    await clickOnTestIdWithText(aliceWindow1, 'session-confirm-ok-button');
+    await clickOnWithText(aliceWindow1, Global.contactItem, bob.userName);
+    await clickOn(aliceWindow1, Global.confirmButton);
     // For lack of a unique ID we use native Playwright methods
     await aliceWindow1
       .getByTestId('invite-contacts-dialog')
       .getByTestId('modal-close-button')
       .click();
-    await clickOnTestIdWithText(aliceWindow1, 'modal-close-button');
-    await clickOnTestIdWithText(
+    await clickOn(aliceWindow1, Global.modalCloseButton);
+    await clickOnWithText(
       aliceWindow1,
-      'module-conversation__user__profile-name',
+      HomeScreen.conversationItemName,
       bob.userName,
     );
     await Promise.all([
@@ -307,7 +309,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSetYou')
           .withArgs({
             time: formattedTime,
@@ -317,7 +319,7 @@ test_Alice_1W_Bob_1W(
       ),
       waitForTestIdWithText(
         bobWindow1,
-        'disappear-control-message',
+        Conversation.disappearingControlMessage.selector,
         englishStrippedStr('disappearingMessagesSet')
           .withArgs({
             time: formattedTime,
@@ -327,7 +329,7 @@ test_Alice_1W_Bob_1W(
           .toString(),
       ),
     ]);
-    await makeVoiceCall(aliceWindow1, bobWindow1, alice, bob);
+    await makeVoiceCall(aliceWindow1, bobWindow1);
     // In the receivers window, the message is 'Call in progress'
     await Promise.all([
       waitForTestIdWithText(

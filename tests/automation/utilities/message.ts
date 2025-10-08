@@ -1,4 +1,5 @@
 import { Page } from '@playwright/test';
+
 // eslint-disable-next-line import/no-cycle
 import { clickOnElement, typeIntoInput } from './utils';
 
@@ -14,6 +15,21 @@ export const waitForSentTick = async (window: Page, message: string) => {
     'found the tick of message sent: ',
     message,
     Boolean(tickMessageSent),
+  );
+};
+
+export const waitForReadTick = async (window: Page, message: string) => {
+  // wait for confirmation tick to send reply message
+  const selc = `css=[data-testid=message-content]:has-text("${message}"):has([data-testid=msg-status][data-testtype=read])`;
+  console.info('waiting for read tick of message: ', message);
+
+  const tickMessageRead = await window.waitForSelector(selc, {
+    timeout: 30000,
+  });
+  console.info(
+    'found the tick of message read: ',
+    message,
+    Boolean(tickMessageRead),
   );
 };
 

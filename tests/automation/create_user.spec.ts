@@ -1,30 +1,36 @@
 import { sleepFor } from '../promise_utils';
+import { Global, LeftPane, Settings } from './locators';
 import { newUser } from './setup/new_user';
 import { sessionTestOneWindow } from './setup/sessionTest';
-import {
-  clickOnTestIdWithText,
-  waitForTestIdWithText,
-} from './utilities/utils';
+import { clickOn, waitForTestIdWithText } from './utilities/utils';
 
 sessionTestOneWindow('Create User', async ([window]) => {
   // Create User
   const userA = await newUser(window, 'Alice', false);
   // Open profile tab
-  await clickOnTestIdWithText(window, 'leftpane-primary-avatar');
+  await clickOn(window, LeftPane.profileButton);
   await sleepFor(100, true);
   // check username matches
-  await waitForTestIdWithText(window, 'your-profile-name', userA.userName);
-  // check Account ID matches
-  await waitForTestIdWithText(window, 'your-account-id', userA.accountid);
-  // exit profile modal
-  await clickOnTestIdWithText(window, 'modal-close-button');
-  // go to settings section
-  await clickOnTestIdWithText(window, 'settings-section');
-  // check recovery phrase matches
-  await clickOnTestIdWithText(window, 'recovery-password-settings-menu-item');
   await waitForTestIdWithText(
     window,
-    'recovery-password-seed-modal',
+    Settings.displayName.selector,
+    userA.userName,
+  );
+  // check Account ID matches
+  await waitForTestIdWithText(
+    window,
+    Settings.accountId.selector,
+    userA.accountid,
+  );
+  // exit profile modal
+  await clickOn(window, Global.modalCloseButton);
+  // go to settings section
+  await clickOn(window, LeftPane.settingsButton);
+  // check recovery phrase matches
+  await clickOn(window, Settings.recoveryPasswordMenuItem);
+  await waitForTestIdWithText(
+    window,
+    Settings.recoveryPasswordContainer.selector,
     userA.recoveryPassword,
   );
 });

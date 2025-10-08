@@ -1,9 +1,17 @@
 import { Page } from '@playwright/test';
 import chalk from 'chalk';
+
+import {
+  Global,
+  HomeScreen,
+  LeftPane,
+  Onboarding,
+  Settings,
+} from '../locators';
 import { User } from '../types/testing';
 import {
   checkPathLight,
-  clickOnTestIdWithText,
+  clickOn,
   grabTextFromElement,
   typeIntoInput,
   waitForTestIdWithText,
@@ -15,13 +23,16 @@ export const newUser = async (
   awaitOnionPath = true,
 ): Promise<User> => {
   // Create User
-  await clickOnTestIdWithText(window, 'create-account-button');
+  await clickOn(window, Onboarding.createAccountButton);
   // Input username = testuser
-  await typeIntoInput(window, 'display-name-input', userName);
-  await clickOnTestIdWithText(window, 'continue-button');
+  await typeIntoInput(window, Onboarding.displayNameInput.selector, userName);
+  await clickOn(window, Global.continueButton);
   // save recovery phrase
-  await clickOnTestIdWithText(window, 'reveal-recovery-phrase');
-  await waitForTestIdWithText(window, 'recovery-password-seed-modal');
+  await clickOn(window, HomeScreen.revealRecoveryPhraseButton);
+  await waitForTestIdWithText(
+    window,
+    Settings.recoveryPasswordContainer.selector,
+  );
   const recoveryPassword = await grabTextFromElement(
     window,
     'data-testid',
@@ -30,22 +41,23 @@ export const newUser = async (
   // const recoveryPhrase = await window.innerText(
   //   '[data-testid=recovery-password-seed-modal]',
   // );
-  // await clickOnTestIdWithText(window, 'modal-close-button');
-  await clickOnTestIdWithText(window, 'leftpane-primary-avatar');
+  await clickOn(window, Global.modalCloseButton);
+  await clickOn(window, LeftPane.profileButton);
 
   // Save Account ID to a variable
-  let accountid = await window.innerText('[data-testid=your-account-id]');
-  accountid = accountid.replace(/(\r\n|\n|\r)/gm, ''); // remove the new line in the Account ID as it is rendered with one forced
+  let accountid = await window.innerText(
+    `[data-testid=${Settings.accountId.selector}]`,
+  );
+  accountid = accountid.replace(/[^0-9a-fA-F]/g, ''); // keep only hex characters
 
   console.log(
     `${userName}: Account ID: "${chalk.blue(
       accountid,
     )}" and Recovery password: "${chalk.green(recoveryPassword)}"`,
   );
-  await clickOnTestIdWithText(window, 'modal-close-button');
+  await clickOn(window, Global.modalCloseButton);
   if (awaitOnionPath) {
     await checkPathLight(window);
   }
-  await clickOnTestIdWithText(window, 'message-section');
   return { userName, accountid, recoveryPassword };
 };

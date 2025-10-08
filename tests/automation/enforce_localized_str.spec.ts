@@ -206,7 +206,7 @@ function getExpectedStringFromKey(
     case 'callsVoiceAndVideoBeta':
       return 'Voice and Video Calls (Beta)';
     case 'callsVoiceAndVideoModalDescription':
-      return 'Your IP is visible to your call partner and a Session Technology Foundation server while using beta calls.';
+      return 'Your IP is visible to your call partner and a Session Foundation server while using beta calls.';
     case 'blockDescription':
       return 'Are you sure you want to block {name}? Blocked users cannot send you message requests, group invites or call you.';
     case 'noteToSelfHide':
@@ -240,7 +240,7 @@ function getExpectedStringFromKey(
     case 'qrView':
       return 'View QR';
     case 'recoveryPasswordView':
-      return 'View Password';
+      return 'View Recovery Password';
     case 'deleteConversationDescription':
       return 'Are you sure you want to delete your conversation with {name}? This will permanently delete all messages and attachments.';
     case 'manageMembers':
@@ -249,6 +249,17 @@ function getExpectedStringFromKey(
       return 'Without your recovery password, you cannot load your account on new devices. We strongly recommend you save your recovery password in a safe and secure place before continuing.';
     case 'recoveryPasswordHidePermanentlyDescription2':
       return 'Are you sure you want to permanently hide your recovery password on this device? This cannot be undone.';
+    case 'enter':
+      return 'Enter';
+    case 'onboardingAccountCreated':
+      return 'Account Created';
+    case 'onboardingBubbleWelcomeToSession':
+      return 'Welcome to Session {emoji}';
+    case 'conversationsNone':
+      return "You don't have any conversations yet";
+    case 'onboardingHitThePlusButton':
+      return 'Hit the plus button to start a chat, create a group, or join an official community!';
+
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail

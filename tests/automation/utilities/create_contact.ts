@@ -1,8 +1,10 @@
 import { Page } from '@playwright/test';
+
+import { HomeScreen } from '../locators';
 import { User } from '../types/testing';
 import { replyTo } from './reply_message';
 import { sendNewMessage } from './send_message';
-import { clickOnElement, clickOnTestIdWithText } from './utils';
+import { clickOnElement, clickOnWithText } from './utils';
 
 export const createContact = async (
   windowA: Page,
@@ -19,9 +21,9 @@ export const createContact = async (
     strategy: 'data-testid',
     selector: 'message-request-banner',
   });
-  await clickOnTestIdWithText(
+  await clickOnWithText(
     windowB,
-    'module-conversation__user__profile-name',
+    HomeScreen.conversationItemName,
     userA.userName,
   );
   await clickOnElement({

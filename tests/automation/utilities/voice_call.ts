@@ -1,55 +1,41 @@
 import { Page } from '@playwright/test';
+
 import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import { sleepFor } from '../../promise_utils';
-import { User } from '../types/testing';
-import {
-  checkModalStrings,
-  clickOnMatchingText,
-  clickOnTestIdWithText,
-} from './utils';
+import { Conversation, Global, Settings } from '../locators';
+import { checkModalStrings, clickOn, clickOnMatchingText } from './utils';
 
 export const makeVoiceCall = async (
   callerWindow: Page,
   receiverWindow: Page,
-  caller: User,
-  receiver: User,
 ) => {
-  await clickOnTestIdWithText(callerWindow, 'call-button');
-  await clickOnTestIdWithText(callerWindow, 'session-toast');
-  await clickOnTestIdWithText(callerWindow, 'enable-calls');
+  await clickOn(callerWindow, Conversation.callButton);
+  await clickOn(callerWindow, Global.toast);
+  await clickOn(callerWindow, Settings.enableCalls);
   await checkModalStrings(
     callerWindow,
     englishStrippedStr('callsVoiceAndVideoBeta').toString(),
     englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
+    'confirmModal',
   );
-  await clickOnTestIdWithText(callerWindow, 'session-confirm-ok-button');
-  await clickOnTestIdWithText(callerWindow, 'message-section');
-  await clickOnTestIdWithText(
-    callerWindow,
-    'module-conversation__user__profile-name',
-    receiver.userName,
-  );
-  await clickOnTestIdWithText(callerWindow, 'call-button');
+  await clickOn(callerWindow, Global.confirmButton);
+  await clickOn(callerWindow, Global.modalCloseButton);
+  await clickOn(callerWindow, Conversation.callButton);
   // Enable calls in window B
-  await clickOnTestIdWithText(receiverWindow, 'session-toast');
-  await clickOnTestIdWithText(receiverWindow, 'enable-calls');
-  // Getting wrong strings from locales.ts file
+  await clickOn(receiverWindow, Global.toast);
+  await clickOn(receiverWindow, Settings.enableCalls);
   await checkModalStrings(
     receiverWindow,
     englishStrippedStr('callsVoiceAndVideoBeta').toString(),
     englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
+    'confirmModal',
   );
-  await clickOnTestIdWithText(receiverWindow, 'session-confirm-ok-button');
+  await clickOn(receiverWindow, Global.confirmButton);
   await clickOnMatchingText(
     receiverWindow,
     englishStrippedStr('accept').toString(),
   );
-  await clickOnTestIdWithText(receiverWindow, 'message-section');
-  await clickOnTestIdWithText(
-    receiverWindow,
-    'module-conversation__user__profile-name',
-    caller.userName,
-  );
+  await clickOn(receiverWindow, Global.modalCloseButton);
   await sleepFor(5000);
-  await clickOnTestIdWithText(callerWindow, 'end-call');
+  await clickOn(callerWindow, Conversation.endCallButton);
 };

@@ -1,17 +1,19 @@
 import { Page } from '@playwright/test';
+
+import { HomeScreen } from '../locators';
 import { sendMessage } from './message';
-import { clickOnTestIdWithText, typeIntoInput } from './utils';
+import { clickOn, typeIntoInput } from './utils';
 
 export const sendNewMessage = async (
   window: Page,
   sessionid: string,
   message: string,
 ) => {
-  await clickOnTestIdWithText(window, 'new-conversation-button');
-  await clickOnTestIdWithText(window, 'chooser-new-conversation-button');
+  await clickOn(window, HomeScreen.plusButton);
+  await clickOn(window, HomeScreen.newMessageOption);
   // Enter session ID of USER B
   await typeIntoInput(window, 'new-session-conversation', sessionid);
   // click next
-  await clickOnTestIdWithText(window, 'next-new-conversation-button');
+  await clickOn(window, HomeScreen.newMessageNextButton);
   await sendMessage(window, message);
 };

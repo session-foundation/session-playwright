@@ -1,6 +1,8 @@
 import { expect } from '@playwright/test';
+
+import { LeftPane } from './locators';
 import { test_Alice_1W_no_network } from './setup/sessionTest';
-import { clickOnTestIdWithText } from './utilities/utils';
+import { clickOn } from './utilities/utils';
 
 test_Alice_1W_no_network('Switch themes', async ({ aliceWindow1 }) => {
   // Create
@@ -9,7 +11,7 @@ test_Alice_1W_no_network('Switch themes', async ({ aliceWindow1 }) => {
   await expect(darkThemeColor).toHaveCSS('background-color', 'rgb(27, 27, 27)');
 
   // Click theme button and change to dark theme
-  await clickOnTestIdWithText(aliceWindow1, 'theme-section');
+  await clickOn(aliceWindow1, LeftPane.themeButton);
   // Check background colour of background to verify dark theme
   const lightThemeColor = aliceWindow1.locator('.inbox.index');
   await expect(lightThemeColor).toHaveCSS(
@@ -18,7 +20,7 @@ test_Alice_1W_no_network('Switch themes', async ({ aliceWindow1 }) => {
   );
 
   // Toggle back to light theme
-  await clickOnTestIdWithText(aliceWindow1, 'theme-section');
+  await clickOn(aliceWindow1, LeftPane.themeButton);
   // Check background colour again
   await expect(darkThemeColor).toHaveCSS('background-color', 'rgb(27, 27, 27)');
 });

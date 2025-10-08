@@ -3,11 +3,13 @@
 /* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable no-await-in-loop */
 import { ElementHandle, Page } from '@playwright/test';
+
 import { sleepFor } from '../../promise_utils';
 import {
-  DMTimeOption,
   DataTestId,
+  DMTimeOption,
   LoaderType,
+  ModalId,
   Strategy,
   StrategyExtractionObj,
   WithMaxWait,
@@ -15,10 +17,14 @@ import {
   WithRightButton,
 } from '../types/testing';
 import { sendMessage } from './message';
-import fs from 'fs';
-import path from 'path';
-import { screenshotFolder } from '../constants/variables';
-import type { ElementState } from '../types/landing_page_states';
+
+type ElementOptions = {
+  maxWait?: number;
+  rightButton?: boolean;
+};
+
+// TODO Unify element interaction functions to use locator objects the way clickOn and clickOnWithText do
+// Remaining functions to migrate: waitForElement, typeIntoInput, grabTextFromElement etc.
 
 // WAIT FOR FUNCTIONS
 
@@ -165,7 +171,7 @@ export async function waitForLoadingAnimationToFinish(
   loader: LoaderType,
   maxWait?: number,
 ) {
-  let loadingAnimation: ElementHandle<SVGElement | HTMLElement> | undefined;
+  let loadingAnimation: ElementHandle<HTMLElement | SVGElement> | undefined;
 
   await waitForElement(window, 'data-testid', `${loader}`, maxWait);
 
@@ -242,19 +248,72 @@ export async function checkPathLight(window: Page, maxWait?: number) {
 
 // ACTIONS
 
+/**
+ * Clicks on an element using a locator object
+ * @param window - Playwright page instance
+ * @param locator - Element locator with strategy and selector
+ * @param options - Optional element interaction configuration
+ */
+export async function clickOn(
+  window: Page,
+  locator: StrategyExtractionObj,
+  options?: ElementOptions,
+) {
+  let builtSelector: string;
+
+  if (locator.strategy === 'class') {
+    builtSelector = `css=.${locator.selector}`;
+  } else {
+    builtSelector = `css=[${locator.strategy}=${locator.selector}]`;
+  }
+
+  const sharedOpts = { timeout: options?.maxWait, strict: true };
+  await window.click(
+    builtSelector,
+    options?.rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
+  );
+}
+
+/**
+ * Clicks on an element that contains specific text
+ * @param window - Playwright page instance
+ * @param locator - Element locator with strategy and selector
+ * @param text - Text content to match within the element
+ * @param options - Optional element interaction configuration
+ */
+export async function clickOnWithText(
+  window: Page,
+  locator: StrategyExtractionObj,
+  text: string,
+  options?: ElementOptions,
+) {
+  let builtSelector: string;
+
+  if (locator.strategy === 'class') {
+    builtSelector = `css=.${locator.selector}:has-text("${text.replace(
+      /"/g,
+      '\\"',
+    )}")`;
+  } else {
+    builtSelector = `css=[${locator.strategy}=${
+      locator.selector
+    }]:has-text("${text.replace(/"/g, '\\"')}")`;
+  }
+
+  const sharedOpts = { timeout: options?.maxWait, strict: true };
+  await window.click(
+    builtSelector,
+    options?.rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
+  );
+}
+// Legacy wrapper for backwards compatibility
 export async function clickOnElement({
   window,
   maxWait,
   rightButton,
   ...obj
 }: WithPage & StrategyExtractionObj & WithMaxWait & WithRightButton) {
-  const builtSelector = `css=[${obj.strategy}=${obj.selector}]`;
-  console.info(`clickOnElement: looking for selector ${builtSelector}`);
-  const sharedOpts = { timeout: maxWait };
-  await window.click(
-    builtSelector,
-    rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
-  );
+  return clickOn(window, obj, { maxWait, rightButton });
 }
 
 export async function lookForPartialTestId(
@@ -276,8 +335,6 @@ export async function lookForPartialTestId(
   return builtSelector;
 }
 
-//
-
 export async function clickOnMatchingText(
   window: Page,
   text: string,
@@ -290,35 +347,6 @@ export async function clickOnMatchingText(
     rightButton
       ? { button: 'right', timeout: timeoutMs }
       : { timeout: timeoutMs },
-  );
-}
-
-export async function clickOnTestIdWithText(
-  window: Page,
-  dataTestId: DataTestId,
-  text?: string,
-  rightButton?: boolean,
-  maxWait?: number,
-) {
-  const sharedOpts = { timeout: maxWait, strict: true };
-  console.info(
-    `clickOnTestIdWithText with testId:${dataTestId} and text:${
-      text || 'none'
-    }, rightButton:${!!rightButton}`,
-  );
-
-  const builtSelector = !text
-    ? `css=[data-testid=${dataTestId}]`
-    : `css=[data-testid=${dataTestId}]:has-text("${text}")`;
-
-  await window.click(
-    builtSelector,
-    rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
-  );
-  console.info(
-    `clickOnTestIdWithText:clicked! testId:${dataTestId} and text:${
-      text || 'none'
-    }`,
   );
 }
 
@@ -349,7 +377,9 @@ export async function typeIntoInput(
   console.info(`typeIntoInput testId: ${dataTestId} : "${text}"`);
   const builtSelector = `css=[data-testid=${dataTestId}]`;
   // the new input made with onboarding element needs a click to reveal the input in the DOM
-  await clickOnTestIdWithText(window, dataTestId);
+  // Convert DataTestId to locator object for clickOn
+  const locator = { strategy: 'data-testid' as const, selector: dataTestId };
+  await clickOn(window, locator);
   // reset the content to be empty before typing into the input
   await window.fill(builtSelector, '');
   return window.type(builtSelector, text);
@@ -390,7 +420,7 @@ export async function hasElementBeenDeleted(
 ) {
   const start = Date.now();
 
-  let el: ElementHandle<SVGElement | HTMLElement> | undefined;
+  let el: ElementHandle<HTMLElement | SVGElement> | undefined;
   do {
     try {
       el = await waitForElement(window, strategy, selector, maxWait, text);
@@ -421,7 +451,7 @@ export async function hasTextMessageBeenDeleted(
   maxWait: number = 5000,
 ) {
   await doWhileWithMax(
-    15000,
+    maxWait,
     500,
     'waiting for text message to be deleted',
     async () => {
@@ -501,13 +531,28 @@ export async function checkModalStrings(
   window: Page,
   expectedHeading: string,
   expectedDescription: string,
+  modalId?: ModalId,
 ) {
-  const heading = await waitForElement(window, 'data-testid', 'modal-heading');
-  const description = await waitForElement(
-    window,
-    'data-testid',
-    'modal-description',
-  );
+  let modalSelector = '[data-modal-id]'; // Base selector for modals
+
+  // If a specific modal ID is provided, target that one
+  if (modalId) {
+    modalSelector = `[data-modal-id="${modalId}"]`;
+  }
+
+  // Find the target modal
+  const targetModal = window.locator(modalSelector).first();
+
+  // Wait for the modal to be visible
+  await targetModal.waitFor({ state: 'visible' });
+
+  // Get elements within this specific modal
+  const heading = targetModal.locator('[data-testid="modal-heading"]');
+  const description = targetModal.locator('[data-testid="modal-description"]');
+
+  // Wait for these elements to be visible
+  await heading.waitFor({ state: 'visible' });
+  await description.waitFor({ state: 'visible' });
 
   const headingText = await heading.innerText();
   const descriptionText = await description.innerText();
@@ -530,64 +575,4 @@ export function formatTimeOption(option: DMTimeOption) {
   const timePart = option.replace('time-option-', '');
   const formattedTime = timePart.replace(/-/g, ' ');
   return formattedTime;
-}
-
-async function deleteDifferenceFile(
-  fileFolder: string,
-  fileName: string,
-  os: string,
-) {
-  const filePath = path.join(
-    screenshotFolder,
-    fileFolder,
-    `${fileName}-${os}-difference.png`,
-  );
-
-  if (fs.existsSync(filePath)) {
-    // Delete the file if it exists
-    fs.unlinkSync(filePath);
-    console.log(`Deleted difference file at: ${filePath}`);
-  } else {
-    console.log(`No difference file found at: ${filePath}, proceeding...`);
-  }
-}
-
-export async function compareScreenshot(
-  element: ElementHandle<SVGElement | HTMLElement>,
-  testTitle: string,
-  elementState: ElementState,
-  os: string,
-) {
-  const formattedTitle = testTitle.toLowerCase().replace(/\s+/g, '-');
-  await deleteDifferenceFile(formattedTitle, elementState, os);
-
-  const elementScreenshot = await element.screenshot();
-  const folderPath = path.join(screenshotFolder, `${formattedTitle}`);
-
-  // If folder doesn't exist, create folder
-  if (!fs.existsSync(folderPath)) {
-    fs.mkdirSync(folderPath, { recursive: true });
-  }
-  const previousScreenshotFilePath = path.join(
-    folderPath,
-    `${elementState}-${os}.png`,
-  );
-  // If screenshot does not exist, save it to the folder
-  if (!fs.existsSync(previousScreenshotFilePath)) {
-    fs.writeFileSync(previousScreenshotFilePath, elementScreenshot);
-  }
-  // If screenshot does exist, compare it to previous screenshot in the folder
-  const previousScreenshot = fs.readFileSync(previousScreenshotFilePath);
-  const diffFilePath = path.join(
-    folderPath,
-    `${elementState}-${os}-difference.png`,
-  );
-  // If screenshots are different, then create a difference screenshot
-  if (!elementScreenshot.equals(previousScreenshot)) {
-    //  If elements do not match, then take the elementScreenshot and save it to same folder but with a new name of 'difference.png'
-    fs.writeFileSync(diffFilePath, elementScreenshot);
-    throw new Error(
-      `Screenshots do not match, see ${screenshotFolder} > ${testTitle} folder > \n\t\t diff: ${diffFilePath}\n\t\t previous: ${previousScreenshotFilePath}`,
-    );
-  }
 }

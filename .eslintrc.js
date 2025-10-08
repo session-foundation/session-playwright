@@ -9,7 +9,7 @@ module.exports = {
 
   extends: ['airbnb-base', 'airbnb-typescript/base', 'prettier', 'plugin:@typescript-eslint/recommended'],
 
-  plugins: ['mocha', 'more', '@typescript-eslint'],
+  plugins: ['mocha', 'more', '@typescript-eslint', 'perfectionist'],
   parser: '@typescript-eslint/parser',
   parserOptions: { project: ['./tsconfig.json'] },
 
@@ -53,6 +53,36 @@ module.exports = {
     'no-await-in-loop': 'off',
     'import/order': 'off',
     'no-useless-catch': 'off',
+
+     'perfectionist/sort-imports': 'error',
+      'perfectionist/sort-named-imports': 'error',
+      'perfectionist/sort-classes': [
+        'error', 
+        {
+          partitionByComment: true,
+        },
+      ],
+      'perfectionist/sort-union-types': [
+        'error',
+        {
+          // This ensures null/undefined come after other types for better readability
+          groups: [
+            'named',
+            'keyword',
+            'operator',
+            'literal',
+            'function',
+            'import',
+            'conditional',
+            'object',
+            'tuple',
+            'intersection',
+            'union',
+            'nullish',
+          ],
+        }
+      ],
+
 
     quotes: [
       'error',
