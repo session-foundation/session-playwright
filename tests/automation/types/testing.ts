@@ -186,6 +186,7 @@ export type DataTestId =
   | 'set-password-settings-button'
   | 'settings-section'
   | 'theme-section'
+  | 'tooltip-character-count'
   | 'unblock-button-settings-screen'
   | 'update-group-info-name-input'
   | 'update-profile-info-name-input'

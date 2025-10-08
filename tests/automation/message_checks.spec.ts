@@ -10,6 +10,7 @@ import {
 } from './locators';
 import { newUser } from './setup/new_user';
 import {
+  sessionTestOneWindow,
   sessionTestTwoWindows,
   test_Alice_1W_Bob_1W,
 } from './setup/sessionTest';
@@ -24,6 +25,7 @@ import {
   trustUser,
 } from './utilities/send_media';
 import {
+  checkModalStrings,
   clickOn,
   clickOnElement,
   clickOnMatchingText,
@@ -255,3 +257,101 @@ sessionTestTwoWindows(
     console.log(timesArray);
   },
 );
+
+// Message length limit tests (pre-pro)
+const maxChars = 2000;
+const countdownThreshold = 1800;
+
+const messageLengthTestCases = [
+  {
+    length: 1799,
+    char: 'a',
+    shouldSend: true,
+  },
+  {
+    length: 1800,
+    char: 'b',
+    shouldSend: true,
+  },
+  {
+    length: 2000,
+    char: 'c',
+    shouldSend: true,
+  },
+  {
+    length: 2001,
+    char: 'd',
+    shouldSend: false,
+  },
+];
+
+messageLengthTestCases.forEach((testCase) => {
+  sessionTestOneWindow(
+    `Message length limit (${testCase.length} chars)`,
+    async ([aliceWindow1]) => {
+      const alice = await newUser(aliceWindow1, 'Alice', false);
+      const expectedCount =
+        testCase.length < countdownThreshold
+          ? null
+          : (maxChars - testCase.length).toString();
+      const message = testCase.char.repeat(testCase.length);
+      await clickOn(aliceWindow1, HomeScreen.plusButton);
+      await clickOn(aliceWindow1, HomeScreen.newMessageOption);
+      await typeIntoInput(aliceWindow1, 'new-session-conversation', alice.accountid);
+      await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
+      // Type the message
+      await typeIntoInput(aliceWindow1, 'message-input-text-area', message, true);
+
+      // Check countdown behavior
+      if (expectedCount) {
+        await waitForTestIdWithText(
+          aliceWindow1,
+          'tooltip-character-count',
+          expectedCount,
+        );
+      } else {
+        // Verify countdown tooltip is not present
+        try {
+          await waitForElement(
+            aliceWindow1,
+            'data-testid',
+            'tooltip-character-count',
+            1000,
+          );
+          throw new Error(
+            `Countdown should not be visible for messages under ${countdownThreshold} chars`,
+          );
+        } catch (e) {
+          // Expected - countdown should not exist
+          console.log('Countdown not present as expected');
+        }
+      }
+
+      // Try to send
+      await clickOn(aliceWindow1, Conversation.sendMessageButton);
+
+      if (testCase.shouldSend) {
+        // Message should appear in Alice's window
+        await waitForTextMessage(aliceWindow1, message);
+      } else {
+        // Message Too Long modal
+        await checkModalStrings(
+          aliceWindow1,
+          englishStrippedStr('modalMessageTooLongTitle').toString(),
+          englishStrippedStr('modalMessageTooLongDescription')
+            .withArgs({ limit: maxChars.toLocaleString('en-AU') }) // With .toString() the test expects "2000" not "2,000"
+            .toString(),
+        );
+        await clickOn(aliceWindow1, Global.confirmButton);
+
+        // Verify message didn't send
+        try {
+          await waitForTextMessage(aliceWindow1, message, 2000);
+          throw new Error('Message should not have been sent');
+        } catch (e) {
+          console.log(`Message didn't send as expected`);
+        }
+      }
+    },
+  );
+});
