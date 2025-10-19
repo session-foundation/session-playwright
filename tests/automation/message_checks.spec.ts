@@ -297,10 +297,19 @@ messageLengthTestCases.forEach((testCase) => {
       const message = testCase.char.repeat(testCase.length);
       await clickOn(aliceWindow1, HomeScreen.plusButton);
       await clickOn(aliceWindow1, HomeScreen.newMessageOption);
-      await typeIntoInput(aliceWindow1, 'new-session-conversation', alice.accountid);
+      await typeIntoInput(
+        aliceWindow1,
+        'new-session-conversation',
+        alice.accountid,
+      );
       await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
       // Type the message
-      await typeIntoInput(aliceWindow1, 'message-input-text-area', message, true);
+      await typeIntoInput(
+        aliceWindow1,
+        'message-input-text-area',
+        message,
+        true, // Paste because otherwise Playwright times out
+      );
 
       // Check countdown behavior
       if (expectedCount) {
@@ -339,7 +348,7 @@ messageLengthTestCases.forEach((testCase) => {
           aliceWindow1,
           englishStrippedStr('modalMessageTooLongTitle').toString(),
           englishStrippedStr('modalMessageTooLongDescription')
-            .withArgs({ limit: maxChars.toLocaleString('en-AU') }) // With .toString() the test expects "2000" not "2,000"
+            .withArgs({ limit: maxChars.toLocaleString('en-AU') }) // Force "2,000" instead of "2000"
             .toString(),
         );
         await clickOn(aliceWindow1, Global.confirmButton);

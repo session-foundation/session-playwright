@@ -120,6 +120,7 @@ export type DataTestId =
   | 'edit-profile-icon'
   | 'empty-conversation-notification'
   | 'enable-calls-settings-row'
+  | 'enable-communities-message-requests-settings-row'
   | 'enable-microphone-settings-row'
   | 'enable-read-receipts-settings-row'
   | 'end-call'

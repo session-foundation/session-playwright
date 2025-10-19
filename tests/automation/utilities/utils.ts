@@ -373,7 +373,7 @@ export async function typeIntoInput(
   window: Page,
   dataTestId: DataTestId,
   text: string,
-  paste?: boolean, // typing long messages hits the runner timeout 
+  paste?: boolean, // typing long messages hits the runner timeout
 ) {
   console.info(`typeIntoInput testId: ${dataTestId} : "${text}"`);
   const builtSelector = `css=[data-testid=${dataTestId}]`;
@@ -384,9 +384,9 @@ export async function typeIntoInput(
   // reset the content to be empty before typing into the input
   await window.fill(builtSelector, '');
   if (paste) {
-  await window.fill(builtSelector, text);
+    await window.fill(builtSelector, text);
   } else {
-  await window.type(builtSelector, text);
+    await window.type(builtSelector, text);
   }
 }
 
