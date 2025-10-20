@@ -159,6 +159,9 @@ export class Settings extends Locator {
   );
   static readonly confirmPasswordInput = this.testId('password-input-confirm');
   static readonly enableCalls = this.testId('enable-calls-settings-row');
+  static readonly enableCommunityMessageRequests = this.testId(
+    'enable-communities-message-requests-settings-row',
+  );
   static readonly enableMicrophone = this.testId(
     'enable-microphone-settings-row',
   );

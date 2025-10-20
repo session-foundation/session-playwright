@@ -259,7 +259,10 @@ function getExpectedStringFromKey(
       return "You don't have any conversations yet";
     case 'onboardingHitThePlusButton':
       return 'Hit the plus button to start a chat, create a group, or join an official community!';
-
+    case 'modalMessageTooLongTitle':
+      return 'Message Too Long';
+    case 'modalMessageTooLongDescription':
+      return 'Please shorten your message to {limit} characters or less.';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail

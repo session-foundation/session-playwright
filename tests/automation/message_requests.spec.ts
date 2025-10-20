@@ -1,3 +1,5 @@
+import { expect } from '@playwright/test';
+
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import {
   Conversation,
@@ -7,6 +9,7 @@ import {
   Settings,
 } from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
+import { joinCommunity } from './utilities/join_community';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
 import {
@@ -14,6 +17,7 @@ import {
   clickOn,
   clickOnMatchingText,
   clickOnWithText,
+  grabTextFromElement,
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utilities/utils';
@@ -162,5 +166,83 @@ test_Alice_1W_Bob_1W(
       bobWindow1,
       englishStrippedStr('messageRequestsNonePending').toString(),
     );
+  },
+);
+
+test_Alice_1W_Bob_1W(
+  'Community message requests on',
+  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+    await clickOn(bobWindow1, LeftPane.settingsButton);
+    await clickOn(bobWindow1, Settings.privacyMenuItem);
+    await clickOn(bobWindow1, Settings.enableCommunityMessageRequests);
+    await clickOn(bobWindow1, Global.modalCloseButton);
+    await Promise.all([joinCommunity(aliceWindow1), joinCommunity(bobWindow1)]);
+    const communityMsg = `I accept message requests + ${Date.now()}`;
+    await sendMessage(bobWindow1, communityMsg);
+    await clickOn(aliceWindow1, Conversation.scrollToBottomButton);
+    // Using native methods to locate the author corresponding to the sent message
+    await aliceWindow1
+      .locator('.module-message__container', { hasText: communityMsg })
+      .locator('..') // Go up to parent
+      .locator('svg')
+      .click();
+    const elText = await grabTextFromElement(
+      aliceWindow1,
+      'data-testid',
+      'account-id',
+    );
+    expect(elText).toMatch(/^15/);
+    await clickOn(aliceWindow1, HomeScreen.newMessageAccountIDInput); // yes this is the actual locator for the 'Message' button
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'header-conversation-name',
+      bob.userName,
+    );
+    const messageRequestMsg = `${alice.userName} to ${bob.userName}`;
+    const messageRequestResponse = `${bob.userName} accepts message request`;
+    await sendMessage(aliceWindow1, messageRequestMsg);
+    await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
+    // Select message request from User A
+    await clickOnWithText(
+      bobWindow1,
+      HomeScreen.conversationItemName,
+      alice.userName,
+    );
+    await sendMessage(bobWindow1, messageRequestResponse);
+    // Check config message of message request acceptance
+    await waitForTestIdWithText(
+      bobWindow1,
+      'message-request-response-message',
+      englishStrippedStr('messageRequestYouHaveAccepted')
+        .withArgs({
+          name: alice.userName,
+        })
+        .toString(),
+    );
+  },
+);
+test_Alice_1W_Bob_1W(
+  'Community message requests off',
+  async ({ aliceWindow1, bobWindow1 }) => {
+    await Promise.all([joinCommunity(aliceWindow1), joinCommunity(bobWindow1)]);
+    const communityMsg = `I do not accept message requests + ${Date.now()}`;
+    await sendMessage(bobWindow1, communityMsg);
+    await clickOn(aliceWindow1, Conversation.scrollToBottomButton);
+    // Using native methods to locate the author corresponding to the sent message
+    await aliceWindow1
+      .locator('.module-message__container', { hasText: communityMsg })
+      .locator('..') // Go up to parent
+      .locator('svg')
+      .click();
+    const elText = await grabTextFromElement(
+      aliceWindow1,
+      'data-testid',
+      'account-id',
+    );
+    expect(elText).toMatch(/^15/);
+    const messageButton = aliceWindow1.getByTestId(
+      HomeScreen.newMessageAccountIDInput.selector,
+    );
+    await expect(messageButton).toHaveClass(/disabled/);
   },
 );
