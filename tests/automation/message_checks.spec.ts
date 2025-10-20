@@ -10,7 +10,6 @@ import {
 } from './locators';
 import { newUser } from './setup/new_user';
 import {
-  sessionTestOneWindow,
   sessionTestTwoWindows,
   test_Alice_1W_Bob_1W,
 } from './setup/sessionTest';
@@ -286,23 +285,15 @@ const messageLengthTestCases = [
 ];
 
 messageLengthTestCases.forEach((testCase) => {
-  sessionTestOneWindow(
+  test_Alice_1W_Bob_1W(
     `Message length limit (${testCase.length} chars)`,
-    async ([aliceWindow1]) => {
-      const alice = await newUser(aliceWindow1, 'Alice', false);
+    async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+      await createContact(aliceWindow1, bobWindow1, alice, bob);
       const expectedCount =
         testCase.length < countdownThreshold
           ? null
           : (maxChars - testCase.length).toString();
       const message = testCase.char.repeat(testCase.length);
-      await clickOn(aliceWindow1, HomeScreen.plusButton);
-      await clickOn(aliceWindow1, HomeScreen.newMessageOption);
-      await typeIntoInput(
-        aliceWindow1,
-        'new-session-conversation',
-        alice.accountid,
-      );
-      await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
       // Type the message
       await typeIntoInput(
         aliceWindow1,
@@ -341,7 +332,11 @@ messageLengthTestCases.forEach((testCase) => {
 
       if (testCase.shouldSend) {
         // Message should appear in Alice's window
-        await waitForTextMessage(aliceWindow1, message);
+        await Promise.all(
+          [aliceWindow1, bobWindow1].map(async (w) => {
+            await waitForTextMessage(w, message);
+          }),
+        );
       } else {
         // Message Too Long modal
         await checkModalStrings(

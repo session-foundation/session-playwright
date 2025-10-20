@@ -199,7 +199,7 @@ test_Alice_1W_Bob_1W(
       bob.userName,
     );
     const messageRequestMsg = `${alice.userName} to ${bob.userName}`;
-    const testReply = `${bob.userName} accepts message request`;
+    const messageRequestResponse = `${bob.userName} accepts message request`;
     await sendMessage(aliceWindow1, messageRequestMsg);
     await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select message request from User A
@@ -208,7 +208,7 @@ test_Alice_1W_Bob_1W(
       HomeScreen.conversationItemName,
       alice.userName,
     );
-    await sendMessage(bobWindow1, testReply);
+    await sendMessage(bobWindow1, messageRequestResponse);
     // Check config message of message request acceptance
     await waitForTestIdWithText(
       bobWindow1,
