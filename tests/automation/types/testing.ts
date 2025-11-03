@@ -118,6 +118,7 @@ export type DataTestId =
   | 'dropdownitem-5-seconds'
   | 'edit-group-name'
   | 'edit-profile-icon'
+  | 'empty-conversation-control-message'
   | 'empty-conversation-notification'
   | 'enable-calls-settings-row'
   | 'enable-communities-message-requests-settings-row'

@@ -21,6 +21,7 @@ import {
   clickOn,
   clickOnMatchingText,
   clickOnWithText,
+  hasElementBeenDeleted,
   waitForTestIdWithText,
 } from './utilities/utils';
 
@@ -309,5 +310,50 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
         charlie.userName,
       ),
     ]);
+  },
+);
+
+test_group_Alice_2W_Bob_1W_Charlie_1W(
+  'Delete group linked device',
+  async ({
+    aliceWindow1,
+    aliceWindow2,
+    bobWindow1,
+    charlieWindow1,
+    groupCreated,
+  }) => {
+    await clickOn(aliceWindow1, Conversation.conversationSettingsIcon);
+    await clickOn(aliceWindow1, ConversationSettings.leaveOrDeleteGroupOption);
+    await checkModalStrings(
+      aliceWindow1,
+      englishStrippedStr('groupDelete').toString(),
+      englishStrippedStr('groupDeleteDescription')
+        .withArgs({ group_name: groupCreated.userName })
+        .toString(),
+      'confirmModal',
+    );
+    await clickOn(aliceWindow1, Global.confirmButton);
+    await Promise.all(
+      [bobWindow1, charlieWindow1].map(async (w) => {
+        await waitForTestIdWithText(
+          w,
+          'empty-conversation-control-message',
+          englishStrippedStr('groupDeletedMemberDescription')
+            .withArgs({ group_name: groupCreated.userName })
+            .toString(),
+        );
+      }),
+    );
+    await Promise.all(
+      [aliceWindow1, aliceWindow2].map(async (w) => {
+        await hasElementBeenDeleted(
+          w,
+          'data-testid',
+          HomeScreen.conversationItemName.selector,
+          10_000,
+          groupCreated.userName,
+        );
+      }),
+    );
   },
 );

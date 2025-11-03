@@ -263,6 +263,12 @@ function getExpectedStringFromKey(
       return 'Message Too Long';
     case 'modalMessageTooLongDescription':
       return 'Please shorten your message to {limit} characters or less.';
+    case 'groupDelete': 
+      return 'Delete Group';
+    case 'groupDeleteDescription':
+      return 'Are you sure you want to delete {group_name}? This will remove all members and delete all group content.';
+    case 'groupDeletedMemberDescription':
+      return '{group_name} has been deleted by a group admin. You will not be able to send any more messages.';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail

@@ -121,6 +121,7 @@ export class ConversationSettings extends Locator {
   static readonly inviteContactsOption = this.testId(
     'invite-contacts-menu-option',
   );
+  static readonly leaveOrDeleteGroupOption = this.testId('leave-group-button');
   static readonly manageMembersOption = this.testId(
     'manage-members-menu-option',
   );
