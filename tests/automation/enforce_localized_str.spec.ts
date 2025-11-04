@@ -263,7 +263,7 @@ function getExpectedStringFromKey(
       return 'Message Too Long';
     case 'modalMessageTooLongDescription':
       return 'Please shorten your message to {limit} characters or less.';
-    case 'groupDelete': 
+    case 'groupDelete':
       return 'Delete Group';
     case 'groupDeleteDescription':
       return 'Are you sure you want to delete {group_name}? This will remove all members and delete all group content.';

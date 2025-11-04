@@ -150,6 +150,9 @@ export class Settings extends Locator {
   static readonly messageRequestsMenuItem = this.testId(
     'message-requests-settings-menu-item',
   );
+  static readonly networkPageMenuItem = this.testId(
+    'session-network-settings-menu-item',
+  );
   static readonly privacyMenuItem = this.testId('privacy-settings-menu-item');
   static readonly recoveryPasswordMenuItem = this.testId(
     'recovery-password-settings-menu-item',
