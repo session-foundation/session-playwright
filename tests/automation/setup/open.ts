@@ -7,6 +7,7 @@ import { v4 } from 'uuid';
 export const NODE_ENV = 'production';
 export const MULTI_PREFIX = 'test-integration-';
 const multisAvailable = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+let electronPids: Array<number> = [];
 
 export function getAppRootPath() {
   if (isEmpty(process.env.SESSION_DESKTOP_ROOT)) {
@@ -40,6 +41,17 @@ const openElectronAppOnly = async (multi: string) => {
         '--force-device-scale-factor=1', // Normalizes Retina and non-Retina mac screens
       ],
     });
+
+    // When a test closes a window on purpose,
+    // the restarted app is considered a child process of the original electronApp.
+    // However Playwright only tracks the original processes.
+    // In order to close all Electron windows during teardown
+    // we need to keep track of the opened PIDs.
+    const pid = electronApp.process()?.pid;
+    if (pid) {
+      electronPids.push(pid);
+    }
+
     return electronApp;
   } catch (e) {
     console.info(
@@ -72,6 +84,7 @@ const openAppAndWait = async (multi: string) => {
 };
 
 export async function openApp(windowsToCreate: number) {
+  electronPids = []; // Reset
   if (windowsToCreate >= multisAvailable.length) {
     throw new Error(`Do you really need ${multisAvailable.length} windows?!`);
   }
@@ -91,4 +104,8 @@ export async function openApp(windowsToCreate: number) {
     chalk.bgRedBright(`Pathway to app: `, process.env.SESSION_DESKTOP_ROOT),
   );
   return toRet;
+}
+
+export function getTrackedElectronPids(): Array<number> {
+  return electronPids;
 }
