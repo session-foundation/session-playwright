@@ -9,11 +9,8 @@ import {
 } from './utilities/utils';
 
 sessionTestOneWindow('Warning modal new account', async ([aliceWindow1]) => {
-  // Create User
   await clickOn(aliceWindow1, Onboarding.createAccountButton);
-  // Need to implement a back button on Desktop
   await clickOn(aliceWindow1, Global.backButton);
-  //  Expect modal to appear with warning message
   await checkModalStrings(
     aliceWindow1,
     englishStrippedStr('warning').toString(),
@@ -38,15 +35,10 @@ sessionTestOneWindow(
   async ([aliceWindow1]) => {
     const seedPhrase =
       'eldest fazed hybrid buzzer nasty domestic digit pager unusual purged makeup assorted domestic';
-    // Restore user
     await clickOn(aliceWindow1, Onboarding.iHaveAnAccountButton);
-    // Input recovery phrase
     await typeIntoInput(aliceWindow1, 'recovery-phrase-input', seedPhrase);
-    // Click continue to go to loading page
     await clickOn(aliceWindow1, Global.continueButton);
-    // Need to implement a back button on Desktop
     await clickOn(aliceWindow1, Global.backButton);
-    // Expect modal to appear with warning message
     await checkModalStrings(
       aliceWindow1,
       englishStrippedStr('warning').toString(),

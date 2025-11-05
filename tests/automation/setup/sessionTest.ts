@@ -224,7 +224,6 @@ export function test_Alice_1W_no_network(
   );
 }
 
-// Need a test for one window with network, mainly for Network Page
 export function test_Alice_1W(
   testname: string,
   testCallback: (
