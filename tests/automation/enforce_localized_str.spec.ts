@@ -275,6 +275,14 @@ function getExpectedStringFromKey(
       return 'Are you sure you want to open this URL in your browser? {url}';
     case 'updated':
       return 'Last updated {relative_time} ago';
+    case 'warning':
+      return 'Warning';
+    case 'onboardingBackAccountCreation':
+      return 'You cannot go back further. In order to cancel your account creation, Session needs to quit.';
+    case 'onboardingBackLoadAccount':
+      return 'You cannot go back further. In order to stop loading your account, Session needs to quit.';
+    case 'quitButton':
+      return 'Quit';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
