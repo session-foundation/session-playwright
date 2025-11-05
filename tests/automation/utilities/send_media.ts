@@ -93,7 +93,7 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     Global.confirmButton,
     englishStrippedStr('enable').toString(),
   );
-  await waitForLoadingAnimationToFinish(window, 'loading-spinner');
+  await waitForLoadingAnimationToFinish(window, Global.loadingSpinner.selector);
   await waitForTestIdWithText(window, 'link-preview-image');
   await waitForTestIdWithText(
     window,

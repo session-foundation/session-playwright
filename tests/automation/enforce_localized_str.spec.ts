@@ -269,6 +269,12 @@ function getExpectedStringFromKey(
       return 'Are you sure you want to delete {group_name}? This will remove all members and delete all group content.';
     case 'groupDeletedMemberDescription':
       return '{group_name} has been deleted by a group admin. You will not be able to send any more messages.';
+    case 'urlOpen':
+      return 'Open URL';
+    case 'urlOpenDescription':
+      return 'Are you sure you want to open this URL in your browser? {url}';
+    case 'updated':
+      return 'Last updated {relative_time} ago';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail

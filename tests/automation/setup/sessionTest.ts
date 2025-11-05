@@ -224,6 +224,30 @@ export function test_Alice_1W_no_network(
   );
 }
 
+// Need a test for one window with network, mainly for Network Page
+export function test_Alice_1W(
+  testname: string,
+  testCallback: (
+    details: WithAlice & WithAliceWindow1,
+    testInfo: TestInfo,
+  ) => Promise<void>,
+) {
+  return sessionTestGeneric(
+    testname,
+    1,
+    { waitForNetwork: true },
+    ({ mainWindows, users }, testInfo) => {
+      return testCallback(
+        {
+          alice: users[0],
+          aliceWindow1: mainWindows[0],
+        },
+        testInfo,
+      );
+    },
+  );
+}
+
 /**
  * Setup the test with 1 user and 2 windows total:
  * - Alice with 2 windows.

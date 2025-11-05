@@ -72,7 +72,6 @@ export type WithPage = { window: Page };
 export type WithMaxWait = { maxWait?: number };
 export type WithRightButton = { rightButton?: boolean };
 
-export type LoaderType = 'loading-animation' | 'loading-spinner';
 export type MediaType = 'audio' | 'file' | 'image' | 'video';
 export type Strategy = ':has-text' | 'class' | 'data-testid';
 
@@ -138,11 +137,15 @@ export type DataTestId =
   | 'join-community-button'
   | 'join-community-conversation'
   | 'label-device_and_network'
+  | 'last-updated-timestamp'
+  | 'learn-about-staking-link'
+  | 'learn-more-network-link'
   | 'leave-group-button'
   | 'leftpane-primary-avatar'
   | 'link-device'
   | 'link-preview-image'
   | 'link-preview-title'
+  | 'loading-animation'
   | 'loading-spinner'
   | 'manage-members-menu-option'
   | 'market-cap-amount'
@@ -174,6 +177,7 @@ export type DataTestId =
   | 'recovery-password-seed-modal'
   | 'recovery-password-settings-menu-item'
   | 'recovery-phrase-input'
+  | 'refresh-button'
   | 'restore-using-recovery'
   | 'reveal-recovery-phrase'
   | 'save-button-profile-update'
@@ -205,4 +209,5 @@ export type ModalId =
   | 'confirmModal'
   | 'deleteAccountModal'
   | 'hideRecoveryPasswordModal'
+  | 'openUrlModal'
   | 'userSettingsModal';

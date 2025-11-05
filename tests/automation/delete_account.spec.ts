@@ -60,7 +60,10 @@ sessionTestTwoWindows(
         windowA,
         englishStrippedStr('clear').toString(),
       );
-      await waitForLoadingAnimationToFinish(windowA, 'loading-spinner');
+      await waitForLoadingAnimationToFinish(
+        windowA,
+        Global.loadingSpinner.selector,
+      );
       // await sleepFor(7500);
       // Wait for window to close and reopen
 

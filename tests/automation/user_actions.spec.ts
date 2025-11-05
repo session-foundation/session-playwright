@@ -183,7 +183,10 @@ test_Alice_1W_no_network(
     // allow for the image to be resized before we try to save it
     await sleepFor(500);
     await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
-    await waitForLoadingAnimationToFinish(aliceWindow1, 'loading-spinner');
+    await waitForLoadingAnimationToFinish(
+      aliceWindow1,
+      Global.loadingSpinner.selector,
+    );
     await clickOnMatchingText(
       aliceWindow1,
       englishStrippedStr('save').toString(),
