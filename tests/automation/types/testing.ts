@@ -72,7 +72,6 @@ export type WithPage = { window: Page };
 export type WithMaxWait = { maxWait?: number };
 export type WithRightButton = { rightButton?: boolean };
 
-export type LoaderType = 'loading-animation' | 'loading-spinner';
 export type MediaType = 'audio' | 'file' | 'image' | 'video';
 export type Strategy = ':has-text' | 'class' | 'data-testid';
 
@@ -118,6 +117,7 @@ export type DataTestId =
   | 'dropdownitem-5-seconds'
   | 'edit-group-name'
   | 'edit-profile-icon'
+  | 'empty-conversation-control-message'
   | 'empty-conversation-notification'
   | 'enable-calls-settings-row'
   | 'enable-communities-message-requests-settings-row'
@@ -137,13 +137,18 @@ export type DataTestId =
   | 'join-community-button'
   | 'join-community-conversation'
   | 'label-device_and_network'
+  | 'last-updated-timestamp'
+  | 'learn-about-staking-link'
+  | 'learn-more-network-link'
   | 'leave-group-button'
   | 'leftpane-primary-avatar'
   | 'link-device'
   | 'link-preview-image'
   | 'link-preview-title'
+  | 'loading-animation'
   | 'loading-spinner'
   | 'manage-members-menu-option'
+  | 'market-cap-amount'
   | 'mentions-popup-row'
   | 'message-content'
   | 'message-input-text-area'
@@ -172,20 +177,24 @@ export type DataTestId =
   | 'recovery-password-seed-modal'
   | 'recovery-password-settings-menu-item'
   | 'recovery-phrase-input'
+  | 'refresh-button'
   | 'restore-using-recovery'
   | 'reveal-recovery-phrase'
   | 'save-button-profile-update'
   | 'scroll-to-bottom-button'
   | 'send-message-button'
+  | 'sent-price'
   | 'session-confirm-cancel-button'
   | 'session-confirm-ok-button'
   | 'session-id-signup'
+  | 'session-network-settings-menu-item'
   | 'session-recovery-password'
   | 'session-toast'
   | 'set-nickname-confirm-button'
   | 'set-password-button'
   | 'set-password-settings-button'
   | 'settings-section'
+  | 'staking-reward-pool-amount'
   | 'theme-section'
   | 'tooltip-character-count'
   | 'unblock-button-settings-screen'
@@ -200,4 +209,5 @@ export type ModalId =
   | 'confirmModal'
   | 'deleteAccountModal'
   | 'hideRecoveryPasswordModal'
+  | 'openUrlModal'
   | 'userSettingsModal';

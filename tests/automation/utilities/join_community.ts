@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { testCommunityLink } from '../constants/community';
-import { HomeScreen } from '../locators';
+import { Global, HomeScreen } from '../locators';
 import {
   clickOn,
   typeIntoInput,
@@ -18,5 +18,5 @@ export const joinCommunity = async (window: Page) => {
     testCommunityLink,
   );
   await clickOn(window, HomeScreen.joinCommunityButton);
-  await waitForLoadingAnimationToFinish(window, 'loading-spinner');
+  await waitForLoadingAnimationToFinish(window, Global.loadingSpinner.selector);
 };

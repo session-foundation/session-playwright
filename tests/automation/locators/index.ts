@@ -121,6 +121,7 @@ export class ConversationSettings extends Locator {
   static readonly inviteContactsOption = this.testId(
     'invite-contacts-menu-option',
   );
+  static readonly leaveOrDeleteGroupOption = this.testId('leave-group-button');
   static readonly manageMembersOption = this.testId(
     'manage-members-menu-option',
   );
@@ -149,9 +150,24 @@ export class Settings extends Locator {
   static readonly messageRequestsMenuItem = this.testId(
     'message-requests-settings-menu-item',
   );
+  static readonly networkPageMenuItem = this.testId(
+    'session-network-settings-menu-item',
+  );
   static readonly privacyMenuItem = this.testId('privacy-settings-menu-item');
   static readonly recoveryPasswordMenuItem = this.testId(
     'recovery-password-settings-menu-item',
+  );
+  // Session Network
+  static readonly lastUpdatedTimestamp = this.testId('last-updated-timestamp');
+  static readonly learnMoreAboutStakingLink = this.testId(
+    'learn-about-staking-link',
+  );
+  static readonly learnMoreNetworkLink = this.testId('learn-more-network-link');
+  static readonly marketCapAmount = this.testId('market-cap-amount');
+  static readonly refreshButton = this.testId('refresh-button');
+  static readonly seshPrice = this.testId('sent-price');
+  static readonly stakingRewardPoolAmount = this.testId(
+    'staking-reward-pool-amount',
   );
   // Privacy
   static readonly changePasswordSettingsButton = this.testId(
@@ -207,6 +223,7 @@ export class Global extends Locator {
   static readonly contextMenuItem = this.testId('context-menu-item');
   static readonly continueButton = this.testId('continue-button');
   static readonly errorMessage = this.testId('error-message');
+  static readonly loadingSpinner = this.testId('loading-spinner');
   static readonly modalBackButton = this.testId('modal-back-button');
   static readonly modalCloseButton = this.testId('modal-close-button');
   static readonly toast = this.testId('session-toast');

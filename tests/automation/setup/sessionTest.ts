@@ -10,7 +10,7 @@ import { linkedDevice } from '../utilities/linked_device';
 import { forceCloseAllWindows } from './closeWindows';
 import { createGroup } from './create_group';
 import { newUser } from './new_user';
-import { openApp } from './open';
+import { openApp, resetTrackedElectronPids } from './open';
 
 // This is not ideal, most of our test needs to open a specific number of windows and close them once the test is done or failed.
 // This file contains a bunch of utility function to use to open those windows and clean them afterwards.
@@ -46,6 +46,7 @@ function sessionTest<T extends CountWindows, N extends Tuple<Page, T>>(
   count: T,
 ) {
   return test(testName, async ({}, testinfo) => {
+    resetTrackedElectronPids();
     const windows = await openApp(count);
 
     try {
@@ -212,6 +213,29 @@ export function test_Alice_1W_no_network(
     testname,
     1,
     { waitForNetwork: false },
+    ({ mainWindows, users }, testInfo) => {
+      return testCallback(
+        {
+          alice: users[0],
+          aliceWindow1: mainWindows[0],
+        },
+        testInfo,
+      );
+    },
+  );
+}
+
+export function test_Alice_1W(
+  testname: string,
+  testCallback: (
+    details: WithAlice & WithAliceWindow1,
+    testInfo: TestInfo,
+  ) => Promise<void>,
+) {
+  return sessionTestGeneric(
+    testname,
+    1,
+    { waitForNetwork: true },
     ({ mainWindows, users }, testInfo) => {
       return testCallback(
         {

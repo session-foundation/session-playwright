@@ -8,7 +8,6 @@ import { sleepFor } from '../../promise_utils';
 import {
   DataTestId,
   DMTimeOption,
-  LoaderType,
   ModalId,
   Strategy,
   StrategyExtractionObj,
@@ -168,7 +167,7 @@ export async function waitForMatchingPlaceholder(
 }
 export async function waitForLoadingAnimationToFinish(
   window: Page,
-  loader: LoaderType,
+  loader: DataTestId,
   maxWait?: number,
 ) {
   let loadingAnimation: ElementHandle<HTMLElement | SVGElement> | undefined;
@@ -580,4 +579,13 @@ export function formatTimeOption(option: DMTimeOption) {
   const timePart = option.replace('time-option-', '');
   const formattedTime = timePart.replace(/-/g, ' ');
   return formattedTime;
+}
+
+export async function assertUrlIsReachable(url: string): Promise<void> {
+  const response = await fetch(url);
+  if (response.status !== 200) {
+    throw new Error(
+      `Expected status 200 but got ${response.status} for URL: ${url}`,
+    );
+  }
 }
