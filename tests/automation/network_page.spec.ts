@@ -2,6 +2,7 @@ import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { Global, LeftPane, Settings } from './locators';
 import { test_Alice_1W } from './setup/sessionTest';
+import { validateNetworkData } from './utilities/network_api';
 import {
   assertUrlIsReachable,
   checkModalStrings,
@@ -9,19 +10,6 @@ import {
   waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
 } from './utilities/utils';
-
-function validateNetworkData(data: any): asserts data is {
-  price: { usd: number; usd_market_cap: number };
-  token: { staking_reward_pool: number };
-} {
-  if (
-    typeof data?.price?.usd !== 'number' ||
-    typeof data?.token?.staking_reward_pool !== 'number' ||
-    typeof data?.price?.usd_market_cap !== 'number'
-  ) {
-    throw new Error('Network API response missing or invalid numeric fields');
-  }
-}
 
 test_Alice_1W('Network page values', async ({ aliceWindow1 }) => {
   await clickOn(aliceWindow1, LeftPane.settingsButton);

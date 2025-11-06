@@ -84,7 +84,6 @@ const openAppAndWait = async (multi: string) => {
 };
 
 export async function openApp(windowsToCreate: number) {
-  electronPids = []; // Reset
   if (windowsToCreate >= multisAvailable.length) {
     throw new Error(`Do you really need ${multisAvailable.length} windows?!`);
   }
@@ -108,4 +107,8 @@ export async function openApp(windowsToCreate: number) {
 
 export function getTrackedElectronPids(): Array<number> {
   return electronPids;
+}
+
+export function resetTrackedElectronPids() {
+  electronPids = [];
 }
