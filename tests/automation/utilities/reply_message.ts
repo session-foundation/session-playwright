@@ -4,6 +4,7 @@ import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import { sleepFor } from '../../promise_utils';
 import { Strategy } from '../types/testing';
 import { sendMessage } from './message';
+import { verifyMediaPreviewLoaded } from './send_media';
 import {
   clickOnMatchingText,
   clickOnTextMessage,
@@ -25,13 +26,20 @@ export const replyTo = async ({
   textMessage,
   receiverWindow,
   senderWindow,
+  shouldCheckMediaPreview = false,
 }: {
   senderWindow: Page;
   textMessage: string;
   replyText: string;
   receiverWindow: Page | null;
+  shouldCheckMediaPreview?: boolean;
 }) => {
   await waitForTextMessage(senderWindow, textMessage);
+
+  // If the original message has media, verify sender sees it before replying
+  if (shouldCheckMediaPreview) {
+     await verifyMediaPreviewLoaded(senderWindow, textMessage);
+  }
   // the right click context menu, for some reasons, often doesn't show up on the first try. Let's loop a few times
 
   for (let index = 0; index < 5; index++) {

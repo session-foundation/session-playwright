@@ -42,7 +42,7 @@ import { makeVoiceCall } from './utilities/voice_call';
 const { timeOption, disappearingMessagesType, disappearAction } =
   defaultDisappearingOptions.DAS;
 
-mediaArray.forEach(({ mediaType, path, attachmentType }) => {
+mediaArray.forEach(({ mediaType, path, attachmentType, shouldCheckMediaPreview }) => {
   test_Alice_1W_Bob_1W(
     `Send disappearing ${mediaType} 1:1`,
     async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
@@ -82,7 +82,7 @@ mediaArray.forEach(({ mediaType, path, attachmentType }) => {
       if (mediaType === 'voice') {
         await sendVoiceMessage(aliceWindow1);
       } else {
-        await sendMedia(aliceWindow1, path, testMessage);
+        await sendMedia(aliceWindow1, path, testMessage, shouldCheckMediaPreview);
       }
       // Click on untrusted attachment
       await trustUser(bobWindow1, attachmentType, alice.userName);

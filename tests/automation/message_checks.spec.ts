@@ -40,43 +40,51 @@ import {
   waitForTextMessage,
 } from './utilities/utils';
 
-mediaArray.forEach(({ mediaType, path, attachmentType }) => {
-  test_Alice_1W_Bob_1W(
-    `Send ${mediaType} 1:1`,
-    async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-      const testMessage = `${alice.userName} sending ${mediaType} to ${bob.userName}`;
-      const testReply = `${bob.userName} replying to ${mediaType} from ${alice.userName}`;
-      await createContact(aliceWindow1, bobWindow1, alice, bob);
-      if (mediaType === 'voice') {
-        await sendVoiceMessage(aliceWindow1);
-      } else {
-        await sendMedia(aliceWindow1, path, testMessage);
-      }
-      // Click on untrusted attachment in window B
-      await sleepFor(1000);
-      await trustUser(bobWindow1, attachmentType, alice.userName);
-      await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
-      // Waiting for image to change from loading state to loaded (takes a second)
-      await sleepFor(1000);
-      if (mediaType === 'voice') {
-        await replyToMedia({
-          senderWindow: bobWindow1,
-          strategy: 'data-testid',
-          selector: 'audio-player',
-          replyText: testReply,
-          receiverWindow: aliceWindow1,
-        });
-      } else {
-        await replyTo({
-          senderWindow: bobWindow1,
-          textMessage: testMessage,
-          replyText: testReply,
-          receiverWindow: aliceWindow1,
-        });
-      }
-    },
-  );
-});
+mediaArray.forEach(
+  ({ mediaType, path, attachmentType, shouldCheckMediaPreview }) => {
+    test_Alice_1W_Bob_1W(
+      `Send ${mediaType} 1:1`,
+      async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+        const testMessage = `${alice.userName} sending ${mediaType} to ${bob.userName}`;
+        const testReply = `${bob.userName} replying to ${mediaType} from ${alice.userName}`;
+        await createContact(aliceWindow1, bobWindow1, alice, bob);
+        if (mediaType === 'voice') {
+          await sendVoiceMessage(aliceWindow1);
+        } else {
+          await sendMedia(
+            aliceWindow1,
+            path,
+            testMessage,
+            shouldCheckMediaPreview,
+          );
+        }
+        // Click on untrusted attachment in window B
+        await sleepFor(1000);
+        await trustUser(bobWindow1, attachmentType, alice.userName);
+        await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
+        // Waiting for image to change from loading state to loaded (takes a second)
+        await sleepFor(1000);
+        if (mediaType === 'voice') {
+          await replyToMedia({
+            senderWindow: bobWindow1,
+            strategy: 'data-testid',
+            selector: 'audio-player',
+            replyText: testReply,
+            receiverWindow: aliceWindow1,
+          });
+        } else {
+          await replyTo({
+            senderWindow: bobWindow1,
+            textMessage: testMessage,
+            replyText: testReply,
+            receiverWindow: aliceWindow1,
+            shouldCheckMediaPreview,
+          });
+        }
+      },
+    );
+  },
+);
 
 test_Alice_1W_Bob_1W(
   'Send long text 1:1',
