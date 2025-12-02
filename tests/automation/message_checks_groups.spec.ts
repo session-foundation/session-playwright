@@ -39,7 +39,12 @@ mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
       if (mediaType === 'voice') {
         await sendVoiceMessage(aliceWindow1);
       } else {
-        await sendMedia(aliceWindow1, path, testMessage, shouldCheckMediaPreview);
+        await sendMedia(
+          aliceWindow1,
+          path,
+          testMessage,
+          shouldCheckMediaPreview,
+        );
       }
       if (mediaType === 'document' || mediaType === 'voice') {
         console.log('No loading animation for documents and voice message');

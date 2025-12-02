@@ -47,7 +47,12 @@ mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
       if (mediaType === 'voice') {
         await sendVoiceMessage(aliceWindow1);
       } else {
-        await sendMedia(aliceWindow1, path, testMessage, shouldCheckMediaPreview);
+        await sendMedia(
+          aliceWindow1,
+          path,
+          testMessage,
+          shouldCheckMediaPreview,
+        );
       }
       if (mediaType === 'voice') {
         await Promise.all([

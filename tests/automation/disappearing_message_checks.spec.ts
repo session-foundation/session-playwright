@@ -42,65 +42,76 @@ import { makeVoiceCall } from './utilities/voice_call';
 const { timeOption, disappearingMessagesType, disappearAction } =
   defaultDisappearingOptions.DAS;
 
-mediaArray.forEach(({ mediaType, path, attachmentType, shouldCheckMediaPreview }) => {
-  test_Alice_1W_Bob_1W(
-    `Send disappearing ${mediaType} 1:1`,
-    async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-      const testMessage = `${alice.userName} sending disappearing ${mediaType} to ${bob.userName}`;
-      const formattedTime = formatTimeOption(timeOption);
-      await createContact(aliceWindow1, bobWindow1, alice, bob);
-      // Set disappearing messages
-      await setDisappearingMessages(
-        aliceWindow1,
-        ['1:1', disappearingMessagesType, timeOption, disappearAction],
-        bobWindow1,
-      );
-      await Promise.all([
-        waitForTestIdWithText(
+mediaArray.forEach(
+  ({ mediaType, path, attachmentType, shouldCheckMediaPreview }) => {
+    test_Alice_1W_Bob_1W(
+      `Send disappearing ${mediaType} 1:1`,
+      async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
+        const testMessage = `${alice.userName} sending disappearing ${mediaType} to ${bob.userName}`;
+        const formattedTime = formatTimeOption(timeOption);
+        await createContact(aliceWindow1, bobWindow1, alice, bob);
+        // Set disappearing messages
+        await setDisappearingMessages(
           aliceWindow1,
-          Conversation.disappearingControlMessage.selector,
-          englishStrippedStr('disappearingMessagesSetYou')
-            .withArgs({
-              time: formattedTime,
-              disappearing_messages_type: disappearAction,
-            })
-            .toString(),
-        ),
-        waitForTestIdWithText(
+          ['1:1', disappearingMessagesType, timeOption, disappearAction],
           bobWindow1,
-          Conversation.disappearingControlMessage.selector,
-          englishStrippedStr('disappearingMessagesSet')
-            .withArgs({
-              time: formattedTime,
-              disappearing_messages_type: disappearAction,
-              name: alice.userName,
-            })
-            .toString(),
-        ),
-      ]);
-      // Send media
-      if (mediaType === 'voice') {
-        await sendVoiceMessage(aliceWindow1);
-      } else {
-        await sendMedia(aliceWindow1, path, testMessage, shouldCheckMediaPreview);
-      }
-      // Click on untrusted attachment
-      await trustUser(bobWindow1, attachmentType, alice.userName);
+        );
+        await Promise.all([
+          waitForTestIdWithText(
+            aliceWindow1,
+            Conversation.disappearingControlMessage.selector,
+            englishStrippedStr('disappearingMessagesSetYou')
+              .withArgs({
+                time: formattedTime,
+                disappearing_messages_type: disappearAction,
+              })
+              .toString(),
+          ),
+          waitForTestIdWithText(
+            bobWindow1,
+            Conversation.disappearingControlMessage.selector,
+            englishStrippedStr('disappearingMessagesSet')
+              .withArgs({
+                time: formattedTime,
+                disappearing_messages_type: disappearAction,
+                name: alice.userName,
+              })
+              .toString(),
+          ),
+        ]);
+        // Send media
+        if (mediaType === 'voice') {
+          await sendVoiceMessage(aliceWindow1);
+        } else {
+          await sendMedia(
+            aliceWindow1,
+            path,
+            testMessage,
+            shouldCheckMediaPreview,
+          );
+        }
+        // Click on untrusted attachment
+        await trustUser(bobWindow1, attachmentType, alice.userName);
 
-      await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
-      if (mediaType === 'voice') {
-        await waitForTestIdWithText(bobWindow1, 'audio-player');
-        await sleepFor(30000);
-        await hasElementBeenDeleted(bobWindow1, 'data-testid', 'audio-player');
-      } else {
-        await waitForTextMessage(bobWindow1, testMessage);
-        // Wait 30 seconds for image to disappear
-        await sleepFor(30000);
-        await hasTextMessageBeenDeleted(bobWindow1, testMessage);
-      }
-    },
-  );
-});
+        await waitForLoadingAnimationToFinish(bobWindow1, 'loading-animation');
+        if (mediaType === 'voice') {
+          await waitForTestIdWithText(bobWindow1, 'audio-player');
+          await sleepFor(30000);
+          await hasElementBeenDeleted(
+            bobWindow1,
+            'data-testid',
+            'audio-player',
+          );
+        } else {
+          await waitForTextMessage(bobWindow1, testMessage);
+          // Wait 30 seconds for image to disappear
+          await sleepFor(30000);
+          await hasTextMessageBeenDeleted(bobWindow1, testMessage);
+        }
+      },
+    );
+  },
+);
 
 test_Alice_1W_Bob_1W(
   `Send disappearing long text 1:1`,

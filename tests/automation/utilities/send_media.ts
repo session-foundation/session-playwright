@@ -20,7 +20,7 @@ import {
 /**
  * Verify media preview loaded by checking screenshot buffer size
  * Pixel matching and other image metadata approaches were all too unreliable.
- * A broken image has the exact same appearance in the DOM as a loaded one. 
+ * A broken image has the exact same appearance in the DOM as a loaded one.
  * Waits for loading animation to finish before checking
  * Throws if media fails to load
  */

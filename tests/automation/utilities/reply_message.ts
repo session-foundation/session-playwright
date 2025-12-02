@@ -38,7 +38,7 @@ export const replyTo = async ({
 
   // If the original message has media, verify sender sees it before replying
   if (shouldCheckMediaPreview) {
-     await verifyMediaPreviewLoaded(senderWindow, textMessage);
+    await verifyMediaPreviewLoaded(senderWindow, textMessage);
   }
   // the right click context menu, for some reasons, often doesn't show up on the first try. Let's loop a few times
 
