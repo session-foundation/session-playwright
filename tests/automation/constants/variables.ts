@@ -17,26 +17,31 @@ export const mediaArray = [
     mediaType: 'image',
     path: 'sample_files/test-image.png',
     attachmentType: 'media' as MediaType,
+    shouldCheckMediaPreview: true,
   },
   {
     mediaType: 'video',
     path: 'sample_files/test-video.mp4',
     attachmentType: 'media' as MediaType,
+    shouldCheckMediaPreview: true,
   },
   {
     mediaType: 'gif',
     path: 'sample_files/test-gif.gif',
     attachmentType: 'media' as MediaType,
+    shouldCheckMediaPreview: true,
   },
   {
     mediaType: 'document',
     path: 'sample_files/test-file.pdf',
     attachmentType: 'file' as MediaType,
+    shouldCheckMediaPreview: false,
   },
   {
     mediaType: 'voice',
     path: '',
     attachmentType: 'audio' as MediaType,
+    shouldCheckMediaPreview: false,
   },
 ];
 

@@ -22,7 +22,7 @@ import {
   waitForTextMessage,
 } from './utilities/utils';
 
-mediaArray.forEach(({ mediaType, path }) => {
+mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
   test_group_Alice_1W_Bob_1W_Charlie_1W(
     `Send ${mediaType} to group`,
     async ({
@@ -39,7 +39,12 @@ mediaArray.forEach(({ mediaType, path }) => {
       if (mediaType === 'voice') {
         await sendVoiceMessage(aliceWindow1);
       } else {
-        await sendMedia(aliceWindow1, path, testMessage);
+        await sendMedia(
+          aliceWindow1,
+          path,
+          testMessage,
+          shouldCheckMediaPreview,
+        );
       }
       if (mediaType === 'document' || mediaType === 'voice') {
         console.log('No loading animation for documents and voice message');
@@ -74,6 +79,7 @@ mediaArray.forEach(({ mediaType, path }) => {
           textMessage: testMessage,
           replyText: testReply,
           receiverWindow: aliceWindow1,
+          shouldCheckMediaPreview,
         });
       }
 

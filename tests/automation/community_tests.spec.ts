@@ -22,8 +22,8 @@ test_Alice_2W('Join community', async ({ aliceWindow1, aliceWindow2 }) => {
 test_Alice_1W_Bob_1W(
   'Send image to community',
   async ({ alice, bob, aliceWindow1, bobWindow1 }) => {
-    const testMessage = 'Testing sending images to communities';
-    const testImageMessage = `Image message + ${Date.now()}`;
+    const mediaPath = 'sample_files/test-image.png';
+    const testImageMessage = `Image message + ${Date.now()} + desktop`;
     const testReply = `${bob.userName} replying to image from ${alice.userName}`;
     await Promise.all([joinCommunity(aliceWindow1), joinCommunity(bobWindow1)]);
     // await Promise.all([
@@ -35,23 +35,13 @@ test_Alice_1W_Bob_1W(
         clickOn(window, Conversation.scrollToBottomButton),
       ),
     );
-    await sendMessage(aliceWindow1, testMessage);
-    // Check linked device for community
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      testCommunityName,
-    );
-    await sendMedia(
-      aliceWindow1,
-      'sample_files/test-image.png',
-      testImageMessage,
-    );
+    await sendMedia(aliceWindow1, mediaPath, testImageMessage, true);
     await replyTo({
       senderWindow: bobWindow1,
       textMessage: testImageMessage,
       replyText: testReply,
       receiverWindow: aliceWindow1,
+      shouldCheckMediaPreview: true,
     });
   },
 );

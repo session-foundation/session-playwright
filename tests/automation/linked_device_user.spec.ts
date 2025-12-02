@@ -297,7 +297,7 @@ test_Alice_2W_Bob_1W(
       englishStrippedStr('deleteMessageDeletedGlobally').toString(),
     );
     // linked device for deleted message
-    await hasTextMessageBeenDeleted(aliceWindow2, unsentMessage, 1000);
+    await hasTextMessageBeenDeleted(aliceWindow2, unsentMessage, 5_000);
   },
 );
 

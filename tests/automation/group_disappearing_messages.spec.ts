@@ -26,7 +26,7 @@ import {
 const { timeOption, disappearingMessagesType, disappearAction } =
   defaultDisappearingOptions.group;
 
-mediaArray.forEach(({ mediaType, path }) => {
+mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
   test_group_Alice_1W_Bob_1W_Charlie_1W(
     `Send disappearing ${mediaType} groups`,
     async ({
@@ -47,7 +47,12 @@ mediaArray.forEach(({ mediaType, path }) => {
       if (mediaType === 'voice') {
         await sendVoiceMessage(aliceWindow1);
       } else {
-        await sendMedia(aliceWindow1, path, testMessage);
+        await sendMedia(
+          aliceWindow1,
+          path,
+          testMessage,
+          shouldCheckMediaPreview,
+        );
       }
       if (mediaType === 'voice') {
         await Promise.all([
