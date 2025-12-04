@@ -213,6 +213,13 @@ export class Settings extends Locator {
   );
 }
 
+export class CTA extends Locator {
+  static readonly cancelButton = this.testId('cta-cancel-button');
+  static readonly confirmButton = this.testId('cta-confirm-button');
+  static readonly description = this.testId('cta-body');
+  static readonly heading = this.testId('cta-heading');
+}
+
 export class Global extends Locator {
   static readonly backButton = this.testId('back-button');
   static readonly cancelButton = this.testId('session-confirm-cancel-button');

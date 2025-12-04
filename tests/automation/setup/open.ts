@@ -9,6 +9,10 @@ export const MULTI_PREFIX = 'test-integration-';
 const multisAvailable = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let electronPids: Array<number> = [];
 
+export type TestContext = {
+  dbCreationTimestampMs?: number;
+};
+
 export function getAppRootPath() {
   if (isEmpty(process.env.SESSION_DESKTOP_ROOT)) {
     throw new Error(
@@ -18,7 +22,7 @@ export function getAppRootPath() {
   return process.env.SESSION_DESKTOP_ROOT as string;
 }
 
-const openElectronAppOnly = async (multi: string) => {
+const openElectronAppOnly = async (multi: string, context?: TestContext) => {
   process.env.MULTI = `${multi}`;
   // using a v4 uuid, as timestamps to the ms are sometimes the same (when a bunch of workers are started)
   const uniqueId = v4();
@@ -27,6 +31,22 @@ const openElectronAppOnly = async (multi: string) => {
   process.env.SESSION_DEBUG = '1';
   process.env.LOCAL_DEVNET_SEED_URL = 'http://seed2.getsession.org:38157/';
   // process.env.LOCAL_DEVNET_SEED_URL = 'http://sesh-net:1280'
+
+  // Inject custom env vars if provided
+  if (context?.dbCreationTimestampMs) {
+    process.env.DB_CREATION_TIMESTAMP_MS = String(
+      context.dbCreationTimestampMs,
+    );
+    const humanReadable = new Date(
+      context.dbCreationTimestampMs,
+    ).toLocaleString('en-AU');
+    console.info(
+      `   DB Creation Timestamp: ${process.env.DB_CREATION_TIMESTAMP_MS} (${humanReadable})`,
+    );
+  } else {
+    // Cleanup for tests without context
+    delete process.env.DB_CREATION_TIMESTAMP_MS;
+  }
 
   console.info(`   ${process.env.LOCAL_DEVNET_SEED_URL}`);
   console.info(`   NON CI RUN`);
@@ -66,8 +86,8 @@ const openElectronAppOnly = async (multi: string) => {
 
 const logBrowserConsole = false;
 
-const openAppAndWait = async (multi: string) => {
-  const electronApp = await openElectronAppOnly(multi);
+const openAppAndWait = async (multi: string, context?: TestContext) => {
+  const electronApp = await openElectronAppOnly(multi, context);
   // Get the first window that the app opens, wait if necessary.
   const window = await electronApp.firstWindow();
   window.on('console', (msg) => {
@@ -83,7 +103,7 @@ const openAppAndWait = async (multi: string) => {
   return window;
 };
 
-export async function openApp(windowsToCreate: number) {
+export async function openApp(windowsToCreate: number, context?: TestContext) {
   if (windowsToCreate >= multisAvailable.length) {
     throw new Error(`Do you really need ${multisAvailable.length} windows?!`);
   }
@@ -96,7 +116,7 @@ export async function openApp(windowsToCreate: number) {
   for (let index = 0; index < array.length; index++) {
     const element = array[index];
     // eslint-disable-next-line no-await-in-loop
-    const openedWindow = await openAppAndWait(`${element}`);
+    const openedWindow = await openAppAndWait(`${element}`, context);
     toRet.push(openedWindow);
   }
   console.log(
