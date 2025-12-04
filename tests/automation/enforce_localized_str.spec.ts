@@ -54,9 +54,7 @@ function getExpectedStringFromKey(
     | { key: TokenPluralWithArgs; count: number }
     | { key: TokenSimpleNoArgs | TokenSimpleWithArgs },
 ) {
-  // Type guard that checks if args has the count property
   if ('count' in args && isPluralToken(args.key)) {
-    // TypeScript now knows args has count property
     const count = args.count;
 
     switch (args.key) {
@@ -69,7 +67,6 @@ function getExpectedStringFromKey(
         return count === 1
           ? 'Are you sure you want to delete this message?'
           : 'Are you sure you want to delete these messages?';
-      // Add other plural cases here
       default:
         return null;
     }
