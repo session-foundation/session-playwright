@@ -165,8 +165,6 @@ export type DataTestId =
   | 'modal-close-button'
   | 'modal-description'
   | 'modal-heading'
-  | 'modal-session-pro-cancel-button'
-  | 'modal-session-pro-confirm-button'
   | 'module-contact-name__profile-name'
   | 'module-conversation__user__profile-name'
   | 'new-closed-group-name'
@@ -208,6 +206,7 @@ export type DataTestId =
   | 'update-profile-info-name-input'
   | 'your-account-id'
   | 'your-profile-name'
+  | `cta-list-item-${number}`
   | `input-${DMTimeOption}`;
 
 export type ModalId =

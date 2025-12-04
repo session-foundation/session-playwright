@@ -621,7 +621,7 @@ export async function checkCTAStrings(
   if (expectedFeatures) {
     for (let i = 0; i < expectedFeatures.length; i++) {
       const feature = targetModal.locator(
-        `[data-testid="cta-feature-${i + 1}"]`,
+        `[data-testid="cta-list-item-${i + 1}"]`,
       );
       await feature.waitFor({ state: 'visible' });
       const featureText = await feature.innerText();
