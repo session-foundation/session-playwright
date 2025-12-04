@@ -1,7 +1,7 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { CTA } from './locators';
 import { test_Alice_1W } from './setup/sessionTest';
-import { calculateDesktopDBCreationTime as mockDBCreationTime } from './utilities/time_travel';
+import { mockDBCreationTime } from './utilities/time_travel';
 import {
   checkCTAStrings,
   hasElementPoppedUpThatShouldnt,
