@@ -102,6 +102,10 @@ export type DataTestId =
   | 'copy-button-profile-update'
   | 'create-account-button'
   | 'create-group-button'
+  | 'cta-body'
+  | 'cta-cancel-button'
+  | 'cta-confirm-button'
+  | 'cta-heading'
   | 'decline-and-block-message-request'
   | 'delete-message-request'
   | 'disappear-after-read-option'
@@ -202,6 +206,7 @@ export type DataTestId =
   | 'update-profile-info-name-input'
   | 'your-account-id'
   | 'your-profile-name'
+  | `cta-list-item-${number}`
   | `input-${DMTimeOption}`;
 
 export type ModalId =

@@ -5,6 +5,7 @@
 import { ElementHandle, Page } from '@playwright/test';
 
 import { sleepFor } from '../../promise_utils';
+import { CTA } from '../locators';
 import {
   DataTestId,
   DMTimeOption,
@@ -531,6 +532,25 @@ export function removeNewLines(input: string): string {
   return input.replace(/\s+/g, ' ').trim();
 }
 
+/**
+ * Asserts that actual text matches expected text.
+ * @throws Error with detailed message if texts don't match
+ */
+function assertTextMatches(
+  actual: string,
+  expected: string,
+  fieldName: string,
+): void {
+  const sanitizedActual = removeNewLines(actual);
+  const sanitizedExpected = removeNewLines(expected);
+
+  if (sanitizedExpected !== sanitizedActual) {
+    throw new Error(
+      `${fieldName} is incorrect.\nExpected: ${sanitizedExpected}\nActual: ${sanitizedActual}`,
+    );
+  }
+}
+
 export async function checkModalStrings(
   window: Page,
   expectedHeading: string,
@@ -560,21 +580,90 @@ export async function checkModalStrings(
 
   const headingText = await heading.innerText();
   const descriptionText = await description.innerText();
-  const formattedDescription = removeNewLines(descriptionText);
+  assertTextMatches(headingText, expectedHeading, 'Modal heading');
+  assertTextMatches(descriptionText, expectedDescription, 'Modal description');
+}
 
-  if (headingText !== expectedHeading) {
-    throw new Error(
-      `Expected heading: ${expectedHeading}, got: ${headingText}`,
-    );
+export async function checkCTAStrings(
+  window: Page,
+  expectedHeading: string,
+  expectedBody: string,
+  expectedButtons: Array<string>,
+  expectedFeatures?: Array<string>,
+) {
+  // Validate input
+  if (expectedFeatures && expectedFeatures.length > 3) {
+    throw new Error('CTAs support maximum 3 features');
+  }
+  if (expectedButtons.length < 1 || expectedButtons.length > 2) {
+    throw new Error('CTAs must have 1-2 buttons');
   }
 
-  if (formattedDescription !== expectedDescription) {
-    throw new Error(
-      `Expected description: ${expectedDescription}, got: ${formattedDescription}`,
+  // Find the target CTA modal
+  const modalSelector = '[data-modal-id="sessionProInfoModal"]';
+  const targetModal = window.locator(modalSelector).first();
+
+  // Wait for the modal to be visible
+  await targetModal.waitFor({ state: 'visible' });
+
+  // Check heading
+  const heading = targetModal.locator(
+    `[${CTA.heading.strategy}="${CTA.heading.selector}"]`,
+  );
+  await heading.waitFor({ state: 'visible' });
+  const headingText = await heading.innerText();
+  assertTextMatches(headingText, expectedHeading, 'CTA heading');
+
+  // Check body
+  const body = targetModal.locator(
+    `[${CTA.description.strategy}="${CTA.description.selector}"]`,
+  );
+  await body.waitFor({ state: 'visible' });
+  const bodyText = await body.innerText();
+  assertTextMatches(bodyText, expectedBody, 'CTA body');
+
+  if (expectedFeatures) {
+    for (let i = 0; i < expectedFeatures.length; i++) {
+      const featureLocator = CTA.feature(i + 1);
+      const feature = targetModal.locator(
+        `[${featureLocator.strategy}="${featureLocator.selector}"]`,
+      );
+      await feature.waitFor({ state: 'visible' });
+      const featureText = await feature.innerText();
+      assertTextMatches(
+        featureText,
+        expectedFeatures[i],
+        `CTA feature ${i + 1}`,
+      );
+    }
+  }
+
+  // Check positive button
+  const positiveButton = targetModal.locator(
+    `[${CTA.confirmButton.strategy}="${CTA.confirmButton.selector}"]`,
+  );
+  await positiveButton.waitFor({ state: 'visible' });
+  const positiveButtonText = await positiveButton.innerText();
+  assertTextMatches(
+    positiveButtonText,
+    expectedButtons[0],
+    'CTA positive button',
+  );
+
+  // Check negative button if provided
+  if (expectedButtons.length === 2) {
+    const negativeButton = targetModal.locator(
+      `[${CTA.cancelButton.strategy}="${CTA.cancelButton.selector}"]`,
+    );
+    await negativeButton.waitFor({ state: 'visible' });
+    const negativeButtonText = await negativeButton.innerText();
+    assertTextMatches(
+      negativeButtonText,
+      expectedButtons[1],
+      'CTA negative button',
     );
   }
 }
-
 export function formatTimeOption(option: DMTimeOption) {
   const timePart = option.replace('time-option-', '');
   const formattedTime = timePart.replace(/-/g, ' ');

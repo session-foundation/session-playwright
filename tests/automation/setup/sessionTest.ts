@@ -10,7 +10,7 @@ import { linkedDevice } from '../utilities/linked_device';
 import { forceCloseAllWindows } from './closeWindows';
 import { createGroup } from './create_group';
 import { newUser } from './new_user';
-import { openApp, resetTrackedElectronPids } from './open';
+import { openApp, resetTrackedElectronPids, TestContext } from './open';
 
 // This is not ideal, most of our test needs to open a specific number of windows and close them once the test is done or failed.
 // This file contains a bunch of utility function to use to open those windows and clean them afterwards.
@@ -44,11 +44,11 @@ function sessionTest<T extends CountWindows, N extends Tuple<Page, T>>(
   testName: string,
   testCallback: (windows: N, testInfo: TestInfo) => Promise<void>,
   count: T,
+  context?: TestContext,
 ) {
   return test(testName, async ({}, testinfo) => {
     resetTrackedElectronPids();
-    const windows = await openApp(count);
-
+    const windows = await openApp(count, context);
     try {
       if (windows.length !== count) {
         throw new Error(
@@ -71,15 +71,17 @@ function sessionTest<T extends CountWindows, N extends Tuple<Page, T>>(
 export function sessionTestOneWindow(
   testName: string,
   testCallback: (windows: Tuple<Page, 1>, testInfo: TestInfo) => Promise<void>,
+  context?: TestContext,
 ) {
-  return sessionTest(testName, testCallback, 1);
+  return sessionTest(testName, testCallback, 1, context);
 }
 
 export function sessionTestTwoWindows(
   testName: string,
   testCallback: ([windowA, windowB]: [Page, Page]) => Promise<void>,
+  context?: TestContext,
 ) {
-  return sessionTest(testName, testCallback, 2);
+  return sessionTest(testName, testCallback, 2, context);
 }
 
 export function sessionTestThreeWindows(
@@ -89,8 +91,9 @@ export function sessionTestThreeWindows(
     Page,
     Page,
   ]) => Promise<void>,
+  context?: TestContext,
 ) {
-  return sessionTest(testName, testCallback, 3);
+  return sessionTest(testName, testCallback, 3, context);
 }
 
 /**
@@ -121,7 +124,13 @@ function sessionTestGeneric<
     links,
     grouped,
     waitForNetwork = true,
-  }: { links?: Links; grouped?: Grouped; waitForNetwork?: boolean },
+    context,
+  }: {
+    links?: Links;
+    grouped?: Grouped;
+    waitForNetwork?: boolean;
+    context?: TestContext;
+  },
   testCallback: (
     details: {
       users: Tuple<User, UserCount>;
@@ -135,7 +144,7 @@ function sessionTestGeneric<
   const userNames: Tuple<string, 4> = ['Alice', 'Bob', 'Charlie', 'Dracula'];
 
   return test(testName, async ({}, testinfo) => {
-    const mainWindows = await openApp(userCount);
+    const mainWindows = await openApp(userCount, context);
     const linkedWindows: Array<Page> = [];
 
     try {
@@ -208,11 +217,12 @@ export function test_Alice_1W_no_network(
     details: WithAlice & WithAliceWindow1,
     testInfo: TestInfo,
   ) => Promise<void>,
+  context?: TestContext,
 ) {
   return sessionTestGeneric(
     testname,
     1,
-    { waitForNetwork: false },
+    { waitForNetwork: false, context },
     ({ mainWindows, users }, testInfo) => {
       return testCallback(
         {
@@ -231,11 +241,12 @@ export function test_Alice_1W(
     details: WithAlice & WithAliceWindow1,
     testInfo: TestInfo,
   ) => Promise<void>,
+  context?: TestContext,
 ) {
   return sessionTestGeneric(
     testname,
     1,
-    { waitForNetwork: true },
+    { waitForNetwork: true, context },
     ({ mainWindows, users }, testInfo) => {
       return testCallback(
         {
@@ -258,11 +269,12 @@ export function test_Alice_2W(
     details: WithAlice & WithAliceWindow1 & WithAliceWindow2,
     testInfo: TestInfo,
   ) => Promise<void>,
+  context?: TestContext,
 ) {
   return sessionTestGeneric(
     testname,
     1,
-    { links: [1] },
+    { links: [1], context },
     ({ mainWindows, users, linkedWindows }, testInfo) => {
       return testCallback(
         {
@@ -287,11 +299,12 @@ export function test_Alice_1W_Bob_1W(
     details: WithAlice & WithAliceWindow1 & WithBob & WithBobWindow1,
     testInfo: TestInfo,
   ) => Promise<void>,
+  context?: TestContext,
 ) {
   return sessionTestGeneric(
     testname,
     2,
-    {},
+    { context },
     ({ mainWindows, users }, testInfo) => {
       return testCallback(
         {
@@ -321,11 +334,12 @@ export function test_Alice_2W_Bob_1W(
       WithBobWindow1,
     testInfo: TestInfo,
   ) => Promise<void>,
+  context?: TestContext,
 ) {
   return sessionTestGeneric(
     testname,
     2,
-    { links: [1] },
+    { links: [1], context },
     ({ mainWindows, users, linkedWindows }, testInfo) => {
       return testCallback(
         {
@@ -359,11 +373,12 @@ export function test_group_Alice_1W_Bob_1W_Charlie_1W(
       WithGroupCreated,
     testInfo: TestInfo,
   ) => Promise<void>,
+  context?: TestContext,
 ) {
   return sessionTestGeneric(
     testname,
     3,
-    { grouped: [1, 2, 3] },
+    { grouped: [1, 2, 3], context },
     ({ mainWindows, users, groupCreated }, testInfo) => {
       return testCallback(
         {
@@ -400,11 +415,12 @@ export function test_group_Alice_2W_Bob_1W_Charlie_1W(
       WithGroupCreated,
     testInfo: TestInfo,
   ) => Promise<void>,
+  context?: TestContext,
 ) {
   return sessionTestGeneric(
     testname,
     3,
-    { grouped: [1, 2, 3], links: [1] },
+    { grouped: [1, 2, 3], links: [1], context },
     ({ mainWindows, users, groupCreated, linkedWindows }, testInfo) => {
       return testCallback(
         {
@@ -445,11 +461,12 @@ export function test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
 
     testInfo: TestInfo,
   ) => Promise<void>,
+  context?: TestContext,
 ) {
   return sessionTestGeneric(
     testname,
     4,
-    { grouped: [1, 2, 3] },
+    { grouped: [1, 2, 3], context },
     ({ mainWindows, users, groupCreated }, testInfo) => {
       return testCallback(
         {

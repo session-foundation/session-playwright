@@ -54,23 +54,24 @@ function getExpectedStringFromKey(
     | { key: TokenPluralWithArgs; count: number }
     | { key: TokenSimpleNoArgs | TokenSimpleWithArgs },
 ) {
-  if (isPluralToken(args.key)) {
-    if (!('count' in args)) {
-      throw new Error(
-        `getExpectedStringFromKey: ${args.key} is a plural form and expected count to be set`,
-      );
+  if ('count' in args && isPluralToken(args.key)) {
+    const count = args.count;
+
+    switch (args.key) {
+      // plurals are centralized here
+      case 'deleteMessageDeleted':
+        return count === 1 ? 'Message deleted' : 'Messages deleted';
+      case 'deleteMessage':
+        return count === 1 ? 'Delete Message' : 'Delete Messages';
+      case 'deleteMessageConfirm':
+        return count === 1
+          ? 'Are you sure you want to delete this message?'
+          : 'Are you sure you want to delete these messages?';
+      default:
+        return null;
     }
   }
   switch (args.key) {
-    // plurals are centralized here
-    case 'deleteMessageDeleted':
-      return args.count === 1 ? 'Message deleted' : 'Messages deleted';
-    case 'deleteMessage':
-      return args.count === 1 ? 'Delete Message' : 'Delete Messages';
-    case 'deleteMessageConfirm':
-      return args.count === 1
-        ? 'Are you sure you want to delete this message?'
-        : 'Are you sure you want to delete these messages?';
     case 'accept':
       return 'Accept';
     case 'sessionClearData':
@@ -283,6 +284,14 @@ function getExpectedStringFromKey(
       return 'You cannot go back further. In order to stop loading your account, Session needs to quit.';
     case 'quitButton':
       return 'Quit';
+    case 'donateSessionHelp':
+      return 'Session Needs Your Help';
+    case 'donateSessionDescription':
+      return 'Powerful forces are trying to weaken privacy, but we can’t continue this fight alone. Donating helps keep Session secure, independent, and online.';
+    case 'donate':
+      return 'Donate';
+    case 'maybeLater':
+      return 'Maybe Later';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
