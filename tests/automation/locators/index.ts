@@ -218,6 +218,10 @@ export class CTA extends Locator {
   static readonly confirmButton = this.testId('cta-confirm-button');
   static readonly description = this.testId('cta-body');
   static readonly heading = this.testId('cta-heading');
+
+  static feature(index: number): StrategyExtractionObj {
+    return this.testId(`cta-list-item-${index}` as DataTestId);
+  }
 }
 
 export class Global extends Locator {

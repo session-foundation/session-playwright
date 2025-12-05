@@ -5,6 +5,7 @@
 import { ElementHandle, Page } from '@playwright/test';
 
 import { sleepFor } from '../../promise_utils';
+import { CTA } from '../locators';
 import {
   DataTestId,
   DMTimeOption,
@@ -606,22 +607,26 @@ export async function checkCTAStrings(
   await targetModal.waitFor({ state: 'visible' });
 
   // Check heading
-  const heading = targetModal.locator('[data-testid="cta-heading"]');
+  const heading = targetModal.locator(
+    `[${CTA.heading.strategy}="${CTA.heading.selector}"]`,
+  );
   await heading.waitFor({ state: 'visible' });
   const headingText = await heading.innerText();
   assertTextMatches(headingText, expectedHeading, 'CTA heading');
 
   // Check body
-  const body = targetModal.locator('[data-testid="cta-body"]');
+  const body = targetModal.locator(
+    `[${CTA.description.strategy}="${CTA.description.selector}"]`,
+  );
   await body.waitFor({ state: 'visible' });
   const bodyText = await body.innerText();
   assertTextMatches(bodyText, expectedBody, 'CTA body');
 
-  // Check features if provided
   if (expectedFeatures) {
     for (let i = 0; i < expectedFeatures.length; i++) {
+      const featureLocator = CTA.feature(i + 1);
       const feature = targetModal.locator(
-        `[data-testid="cta-list-item-${i + 1}"]`,
+        `[${featureLocator.strategy}="${featureLocator.selector}"]`,
       );
       await feature.waitFor({ state: 'visible' });
       const featureText = await feature.innerText();
@@ -635,7 +640,7 @@ export async function checkCTAStrings(
 
   // Check positive button
   const positiveButton = targetModal.locator(
-    '[data-testid="cta-confirm-button"]',
+    `[${CTA.confirmButton.strategy}="${CTA.confirmButton.selector}"]`,
   );
   await positiveButton.waitFor({ state: 'visible' });
   const positiveButtonText = await positiveButton.innerText();
@@ -648,7 +653,7 @@ export async function checkCTAStrings(
   // Check negative button if provided
   if (expectedButtons.length === 2) {
     const negativeButton = targetModal.locator(
-      '[data-testid="cta-cancel-button"]',
+      `[${CTA.cancelButton.strategy}="${CTA.cancelButton.selector}"]`,
     );
     await negativeButton.waitFor({ state: 'visible' });
     const negativeButtonText = await negativeButton.innerText();
