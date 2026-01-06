@@ -5,6 +5,7 @@ import { longText, mediaArray, testLink } from './constants/variables';
 import {
   Conversation,
   ConversationSettings,
+  CTA,
   Global,
   HomeScreen,
 } from './locators';
@@ -24,6 +25,7 @@ import {
   trustUser,
 } from './utilities/send_media';
 import {
+  checkCTAStrings,
   checkModalStrings,
   clickOn,
   clickOnElement,
@@ -346,15 +348,40 @@ messageLengthTestCases.forEach((testCase) => {
           }),
         );
       } else {
-        // Message Too Long modal
-        await checkModalStrings(
-          aliceWindow1,
-          englishStrippedStr('modalMessageTooLongTitle').toString(),
-          englishStrippedStr('modalMessageTooLongDescription')
-            .withArgs({ limit: maxChars.toLocaleString('en-AU') }) // Force "2,000" instead of "2000"
-            .toString(),
-        );
-        await clickOn(aliceWindow1, Global.confirmButton);
+        if (process.env.SESSION_PRO) {
+          console.log('Session Pro detected, checking CTA');
+          // Upgrade to pro
+          await checkCTAStrings(
+            aliceWindow1,
+            englishStrippedStr('upgradeTo').toString(),
+            englishStrippedStr('proCallToActionLongerMessages').toString(),
+            [
+              englishStrippedStr('theContinue').toString(),
+              englishStrippedStr('cancel').toString(),
+            ],
+            [
+              ` ${englishStrippedStr(
+                'proFeatureListLongerMessages',
+              ).toString()}`,
+              ` ${englishStrippedStr(
+                'proFeatureListPinnedConversations',
+              ).toString()}`,
+              englishStrippedStr('proFeatureListLoadsMore').toString(),
+            ],
+          );
+          await clickOn(aliceWindow1, CTA.cancelButton);
+        } else {
+          console.log('Session Pro not detected, checking modal');
+          // Message Too Long modal
+          await checkModalStrings(
+            aliceWindow1,
+            englishStrippedStr('modalMessageTooLongTitle').toString(),
+            englishStrippedStr('modalMessageTooLongDescription')
+              .withArgs({ limit: maxChars.toLocaleString('en-AU') }) // Force "2,000" instead of "2000"
+              .toString(),
+          );
+          await clickOn(aliceWindow1, Global.confirmButton);
+        }
 
         // Verify message didn't send
         try {

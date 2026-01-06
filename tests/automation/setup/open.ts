@@ -28,9 +28,9 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
   const uniqueId = v4();
   process.env.NODE_APP_INSTANCE = `${MULTI_PREFIX}-devprod-${uniqueId}-${process.env.MULTI}`;
   process.env.NODE_ENV = NODE_ENV;
-  process.env.SESSION_DEBUG = '1';
-  process.env.LOCAL_DEVNET_SEED_URL = 'http://seed2.getsession.org:38157/';
-  // process.env.LOCAL_DEVNET_SEED_URL = 'http://sesh-net:1280'
+  // process.env.SESSION_DEBUG = '1';
+  // process.env.LOCAL_DEVNET_SEED_URL = process.env.LOCAL_DEVNET_SEED_URL ?? 'http://seed2.getsession.org:38157/';
+  // process.env.LOCAL_DEVNET_SEED_URL = 'http://sesh-net.local:1280';
 
   // Inject custom env vars if provided
   if (context?.dbCreationTimestampMs) {
@@ -48,7 +48,9 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
     delete process.env.DB_CREATION_TIMESTAMP_MS;
   }
 
-  console.info(`   ${process.env.LOCAL_DEVNET_SEED_URL}`);
+  console.info(
+    `   LOCAL_DEVNET_SEED_URL: ${process.env.LOCAL_DEVNET_SEED_URL}`,
+  );
   console.info(`   NON CI RUN`);
   console.info('   NODE_ENV', process.env.NODE_ENV);
   console.info('   NODE_APP_INSTANCE', process.env.NODE_APP_INSTANCE);
