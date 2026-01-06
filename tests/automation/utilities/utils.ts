@@ -546,7 +546,7 @@ function assertTextMatches(
 
   if (sanitizedExpected !== sanitizedActual) {
     throw new Error(
-      `${fieldName} is incorrect.\nExpected: ${sanitizedExpected}\nActual: ${sanitizedActual}`,
+      `${fieldName} is incorrect.\nExpected: ${sanitizedExpected}\nActual: ${sanitizedActual}\n`,
     );
   }
 }

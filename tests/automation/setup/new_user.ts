@@ -43,7 +43,6 @@ export const newUser = async (
   // );
   await clickOn(window, Global.modalCloseButton);
   await clickOn(window, LeftPane.profileButton);
-
   // Save Account ID to a variable
   let accountid = await window.innerText(
     `[data-testid=${Settings.accountId.selector}]`,
