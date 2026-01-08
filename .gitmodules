@@ -1,0 +1,3 @@
+[submodule "tests/localization/lib"]
+	path = tests/localization/lib
+	url = https://github.com/session-foundation/session-localization.git
