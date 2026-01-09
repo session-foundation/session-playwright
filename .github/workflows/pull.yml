@@ -21,6 +21,7 @@ jobs:
       - name: Checkout git repo
         uses: actions/checkout@v4
         with:
+          submodules: 'recursive'
           lfs: true
 
       - name: Install node
