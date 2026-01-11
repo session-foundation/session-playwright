@@ -2,17 +2,14 @@ import { test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import type {
-  TokenPluralWithArgs,
-  TokenSimpleNoArgs,
-  TokenSimpleWithArgs,
-} from '../localization/locales';
-
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import {
   isPluralToken,
-  type MergedLocalizerTokens,
-} from '../localization/Localizer';
+  MergedLocalizerTokens,
+  TokenPluralWithArgs,
+  TokenSimpleNoArgs,
+  TokenSimpleWithArgs,
+} from '../localization/lib';
 
 function readTsFiles(dir: string): Record<string, string> {
   const tsFilesContent: Record<string, string> = {};
