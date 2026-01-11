@@ -3,7 +3,13 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { englishStrippedStr } from '../localization/englishStrippedStr';
-import { MergedLocalizerTokens, TokenPluralWithArgs, TokenSimpleNoArgs, TokenSimpleWithArgs, isPluralToken } from '../localization/lib';
+import {
+  isPluralToken,
+  MergedLocalizerTokens,
+  TokenPluralWithArgs,
+  TokenSimpleNoArgs,
+  TokenSimpleWithArgs,
+} from '../localization/lib';
 
 function readTsFiles(dir: string): Record<string, string> {
   const tsFilesContent: Record<string, string> = {};
