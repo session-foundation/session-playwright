@@ -1,11 +1,11 @@
-import type { ElementHandle, Locator } from '@playwright/test';
+import type { ElementHandle } from '@playwright/test';
 
 import { expect } from '@playwright/test';
 
 import { sleepFor } from '../../promise_utils';
 
 export type ScreenshotComparisonOptions = {
-  element: ElementHandle | Locator;
+  element: ElementHandle;
   snapshotName: string;
   maxRetryDurationMs?: number;
   imageType?: 'jpeg' | 'png';
@@ -22,16 +22,18 @@ export type ScreenshotComparisonOptions = {
 export async function compareElementScreenshot(
   options: ScreenshotComparisonOptions,
 ): Promise<void> {
+  const MAX_RETRY_DURATION_MS = 20_000; 
+  const POLL_INTERVAL_MS = 500; // Retry every 500ms
+  const MAX_DIFF_PIXEL_RATIO = 0.02; // Allow 2% of pixel differences 
   const {
     element,
     snapshotName,
-    maxRetryDurationMs = 20000,
+    maxRetryDurationMs = MAX_RETRY_DURATION_MS,
     imageType = 'jpeg',
-    maxDiffPixelRatio = 0.02,
+    maxDiffPixelRatio = MAX_DIFF_PIXEL_RATIO,
   } = options;
 
   const start = Date.now();
-  const pollIntervalMs = 500;
   let tryNumber = 0;
   let lastError: Error | undefined;
 
@@ -46,19 +48,14 @@ export async function compareElementScreenshot(
         maxDiffPixelRatio,
       });
 
-      console.info(
-        `Screenshot matching of "${snapshotName}" passed after ${tryNumber} ${
-          tryNumber === 1 ? 'retry' : 'retries'
-        }`,
-      );
-      return; // Exit immediately on success
+      return;
     } catch (e) {
       lastError = e as Error;
       tryNumber++;
 
       // Wait between attempts if we haven't exceeded timeout
-      if (Date.now() - start + pollIntervalMs <= maxRetryDurationMs) {
-        await sleepFor(pollIntervalMs);
+      if (Date.now() - start + POLL_INTERVAL_MS <= maxRetryDurationMs) {
+        await sleepFor(POLL_INTERVAL_MS);
       }
     }
   }

@@ -137,6 +137,7 @@ for (let nodeCount = 1; nodeCount <= 10; nodeCount++) {
       await compareElementScreenshot({
         element: swarmImageContainer,
         snapshotName: `swarm-${nodeCount}-node-dark.jpeg`,
+        maxRetryDurationMs: 5_000,
       });
     },
     {
@@ -174,6 +175,7 @@ test_Alice_1W(
     await compareElementScreenshot({
       element: nodeImageContainer,
       snapshotName: `swarm-${LIGHT_THEME_TEST_NODE_COUNT}-node-light.jpeg`,
+      maxRetryDurationMs: 5_000,
     });
   },
   {
