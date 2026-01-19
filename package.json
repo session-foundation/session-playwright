@@ -37,6 +37,7 @@
     "dev": "yarn tsc --watch",
     "test": "npx playwright test",
     "watch": "tsc -w",
+    "sync": "./sync-localization.sh",
     "allure-create": "allure generate ./allure-results",
     "allure-open": "allure open ./allure-report"
   },

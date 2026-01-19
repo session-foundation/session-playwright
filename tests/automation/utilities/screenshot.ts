@@ -1,0 +1,70 @@
+import type { ElementHandle } from '@playwright/test';
+
+import { expect } from '@playwright/test';
+
+import { sleepFor } from '../../promise_utils';
+
+export type ScreenshotComparisonOptions = {
+  element: ElementHandle;
+  snapshotName: string;
+  maxRetryDurationMs?: number;
+  imageType?: 'jpeg' | 'png';
+  maxDiffPixelRatio?: number;
+};
+
+/**
+ * Takes a screenshot of an element and compares it against a baseline snapshot.
+ * Retries until the screenshot matches or timeout is reached.
+ *
+ * @param options - Screenshot comparison configuration
+ * @throws Error if screenshot doesn't match within the retry duration
+ */
+export async function compareElementScreenshot(
+  options: ScreenshotComparisonOptions,
+): Promise<void> {
+  const MAX_RETRY_DURATION_MS = 20_000;
+  const POLL_INTERVAL_MS = 500; // Retry every 500ms
+  const MAX_DIFF_PIXEL_RATIO = 0.02; // Allow 2% of pixel differences
+  const {
+    element,
+    snapshotName,
+    maxRetryDurationMs = MAX_RETRY_DURATION_MS,
+    imageType = 'jpeg',
+    maxDiffPixelRatio = MAX_DIFF_PIXEL_RATIO,
+  } = options;
+
+  const start = Date.now();
+  let tryNumber = 0;
+  let lastError: Error | undefined;
+
+  while (Date.now() - start <= maxRetryDurationMs) {
+    try {
+      const screenshot = await element.screenshot({
+        type: imageType,
+      });
+
+      expect(screenshot).toMatchSnapshot({
+        name: snapshotName,
+        maxDiffPixelRatio,
+      });
+
+      return;
+    } catch (e) {
+      lastError = e as Error;
+      tryNumber++;
+
+      // Wait between attempts if we haven't exceeded timeout
+      if (Date.now() - start + POLL_INTERVAL_MS <= maxRetryDurationMs) {
+        await sleepFor(POLL_INTERVAL_MS);
+      }
+    }
+  }
+
+  // Only reach here if we timed out
+  console.error(
+    `Screenshot matching of "${snapshotName}" failed after ${tryNumber} attempt(s) (${maxRetryDurationMs}ms)`,
+  );
+  throw (
+    lastError ?? new Error('Screenshot comparison failed without error details')
+  );
+}

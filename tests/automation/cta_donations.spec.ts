@@ -1,13 +1,13 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { CTA } from './locators';
-import { test_Alice_1W } from './setup/sessionTest';
+import { test_Alice_1W_no_network } from './setup/sessionTest';
 import { mockDBCreationTime } from './utilities/time_travel';
 import {
   checkCTAStrings,
   hasElementPoppedUpThatShouldnt,
 } from './utilities/utils';
 
-test_Alice_1W(
+test_Alice_1W_no_network(
   'Donate CTA, DB age >= 7 days',
   async ({ aliceWindow1 }) => {
     await checkCTAStrings(
@@ -28,7 +28,7 @@ test_Alice_1W(
   },
 );
 
-test_Alice_1W(
+test_Alice_1W_no_network(
   'Donate CTA, DB age < 7 days',
   async ({ aliceWindow1 }) => {
     await Promise.all([

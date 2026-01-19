@@ -85,6 +85,7 @@ jobs:
           repository: ${{ github.event.inputs.PLAYWRIGHT_REPO }}
           ref: ${{ github.event.inputs.BRANCH_TO_CHECKOUT_PW }}
           path: 'playwright'
+          submodules: 'recursive'
 
       - name: Install system deps
         run: apt update && apt install -y git g++ build-essential cmake
@@ -95,6 +96,7 @@ jobs:
           repository: ${{ github.event.inputs.SESSION_DESKTOP_REPO }}
           ref: ${{ github.event.inputs.BRANCH_TO_CHECKOUT_SESSION }}
           path: 'desktop'
+          submodules: 'recursive'
 
       # Note: caching is breaking things up (app doesn't start)
       # - name: Calculate desktop cache key

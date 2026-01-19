@@ -78,6 +78,7 @@ export type Strategy = ':has-text' | 'class' | 'data-testid';
 export type DataTestId =
   | DMTimeOption
   | 'accept-message-request'
+  | 'appearance-settings-menu-item'
   | 'audio-player'
   | 'back-button'
   | 'blocked-contacts-settings-row'
@@ -89,6 +90,8 @@ export type DataTestId =
   | 'chooser-new-community'
   | 'chooser-new-conversation-button'
   | 'chooser-new-group'
+  | 'classic-dark-themes-settings-menu-item'
+  | 'classic-light-themes-settings-menu-item'
   | 'clear-data-settings-menu-item'
   | 'clear-group-info-name-button'
   | 'contact'
@@ -172,6 +175,8 @@ export type DataTestId =
   | 'new-session-conversation'
   | 'next-new-conversation-button'
   | 'nickname-input'
+  | 'ocean-dark-themes-settings-menu-item'
+  | 'ocean-light-themes-settings-menu-item'
   | 'password-input-confirm'
   | 'password-input-reconfirm'
   | 'password-input'
@@ -199,6 +204,7 @@ export type DataTestId =
   | 'set-password-settings-button'
   | 'settings-section'
   | 'staking-reward-pool-amount'
+  | 'swarm-image'
   | 'theme-section'
   | 'tooltip-character-count'
   | 'unblock-button-settings-screen'
@@ -206,6 +212,7 @@ export type DataTestId =
   | 'update-profile-info-name-input'
   | 'your-account-id'
   | 'your-profile-name'
+  | 'your-swarm-amount'
   | `cta-list-item-${number}`
   | `input-${DMTimeOption}`;
 
