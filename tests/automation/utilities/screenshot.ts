@@ -1,12 +1,14 @@
-import type { ElementHandle } from '@playwright/test';
+import type { ElementHandle, TestInfo } from '@playwright/test';
 
 import { expect } from '@playwright/test';
+import fs from 'node:fs';
 
 import { sleepFor } from '../../promise_utils';
 
 export type ScreenshotComparisonOptions = {
   element: ElementHandle;
   snapshotName: string;
+  testInfo: TestInfo;
   maxRetryDurationMs?: number;
   imageType?: 'jpeg' | 'png';
   maxDiffPixelRatio?: number;
@@ -28,11 +30,25 @@ export async function compareElementScreenshot(
   const {
     element,
     snapshotName,
+    testInfo,
     maxRetryDurationMs = MAX_RETRY_DURATION_MS,
     imageType = 'jpeg',
     maxDiffPixelRatio = MAX_DIFF_PIXEL_RATIO,
   } = options;
 
+  // Check if snapshot file exists
+  const snapshotPath = testInfo.snapshotPath(snapshotName);
+  const snapshotExists = fs.existsSync(snapshotPath);
+
+  // If there's no snapshot available, let UI settle before taking a candidate baseline snapshot
+  // (e.g. display picture syncing to linked device)
+  // Playwright saves missing snapshots by default (updateSnapshots = 'missing')
+  if (!snapshotExists) {
+    console.log('No baseline screenshot available');
+    await sleepFor(15_000, true);
+  }
+
+  // Poll for MAX_RETRY_DURATION_MS and attempt to match every POLL_INTERVAL_MS
   const start = Date.now();
   let tryNumber = 0;
   let lastError: Error | undefined;

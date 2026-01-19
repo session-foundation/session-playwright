@@ -171,37 +171,41 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   await clickOn(aliceWindow1, Global.modalCloseButton);
 });
 
-test_Alice_1W_no_network('Change avatar', async ({ aliceWindow1 }) => {
-  // Open profile
-  await clickOn(aliceWindow1, LeftPane.profileButton);
-  // Click on current profile picture
-  await clickOn(aliceWindow1, Settings.displayName);
+test_Alice_1W_no_network(
+  'Change avatar',
+  async ({ aliceWindow1 }, testInfo) => {
+    // Open profile
+    await clickOn(aliceWindow1, LeftPane.profileButton);
+    // Click on current profile picture
+    await clickOn(aliceWindow1, Settings.displayName);
 
-  await clickOn(aliceWindow1, Settings.imageUploadSection);
-  await clickOn(aliceWindow1, Settings.imageUploadClick);
-  // allow for the image to be resized before we try to save it
-  await sleepFor(500);
-  await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
-  await waitForLoadingAnimationToFinish(
-    aliceWindow1,
-    Global.loadingSpinner.selector,
-  );
-  await clickOnMatchingText(
-    aliceWindow1,
-    englishStrippedStr('save').toString(),
-  );
-  await clickOn(aliceWindow1, Global.modalCloseButton);
-  await sleepFor(500);
-  const leftpaneAvatarContainer = await waitForTestIdWithText(
-    aliceWindow1,
-    LeftPane.profileButton.selector,
-  );
+    await clickOn(aliceWindow1, Settings.imageUploadSection);
+    await clickOn(aliceWindow1, Settings.imageUploadClick);
+    // allow for the image to be resized before we try to save it
+    await sleepFor(500);
+    await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
+    await waitForLoadingAnimationToFinish(
+      aliceWindow1,
+      Global.loadingSpinner.selector,
+    );
+    await clickOnMatchingText(
+      aliceWindow1,
+      englishStrippedStr('save').toString(),
+    );
+    await clickOn(aliceWindow1, Global.modalCloseButton);
+    await sleepFor(500);
+    const leftpaneAvatarContainer = await waitForTestIdWithText(
+      aliceWindow1,
+      LeftPane.profileButton.selector,
+    );
 
-  await compareElementScreenshot({
-    element: leftpaneAvatarContainer,
-    snapshotName: 'avatar-updated-blue.jpeg',
-  });
-});
+    await compareElementScreenshot({
+      element: leftpaneAvatarContainer,
+      snapshotName: 'avatar-updated-blue.jpeg',
+      testInfo,
+    });
+  },
+);
 
 test_Alice_1W_Bob_1W(
   'Set nickname',

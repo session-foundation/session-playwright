@@ -138,7 +138,7 @@ test_Alice_2W(
 
 test_Alice_2W(
   'Profile picture syncs',
-  async ({ aliceWindow1, aliceWindow2 }) => {
+  async ({ aliceWindow1, aliceWindow2 }, testInfo) => {
     await clickOn(aliceWindow1, LeftPane.profileButton);
     // Click on current profile picture
     await clickOn(aliceWindow1, Settings.displayName);
@@ -165,6 +165,7 @@ test_Alice_2W(
     await compareElementScreenshot({
       element: leftpaneAvatarContainer,
       snapshotName: 'avatar-updated-blue.jpeg',
+      testInfo,
     });
   },
 );
