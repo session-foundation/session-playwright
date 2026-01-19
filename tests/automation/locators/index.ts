@@ -141,6 +141,9 @@ export class Settings extends Locator {
     'save-button-profile-update',
   );
   // Menu items
+  static readonly appearanceMenuItem = this.testId(
+    'appearance-settings-menu-item',
+  );
   static readonly clearDataMenuItem = this.testId(
     'clear-data-settings-menu-item',
   );
@@ -157,6 +160,19 @@ export class Settings extends Locator {
   static readonly recoveryPasswordMenuItem = this.testId(
     'recovery-password-settings-menu-item',
   );
+  // Appearance settings
+  static readonly classicDarkOption = this.testId(
+    'classic-dark-themes-settings-menu-item',
+  );
+  static readonly classicLightOption = this.testId(
+    'classic-light-themes-settings-menu-item',
+  );
+  static readonly oceanDarkOption = this.testId(
+    'ocean-dark-themes-settings-menu-item',
+  );
+  static readonly oceanLightOption = this.testId(
+    'ocean-light-themes-settings-menu-item',
+  );
   // Session Network
   static readonly lastUpdatedTimestamp = this.testId('last-updated-timestamp');
   static readonly learnMoreAboutStakingLink = this.testId(
@@ -169,6 +185,8 @@ export class Settings extends Locator {
   static readonly stakingRewardPoolAmount = this.testId(
     'staking-reward-pool-amount',
   );
+  static readonly swarmImage = this.testId('swarm-image');
+  static readonly yourSwarmAmount = this.testId('your-swarm-amount');
   // Privacy
   static readonly changePasswordSettingsButton = this.testId(
     'change-password-settings-button',

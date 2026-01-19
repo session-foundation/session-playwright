@@ -3,6 +3,7 @@ import { sleepFor } from '../promise_utils';
 import { Global, LeftPane, Settings } from './locators';
 import { test_Alice_1W } from './setup/sessionTest';
 import { validateNetworkData } from './utilities/network_api';
+import { compareElementScreenshot } from './utilities/screenshot';
 import {
   assertUrlIsReachable,
   checkModalStrings,
@@ -110,3 +111,76 @@ test_Alice_1W('Network page refresh', async ({ aliceWindow1 }) => {
     zeroMinAgoText,
   );
 });
+
+// Cycle through all valid node counts and check count + graph
+for (let nodeCount = 1; nodeCount <= 10; nodeCount++) {
+  test_Alice_1W(
+    `Network page node count: ${nodeCount} - dark theme`,
+    async ({ aliceWindow1 }, testInfo) => {
+      await clickOn(aliceWindow1, LeftPane.settingsButton);
+      await clickOn(aliceWindow1, Settings.networkPageMenuItem);
+      await waitForLoadingAnimationToFinish(
+        aliceWindow1,
+        Global.loadingSpinner.selector,
+      );
+      await waitForTestIdWithText(
+        aliceWindow1,
+        Settings.yourSwarmAmount.selector,
+        String(nodeCount),
+      );
+
+      const swarmImageContainer = await waitForTestIdWithText(
+        aliceWindow1,
+        Settings.swarmImage.selector,
+      );
+
+      await compareElementScreenshot({
+        element: swarmImageContainer,
+        snapshotName: `swarm-${nodeCount}-node-dark.jpeg`,
+        testInfo,
+        maxRetryDurationMs: 5_000,
+      });
+    },
+    {
+      networkPageNodeCount: nodeCount,
+    },
+  );
+}
+
+// 7 has been chosen as it's the most common swarm size
+// Single check to verify light mode svg also renders correctly
+const LIGHT_THEME_TEST_NODE_COUNT = 7;
+test_Alice_1W(
+  `Network page node count: ${LIGHT_THEME_TEST_NODE_COUNT} - light theme`,
+  async ({ aliceWindow1 }, testInfo) => {
+    await clickOn(aliceWindow1, LeftPane.settingsButton);
+    await clickOn(aliceWindow1, Settings.appearanceMenuItem);
+    await clickOn(aliceWindow1, Settings.oceanLightOption);
+    await clickOn(aliceWindow1, Global.modalBackButton);
+    await clickOn(aliceWindow1, Settings.networkPageMenuItem);
+    await waitForLoadingAnimationToFinish(
+      aliceWindow1,
+      Global.loadingSpinner.selector,
+    );
+    await waitForTestIdWithText(
+      aliceWindow1,
+      Settings.yourSwarmAmount.selector,
+      String(LIGHT_THEME_TEST_NODE_COUNT),
+    );
+
+    const nodeImageContainer = await waitForTestIdWithText(
+      aliceWindow1,
+      Settings.swarmImage.selector,
+    );
+
+    await compareElementScreenshot({
+      element: nodeImageContainer,
+      snapshotName: `swarm-${LIGHT_THEME_TEST_NODE_COUNT}-node-light.jpeg`,
+      testInfo,
+      maxRetryDurationMs: 5_000,
+    });
+  },
+  {
+    networkPageNodeCount: LIGHT_THEME_TEST_NODE_COUNT,
+  },
+);

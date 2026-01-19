@@ -18,6 +18,7 @@ import {
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { sendMessage, waitForReadTick } from './utilities/message';
+import { compareElementScreenshot } from './utilities/screenshot';
 import {
   checkModalStrings,
   clickOn,
@@ -192,46 +193,17 @@ test_Alice_1W_no_network(
       englishStrippedStr('save').toString(),
     );
     await clickOn(aliceWindow1, Global.modalCloseButton);
-    // if we were asked to update the snapshots, make sure we wait for the change to be received before taking a screenshot.
-    if (testInfo.config.updateSnapshots === 'all') {
-      await sleepFor(15000);
-    } else {
-      await sleepFor(2000);
-    }
     await sleepFor(500);
     const leftpaneAvatarContainer = await waitForTestIdWithText(
       aliceWindow1,
       LeftPane.profileButton.selector,
     );
-    const start = Date.now();
-    let correctScreenshot = false;
-    let tryNumber = 0;
-    let lastError: Error | undefined;
-    do {
-      try {
-        const screenshot = await leftpaneAvatarContainer.screenshot({
-          type: 'jpeg',
-        });
-        // this file is saved in `Change-avatar` folder
-        expect(screenshot).toMatchSnapshot({
-          name: 'avatar-updated-blue.jpeg',
-        });
-        correctScreenshot = true;
-        console.info(
-          `screenshot matching of "Check profile picture" passed after "${tryNumber}" retries!`,
-        );
-      } catch (e) {
-        lastError = e;
-      }
-      tryNumber++;
-    } while (Date.now() - start <= 20000 && !correctScreenshot);
 
-    if (!correctScreenshot) {
-      console.info(
-        `screenshot matching of "Check profile picture" try "${tryNumber}" failed with: ${lastError?.message}`,
-      );
-      throw new Error('waiting 20s and still the screenshot is not right');
-    }
+    await compareElementScreenshot({
+      element: leftpaneAvatarContainer,
+      snapshotName: 'avatar-updated-blue.jpeg',
+      testInfo,
+    });
   },
 );
 
