@@ -22,9 +22,9 @@ export type ScreenshotComparisonOptions = {
 export async function compareElementScreenshot(
   options: ScreenshotComparisonOptions,
 ): Promise<void> {
-  const MAX_RETRY_DURATION_MS = 20_000; 
+  const MAX_RETRY_DURATION_MS = 20_000;
   const POLL_INTERVAL_MS = 500; // Retry every 500ms
-  const MAX_DIFF_PIXEL_RATIO = 0.02; // Allow 2% of pixel differences 
+  const MAX_DIFF_PIXEL_RATIO = 0.02; // Allow 2% of pixel differences
   const {
     element,
     snapshotName,
