@@ -1,5 +1,5 @@
 /* eslint-disable no-await-in-loop */
-import { expect, Page } from '@playwright/test';
+import { Page } from '@playwright/test';
 
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
@@ -20,6 +20,7 @@ import {
 import { createContact } from './utilities/create_contact';
 import { linkedDevice } from './utilities/linked_device';
 import { sendMessage } from './utilities/message';
+import { compareElementScreenshot } from './utilities/screenshot';
 import {
   checkModalStrings,
   clickOn,
@@ -137,7 +138,7 @@ test_Alice_2W(
 
 test_Alice_2W(
   'Profile picture syncs',
-  async ({ aliceWindow1, aliceWindow2 }, testinfo) => {
+  async ({ aliceWindow1, aliceWindow2 }) => {
     await clickOn(aliceWindow1, LeftPane.profileButton);
     // Click on current profile picture
     await clickOn(aliceWindow1, Settings.displayName);
@@ -156,44 +157,15 @@ test_Alice_2W(
     );
     await clickOn(aliceWindow1, Global.modalCloseButton);
 
-    if (testinfo.config.updateSnapshots === 'all') {
-      await sleepFor(15000, true); // long time to be sure a poll happened when we want to update the snapshot
-    } else {
-      await sleepFor(2000); // short time as we will loop right below until the snapshot is what we expect
-    }
     const leftpaneAvatarContainer = await waitForTestIdWithText(
       aliceWindow2,
       LeftPane.profileButton.selector,
     );
-    const start = Date.now();
-    let correctScreenshot = false;
-    let tryNumber = 0;
-    let lastError: Error | undefined;
-    do {
-      try {
-        const screenshot = await leftpaneAvatarContainer.screenshot({
-          type: 'jpeg',
-        });
-        // This file is saved in `Profile-picture-syncs` folder
-        expect(screenshot).toMatchSnapshot({
-          name: `avatar-updated-blue.jpeg`,
-        });
-        correctScreenshot = true;
-        console.info(
-          `screenshot matching of "Check profile picture syncs" passed after "${tryNumber}" retries!`,
-        );
-      } catch (e) {
-        lastError = e;
-      }
-      tryNumber++;
-    } while (Date.now() - start <= 20000 && !correctScreenshot);
 
-    if (!correctScreenshot) {
-      console.info(
-        `screenshot matching of "Check profile picture syncs" try "${tryNumber}" failed with: ${lastError?.message}`,
-      );
-      throw new Error('waited 20s and still the screenshot is not right');
-    }
+    await compareElementScreenshot({
+      element: leftpaneAvatarContainer,
+      snapshotName: 'avatar-updated-blue.jpeg',
+    });
   },
 );
 
