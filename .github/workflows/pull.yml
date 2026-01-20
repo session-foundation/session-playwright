@@ -82,7 +82,7 @@ jobs:
 
       - name: Compile typescript files
         shell: bash
-        run: pnpm run tsc
+        run: pnpm tsc
 
       - name: Run the only test we can without a browser
         shell: bash
