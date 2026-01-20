@@ -13,8 +13,8 @@ Once nvm is installed, install the node version declared in the `.nvmrc` file:
 - `nvm install` on linux/macos
 - `nvm install <specific version from the .nvmrc>` on windows
 
-Install pnpm:
-You can install it by running `npm install --global pnpm`, but you should read the installation instructions as other methods are better.
+Install [pnpm](https://pnpm.io/installation):
+You can install it by running `npm install --global pnpm`, but you should read the [installation instructions](https://pnpm.io/installation) as other methods are better.
 
 Install dependencies:
 - `pnpm install`
