@@ -18,41 +18,72 @@ jobs:
     steps:
       - run: git config --global core.autocrlf false
 
-      - name: Checkout git repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.target_branch || github.ref  }}
           submodules: 'recursive'
           lfs: true
 
-      - name: Install node
-        uses: actions/setup-node@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+
+      - name: Enable long paths (Windows Only)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: git config --system core.longpaths true
+
+      - name: Setup pnpm hoisted node-linker (Windows Only)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: pnpm config set node-linker hoisted
+
+      - name: Setup node.js
+        uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6
         with:
           node-version-file: '.nvmrc'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
 
-      - uses: actions/cache/restore@v4
-        id: cache-playwright-modules
+      - name: Cache .electron-gyp
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
         with:
-          path: node_modules
-          key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package.json', 'yarn.lock', 'patches/**') }}
+          path: ~/.electron-gyp
+          key: electron-gyp-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
-      - name: Install dependencies
+      - name: Restore cached .eslintcache and tsconfig.tsbuildinfo
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        id: cache-lint
+        with:
+          path: |
+            .eslintcache
+            tsconfig.tsbuildinfo
+          key: lint-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml', 'patches/**', '.eslintrc.js', '.eslint/**', 'tsconfig.json') }}
+
+      - name: Install node_modules
         shell: bash
-        if: steps.cache-playwright-modules.outputs.cache-hit != 'true'
-        run: yarn install --immutable
-
-      - uses: actions/cache/save@v4
-        id: cache-playwright-modules-save
-        with:
-          path: node_modules
-          key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('package.json', 'yarn.lock', 'patches/**') }}
+        run: pnpm install
+        env:
+          NPM_CONFIG_LOGLEVEL: verbose
 
       - name: Lint Files
-        run: yarn lint-check
+        shell: bash
+        run: pnpm run lint-check
+
+      - run: git diff --exit-code
+
+      - name: Update cached .eslintcache and tsconfig.tsbuildinfo
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        if: github.ref == 'refs/heads/main'
+        with:
+          path: |
+            .eslintcache
+            tsconfig.tsbuildinfo
+          key: ${{ steps.cache-lint.outputs.cache-primary-key }}
 
       - name: Compile typescript files
         shell: bash
-        run: yarn tsc
+        run: pnpm run tsc
 
       - name: Run the only test we can without a browser
         shell: bash
-        run: PRINT_FAILED_TEST_LOGS=1 npx playwright test  -g "Enforce localized strings return expected values"
+        run: PRINT_FAILED_TEST_LOGS=1 pnpx playwright test  -g "Enforce localized strings return expected values"
