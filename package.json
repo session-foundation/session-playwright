@@ -7,7 +7,7 @@
   "author": "Audric Ackermann <audric@loki.network>",
   "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.51",
+    "@playwright/test": "^1.57.0",
     "@types/fs-extra": "^11.0.1",
     "@types/lodash": "^4.14.196",
     "@types/uuid": "^9.0.8",
@@ -28,6 +28,7 @@
     "eslint-plugin-perfectionist": "^4.15.0",
     "fs-extra": "^11.1.1",
     "lodash": "^4.17.21",
+    "playwright": "^1.57.0",
     "prettier": "^3.0.1",
     "typescript": "^5.1.6",
     "uuid": "^9.0.1"
@@ -37,7 +38,7 @@
     "lint": "pnpm prettier . --write --cache && pnpm eslint .",
     "lint-check": "pnpm prettier . --check && pnpm eslint .",
     "dev": "pnpm tsc --watch",
-    "test": "pnpx playwright test",
+    "test": "playwright test",
     "watch": "tsc -w",
     "sync": "./sync-localization.sh",
     "allure-create": "allure generate ./allure-results",

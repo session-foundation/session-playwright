@@ -86,4 +86,4 @@ jobs:
 
       - name: Run the only test we can without a browser
         shell: bash
-        run: PRINT_FAILED_TEST_LOGS=1 pnpx playwright test  -g "Enforce localized strings return expected values"
+        run: PRINT_FAILED_TEST_LOGS=1 pnpm playwright test -g "Enforce localized strings return expected values"
