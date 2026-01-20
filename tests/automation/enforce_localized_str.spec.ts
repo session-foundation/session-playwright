@@ -2,17 +2,14 @@ import { test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import type {
-  TokenPluralWithArgs,
-  TokenSimpleNoArgs,
-  TokenSimpleWithArgs,
-} from '../localization/locales';
-
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import {
   isPluralToken,
-  type MergedLocalizerTokens,
-} from '../localization/Localizer';
+  MergedLocalizerTokens,
+  TokenPluralWithArgs,
+  TokenSimpleNoArgs,
+  TokenSimpleWithArgs,
+} from '../localization/lib';
 
 function readTsFiles(dir: string): Record<string, string> {
   const tsFilesContent: Record<string, string> = {};
@@ -292,6 +289,12 @@ function getExpectedStringFromKey(
       return 'Donate';
     case 'maybeLater':
       return 'Maybe Later';
+    case 'upgradeTo':
+      return 'Upgrade to';
+    case 'proCallToActionLongerMessages':
+      return 'Want to send longer messages? Send more text and unlock premium features with Session Pro Beta';
+    case 'proFeatureListLoadsMore':
+      return 'Plus loads more exclusive features';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail

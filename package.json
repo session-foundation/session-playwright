@@ -38,6 +38,7 @@
     "dev": "pnpm tsc --watch",
     "test": "pnpx playwright test",
     "watch": "tsc -w",
+    "sync": "./sync-localization.sh",
     "allure-create": "allure generate ./allure-results",
     "allure-open": "allure open ./allure-report"
   }

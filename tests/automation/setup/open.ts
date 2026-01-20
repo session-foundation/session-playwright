@@ -11,6 +11,7 @@ let electronPids: Array<number> = [];
 
 export type TestContext = {
   dbCreationTimestampMs?: number;
+  networkPageNodeCount?: number;
 };
 
 export function getAppRootPath() {
@@ -22,33 +23,54 @@ export function getAppRootPath() {
   return process.env.SESSION_DESKTOP_ROOT as string;
 }
 
+function mockDbCreationTimestamp(dbCreationTimestampMs?: number) {
+  if (dbCreationTimestampMs !== undefined) {
+    process.env.DB_CREATION_TIMESTAMP_MS = String(dbCreationTimestampMs);
+    const humanReadable = new Date(dbCreationTimestampMs).toLocaleString(
+      'en-AU',
+    );
+    console.info(
+      `   DB Creation Timestamp: ${process.env.DB_CREATION_TIMESTAMP_MS} (${humanReadable})`,
+    );
+  } else {
+    delete process.env.DB_CREATION_TIMESTAMP_MS;
+  }
+}
+
+function mockNetworkPageNodeCount(networkPageNodeCount?: number) {
+  if (networkPageNodeCount !== undefined) {
+    if (networkPageNodeCount < 1 || networkPageNodeCount > 10) {
+      throw new Error(
+        `networkPageNodeCount must be between 1 and 10, got ${networkPageNodeCount}`,
+      );
+    }
+    process.env.SESSION_MOCK_NETWORK_PAGE_NODE_COUNT =
+      String(networkPageNodeCount);
+    console.info(
+      `   Network Page Node Count: ${process.env.SESSION_MOCK_NETWORK_PAGE_NODE_COUNT}`,
+    );
+  } else {
+    delete process.env.SESSION_MOCK_NETWORK_PAGE_NODE_COUNT;
+  }
+}
+
 const openElectronAppOnly = async (multi: string, context?: TestContext) => {
   process.env.MULTI = `${multi}`;
   // using a v4 uuid, as timestamps to the ms are sometimes the same (when a bunch of workers are started)
   const uniqueId = v4();
   process.env.NODE_APP_INSTANCE = `${MULTI_PREFIX}-devprod-${uniqueId}-${process.env.MULTI}`;
   process.env.NODE_ENV = NODE_ENV;
-  process.env.SESSION_DEBUG = '1';
-  process.env.LOCAL_DEVNET_SEED_URL = 'http://seed2.getsession.org:38157/';
-  // process.env.LOCAL_DEVNET_SEED_URL = 'http://sesh-net:1280'
+  // process.env.SESSION_DEBUG = '1';
+  // process.env.LOCAL_DEVNET_SEED_URL = process.env.LOCAL_DEVNET_SEED_URL ?? 'http://seed2.getsession.org:38157/';
+  // process.env.LOCAL_DEVNET_SEED_URL = 'http://sesh-net.local:1280';
 
   // Inject custom env vars if provided
-  if (context?.dbCreationTimestampMs) {
-    process.env.DB_CREATION_TIMESTAMP_MS = String(
-      context.dbCreationTimestampMs,
-    );
-    const humanReadable = new Date(
-      context.dbCreationTimestampMs,
-    ).toLocaleString('en-AU');
-    console.info(
-      `   DB Creation Timestamp: ${process.env.DB_CREATION_TIMESTAMP_MS} (${humanReadable})`,
-    );
-  } else {
-    // Cleanup for tests without context
-    delete process.env.DB_CREATION_TIMESTAMP_MS;
-  }
+  mockDbCreationTimestamp(context?.dbCreationTimestampMs);
+  mockNetworkPageNodeCount(context?.networkPageNodeCount);
 
-  console.info(`   ${process.env.LOCAL_DEVNET_SEED_URL}`);
+  console.info(
+    `   LOCAL_DEVNET_SEED_URL: ${process.env.LOCAL_DEVNET_SEED_URL}`,
+  );
   console.info(`   NON CI RUN`);
   console.info('   NODE_ENV', process.env.NODE_ENV);
   console.info('   NODE_APP_INSTANCE', process.env.NODE_APP_INSTANCE);
