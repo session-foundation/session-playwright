@@ -246,6 +246,17 @@ export async function checkPathLight(window: Page, maxWait?: number) {
   console.log('Path built correctly, Yay!', pathFilter);
 }
 
+export async function reloadWindow(
+  window: Page,
+  awaitOnionPath: boolean = true,
+) {
+  await window.reload();
+  // Playwright might think the page already reloaded but the path might not be rebuilt yet
+  if (awaitOnionPath) {
+    await checkPathLight(window);
+  }
+}
+
 // ACTIONS
 
 /**
@@ -582,6 +593,32 @@ export async function checkModalStrings(
   const descriptionText = await description.innerText();
   assertTextMatches(headingText, expectedHeading, 'Modal heading');
   assertTextMatches(descriptionText, expectedDescription, 'Modal description');
+}
+
+export async function verifyNoCTAShows(window: Page) {
+  await sleepFor(1_000); // Let the UI settle
+  await Promise.all([
+    hasElementPoppedUpThatShouldnt(
+      window,
+      CTA.heading.strategy,
+      CTA.heading.selector,
+    ),
+    hasElementPoppedUpThatShouldnt(
+      window,
+      CTA.description.strategy,
+      CTA.description.selector,
+    ),
+    hasElementPoppedUpThatShouldnt(
+      window,
+      CTA.confirmButton.strategy,
+      CTA.confirmButton.selector,
+    ),
+    hasElementPoppedUpThatShouldnt(
+      window,
+      CTA.cancelButton.strategy,
+      CTA.cancelButton.selector,
+    ),
+  ]);
 }
 
 export async function checkCTAStrings(

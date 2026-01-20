@@ -251,9 +251,11 @@ export class Global extends Locator {
   );
   static readonly contextMenuItem = this.testId('context-menu-item');
   static readonly continueButton = this.testId('continue-button');
+  static readonly copyUrlButton = this.testId('copy-url-button');
   static readonly errorMessage = this.testId('error-message');
   static readonly loadingSpinner = this.testId('loading-spinner');
   static readonly modalBackButton = this.testId('modal-back-button');
   static readonly modalCloseButton = this.testId('modal-close-button');
+  static readonly openUrlButton = this.testId('open-url-confirm-button');
   static readonly toast = this.testId('session-toast');
 }
