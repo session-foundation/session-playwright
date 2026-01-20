@@ -13,9 +13,11 @@ Once nvm is installed, install the node version declared in the `.nvmrc` file:
 - `nvm install` on linux/macos
 - `nvm install <specific version from the .nvmrc>` on windows
 
-Install yarn & dependencies:
-- `npm install -g yarn`
-- `yarn install --frozen-lockfile`
+Install pnpm:
+You can install it by running `npm install --global pnpm`, but you should read the installation instructions as other methods are better.
+
+Install dependencies:
+- `pnpm install`
 
 ## Config
 
@@ -47,7 +49,7 @@ Create your own config from the `.env.sample` and edit the values to match your 
 ## Test run
 
 To run a specific test, or tests matching a string you can do so with
-`yarn test -g "<string to match>"`.
+`pnpm test -g "<string to match>"`.
 
 To run all the test suite, just do
-`yarn test`.
+`pnpm test`.

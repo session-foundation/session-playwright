@@ -1,5 +1,6 @@
 {
   "name": "session-playwright",
+  "packageManager": "pnpm@10.28.1",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "git@github.com:session-foundation/session-playwright.git",
@@ -15,7 +16,7 @@
     "allure-commandline": "^2.23.1",
     "allure-playwright": "2.6.0",
     "dotenv": "^16.4.5",
-    "electron": "34.2.0",
+    "electron": "40.0.0",
     "eslint": "^8.46.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
@@ -31,14 +32,13 @@
     "uuid": "^9.0.1"
   },
   "scripts": {
-    "build": "yarn tsc --watch",
-    "lint": "yarn prettier . --write --cache && yarn eslint .",
-    "lint-check": "yarn prettier . --check && yarn eslint .",
-    "dev": "yarn tsc --watch",
-    "test": "npx playwright test",
+    "build": "pnpm tsc --watch",
+    "lint": "pnpm prettier . --write --cache && pnpm eslint .",
+    "lint-check": "pnpm prettier . --check && pnpm eslint .",
+    "dev": "pnpm tsc --watch",
+    "test": "pnpx playwright test",
     "watch": "tsc -w",
     "allure-create": "allure generate ./allure-results",
     "allure-open": "allure open ./allure-report"
-  },
-  "dependencies": {}
+  }
 }
