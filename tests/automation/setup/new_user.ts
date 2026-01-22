@@ -1,13 +1,7 @@
 import { Page } from '@playwright/test';
 import chalk from 'chalk';
 
-import {
-  Global,
-  HomeScreen,
-  LeftPane,
-  Onboarding,
-  Settings,
-} from '../locators';
+import { Global, LeftPane, Onboarding, Settings } from '../locators';
 import { User } from '../types/testing';
 import {
   checkPathLight,
@@ -28,7 +22,8 @@ export const newUser = async (
   await typeIntoInput(window, Onboarding.displayNameInput.selector, userName);
   await clickOn(window, Global.continueButton);
   // save recovery phrase
-  await clickOn(window, HomeScreen.revealRecoveryPhraseButton);
+  await clickOn(window, LeftPane.profileButton);
+  await clickOn(window, Settings.recoveryPasswordMenuItem);
   await waitForTestIdWithText(
     window,
     Settings.recoveryPasswordContainer.selector,

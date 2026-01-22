@@ -135,10 +135,9 @@ class SessionReporter implements Reporter {
     _result: TestResult | void,
   ) {
     if (printOngoingTestLogs()) {
+      const asStr = isString(chunk) ? chunk : chunk.toString('utf-8');
       process.stdout.write(
-        `"${test ? `${chalk.cyanBright(test.title)}` : ''}": ${
-          isString(chunk) ? chunk : chunk.toString('utf-8')
-        }`,
+        `"${test ? `${chalk.cyanBright(test.title)}` : ''}": ${asStr}`,
       );
     }
   }
