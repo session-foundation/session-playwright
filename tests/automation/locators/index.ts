@@ -98,7 +98,7 @@ export class Conversation extends Locator {
   );
   static readonly endCallButton = this.testId('end-call');
   static readonly endVoiceMessageButton = this.testId('end-voice-message');
-  static readonly mentionsPopup = this.testId('mentions-popup-row');
+  static readonly mentionsPopup = this.testId('mentions-container-row');
   static readonly messageContent = this.testId('message-content');
 
   static readonly messageInput = this.testId('message-input-text-area');

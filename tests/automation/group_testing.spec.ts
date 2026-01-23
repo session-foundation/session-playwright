@@ -176,15 +176,15 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     await typeIntoInput(aliceWindow1, 'message-input-text-area', '@');
     // does 'message-input-text-area' have aria-expanded: true when @ is typed into input
-    await waitForTestIdWithText(aliceWindow1, 'mentions-popup-row');
+    await waitForTestIdWithText(aliceWindow1, 'mentions-container-row');
     await waitForTestIdWithText(
       aliceWindow1,
-      'mentions-popup-row',
+      'mentions-container-row',
       bob.userName,
     );
     await waitForTestIdWithText(
       aliceWindow1,
-      'mentions-popup-row',
+      'mentions-container-row',
       charlie.userName,
     );
     // ALice tags Bob
@@ -203,15 +203,15 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     await typeIntoInput(bobWindow1, 'message-input-text-area', '@');
     // does 'message-input-text-area' have aria-expanded: true when @ is typed into input
-    await waitForTestIdWithText(bobWindow1, 'mentions-popup-row');
+    await waitForTestIdWithText(bobWindow1, 'mentions-container-row');
     await waitForTestIdWithText(
       bobWindow1,
-      'mentions-popup-row',
+      'mentions-container-row',
       alice.userName,
     );
     await waitForTestIdWithText(
       bobWindow1,
-      'mentions-popup-row',
+      'mentions-container-row',
       charlie.userName,
     );
     // Bob tags Charlie
@@ -230,15 +230,15 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     );
     await typeIntoInput(charlieWindow1, 'message-input-text-area', '@');
     // does 'message-input-text-area' have aria-expanded: true when @ is typed into input
-    await waitForTestIdWithText(charlieWindow1, 'mentions-popup-row');
+    await waitForTestIdWithText(charlieWindow1, 'mentions-container-row');
     await waitForTestIdWithText(
       charlieWindow1,
-      'mentions-popup-row',
+      'mentions-container-row',
       alice.userName,
     );
     await waitForTestIdWithText(
       charlieWindow1,
-      'mentions-popup-row',
+      'mentions-container-row',
       bob.userName,
     );
     // Charlie tags Alice
