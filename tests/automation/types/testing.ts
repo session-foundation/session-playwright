@@ -158,6 +158,7 @@ export type DataTestId =
   | 'manage-members-menu-option'
   | 'market-cap-amount'
   | 'mentions-container-row'
+  | 'mentions-container'
   | 'message-content'
   | 'message-input-text-area'
   | 'message-request-banner'

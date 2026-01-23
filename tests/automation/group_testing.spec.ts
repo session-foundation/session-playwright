@@ -167,7 +167,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     charlieWindow1,
     groupCreated,
   }) => {
-    // in windowA we should be able to mentions bob and userC
+    // Alice should be able to mention all users including themselves
 
     await clickOnWithText(
       aliceWindow1,
@@ -175,8 +175,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     await typeIntoInput(aliceWindow1, 'message-input-text-area', '@');
-    // does 'message-input-text-area' have aria-expanded: true when @ is typed into input
-    await waitForTestIdWithText(aliceWindow1, 'mentions-container-row');
+    await waitForTestIdWithText(aliceWindow1, 'mentions-container-row', 'You');
     await waitForTestIdWithText(
       aliceWindow1,
       'mentions-container-row',
@@ -190,20 +189,19 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // ALice tags Bob
     await clickOnWithText(
       aliceWindow1,
-      Conversation.mentionsPopup,
+      Conversation.mentionsItem,
       bob.userName,
     );
     await waitForMatchingText(bobWindow1, 'You');
 
-    // in windowB we should be able to mentions alice and charlie
+    // Bob should be able to mention all users including themselves
     await clickOnWithText(
       bobWindow1,
       HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     await typeIntoInput(bobWindow1, 'message-input-text-area', '@');
-    // does 'message-input-text-area' have aria-expanded: true when @ is typed into input
-    await waitForTestIdWithText(bobWindow1, 'mentions-container-row');
+    await waitForTestIdWithText(bobWindow1, 'mentions-container-row', 'You');
     await waitForTestIdWithText(
       bobWindow1,
       'mentions-container-row',
@@ -217,20 +215,23 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Bob tags Charlie
     await clickOnWithText(
       bobWindow1,
-      Conversation.mentionsPopup,
+      Conversation.mentionsItem,
       charlie.userName,
     );
     await waitForMatchingText(charlieWindow1, 'You');
 
-    // in charlieWindow1 we should be able to mentions alice and userB
+    // Charlie should be able to mention all users including themselves
     await clickOnWithText(
       charlieWindow1,
       HomeScreen.conversationItemName,
       groupCreated.userName,
     );
     await typeIntoInput(charlieWindow1, 'message-input-text-area', '@');
-    // does 'message-input-text-area' have aria-expanded: true when @ is typed into input
-    await waitForTestIdWithText(charlieWindow1, 'mentions-container-row');
+    await waitForTestIdWithText(
+      charlieWindow1,
+      'mentions-container-row',
+      'You',
+    );
     await waitForTestIdWithText(
       charlieWindow1,
       'mentions-container-row',
@@ -244,7 +245,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // Charlie tags Alice
     await clickOnWithText(
       charlieWindow1,
-      Conversation.mentionsPopup,
+      Conversation.mentionsItem,
       alice.userName,
     );
     await waitForMatchingText(aliceWindow1, 'You');
