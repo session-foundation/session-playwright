@@ -7,17 +7,20 @@ import { replyTo } from './utilities/reply_message';
 import { sendMedia } from './utilities/send_media';
 import { clickOn, clickOnWithText } from './utilities/utils';
 
-test_Alice_2W('Join community', async ({ aliceWindow1, aliceWindow2 }) => {
-  await joinCommunity(aliceWindow1);
-  await clickOn(aliceWindow1, Conversation.scrollToBottomButton);
-  await sendMessage(aliceWindow1, 'Hello, community!');
-  // Check linked device for community
-  await clickOnWithText(
-    aliceWindow2,
-    HomeScreen.conversationItemName,
-    testCommunityName,
-  );
-});
+test_Alice_2W(
+  'Join community and sync',
+  async ({ aliceWindow1, aliceWindow2 }) => {
+    await joinCommunity(aliceWindow1);
+    await clickOn(aliceWindow1, Conversation.scrollToBottomButton);
+    await sendMessage(aliceWindow1, 'Hello, community!');
+    // Check linked device for community
+    await clickOnWithText(
+      aliceWindow2,
+      HomeScreen.conversationItemName,
+      testCommunityName,
+    );
+  },
+);
 
 test_Alice_1W_Bob_1W(
   'Send image to community',

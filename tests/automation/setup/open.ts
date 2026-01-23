@@ -4,6 +4,8 @@ import { isEmpty } from 'lodash';
 import { join } from 'path';
 import { v4 } from 'uuid';
 
+const logNodeConsole = process.env.LOG_NODE_CONSOLE === '1';
+
 export const NODE_ENV = 'production';
 export const MULTI_PREFIX = 'test-integration-';
 const multisAvailable = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -60,9 +62,6 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
   const uniqueId = v4();
   process.env.NODE_APP_INSTANCE = `${MULTI_PREFIX}-devprod-${uniqueId}-${process.env.MULTI}`;
   process.env.NODE_ENV = NODE_ENV;
-  // process.env.SESSION_DEBUG = '1';
-  // process.env.LOCAL_DEVNET_SEED_URL = process.env.LOCAL_DEVNET_SEED_URL ?? 'http://seed2.getsession.org:38157/';
-  // process.env.LOCAL_DEVNET_SEED_URL = 'http://sesh-net.local:1280';
 
   // Inject custom env vars if provided
   mockDbCreationTimestamp(context?.dbCreationTimestampMs);
@@ -82,7 +81,23 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
         '--disable-gpu',
         '--force-device-scale-factor=1', // Normalizes Retina and non-Retina mac screens
       ],
+      env: {
+        ...process.env,
+        ELECTRON_ENABLE_LOGGING: '1',
+        // Optional: control log level
+        ELECTRON_LOG_LEVEL: 'verbose', // 'verbose', 'info', 'warn', 'error'
+      },
     });
+
+    if (logNodeConsole) {
+      electronApp.on('console', (msg) => {
+        const text = msg.text();
+
+        // if (text.includes('[QUERY PLAN]')) {
+        console.log(`[FROM NODE ${msg.type()}]:`, text);
+        // }
+      });
+    }
 
     // When a test closes a window on purpose,
     // the restarted app is considered a child process of the original electronApp.
@@ -106,7 +121,7 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
   }
 };
 
-const logBrowserConsole = false;
+const logBrowserConsole = process.env.LOG_BROWSER_CONSOLE === '1';
 
 const openAppAndWait = async (multi: string, context?: TestContext) => {
   const electronApp = await openElectronAppOnly(multi, context);
