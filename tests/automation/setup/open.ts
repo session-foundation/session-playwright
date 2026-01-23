@@ -85,7 +85,7 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
         ...process.env,
         ELECTRON_ENABLE_LOGGING: '1',
         // Optional: control log level
-        ELECTRON_LOG_LEVEL: 'verbose', // or 'info', 'warn', 'error'
+        ELECTRON_LOG_LEVEL: 'verbose', // 'verbose', 'info', 'warn', 'error'
       },
     });
 
