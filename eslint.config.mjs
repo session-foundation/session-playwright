@@ -9,7 +9,6 @@ export default tseslint.config(
   {
     ignores: [
       '**/node_modules/**',
-      '.yarn/',
       'eslint.config.mjs',
       'run/**/*.js',
       'avd/',
