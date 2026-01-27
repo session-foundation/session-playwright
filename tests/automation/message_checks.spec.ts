@@ -12,6 +12,7 @@ import {
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
+  test_Alice_1W,
   test_Alice_1W_Bob_1W,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
@@ -32,6 +33,7 @@ import {
   clickOnMatchingText,
   clickOnTextMessage,
   clickOnWithText,
+  hasElementPoppedUpThatShouldnt,
   hasTextMessageBeenDeleted,
   measureSendingTime,
   typeIntoInput,
@@ -394,3 +396,83 @@ messageLengthTestCases.forEach((testCase) => {
     },
   );
 });
+
+test_Alice_1W(
+  'Emoji container does not show for links',
+  async ({ aliceWindow1, alice }) => {
+    await clickOn(aliceWindow1, HomeScreen.plusButton);
+    await clickOn(aliceWindow1, HomeScreen.newMessageOption);
+    await typeIntoInput(
+      aliceWindow1,
+      HomeScreen.newMessageAccountIDInput.selector,
+      alice.accountid,
+      true,
+    );
+    await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
+    await typeIntoInput(aliceWindow1, Conversation.messageInput.selector, ':a');
+    await waitForTestIdWithText(
+      aliceWindow1,
+      Conversation.mentionsContainer.selector,
+    );
+    await waitForTestIdWithText(
+      aliceWindow1,
+      Conversation.mentionsItem.selector,
+      ':a:',
+    );
+    await typeIntoInput(
+      aliceWindow1,
+      Conversation.messageInput.selector,
+      'https:/',
+    );
+    await hasElementPoppedUpThatShouldnt(
+      aliceWindow1,
+      Conversation.mentionsContainer.strategy,
+      Conversation.mentionsContainer.selector,
+    );
+    await typeIntoInput(
+      aliceWindow1,
+      Conversation.messageInput.selector,
+      'check this out https:/',
+    );
+    await hasElementPoppedUpThatShouldnt(
+      aliceWindow1,
+      Conversation.mentionsContainer.strategy,
+      Conversation.mentionsContainer.selector,
+    );
+  },
+);
+
+test_Alice_1W(
+  'Emoji container closes when clicking away',
+  async ({ aliceWindow1, alice }) => {
+    await clickOn(aliceWindow1, HomeScreen.plusButton);
+    await clickOn(aliceWindow1, HomeScreen.newMessageOption);
+    await typeIntoInput(
+      aliceWindow1,
+      HomeScreen.newMessageAccountIDInput.selector,
+      alice.accountid,
+      true,
+    );
+    await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
+    await typeIntoInput(
+      aliceWindow1,
+      Conversation.messageInput.selector,
+      'hey check this out :a',
+    );
+    await waitForTestIdWithText(
+      aliceWindow1,
+      Conversation.mentionsContainer.selector,
+    );
+    await waitForTestIdWithText(
+      aliceWindow1,
+      Conversation.mentionsItem.selector,
+      ':a:',
+    );
+    await clickOn(aliceWindow1, Conversation.messageInput);
+    await hasElementPoppedUpThatShouldnt(
+      aliceWindow1,
+      Conversation.mentionsContainer.strategy,
+      Conversation.mentionsContainer.selector,
+    );
+  },
+);
