@@ -137,10 +137,10 @@ test_Alice_2W(
 );
 
 test_Alice_2W(
-  'Profile picture syncs',
+  'Avatar syncs',
   async ({ aliceWindow1, aliceWindow2 }, testInfo) => {
     await clickOn(aliceWindow1, LeftPane.profileButton);
-    // Click on current profile picture
+    // Click on current avatar
     await clickOn(aliceWindow1, Settings.displayName);
     await clickOn(aliceWindow1, Settings.imageUploadSection);
     await clickOn(aliceWindow1, Settings.imageUploadClick);

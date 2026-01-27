@@ -59,7 +59,8 @@ function mockNetworkPageNodeCount(networkPageNodeCount?: number) {
 const openElectronAppOnly = async (multi: string, context?: TestContext) => {
   process.env.MULTI = `${multi}`;
   // using a v4 uuid, as timestamps to the ms are sometimes the same (when a bunch of workers are started)
-  const uniqueId = v4();
+  const fullUniqueId = v4();
+  const uniqueId = fullUniqueId.slice(0, 8);
   process.env.NODE_APP_INSTANCE = `${MULTI_PREFIX}-devprod-${uniqueId}-${process.env.MULTI}`;
   process.env.NODE_ENV = NODE_ENV;
 
