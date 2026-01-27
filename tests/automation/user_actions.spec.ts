@@ -176,7 +176,7 @@ test_Alice_1W_no_network(
   async ({ aliceWindow1 }, testInfo) => {
     // Open profile
     await clickOn(aliceWindow1, LeftPane.profileButton);
-    // Click on current profile picture
+    // Click on current avatar
     await clickOn(aliceWindow1, Settings.displayName);
 
     await clickOn(aliceWindow1, Settings.imageUploadSection);
