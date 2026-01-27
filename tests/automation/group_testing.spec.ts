@@ -25,6 +25,7 @@ import {
   typeIntoInput,
   waitForMatchingText,
   waitForTestIdWithText,
+  waitForTextMessage,
 } from './utilities/utils';
 
 // Note: Note using the group fixture here as we want to test it thoroughly
@@ -167,88 +168,59 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     charlieWindow1,
     groupCreated,
   }) => {
-    // Alice should be able to mention all users including themselves
+    const members = [
+      { user: alice, window: aliceWindow1, others: [bob, charlie] },
+      { user: bob, window: bobWindow1, others: [alice, charlie] },
+      { user: charlie, window: charlieWindow1, others: [alice, bob] },
+    ];
 
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
+    // All users open group conversation
+    await Promise.all(
+      members.map((m) =>
+        clickOnWithText(
+          m.window,
+          HomeScreen.conversationItemName,
+          groupCreated.userName,
+        ),
+      ),
     );
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', '@');
-    await waitForTestIdWithText(aliceWindow1, 'mentions-container-row', 'You');
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'mentions-container-row',
-      bob.userName,
-    );
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'mentions-container-row',
-      charlie.userName,
-    );
-    // ALice tags Bob
-    await clickOnWithText(
-      aliceWindow1,
-      Conversation.mentionsItem,
-      bob.userName,
-    );
-    await waitForMatchingText(bobWindow1, 'You');
 
-    // Bob should be able to mention all users including themselves
-    await clickOnWithText(
-      bobWindow1,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
+    // All users type @ to open mentions
+    await Promise.all(
+      members.map((m) =>
+        typeIntoInput(m.window, 'message-input-text-area', '@'),
+      ),
     );
-    await typeIntoInput(bobWindow1, 'message-input-text-area', '@');
-    await waitForTestIdWithText(bobWindow1, 'mentions-container-row', 'You');
-    await waitForTestIdWithText(
-      bobWindow1,
-      'mentions-container-row',
-      alice.userName,
-    );
-    await waitForTestIdWithText(
-      bobWindow1,
-      'mentions-container-row',
-      charlie.userName,
-    );
-    // Bob tags Charlie
-    await clickOnWithText(
-      bobWindow1,
-      Conversation.mentionsItem,
-      charlie.userName,
-    );
-    await waitForMatchingText(charlieWindow1, 'You');
 
-    // Charlie should be able to mention all users including themselves
-    await clickOnWithText(
-      charlieWindow1,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
+    // All users check mentions dropdown shows "You" + other members
+    await Promise.all(
+      members.flatMap((m) =>
+        ['You', ...m.others.map((o) => o.userName)].map((name) =>
+          waitForTestIdWithText(m.window, 'mentions-container-row', name),
+        ),
+      ),
     );
-    await typeIntoInput(charlieWindow1, 'message-input-text-area', '@');
-    await waitForTestIdWithText(
-      charlieWindow1,
-      'mentions-container-row',
-      'You',
+
+    // All users click on next member (Alice→Bob, Bob→Charlie, Charlie→Alice) and send
+    await Promise.all(
+      members.map(async (m, i) => {
+        await clickOnWithText(
+          m.window,
+          Conversation.mentionsItem,
+          members[(i + 1) % members.length].user.userName,
+        );
+        await clickOn(m.window, Conversation.sendMessageButton);
+      }),
     );
-    await waitForTestIdWithText(
-      charlieWindow1,
-      'mentions-container-row',
-      alice.userName,
+
+    // All users should see all mentions ("You" for their own tag, names for others)
+    await Promise.all(
+      members.flatMap((m) =>
+        ['You', ...m.others.map((o) => o.userName)].map((text) =>
+          waitForTextMessage(m.window, text),
+        ),
+      ),
     );
-    await waitForTestIdWithText(
-      charlieWindow1,
-      'mentions-container-row',
-      bob.userName,
-    );
-    // Charlie tags Alice
-    await clickOnWithText(
-      charlieWindow1,
-      Conversation.mentionsItem,
-      alice.userName,
-    );
-    await waitForMatchingText(aliceWindow1, 'You');
   },
 );
 
