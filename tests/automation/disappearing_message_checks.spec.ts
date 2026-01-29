@@ -13,7 +13,7 @@ import {
   Global,
   HomeScreen,
 } from './locators';
-import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
+import { test_Alice1_Bob1 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
 import { waitForSentTick } from './utilities/message';
@@ -44,7 +44,7 @@ const { timeOption, disappearingMessagesType, disappearAction } =
 
 mediaArray.forEach(
   ({ mediaType, path, attachmentType, shouldCheckMediaPreview }) => {
-    test_Alice_1W_Bob_1W(
+    test_Alice1_Bob1(
       `Send disappearing ${mediaType} 1:1`,
       async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
         const testMessage = `${alice.userName} sending disappearing ${mediaType} to ${bob.userName}`;
@@ -113,7 +113,7 @@ mediaArray.forEach(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   `Send disappearing long text 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const formattedTime = formatTimeOption(timeOption);
@@ -158,7 +158,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   `Send disappearing link preview 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const formattedTime = formatTimeOption(timeOption);
@@ -212,7 +212,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   `Send disappearing community invite 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const formattedTime = formatTimeOption(timeOption);
@@ -306,7 +306,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   `Send disappearing call message 1:1`,
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const formattedTime = formatTimeOption(timeOption);

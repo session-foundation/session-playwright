@@ -1,7 +1,7 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { Global, LeftPane, Settings } from './locators';
-import { test_Alice_1W } from './setup/sessionTest';
+import { test_Alice1 } from './setup/sessionTest';
 import { validateNetworkData } from './utilities/network_api';
 import { compareElementScreenshot } from './utilities/screenshot';
 import {
@@ -12,7 +12,7 @@ import {
   waitForTestIdWithText,
 } from './utilities/utils';
 
-test_Alice_1W('Network page values', async ({ aliceWindow1 }) => {
+test_Alice1('Network page values', async ({ aliceWindow1 }) => {
   await clickOn(aliceWindow1, LeftPane.settingsButton);
   await clickOn(aliceWindow1, Settings.networkPageMenuItem);
 
@@ -53,7 +53,7 @@ test_Alice_1W('Network page values', async ({ aliceWindow1 }) => {
   );
 });
 
-test_Alice_1W('Network page network link', async ({ aliceWindow1 }) => {
+test_Alice1('Network page network link', async ({ aliceWindow1 }) => {
   const url = 'https://docs.getsession.org/session-network';
   await clickOn(aliceWindow1, LeftPane.settingsButton);
   await clickOn(aliceWindow1, Settings.networkPageMenuItem);
@@ -67,7 +67,7 @@ test_Alice_1W('Network page network link', async ({ aliceWindow1 }) => {
   await assertUrlIsReachable(url);
 });
 
-test_Alice_1W('Network page staking link', async ({ aliceWindow1 }) => {
+test_Alice1('Network page staking link', async ({ aliceWindow1 }) => {
   const url = 'https://docs.getsession.org/session-network/staking';
   await clickOn(aliceWindow1, LeftPane.settingsButton);
   await clickOn(aliceWindow1, Settings.networkPageMenuItem);
@@ -81,7 +81,7 @@ test_Alice_1W('Network page staking link', async ({ aliceWindow1 }) => {
   await assertUrlIsReachable(url);
 });
 
-test_Alice_1W('Network page refresh', async ({ aliceWindow1 }) => {
+test_Alice1('Network page refresh', async ({ aliceWindow1 }) => {
   const zeroMinAgoText = englishStrippedStr('updated')
     .withArgs({ relative_time: '0m' })
     .toString();
@@ -114,7 +114,7 @@ test_Alice_1W('Network page refresh', async ({ aliceWindow1 }) => {
 
 // Cycle through all valid node counts and check count + graph
 for (let nodeCount = 1; nodeCount <= 10; nodeCount++) {
-  test_Alice_1W(
+  test_Alice1(
     `Network page node count: ${nodeCount} - dark theme`,
     async ({ aliceWindow1 }, testInfo) => {
       await clickOn(aliceWindow1, LeftPane.settingsButton);
@@ -150,7 +150,7 @@ for (let nodeCount = 1; nodeCount <= 10; nodeCount++) {
 // 7 has been chosen as it's the most common swarm size
 // Single check to verify light mode svg also renders correctly
 const LIGHT_THEME_TEST_NODE_COUNT = 7;
-test_Alice_1W(
+test_Alice1(
   `Network page node count: ${LIGHT_THEME_TEST_NODE_COUNT} - light theme`,
   async ({ aliceWindow1 }, testInfo) => {
     await clickOn(aliceWindow1, LeftPane.settingsButton);

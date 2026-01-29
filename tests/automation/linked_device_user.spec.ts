@@ -14,8 +14,8 @@ import { forceCloseAllWindows } from './setup/closeWindows';
 import { newUser } from './setup/new_user';
 import {
   sessionTestOneWindow,
-  test_Alice_2W,
-  test_Alice_2W_Bob_1W,
+  test_Alice2,
+  test_Alice2_Bob1,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { linkedDevice } from './utilities/linked_device';
@@ -84,7 +84,7 @@ sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
   }
 });
 
-test_Alice_2W(
+test_Alice2(
   'Changed username syncs',
   async ({ aliceWindow1, aliceWindow2 }) => {
     const newUsername = 'Tiny bubble';
@@ -136,7 +136,7 @@ test_Alice_2W(
   },
 );
 
-test_Alice_2W(
+test_Alice2(
   'Avatar syncs',
   async ({ aliceWindow1, aliceWindow2 }, testInfo) => {
     await clickOn(aliceWindow1, LeftPane.profileButton);
@@ -170,7 +170,7 @@ test_Alice_2W(
   },
 );
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Contacts syncs',
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     await createContact(aliceWindow1, bobWindow1, alice, bob);
@@ -184,7 +184,7 @@ test_Alice_2W_Bob_1W(
   },
 );
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Deleted message syncs',
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     const messageToDelete = 'Testing deletion functionality for linked device';
@@ -227,7 +227,7 @@ test_Alice_2W_Bob_1W(
   },
 );
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Unsent message syncs',
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     const unsentMessage = 'Testing unsending functionality for linked device';
@@ -274,7 +274,7 @@ test_Alice_2W_Bob_1W(
   },
 );
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Blocked user syncs',
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     const testMessage = 'Testing blocking functionality for linked device';
@@ -330,7 +330,7 @@ test_Alice_2W_Bob_1W(
   },
 );
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Deleted conversation syncs',
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     // Create contact and send new message
@@ -407,7 +407,7 @@ test_Alice_2W_Bob_1W(
   },
 );
 
-test_Alice_2W(
+test_Alice2(
   'Hide note to self syncs',
   async ({ alice, aliceWindow1, aliceWindow2 }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);

@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 
 import { sleepFor } from '../promise_utils';
 import { Global, HomeScreen, Settings } from './locators';
-import { test_Alice_1W } from './setup/sessionTest';
+import { test_Alice1 } from './setup/sessionTest';
 import {
   joinDefaultCommunity,
   leaveCommunity,
@@ -33,7 +33,7 @@ async function bannerShouldAppear(window: Page) {
   console.log('On home screen, banner is visible');
 }
 
-test_Alice_1W(
+test_Alice1(
   'Recovery password banner appears after >2 conversations',
   async ({ aliceWindow1 }) => {
     await bannerShouldNotAppear(aliceWindow1);
@@ -46,7 +46,7 @@ test_Alice_1W(
   },
 );
 
-test_Alice_1W(
+test_Alice1(
   'Recovery password banner 2 windows',
   async ({ aliceWindow1, alice }) => {
     await joinDefaultCommunity(aliceWindow1, 'Lokinet Updates');
@@ -58,7 +58,7 @@ test_Alice_1W(
   },
 );
 
-test_Alice_1W(
+test_Alice1(
   'Recovery password banner persists when conversation count drops below 3',
   async ({ aliceWindow1 }) => {
     await joinDefaultCommunity(aliceWindow1, 'Lokinet Updates');
@@ -71,7 +71,7 @@ test_Alice_1W(
   },
 );
 
-test_Alice_1W(
+test_Alice1(
   'Recovery password banner disappears after being opened',
   async ({ aliceWindow1 }) => {
     await joinDefaultCommunity(aliceWindow1, 'Lokinet Updates');

@@ -7,7 +7,7 @@ import {
   LeftPane,
   Settings,
 } from './locators';
-import { test_Alice_2W_Bob_1W } from './setup/sessionTest';
+import { test_Alice2_Bob1 } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
 import {
@@ -19,7 +19,7 @@ import {
   waitForTextMessage,
 } from './utilities/utils';
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Accept request syncs',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
     const testMessage = `${bob.userName} sending message request to ${alice.userName}`;
@@ -63,7 +63,7 @@ test_Alice_2W_Bob_1W(
   },
 );
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Decline request syncs',
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     const testMessage = `${bob.userName} sending message request to ${alice.userName}`;
@@ -103,7 +103,7 @@ test_Alice_2W_Bob_1W(
   },
 );
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Message requests block',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
     const testMessage = `Sender: ${bob.userName}, Receiver: ${alice.userName}`;

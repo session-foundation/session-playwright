@@ -1,11 +1,11 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
-import { test_Alice_2W } from './setup/sessionTest';
+import { test_Alice2 } from './setup/sessionTest';
 import {
   hasElementPoppedUpThatShouldnt,
   waitForElement,
 } from './utilities/utils';
 
-test_Alice_2W(
+test_Alice2(
   `Landing page states`,
   async ({ aliceWindow1, aliceWindow2 }, _testInfo) => {
     await Promise.all([

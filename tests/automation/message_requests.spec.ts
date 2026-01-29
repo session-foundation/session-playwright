@@ -8,7 +8,7 @@ import {
   LeftPane,
   Settings,
 } from './locators';
-import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
+import { test_Alice1_Bob1 } from './setup/sessionTest';
 import { joinCommunity } from './utilities/join_community';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -23,7 +23,7 @@ import {
 } from './utilities/utils';
 
 // Open two windows and log into 2 separate accounts
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Message requests accept',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testMessage = `Sender: ${alice.userName} Receiver: ${bob.userName}`;
@@ -56,7 +56,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Message requests text reply',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testMessage = `Sender: ${alice.userName}, Receiver: ${bob.userName}`;
@@ -90,7 +90,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Message requests decline',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testMessage = `Sender: ${alice.userName}, Receiver: ${bob.userName}`;
@@ -129,7 +129,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Message requests clear all',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testMessage = `Sender: ${alice.userName}, Receiver: ${bob.userName}`;
@@ -169,7 +169,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Community message requests on',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     await clickOn(bobWindow1, LeftPane.settingsButton);
@@ -221,7 +221,7 @@ test_Alice_1W_Bob_1W(
     );
   },
 );
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Community message requests off',
   async ({ aliceWindow1, bobWindow1 }) => {
     await Promise.all([joinCommunity(aliceWindow1), joinCommunity(bobWindow1)]);

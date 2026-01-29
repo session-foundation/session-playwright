@@ -12,8 +12,8 @@ import {
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
-  test_Alice_1W,
-  test_Alice_1W_Bob_1W,
+  test_Alice1,
+  test_Alice1_Bob1,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
@@ -46,7 +46,7 @@ import {
 
 mediaArray.forEach(
   ({ mediaType, path, attachmentType, shouldCheckMediaPreview }) => {
-    test_Alice_1W_Bob_1W(
+    test_Alice1_Bob1(
       `Send ${mediaType} 1:1`,
       async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
         const testMessage = `${alice.userName} sending ${mediaType} to ${bob.userName}`;
@@ -90,7 +90,7 @@ mediaArray.forEach(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Send long text 1:1',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testReply = `${bob.userName} replying to long text message from ${alice.userName}`;
@@ -113,7 +113,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Send link 1:1',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testReply = `${bob.userName} replying to link from ${alice.userName}`;
@@ -136,7 +136,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Send community invite',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     await createContact(aliceWindow1, bobWindow1, alice, bob);
@@ -181,7 +181,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Unsend message 1:1',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const unsendMessage = 'Testing unsend functionality';
@@ -218,7 +218,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Delete message 1:1',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const deletedMessage = 'Testing deletion functionality';
@@ -297,7 +297,7 @@ const messageLengthTestCases = [
 ];
 
 messageLengthTestCases.forEach((testCase) => {
-  test_Alice_1W_Bob_1W(
+  test_Alice1_Bob1(
     `Message length limit (${testCase.length} chars)`,
     async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
       await createContact(aliceWindow1, bobWindow1, alice, bob);
@@ -397,7 +397,7 @@ messageLengthTestCases.forEach((testCase) => {
   );
 });
 
-test_Alice_1W(
+test_Alice1(
   'Emoji container does not show for links',
   async ({ aliceWindow1, alice }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);
@@ -442,7 +442,7 @@ test_Alice_1W(
   },
 );
 
-test_Alice_1W(
+test_Alice1(
   'Emoji container closes when clicking away',
   async ({ aliceWindow1, alice }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);

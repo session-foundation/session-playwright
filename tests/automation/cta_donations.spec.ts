@@ -2,7 +2,7 @@ import { Page } from '@playwright/test';
 
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { CTA, Global } from './locators';
-import { test_Alice_1W } from './setup/sessionTest';
+import { test_Alice1 } from './setup/sessionTest';
 import { mockDBCreationTime } from './utilities/time_travel';
 import {
   checkCTAStrings,
@@ -24,7 +24,7 @@ async function verifyDonateCTAShows(window: Page) {
   );
 }
 
-test_Alice_1W(
+test_Alice1(
   'Donate CTA, DB age >= 7 days, max 4 times',
   async ({ aliceWindow1 }) => {
     const MAX_DONATE_CTA_SHOWS = 4;
@@ -52,7 +52,7 @@ const urlModalButtons = [
 ];
 
 urlModalButtons.forEach(({ button, name }) => {
-  test_Alice_1W(
+  test_Alice1(
     `Donate CTA, never shows after clicking ${name} in URL modal`,
     async ({ aliceWindow1 }) => {
       const url = 'https://getsession.org/donate';
@@ -85,7 +85,7 @@ urlModalButtons.forEach(({ button, name }) => {
   );
 });
 
-test_Alice_1W(
+test_Alice1(
   'Donate CTA, DB age < 7 days',
   async ({ aliceWindow1 }) => {
     await verifyNoCTAShows(aliceWindow1);

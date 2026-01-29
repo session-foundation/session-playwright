@@ -3,9 +3,9 @@ import { sleepFor } from '../promise_utils';
 import { defaultDisappearingOptions } from './constants/variables';
 import { Conversation, HomeScreen } from './locators';
 import {
-  test_Alice_2W,
-  test_Alice_2W_Bob_1W,
-  test_group_Alice_2W_Bob_1W_Charlie_1W,
+  test_Alice2,
+  test_Alice2_Bob1,
+  test_group_Alice2_Bob1_Charlie1,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { sendMessage } from './utilities/message';
@@ -25,7 +25,7 @@ import {
   waitForTextMessage,
 } from './utilities/utils';
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Disappear after read 1:1',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
     const { timeOption, disappearingMessagesType, disappearAction } =
@@ -84,7 +84,7 @@ test_Alice_2W_Bob_1W(
   },
 );
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Disappear after send 1:1',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
     const { timeOption, disappearingMessagesType, disappearAction } =
@@ -136,7 +136,7 @@ test_Alice_2W_Bob_1W(
   },
 );
 
-test_group_Alice_2W_Bob_1W_Charlie_1W(
+test_group_Alice2_Bob1_Charlie1(
   'Disappear after send groups',
   async ({
     aliceWindow1,
@@ -192,7 +192,7 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
   },
 );
 
-test_Alice_2W(
+test_Alice2(
   'Disappear after send note to self',
   async ({ alice, aliceWindow1, aliceWindow2 }) => {
     const { timeOption, disappearingMessagesType, disappearAction } =
@@ -239,7 +239,7 @@ test_Alice_2W(
   },
 );
 
-test_Alice_2W_Bob_1W(
+test_Alice2_Bob1(
   'Disappear after send off 1:1',
   async ({ alice, bob, aliceWindow1, aliceWindow2, bobWindow1 }) => {
     const { disappearAction, disappearingMessagesType, timeOption } =
