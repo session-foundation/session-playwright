@@ -12,8 +12,8 @@ import {
 import { openApp } from './setup/open';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import {
-  test_group_Alice_1W_Bob_1W_Charlie_1W,
-  test_group_Alice_2W_Bob_1W_Charlie_1W,
+  test_group_Alice1_Bob1_Charlie1,
+  test_group_Alice2_Bob1_Charlie1,
 } from './setup/sessionTest';
 import { leaveGroup } from './utilities/leave_group';
 import {
@@ -25,7 +25,7 @@ import {
   waitForTestIdWithText,
 } from './utilities/utils';
 
-test_group_Alice_2W_Bob_1W_Charlie_1W(
+test_group_Alice2_Bob1_Charlie1(
   'Leaving group syncs',
   async ({
     aliceWindow1,
@@ -88,7 +88,7 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
   },
 );
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
+test_group_Alice1_Bob1_Charlie1(
   'Restore group',
   async ({ alice, bob, charlie, groupCreated }) => {
     const [aliceWindow2] = await openApp(1);
@@ -173,7 +173,7 @@ async function clearDataOnWindow(window: Page) {
 }
 
 // Delete device data > Restore account
-test_group_Alice_1W_Bob_1W_Charlie_1W(
+test_group_Alice1_Bob1_Charlie1(
   'Delete and restore group',
   async ({ alice, bob, charlie, groupCreated }) => {
     const [aliceWindow2] = await openApp(1);
@@ -313,7 +313,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   },
 );
 
-test_group_Alice_2W_Bob_1W_Charlie_1W(
+test_group_Alice2_Bob1_Charlie1(
   'Delete group linked device',
   async ({
     aliceWindow1,

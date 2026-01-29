@@ -3,7 +3,7 @@ import { Page } from '@playwright/test';
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { Global, LeftPane, Settings } from './locators';
-import { test_Alice_1W_no_network } from './setup/sessionTest';
+import { test_Alice1_no_network } from './setup/sessionTest';
 import {
   clickOn,
   clickOnMatchingText,
@@ -27,7 +27,7 @@ async function expectRecoveryPhraseToBeVisible(
   );
 }
 
-test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
+test_Alice1_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   // Click on settings tab
   await clickOn(aliceWindow1, LeftPane.settingsButton);
   // Click on privacy
@@ -108,7 +108,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   );
 });
 
-test_Alice_1W_no_network(
+test_Alice1_no_network(
   'Wrong Password',
   async ({ alice: { recoveryPassword }, aliceWindow1 }) => {
     // Check if incorrect password works

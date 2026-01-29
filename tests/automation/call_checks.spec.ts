@@ -1,6 +1,6 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { Global, HomeScreen } from './locators';
-import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
+import { test_Alice1_Bob1 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import {
   clickOn,
@@ -9,7 +9,7 @@ import {
 } from './utilities/utils';
 import { makeVoiceCall } from './utilities/voice_call';
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Voice calls',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     await createContact(aliceWindow1, bobWindow1, alice, bob);

@@ -1,13 +1,13 @@
 import { testCommunityName } from './constants/community';
 import { Conversation, HomeScreen } from './locators';
-import { test_Alice_1W_Bob_1W, test_Alice_2W } from './setup/sessionTest';
+import { test_Alice1_Bob1, test_Alice2 } from './setup/sessionTest';
 import { joinCommunity } from './utilities/join_community';
 import { sendMessage } from './utilities/message';
 import { replyTo } from './utilities/reply_message';
 import { sendMedia } from './utilities/send_media';
 import { clickOn, clickOnWithText } from './utilities/utils';
 
-test_Alice_2W(
+test_Alice2(
   'Join community and sync',
   async ({ aliceWindow1, aliceWindow2 }) => {
     await joinCommunity(aliceWindow1);
@@ -22,7 +22,7 @@ test_Alice_2W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Send image to community',
   async ({ alice, bob, aliceWindow1, bobWindow1 }) => {
     const mediaPath = 'sample_files/test-image.png';

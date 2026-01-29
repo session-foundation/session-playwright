@@ -5,7 +5,7 @@ import {
   mediaArray,
   testLink,
 } from './constants/variables';
-import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
+import { test_group_Alice1_Bob1_Charlie1 } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import {
   sendLinkPreview,
@@ -27,7 +27,7 @@ const { timeOption, disappearingMessagesType, disappearAction } =
   defaultDisappearingOptions.group;
 
 mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
-  test_group_Alice_1W_Bob_1W_Charlie_1W(
+  test_group_Alice1_Bob1_Charlie1(
     `Send disappearing ${mediaType} groups`,
     async ({
       alice,
@@ -84,7 +84,7 @@ mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
   );
 });
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
+test_group_Alice1_Bob1_Charlie1(
   'Send disappearing long text to groups',
   async ({ aliceWindow1, bobWindow1, charlieWindow1 }) => {
     await setDisappearingMessages(aliceWindow1, [
@@ -106,7 +106,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   },
 );
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
+test_group_Alice1_Bob1_Charlie1(
   'Send disappearing link to groups',
   async ({ aliceWindow1, bobWindow1, charlieWindow1 }) => {
     await setDisappearingMessages(aliceWindow1, [

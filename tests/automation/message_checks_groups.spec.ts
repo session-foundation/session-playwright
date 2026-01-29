@@ -1,7 +1,7 @@
 import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { sleepFor } from '../promise_utils';
 import { longText, mediaArray, testLink } from './constants/variables';
-import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
+import { test_group_Alice1_Bob1_Charlie1 } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import { replyTo, replyToMedia } from './utilities/reply_message';
 import {
@@ -23,7 +23,7 @@ import {
 } from './utilities/utils';
 
 mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
-  test_group_Alice_1W_Bob_1W_Charlie_1W(
+  test_group_Alice1_Bob1_Charlie1(
     `Send ${mediaType} to group`,
     async ({
       alice,
@@ -89,7 +89,7 @@ mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
   );
 });
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
+test_group_Alice1_Bob1_Charlie1(
   'Send long text to group',
   async ({
     alice,
@@ -118,7 +118,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   },
 );
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
+test_group_Alice1_Bob1_Charlie1(
   'Send link to group',
   async ({
     alice,
@@ -155,7 +155,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   },
 );
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
+test_group_Alice1_Bob1_Charlie1(
   'Unsend message to group',
   async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
     const unsendMessage = `Testing unsend functionality in ${groupCreated.userName}`;
@@ -203,7 +203,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   },
 );
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
+test_group_Alice1_Bob1_Charlie1(
   'Delete message to group',
   async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
     const deletedMessage = `Testing delete message functionality in ${groupCreated.userName}`;

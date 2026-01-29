@@ -108,6 +108,45 @@
   dependencies:
     playwright "1.51.1"
 
+"@session-foundation/basic-types@0.0.6", "@session-foundation/basic-types@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@session-foundation/basic-types/-/basic-types-0.0.6.tgz#c141fb0b82af0ef6aafd8e9f4f68becc29bbfd75"
+  integrity sha512-7+ztoNhirWfCeiPbUFTWplI9Crk65UAiye0dGoKf9TWBTobyUis5PB57ySxUTA0putWlHss366wCtHsX51uzHg==
+  dependencies:
+    buffer-crc32 "^1.0.0"
+
+"@session-foundation/libsession-wasm@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@session-foundation/libsession-wasm/-/libsession-wasm-0.0.7.tgz#0294c62746fc21b11211b37188ac3868d474f0ab"
+  integrity sha512-j8tJgsDZhWFtUkm8pEPzfhFUFBNDtCNA46WShWgPSn1fU2h0C/96pC7DmSVEdVGW3nXTJ4XoOSaVd816iBAh1g==
+
+"@session-foundation/mnemonic@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@session-foundation/mnemonic/-/mnemonic-0.0.8.tgz#241c96d63dbfb93ae5f266780043540a64ad109a"
+  integrity sha512-8YCHnNDEiWdX46wy5knvXN/601J7Vs8mkqwf+4OCJP8ksnHz8CVZDpdwO/RVx1DwDx9fYZLd4OqugY/JexPdoQ==
+  dependencies:
+    buffer-crc32 "^1.0.0"
+
+"@session-foundation/qa-seeder@^0.1.23":
+  version "0.1.23"
+  resolved "https://registry.yarnpkg.com/@session-foundation/qa-seeder/-/qa-seeder-0.1.23.tgz#d2622ba8af9397b5596b1714e52e3a6230272036"
+  integrity sha512-GMXVqgBoPEHJpsXMOtxoXBi49wXh1JjHkn8pvGN767+gdfwfX2GXxdK3bHvA0LYpLJdSXgUXiUtWo5IMmrHbVg==
+  dependencies:
+    "@session-foundation/basic-types" "^0.0.6"
+    "@session-foundation/libsession-wasm" "^0.0.7"
+    "@session-foundation/mnemonic" "^0.0.8"
+    "@session-foundation/sodium" "^0.0.6"
+    lodash "^4.17.21"
+
+"@session-foundation/sodium@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@session-foundation/sodium/-/sodium-0.0.6.tgz#40b518927b220df897cb14281f7e0c0644bab9bf"
+  integrity sha512-PDecdG3LR9rOinPHGVlTaJc1E0e2SS6ctfFhfgrEbEW3ZWymLXO5D36oAfNY1yuxM2QyiXCO+L99IPv4biGZgw==
+  dependencies:
+    "@session-foundation/basic-types" "0.0.6"
+    buffer-crc32 "^1.0.0"
+    libsodium-wrappers-sumo "^0.7.15"
+
 "@sindresorhus/is@^4.0.0":
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-4.6.0.tgz#3c7c9c46e678feefe7a2e5bb609d3dbd665ffb3f"
@@ -522,6 +561,11 @@ braces@^3.0.3:
   integrity sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==
   dependencies:
     fill-range "^7.1.1"
+
+buffer-crc32@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/buffer-crc32/-/buffer-crc32-1.0.0.tgz#a10993b9055081d55304bd9feb4a072de179f405"
+  integrity sha512-Db1SbgBS/fg/392AblrMJk97KggmvYhr4pB5ZIMTWtaivCPMWLkmb7m21cJvpvgK+J3nsU2CmmixNBZx4vFj/w==
 
 buffer-crc32@~0.2.3:
   version "0.2.13"
@@ -1541,6 +1585,18 @@ levn@^0.4.1:
   dependencies:
     prelude-ls "^1.2.1"
     type-check "~0.4.0"
+
+libsodium-sumo@^0.7.16:
+  version "0.7.16"
+  resolved "https://registry.yarnpkg.com/libsodium-sumo/-/libsodium-sumo-0.7.16.tgz#85037acdf9029296373bf2a9f078930a723eedb5"
+  integrity sha512-x6atrz2AdXCJg6G709x9W9TTJRI6/0NcL5dD0l5GGVqNE48UJmDsjO4RUWYTeyXXUpg+NXZ2SHECaZnFRYzwGA==
+
+libsodium-wrappers-sumo@^0.7.15:
+  version "0.7.16"
+  resolved "https://registry.yarnpkg.com/libsodium-wrappers-sumo/-/libsodium-wrappers-sumo-0.7.16.tgz#53838cabe5d99768a3c070bdb65cd0043e0d0bfd"
+  integrity sha512-gR0JEFPeN3831lB9+ogooQk0KH4K5LSMIO5Prd5Q5XYR2wHFtZfPg0eP7t1oJIWq+UIzlU4WVeBxZ97mt28tXw==
+  dependencies:
+    libsodium-sumo "^0.7.16"
 
 locate-path@^6.0.0:
   version "6.0.0"

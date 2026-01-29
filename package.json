@@ -7,6 +7,7 @@
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.51",
+    "@session-foundation/qa-seeder": "^0.1.23",
     "@types/fs-extra": "^11.0.1",
     "@types/lodash": "^4.14.196",
     "@types/uuid": "^9.0.8",

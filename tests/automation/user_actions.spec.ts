@@ -12,9 +12,9 @@ import {
 import { newUser } from './setup/new_user';
 import {
   sessionTestTwoWindows,
-  test_Alice_1W_Bob_1W,
-  test_Alice_1W_no_network,
-  test_Alice_2W,
+  test_Alice1_Bob1,
+  test_Alice1_no_network,
+  test_Alice2,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { sendMessage, waitForReadTick } from './utilities/message';
@@ -70,7 +70,7 @@ sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
   ]);
 });
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Block user in conversation list',
   async ({ aliceWindow1, bobWindow1, alice, bob }) => {
     // Create contact and send new message
@@ -144,7 +144,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
+test_Alice1_no_network('Change username', async ({ aliceWindow1 }) => {
   const newUsername = 'Tiny bubble';
   // Open Profile
   await clickOn(aliceWindow1, LeftPane.profileButton);
@@ -171,43 +171,40 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   await clickOn(aliceWindow1, Global.modalCloseButton);
 });
 
-test_Alice_1W_no_network(
-  'Change avatar',
-  async ({ aliceWindow1 }, testInfo) => {
-    // Open profile
-    await clickOn(aliceWindow1, LeftPane.profileButton);
-    // Click on current avatar
-    await clickOn(aliceWindow1, Settings.displayName);
+test_Alice1_no_network('Change avatar', async ({ aliceWindow1 }, testInfo) => {
+  // Open profile
+  await clickOn(aliceWindow1, LeftPane.profileButton);
+  // Click on current avatar
+  await clickOn(aliceWindow1, Settings.displayName);
 
-    await clickOn(aliceWindow1, Settings.imageUploadSection);
-    await clickOn(aliceWindow1, Settings.imageUploadClick);
-    // allow for the image to be resized before we try to save it
-    await sleepFor(500);
-    await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
-    await waitForLoadingAnimationToFinish(
-      aliceWindow1,
-      Global.loadingSpinner.selector,
-    );
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('save').toString(),
-    );
-    await clickOn(aliceWindow1, Global.modalCloseButton);
-    await sleepFor(500);
-    const leftpaneAvatarContainer = await waitForTestIdWithText(
-      aliceWindow1,
-      LeftPane.profileButton.selector,
-    );
+  await clickOn(aliceWindow1, Settings.imageUploadSection);
+  await clickOn(aliceWindow1, Settings.imageUploadClick);
+  // allow for the image to be resized before we try to save it
+  await sleepFor(500);
+  await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
+  await waitForLoadingAnimationToFinish(
+    aliceWindow1,
+    Global.loadingSpinner.selector,
+  );
+  await clickOnMatchingText(
+    aliceWindow1,
+    englishStrippedStr('save').toString(),
+  );
+  await clickOn(aliceWindow1, Global.modalCloseButton);
+  await sleepFor(500);
+  const leftpaneAvatarContainer = await waitForTestIdWithText(
+    aliceWindow1,
+    LeftPane.profileButton.selector,
+  );
 
-    await compareElementScreenshot({
-      element: leftpaneAvatarContainer,
-      snapshotName: 'avatar-updated-blue.jpeg',
-      testInfo,
-    });
-  },
-);
+  await compareElementScreenshot({
+    element: leftpaneAvatarContainer,
+    snapshotName: 'avatar-updated-blue.jpeg',
+    testInfo,
+  });
+});
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Set nickname',
   async ({ aliceWindow1, bobWindow1, alice, bob }) => {
     const nickname = 'new nickname for Bob';
@@ -253,7 +250,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Read status',
   async ({ aliceWindow1, bobWindow1, alice, bob }) => {
     await createContact(aliceWindow1, bobWindow1, alice, bob);
@@ -298,7 +295,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_1W_Bob_1W(
+test_Alice1_Bob1(
   'Delete conversation',
   async ({ aliceWindow1, bobWindow1, alice, bob }) => {
     // Create contact and send new message
@@ -363,7 +360,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-test_Alice_2W(
+test_Alice2(
   'Hide recovery password',
   async ({ aliceWindow1, aliceWindow2 }) => {
     await clickOn(aliceWindow1, LeftPane.settingsButton);
@@ -411,7 +408,7 @@ test_Alice_2W(
   },
 );
 
-test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
+test_Alice1_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   await clickOn(aliceWindow1, HomeScreen.plusButton);
   await clickOn(aliceWindow1, HomeScreen.inviteAFriendOption);
   await waitForTestIdWithText(aliceWindow1, 'your-account-id', alice.accountid);
@@ -448,54 +445,51 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   );
 });
 
-test_Alice_1W_no_network(
-  'Hide note to self',
-  async ({ aliceWindow1, alice }) => {
-    await clickOn(aliceWindow1, HomeScreen.plusButton);
-    await clickOn(aliceWindow1, HomeScreen.newMessageOption);
-    await typeIntoInput(
-      aliceWindow1,
-      'new-session-conversation',
-      alice.accountid,
-    );
-    await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
-    await waitForTestIdWithText(
-      aliceWindow1,
-      Conversation.conversationHeader.selector,
-      englishStrippedStr('noteToSelf').toString(),
-    );
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      englishStrippedStr('noteToSelf').toString(),
-      { rightButton: true },
-    );
-    await clickOnWithText(
-      aliceWindow1,
-      Global.contextMenuItem,
-      englishStrippedStr('noteToSelfHide').toString(),
-    );
-    await checkModalStrings(
-      aliceWindow1,
-      englishStrippedStr('noteToSelfHide').toString(),
-      englishStrippedStr('noteToSelfHideDescription').toString(),
-    );
-    await clickOnWithText(
-      aliceWindow1,
-      Global.confirmButton,
-      englishStrippedStr('hide').toString(),
-    );
-    await hasElementBeenDeleted(
-      aliceWindow1,
-      'data-testid',
-      'module-conversation__user__profile-name',
-      5000,
-      englishStrippedStr('noteToSelf').toString(),
-    );
-  },
-);
+test_Alice1_no_network('Hide note to self', async ({ aliceWindow1, alice }) => {
+  await clickOn(aliceWindow1, HomeScreen.plusButton);
+  await clickOn(aliceWindow1, HomeScreen.newMessageOption);
+  await typeIntoInput(
+    aliceWindow1,
+    'new-session-conversation',
+    alice.accountid,
+  );
+  await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
+  await waitForTestIdWithText(
+    aliceWindow1,
+    Conversation.conversationHeader.selector,
+    englishStrippedStr('noteToSelf').toString(),
+  );
+  await clickOnWithText(
+    aliceWindow1,
+    HomeScreen.conversationItemName,
+    englishStrippedStr('noteToSelf').toString(),
+    { rightButton: true },
+  );
+  await clickOnWithText(
+    aliceWindow1,
+    Global.contextMenuItem,
+    englishStrippedStr('noteToSelfHide').toString(),
+  );
+  await checkModalStrings(
+    aliceWindow1,
+    englishStrippedStr('noteToSelfHide').toString(),
+    englishStrippedStr('noteToSelfHideDescription').toString(),
+  );
+  await clickOnWithText(
+    aliceWindow1,
+    Global.confirmButton,
+    englishStrippedStr('hide').toString(),
+  );
+  await hasElementBeenDeleted(
+    aliceWindow1,
+    'data-testid',
+    'module-conversation__user__profile-name',
+    5000,
+    englishStrippedStr('noteToSelf').toString(),
+  );
+});
 
-test_Alice_1W_no_network('Toggle password', async ({ aliceWindow1 }) => {
+test_Alice1_no_network('Toggle password', async ({ aliceWindow1 }) => {
   await clickOn(aliceWindow1, LeftPane.settingsButton);
   await clickOn(aliceWindow1, Settings.recoveryPasswordMenuItem);
   await waitForTestIdWithText(
@@ -522,7 +516,7 @@ test_Alice_1W_no_network('Toggle password', async ({ aliceWindow1 }) => {
   );
 });
 
-test_Alice_2W(
+test_Alice2(
   'Consistent avatar colours',
   async ({ aliceWindow1, aliceWindow2 }) => {
     const avatarColors = await Promise.all(
