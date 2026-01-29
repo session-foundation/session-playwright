@@ -132,6 +132,7 @@ export class Settings extends Locator {
   // Profile
   static readonly accountId = this.testId('your-account-id');
   static readonly displayName = this.testId('your-profile-name');
+  static readonly profilePicture = this.testId('avatar-edit-profile-dialog');
   // Update Profile Information
   static readonly displayNameInput = this.testId(
     'update-profile-info-name-input',

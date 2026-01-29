@@ -80,6 +80,7 @@ export type DataTestId =
   | 'accept-message-request'
   | 'appearance-settings-menu-item'
   | 'audio-player'
+  | 'avatar-edit-profile-dialog'
   | 'back-button'
   | 'blocked-contacts-settings-row'
   | 'call-button'
