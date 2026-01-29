@@ -36,7 +36,7 @@
     "lint-check": "yarn prettier . --check && yarn eslint .",
     "dev": "yarn tsc --watch",
     "test": "npx playwright test",
-    "test-rerun": "PLAYWRIGHT_WORKERS_COUNT=1 npx playwright test --last-failed",
+    "test-rerun": "PLAYWRIGHT_WORKERS_COUNT=1 PRINT_FAILED_TEST_LOGS=1 npx playwright test --last-failed",
     "watch": "tsc -w",
     "sync": "./sync-localization.sh",
     "allure-create": "allure generate ./allure-results",
