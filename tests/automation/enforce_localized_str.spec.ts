@@ -295,6 +295,8 @@ function getExpectedStringFromKey(
       return 'Want to send longer messages? Send more text and unlock premium features with Session Pro Beta';
     case 'proFeatureListLoadsMore':
       return 'Plus loads more exclusive features';
+    case 'remove':
+      return 'Remove';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
