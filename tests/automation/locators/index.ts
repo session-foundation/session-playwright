@@ -98,7 +98,8 @@ export class Conversation extends Locator {
   );
   static readonly endCallButton = this.testId('end-call');
   static readonly endVoiceMessageButton = this.testId('end-voice-message');
-  static readonly mentionsPopup = this.testId('mentions-popup-row');
+  static readonly mentionsContainer = this.testId('mentions-container'); // This is also the locator for emojis
+  static readonly mentionsItem = this.testId('mentions-container-row'); // This is also the locator for emojis
   static readonly messageContent = this.testId('message-content');
 
   static readonly messageInput = this.testId('message-input-text-area');
@@ -131,6 +132,7 @@ export class Settings extends Locator {
   // Profile
   static readonly accountId = this.testId('your-account-id');
   static readonly displayName = this.testId('your-profile-name');
+  static readonly profilePicture = this.testId('avatar-edit-profile-dialog');
   // Update Profile Information
   static readonly displayNameInput = this.testId(
     'update-profile-info-name-input',
@@ -251,9 +253,11 @@ export class Global extends Locator {
   );
   static readonly contextMenuItem = this.testId('context-menu-item');
   static readonly continueButton = this.testId('continue-button');
+  static readonly copyUrlButton = this.testId('copy-url-button');
   static readonly errorMessage = this.testId('error-message');
   static readonly loadingSpinner = this.testId('loading-spinner');
   static readonly modalBackButton = this.testId('modal-back-button');
   static readonly modalCloseButton = this.testId('modal-close-button');
+  static readonly openUrlButton = this.testId('open-url-confirm-button');
   static readonly toast = this.testId('session-toast');
 }

@@ -1,24 +1,42 @@
+import { Page } from '@playwright/test';
+
 import { englishStrippedStr } from '../localization/englishStrippedStr';
-import { CTA } from './locators';
-import { test_Alice_1W_no_network } from './setup/sessionTest';
+import { CTA, Global } from './locators';
+import { test_Alice_1W } from './setup/sessionTest';
 import { mockDBCreationTime } from './utilities/time_travel';
 import {
   checkCTAStrings,
-  hasElementPoppedUpThatShouldnt,
+  checkModalStrings,
+  clickOn,
+  reloadWindow,
+  verifyNoCTAShows,
 } from './utilities/utils';
 
-test_Alice_1W_no_network(
-  'Donate CTA, DB age >= 7 days',
+async function verifyDonateCTAShows(window: Page) {
+  await checkCTAStrings(
+    window,
+    englishStrippedStr('donateSessionHelp').toString(),
+    englishStrippedStr('donateSessionDescription').toString(),
+    [
+      englishStrippedStr('donate').toString(),
+      englishStrippedStr('maybeLater').toString(),
+    ],
+  );
+}
+
+test_Alice_1W(
+  'Donate CTA, DB age >= 7 days, max 4 times',
   async ({ aliceWindow1 }) => {
-    await checkCTAStrings(
-      aliceWindow1,
-      englishStrippedStr('donateSessionHelp').toString(),
-      englishStrippedStr('donateSessionDescription').toString(),
-      [
-        englishStrippedStr('donate').toString(),
-        englishStrippedStr('maybeLater').toString(),
-      ],
-    );
+    const MAX_DONATE_CTA_SHOWS = 4;
+
+    // Check CTA appears for the first MAX_DONATE_CTA_SHOWS times
+    for (let i = 0; i < MAX_DONATE_CTA_SHOWS; i++) {
+      await verifyDonateCTAShows(aliceWindow1);
+      await reloadWindow(aliceWindow1);
+    }
+
+    // Verify CTA doesn't appear after MAX_DONATE_CTA_SHOWS reloads
+    await verifyNoCTAShows(aliceWindow1);
   },
   {
     dbCreationTimestampMs: mockDBCreationTime({
@@ -28,31 +46,49 @@ test_Alice_1W_no_network(
   },
 );
 
-test_Alice_1W_no_network(
+const urlModalButtons = [
+  { button: Global.openUrlButton, name: 'Open' },
+  { button: Global.copyUrlButton, name: 'Copy' },
+];
+
+urlModalButtons.forEach(({ button, name }) => {
+  test_Alice_1W(
+    `Donate CTA, never shows after clicking ${name} in URL modal`,
+    async ({ aliceWindow1 }) => {
+      const url = 'https://getsession.org/donate';
+
+      // First time: CTA should appear
+      await verifyDonateCTAShows(aliceWindow1);
+
+      await clickOn(aliceWindow1, CTA.confirmButton);
+      await checkModalStrings(
+        aliceWindow1,
+        englishStrippedStr('urlOpen').toString(),
+        englishStrippedStr('urlOpenDescription').withArgs({ url }).toString(),
+        'openUrlModal',
+      );
+
+      // Click the Open or Copy button
+      // Note: "Open" spawns a system browser outside Playwright's control
+      await clickOn(aliceWindow1, button);
+
+      // Reload and verify CTA never appears again
+      await reloadWindow(aliceWindow1);
+      await verifyNoCTAShows(aliceWindow1);
+    },
+    {
+      dbCreationTimestampMs: mockDBCreationTime({
+        days: -7,
+        minutes: -2,
+      }),
+    },
+  );
+});
+
+test_Alice_1W(
   'Donate CTA, DB age < 7 days',
   async ({ aliceWindow1 }) => {
-    await Promise.all([
-      hasElementPoppedUpThatShouldnt(
-        aliceWindow1,
-        CTA.heading.strategy,
-        CTA.heading.selector,
-      ),
-      hasElementPoppedUpThatShouldnt(
-        aliceWindow1,
-        CTA.description.strategy,
-        CTA.description.selector,
-      ),
-      hasElementPoppedUpThatShouldnt(
-        aliceWindow1,
-        CTA.confirmButton.strategy,
-        CTA.confirmButton.selector,
-      ),
-      hasElementPoppedUpThatShouldnt(
-        aliceWindow1,
-        CTA.cancelButton.strategy,
-        CTA.cancelButton.selector,
-      ),
-    ]);
+    await verifyNoCTAShows(aliceWindow1);
   },
   {
     dbCreationTimestampMs: mockDBCreationTime({

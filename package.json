@@ -39,6 +39,7 @@
     "lint-check": "pnpm prettier . --check && pnpm eslint .",
     "dev": "pnpm tsc --watch",
     "test": "playwright test",
+    "test-rerun": "PLAYWRIGHT_WORKERS_COUNT=1 PRINT_FAILED_TEST_LOGS=1 npx playwright test --last-failed",
     "watch": "tsc -w",
     "sync": "./sync-localization.sh",
     "allure-create": "allure generate ./allure-results",

@@ -33,6 +33,10 @@ import {
   waitForTestIdWithText,
 } from './utilities/utils';
 
+const cancelString = englishStrippedStr('cancel').toString();
+const saveString = englishStrippedStr('save').toString();
+const removeString = englishStrippedStr('remove').toString();
+
 // Send message in one to one conversation with new contact
 sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
   // no fixture for that one
@@ -156,10 +160,7 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
     Settings.displayNameInput.selector,
     newUsername,
   );
-  await clickOnMatchingText(
-    aliceWindow1,
-    englishStrippedStr('save').toString(),
-  );
+  await clickOnMatchingText(aliceWindow1, saveString);
   await sleepFor(1000);
   // verify name change
   expect(
@@ -171,41 +172,76 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   await clickOn(aliceWindow1, Global.modalCloseButton);
 });
 
-test_Alice_1W_no_network(
-  'Change avatar',
-  async ({ aliceWindow1 }, testInfo) => {
-    // Open profile
-    await clickOn(aliceWindow1, LeftPane.profileButton);
-    // Click on current profile picture
-    await clickOn(aliceWindow1, Settings.displayName);
+test_Alice_1W_no_network('Add avatar', async ({ aliceWindow1 }, testInfo) => {
+  await clickOn(aliceWindow1, LeftPane.profileButton);
+  await clickOn(aliceWindow1, Settings.displayName);
+  await clickOn(aliceWindow1, Settings.imageUploadSection);
+  await clickOn(aliceWindow1, Settings.imageUploadClick);
+  await sleepFor(500);
+  await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
+  await waitForLoadingAnimationToFinish(
+    aliceWindow1,
+    Global.loadingSpinner.selector,
+  );
+  // Cancel button should not be visible if you added an avatar
+  await expect(
+    aliceWindow1.getByRole('button').filter({ hasText: cancelString }),
+  ).toBeHidden();
+  await clickOnMatchingText(aliceWindow1, saveString);
+  await clickOn(aliceWindow1, Global.modalCloseButton);
+  await sleepFor(500);
+  const leftpaneAvatarContainer = await waitForTestIdWithText(
+    aliceWindow1,
+    LeftPane.profileButton.selector,
+  );
+  await compareElementScreenshot({
+    element: leftpaneAvatarContainer,
+    snapshotName: 'avatar-updated-blue.jpeg',
+    testInfo,
+  });
+});
 
-    await clickOn(aliceWindow1, Settings.imageUploadSection);
-    await clickOn(aliceWindow1, Settings.imageUploadClick);
-    // allow for the image to be resized before we try to save it
-    await sleepFor(500);
-    await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
-    await waitForLoadingAnimationToFinish(
-      aliceWindow1,
-      Global.loadingSpinner.selector,
-    );
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('save').toString(),
-    );
-    await clickOn(aliceWindow1, Global.modalCloseButton);
-    await sleepFor(500);
-    const leftpaneAvatarContainer = await waitForTestIdWithText(
-      aliceWindow1,
-      LeftPane.profileButton.selector,
-    );
-
-    await compareElementScreenshot({
-      element: leftpaneAvatarContainer,
-      snapshotName: 'avatar-updated-blue.jpeg',
-      testInfo,
-    });
-  },
-);
+test_Alice_1W_no_network('Remove avatar', async ({ aliceWindow1 }) => {
+  await clickOn(aliceWindow1, LeftPane.profileButton);
+  await clickOn(aliceWindow1, Settings.displayName);
+  await clickOn(aliceWindow1, Settings.imageUploadSection);
+  await clickOn(aliceWindow1, Settings.imageUploadClick);
+  await sleepFor(500);
+  await clickOn(aliceWindow1, Settings.saveProfileUpdateButton);
+  await waitForLoadingAnimationToFinish(
+    aliceWindow1,
+    Global.loadingSpinner.selector,
+  );
+  await clickOnMatchingText(aliceWindow1, saveString);
+  await clickOn(aliceWindow1, Global.modalCloseButton);
+  await sleepFor(500);
+  // Verify that an img is present (avatar upload succeeded) but don't do full image comparison
+  await expect(
+    aliceWindow1.getByTestId(LeftPane.profileButton.selector).locator('img'),
+  ).toBeVisible();
+  await clickOn(aliceWindow1, LeftPane.profileButton);
+  await clickOn(aliceWindow1, Settings.displayName);
+  await clickOn(aliceWindow1, Settings.imageUploadSection);
+  await aliceWindow1.getByText(removeString).click();
+  await waitForLoadingAnimationToFinish(
+    aliceWindow1,
+    Global.loadingSpinner.selector,
+  );
+  // Cancel button should not be visible if you remove your avatar
+  await expect(
+    aliceWindow1.getByRole('button').filter({ hasText: cancelString }),
+  ).toBeHidden();
+  await clickOnMatchingText(aliceWindow1, saveString);
+  // If removing was successful, show no img but show Alice's initials instead
+  await expect(
+    aliceWindow1.getByTestId(Settings.profilePicture.selector).locator('img'),
+  ).toBeHidden();
+  await expect(
+    aliceWindow1
+      .getByTestId(Settings.profilePicture.selector)
+      .filter({ hasText: 'AL' }),
+  ).toBeVisible();
+});
 
 test_Alice_1W_Bob_1W(
   'Set nickname',
@@ -230,7 +266,7 @@ test_Alice_1W_Bob_1W(
     await clickOnWithText(
       aliceWindow1,
       HomeScreen.setNicknameButton,
-      englishStrippedStr('save').toString(),
+      saveString,
     );
     await sleepFor(1000);
 
