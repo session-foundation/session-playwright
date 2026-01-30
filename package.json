@@ -1,12 +1,13 @@
 {
   "name": "session-playwright",
+  "packageManager": "pnpm@10.28.1",
   "version": "1.0.0",
   "main": "index.js",
   "repository": "git@github.com:session-foundation/session-playwright.git",
   "author": "Audric Ackermann <audric@loki.network>",
   "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.51",
+    "@playwright/test": "^1.57.0",
     "@types/fs-extra": "^11.0.1",
     "@types/lodash": "^4.14.196",
     "@types/uuid": "^9.0.8",
@@ -14,8 +15,9 @@
     "@typescript-eslint/parser": "^6.0.0",
     "allure-commandline": "^2.23.1",
     "allure-playwright": "2.6.0",
+    "chalk": "4.1.2",
     "dotenv": "^16.4.5",
-    "electron": "34.2.0",
+    "electron": "40.0.0",
     "eslint": "^8.46.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^18.0.0",
@@ -26,21 +28,21 @@
     "eslint-plugin-perfectionist": "^4.15.0",
     "fs-extra": "^11.1.1",
     "lodash": "^4.17.21",
+    "playwright": "^1.57.0",
     "prettier": "^3.0.1",
     "typescript": "^5.1.6",
     "uuid": "^9.0.1"
   },
   "scripts": {
-    "build": "yarn tsc --watch",
-    "lint": "yarn prettier . --write --cache && yarn eslint .",
-    "lint-check": "yarn prettier . --check && yarn eslint .",
-    "dev": "yarn tsc --watch",
-    "test": "npx playwright test",
+    "build": "pnpm tsc --watch",
+    "lint": "pnpm prettier . --write --cache && pnpm eslint .",
+    "lint-check": "pnpm prettier . --check && pnpm eslint .",
+    "dev": "pnpm tsc --watch",
+    "test": "playwright test",
     "test-rerun": "PLAYWRIGHT_WORKERS_COUNT=1 PRINT_FAILED_TEST_LOGS=1 npx playwright test --last-failed",
     "watch": "tsc -w",
     "sync": "./sync-localization.sh",
     "allure-create": "allure generate ./allure-results",
     "allure-open": "allure open ./allure-report"
-  },
-  "dependencies": {}
+  }
 }

@@ -1,3 +1,4 @@
 .eslintrc.js
 *.js
 tests/localization/*
+pnpm-lock.yaml
