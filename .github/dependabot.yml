@@ -1,0 +1,19 @@
+# Get a single PR per month with all updates.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    target-branch: "main"
+    groups:
+      # One group to rule them all
+      monthly-updates:
+        patterns:
+          - "*"
+    
+    # Keep critical deps pinned
+    ignore:
+      - dependency-name: "node"
+      - dependency-name: "pnpm"
+      - dependency-name: "electron"
