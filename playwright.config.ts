@@ -4,7 +4,7 @@ import { toNumber } from 'lodash';
 
 import { screenshotFolder } from './tests/automation/constants/variables';
 
-dotenv.config();
+dotenv.config( { quiet: true });
 
 export default defineConfig({
   timeout: 350000,
