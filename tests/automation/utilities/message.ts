@@ -33,6 +33,20 @@ export const waitForReadTick = async (window: Page, message: string) => {
   );
 };
 
+export const waitForFailedTick = async (window: Page, message: string) => {
+  const selc = `css=[data-testid=message-content]:has-text("${message}"):has([data-testid=msg-status][data-testtype=failed])`;
+  console.info('waiting for read tick of message: ', message);
+
+  const tickMessageRead = await window.waitForSelector(selc, {
+    timeout: 30000,
+  });
+  console.info(
+    'found the tick of message failed: ',
+    message,
+    Boolean(tickMessageRead),
+  );
+};
+
 export const sendMessage = async (window: Page, message: string) => {
   // type into message input box
   await typeIntoInput(window, 'message-input-text-area', message);
