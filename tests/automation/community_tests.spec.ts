@@ -78,10 +78,10 @@ sessionTestTwoWindows('Ban User', async ([windowA, windowB]) => {
   ]);
   await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
   await sendMessage(windowB, msg1);
+  await windowA.bringToFront();
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
-  await windowA.bringToFront();
   await clickOnWithText(windowA, Global.contextMenuItem, 'Ban User', {
     strictMode: false,
   });
@@ -110,6 +110,7 @@ sessionTestTwoWindows('Unban User', async ([windowA, windowB]) => {
   ]);
   await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
   await sendMessage(windowB, msg1);
+  await windowA.bringToFront();
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
@@ -147,6 +148,7 @@ sessionTestTwoWindows('Ban And Delete All', async ([windowA, windowB]) => {
   ]);
   await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
   await sendMessage(windowB, msg1);
+  await windowA.bringToFront();
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
