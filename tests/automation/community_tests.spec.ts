@@ -1,3 +1,4 @@
+import { englishStrippedStr } from '../localization/englishStrippedStr';
 import { testCommunityName } from './constants/community';
 import { Conversation, Global, HomeScreen } from './locators';
 import { newUser } from './setup/new_user';
@@ -24,6 +25,9 @@ import {
   typeIntoInput,
   waitForTestIdWithText,
 } from './utilities/utils';
+
+const banUserString = englishStrippedStr('banUser').toString();
+const unbanUserString = englishStrippedStr('banUnbanUser').toString();
 
 test_Alice_2W(
   'Join community and sync',
@@ -67,39 +71,7 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-sessionTestTwoWindows('Ban User', async ([windowA, windowB]) => {
-  assertAdminIsKnown();
-  const msg1 = `Ban me! - ${Date.now()}`;
-  const msg2 = `Am I still here? - ${Date.now()}`;
-  await Promise.all([
-    recoverFromSeed(windowA, process.env.SOGS_ADMIN_SEED!, {
-      fallbackName: 'Admin',
-    }),
-    newUser(windowB, 'Bob'),
-  ]);
-  await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
-  await sendMessage(windowB, msg1);
-  await windowA.bringToFront();
-  await scrollToBottomIfNecessary(windowA);
-  await clickOnWithText(windowA, Conversation.messageContent, msg1, {
-    rightButton: true,
-  });
-  await clickOnWithText(windowA, Global.contextMenuItem, 'Ban User', {
-    strictMode: false,
-  });
-  await clickOn(windowA, Conversation.banUserButton);
-  await typeIntoInput(windowB, Conversation.messageInput.selector, msg2);
-  await clickOn(windowB, Conversation.sendMessageButton);
-  await waitForMessageStatus(windowB, msg2, 'failed');
-  await hasElementPoppedUpThatShouldnt(
-    windowA,
-    Conversation.messageContent.strategy,
-    Conversation.messageContent.selector,
-    msg2,
-  );
-});
-
-sessionTestTwoWindows('Unban User', async ([windowA, windowB]) => {
+sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
   assertAdminIsKnown();
   const msg1 = `Ban me but unban me later! - ${Date.now()}`;
   const msg2 = `I'm banned :( - ${Date.now()}`;
@@ -117,7 +89,7 @@ sessionTestTwoWindows('Unban User', async ([windowA, windowB]) => {
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
-  await clickOnWithText(windowA, Global.contextMenuItem, 'Ban User', {
+  await clickOnWithText(windowA, Global.contextMenuItem, banUserString, {
     strictMode: false,
   });
   await clickOn(windowA, Conversation.banUserButton);
@@ -127,7 +99,7 @@ sessionTestTwoWindows('Unban User', async ([windowA, windowB]) => {
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
-  await clickOnWithText(windowA, Global.contextMenuItem, 'Unban User', {
+  await clickOnWithText(windowA, Global.contextMenuItem, unbanUserString, {
     strictMode: false,
   });
   await clickOn(windowA, Conversation.unbanUserButton);
@@ -139,7 +111,7 @@ sessionTestTwoWindows('Unban User', async ([windowA, windowB]) => {
   );
 });
 
-sessionTestTwoWindows('Ban And Delete All', async ([windowA, windowB]) => {
+sessionTestTwoWindows('Ban And delete all', async ([windowA, windowB]) => {
   assertAdminIsKnown();
   const msg1 = `Ban and delete! - ${Date.now()}`;
   const msg2 = `Did that work? - ${Date.now()}`;
@@ -156,7 +128,7 @@ sessionTestTwoWindows('Ban And Delete All', async ([windowA, windowB]) => {
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
-  await clickOnWithText(windowA, Global.contextMenuItem, 'Ban User', {
+  await clickOnWithText(windowA, Global.contextMenuItem, banUserString, {
     strictMode: false,
   });
   await clickOn(windowA, Conversation.banAndDeleteAllButton);
