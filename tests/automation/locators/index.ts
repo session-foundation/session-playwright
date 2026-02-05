@@ -114,7 +114,7 @@ export class Conversation extends Locator {
   static readonly microphoneButton = this.testId('microphone-button');
   static readonly scrollToBottomButton = this.testId('scroll-to-bottom-button');
   static readonly sendMessageButton = this.testId('send-message-button');
-  static readonly unbanUserButton = this.testId('unban-user-confirm-button')
+  static readonly unbanUserButton = this.testId('unban-user-confirm-button');
 }
 
 export class ConversationSettings extends Locator {

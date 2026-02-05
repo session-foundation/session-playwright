@@ -81,7 +81,7 @@ sessionTestTwoWindows('Ban User', async ([windowA, windowB]) => {
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
-  await windowA.bringToFront()
+  await windowA.bringToFront();
   await clickOnWithText(windowA, Global.contextMenuItem, 'Ban User', {
     strictMode: false,
   });
@@ -101,7 +101,7 @@ sessionTestTwoWindows('Unban User', async ([windowA, windowB]) => {
   assertAdminIsKnown();
   const msg1 = `Ban me but unban me later! - ${Date.now()}`;
   const msg2 = `I'm banned :( - ${Date.now()}`;
-  const msg3 = `Freedom! - ${Date.now()}`
+  const msg3 = `Freedom! - ${Date.now()}`;
   await Promise.all([
     recoverFromSeed(windowA, process.env.SOGS_ADMIN_SEED!, {
       fallbackName: 'Admin',
@@ -128,7 +128,11 @@ sessionTestTwoWindows('Unban User', async ([windowA, windowB]) => {
   });
   await clickOn(windowA, Conversation.unbanUserButton);
   await sendMessage(windowB, msg3);
-  await waitForTestIdWithText(windowA, Conversation.messageContent.selector, msg3)
+  await waitForTestIdWithText(
+    windowA,
+    Conversation.messageContent.selector,
+    msg3,
+  );
 });
 
 sessionTestTwoWindows('Ban And Delete All', async ([windowA, windowB]) => {
