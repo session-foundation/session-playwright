@@ -261,7 +261,6 @@ sessionTestTwoWindows(
 
     let i;
     for (i = 1; i <= 10; i++) {
-      // eslint-disable-next-line no-await-in-loop
       const timeMs = await measureSendingTime(aliceWindow1, i);
       timesArray.push(timeMs);
     }
@@ -333,7 +332,7 @@ messageLengthTestCases.forEach((testCase) => {
           throw new Error(
             `Countdown should not be visible for messages under ${countdownThreshold} chars`,
           );
-        } catch (e) {
+        } catch (_e) {
           // Expected - countdown should not exist
           console.log('Countdown not present as expected');
         }
@@ -389,7 +388,7 @@ messageLengthTestCases.forEach((testCase) => {
         try {
           await waitForTextMessage(aliceWindow1, message, 2000);
           throw new Error('Message should not have been sent');
-        } catch (e) {
+        } catch (_e) {
           console.log(`Message didn't send as expected`);
         }
       }

@@ -122,7 +122,6 @@ export type DataTestId =
   | 'disappear-control-message'
   | 'disappear-messages-type-and-time'
   | 'disappear-set-button'
-  | 'disappear-set-button'
   | 'disappearing-messages-dropdown'
   | 'disappearing-messages-indicator'
   | 'disappearing-messages-menu-option'

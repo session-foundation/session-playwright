@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/lines-between-class-members */
 import { DataTestId, StrategyExtractionObj } from '../types/testing';
 
 abstract class Locator {

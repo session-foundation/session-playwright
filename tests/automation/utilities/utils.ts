@@ -1,7 +1,5 @@
-/* eslint-disable import/no-cycle */
 /* eslint-disable no-useless-escape */
-/* eslint-disable import/no-extraneous-dependencies */
-/* eslint-disable no-await-in-loop */
+
 import { ElementHandle, Page } from '@playwright/test';
 
 import { sleepFor } from '../../promise_utils';
@@ -186,7 +184,7 @@ export async function waitForLoadingAnimationToFinish(
       );
       await sleepFor(500);
       console.info(`${loader} was found, waiting for it to be gone`);
-    } catch (e) {
+    } catch (_e) {
       loadingAnimation = undefined;
     }
   } while (loadingAnimation);
@@ -449,14 +447,14 @@ export async function hasElementBeenDeleted(
       el = await waitForElement(window, strategy, selector, maxWait, text);
       await sleepFor(100);
       console.info(`Element has been found, waiting for deletion`);
-    } catch (e) {
+    } catch (_e) {
       el = undefined;
       console.info(`Element has been deleted, woohoo!`);
     }
   } while (Date.now() - start <= maxWait && el);
   try {
     el = await waitForElement(window, strategy, selector, 1000, text);
-  } catch (e) {
+  } catch (_e) {
     // if we did throw here it's actually because the element is gone, so it's ok
   }
 
@@ -487,7 +485,7 @@ export async function hasTextMessageBeenDeleted(
           text,
         );
         return false;
-      } catch (e) {
+      } catch (_e) {
         console.info(`Text message not found, yay!`);
         return true;
       }

@@ -35,8 +35,8 @@ export default async function globalSetup() {
     const parentFolderOfAllDataPath = isMacOS()
       ? join(homedir(), 'Library', 'Application Support')
       : isLinux()
-      ? join(homedir(), '.config')
-      : null;
+        ? join(homedir(), '.config')
+        : null;
     if (!parentFolderOfAllDataPath) {
       throw new Error('Only macOS/linux are currently supported');
     }

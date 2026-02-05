@@ -1,22 +1,28 @@
 import eslint from '@eslint/js';
-import tseslint from '@typescript-eslint/eslint-plugin';
+import perfectionist from 'eslint-plugin-perfectionist';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
   {
     files: ['**/*.{ts,tsx,cts,mts,js,cjs,mjs}'],
   },
   {
+    plugins: {
+      perfectionist,
+    },
+  },
+  {
     ignores: [
       '**/node_modules/**',
       'eslint.config.mjs',
       'run/**/*.js',
-      'avd/',
       'tests/localization/*',
+      'pnpm-lock.yaml',
     ],
   },
   eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked, // see https://typescript-eslint.io/getting-started/typed-linting/
+  ...tseslint.configs.recommendedTypeChecked,
   {
     languageOptions: {
       parserOptions: {
@@ -29,9 +35,8 @@ export default tseslint.config(
   },
   {
     rules: {
-      'no-unused-vars': 'off', // we have @typescript-eslint/no-unused-vars enabled below
+      'no-unused-vars': 'off',
       'no-else-return': 'error',
-      '@typescript-eslint/import/no-cycle': 'off',
       '@typescript-eslint/no-floating-promises': 'error',
       '@typescript-eslint/no-unsafe-member-access': 'off',
       '@typescript-eslint/no-explicit-any': 'off',
@@ -39,7 +44,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-redundant-type-constituents': 'off',
       '@typescript-eslint/no-unsafe-enum-comparison': 'off',
-
+      '@typescript-eslint/require-await': 'off',
       quotes: [
         'error',
         'single',
@@ -53,6 +58,27 @@ export default tseslint.config(
           argsIgnorePattern: '^_',
           varsIgnorePattern: '^_',
           caughtErrorsIgnorePattern: '^_',
+        },
+      ],
+      'perfectionist/sort-imports': 'error',
+      'perfectionist/sort-named-imports': 'error',
+      'perfectionist/sort-union-types': [
+        'error',
+        {
+          groups: [
+            'named',
+            'keyword',
+            'operator',
+            'literal',
+            'function',
+            'import',
+            'conditional',
+            'object',
+            'tuple',
+            'intersection',
+            'union',
+            'nullish',
+          ],
         },
       ],
     },

@@ -1,7 +1,5 @@
 /* eslint-disable no-empty-pattern */
-/* eslint-disable @typescript-eslint/array-type */
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/naming-convention */
+
 import { Page, test, TestInfo } from '@playwright/test';
 import chalk from 'chalk';
 
@@ -56,8 +54,6 @@ function sessionTest<T extends CountWindows, N extends Tuple<Page, T>>(
         );
       }
       await testCallback(windows as N, testinfo);
-    } catch (e) {
-      throw e;
     } finally {
       try {
         await forceCloseAllWindows(windows);
@@ -195,8 +191,6 @@ function sessionTestGeneric<
         },
         testinfo,
       );
-    } catch (e) {
-      throw e;
     } finally {
       try {
         await forceCloseAllWindows([...mainWindows, ...linkedWindows]);

@@ -1,7 +1,6 @@
 import { Page } from '@playwright/test';
 
 import { MessageStatus } from '../types/testing';
-// eslint-disable-next-line import/no-cycle
 import { clickOnElement, typeIntoInput } from './utils';
 
 export const waitForMessageStatus = async (

@@ -19,7 +19,7 @@ export const forceCloseAllWindows = async (windows: Array<Page>) => {
           ? `taskkill /F /T /PID ${pid}` // /T kills child processes on Windows
           : `pkill -9 -P ${pid}; kill -9 ${pid}`; // Kill children then parent on Unix
       execSync(killCommand, { stdio: 'ignore' });
-    } catch (e) {
+    } catch (_e) {
       // This is fine - process already dead or doesn't exist
     }
   });
