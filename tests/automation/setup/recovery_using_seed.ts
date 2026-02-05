@@ -8,19 +8,31 @@ import {
   waitForLoadingAnimationToFinish,
 } from '../utilities/utils';
 
-export async function recoverFromSeed(window: Page, recoveryPhrase: string) {
+export async function recoverFromSeed(
+  window: Page,
+  recoveryPhrase: string,
+  options?: { fallbackName?: string },
+) {
   await clickOn(window, Onboarding.iHaveAnAccountButton);
   await typeIntoInput(window, 'recovery-phrase-input', recoveryPhrase);
   await clickOn(window, Global.continueButton);
   await waitForLoadingAnimationToFinish(window, 'loading-animation');
-  const displayName = await doesElementExist(
+  const displayNameInput = await doesElementExist(
     window,
     'data-testid',
     'display-name-input',
   );
-  if (displayName) {
-    throw new Error(`Display name was not found when restoring from seed`);
+  if (displayNameInput) {
+    if (!options?.fallbackName) {
+      throw new Error(`Display name was not found when restoring from seed`);
+    }
+    // Fallback for when name might be missing (but it's okay)
+    await typeIntoInput(
+      window,
+      Onboarding.displayNameInput.selector,
+      options.fallbackName,
+    );
+    await clickOn(window, Global.continueButton);
   }
-
   return { window };
 }
