@@ -74,6 +74,7 @@ export type WithRightButton = { rightButton?: boolean };
 
 export type MediaType = 'audio' | 'file' | 'image' | 'video';
 export type Strategy = ':has-text' | 'class' | 'data-testid';
+export type MessageStatus = 'failed' | 'read' | 'sent';
 
 export type DataTestId =
   | DMTimeOption
@@ -82,6 +83,9 @@ export type DataTestId =
   | 'audio-player'
   | 'avatar-edit-profile-dialog'
   | 'back-button'
+  | 'ban-user-confirm-button'
+  | 'ban-user-delete-all-confirm-button'
+  | 'ban-user-input'
   | 'blocked-contacts-settings-row'
   | 'call-button'
   | 'call-notification-answered-a-call'
@@ -211,6 +215,7 @@ export type DataTestId =
   | 'swarm-image'
   | 'theme-section'
   | 'tooltip-character-count'
+  | 'unban-user-confirm-button'
   | 'unblock-button-settings-screen'
   | 'update-group-info-name-input'
   | 'update-profile-info-name-input'

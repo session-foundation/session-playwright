@@ -5,7 +5,7 @@
 import { ElementHandle, Page } from '@playwright/test';
 
 import { sleepFor } from '../../promise_utils';
-import { CTA } from '../locators';
+import { Conversation, CTA } from '../locators';
 import {
   DataTestId,
   DMTimeOption,
@@ -21,6 +21,7 @@ import { sendMessage } from './message';
 type ElementOptions = {
   maxWait?: number;
   rightButton?: boolean;
+  strictMode?: boolean;
 };
 
 // TODO Unify element interaction functions to use locator objects the way clickOn and clickOnWithText do
@@ -278,7 +279,10 @@ export async function clickOn(
     builtSelector = `css=[${locator.strategy}=${locator.selector}]`;
   }
 
-  const sharedOpts = { timeout: options?.maxWait, strict: true };
+  const sharedOpts = {
+    timeout: options?.maxWait,
+    strict: options?.strictMode ?? true,
+  };
   await window.click(
     builtSelector,
     options?.rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
@@ -311,7 +315,10 @@ export async function clickOnWithText(
     }]:has-text("${text.replace(/"/g, '\\"')}")`;
   }
 
-  const sharedOpts = { timeout: options?.maxWait, strict: true };
+  const sharedOpts = {
+    timeout: options?.maxWait,
+    strict: options?.strictMode ?? true,
+  };
   await window.click(
     builtSelector,
     options?.rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
@@ -713,5 +720,16 @@ export async function assertUrlIsReachable(url: string): Promise<void> {
     throw new Error(
       `Expected status 200 but got ${response.status} for URL: ${url}`,
     );
+  }
+}
+
+export async function scrollToBottomIfNecessary(window: Page): Promise<void> {
+  const canScroll = await doesElementExist(
+    window,
+    Conversation.scrollToBottomButton.strategy,
+    Conversation.scrollToBottomButton.selector,
+  );
+  if (canScroll) {
+    await clickOn(window, Conversation.scrollToBottomButton);
   }
 }

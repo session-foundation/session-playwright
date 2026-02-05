@@ -1,8 +1,10 @@
-import { Page } from '@playwright/test';
+import { type Page, test } from '@playwright/test';
 
+import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import {
   type DefaultCommunity,
   testCommunityLink,
+  testCommunityName,
 } from '../constants/community';
 import { Global, HomeScreen } from '../locators';
 import {
@@ -62,4 +64,46 @@ export const leaveCommunity = async (window: Page, communityName: string) => {
     communityName,
   );
   console.log('Left community');
+};
+
+/**
+ * There is a race condition where two workers joining the community
+ * with the same (admin) account can throw the "You are already a member" error
+ * If joining errors (race condition), attempt to find the on-screen error.
+ * If the error is visible, the conversation already exists, that's fine,
+ * just navigate back and open the convo.
+ */
+export const joinOrOpenCommunity = async (window: Page) => {
+  try {
+    await joinCommunity(window);
+  } catch (joinError) {
+    try {
+      await waitForTestIdWithText(
+        window,
+        Global.errorMessage.selector,
+        englishStrippedStr('communityJoinedAlready').toString(),
+      );
+      await clickOn(window, Global.backButton);
+      await clickOn(window, Global.backButton);
+      await clickOnWithText(
+        window,
+        HomeScreen.conversationItemName,
+        testCommunityName,
+      );
+    } catch (waitError) {
+      // The error message we expected wasn't there, so this is a real failure
+      throw joinError; // Throw the original join error, not the wait timeout
+    }
+  }
+};
+
+export const assertAdminIsKnown = () => {
+  if (!process.env.SOGS_ADMIN_SEED) {
+    console.error('SOGS_ADMIN_SEED required.');
+    console.error(
+      'Promote a user to admin and set their seed as an env variable to run this test.',
+    );
+    console.error('CI runs will use a seed saved as a GitHub secret.');
+    test.skip();
+  }
 };

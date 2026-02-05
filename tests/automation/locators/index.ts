@@ -82,6 +82,11 @@ export class Conversation extends Locator {
   static readonly acceptMessageRequestButton = this.testId(
     'accept-message-request',
   );
+  static readonly banAndDeleteAllButton = this.testId(
+    'ban-user-delete-all-confirm-button',
+  );
+  static readonly banUserButton = this.testId('ban-user-confirm-button');
+  static readonly banUserInput = this.testId('ban-user-input');
   static readonly blockMessageRequestButton = this.testId(
     'decline-and-block-message-request',
   );
@@ -101,7 +106,6 @@ export class Conversation extends Locator {
   static readonly mentionsContainer = this.testId('mentions-container'); // This is also the locator for emojis
   static readonly mentionsItem = this.testId('mentions-container-row'); // This is also the locator for emojis
   static readonly messageContent = this.testId('message-content');
-
   static readonly messageInput = this.testId('message-input-text-area');
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
@@ -109,6 +113,7 @@ export class Conversation extends Locator {
   static readonly microphoneButton = this.testId('microphone-button');
   static readonly scrollToBottomButton = this.testId('scroll-to-bottom-button');
   static readonly sendMessageButton = this.testId('send-message-button');
+  static readonly unbanUserButton = this.testId('unban-user-confirm-button');
 }
 
 export class ConversationSettings extends Locator {

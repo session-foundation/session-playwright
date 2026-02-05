@@ -17,7 +17,7 @@ import {
   test_Alice_2W,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
-import { sendMessage, waitForReadTick } from './utilities/message';
+import { sendMessage, waitForMessageStatus } from './utilities/message';
 import { compareElementScreenshot } from './utilities/screenshot';
 import {
   checkModalStrings,
@@ -330,7 +330,7 @@ test_Alice_1W_Bob_1W(
       HomeScreen.conversationItemName,
       alice.userName,
     );
-    await waitForReadTick(aliceWindow1, 'Testing read receipts');
+    await waitForMessageStatus(aliceWindow1, 'Testing read receipts', 'read');
   },
 );
 
