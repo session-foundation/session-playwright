@@ -16,7 +16,7 @@ import {
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
-import { waitForSentTick } from './utilities/message';
+import { waitForMessageStatus } from './utilities/message';
 import {
   sendLinkPreview,
   sendMedia,
@@ -150,7 +150,7 @@ test_Alice_1W_Bob_1W(
     await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
     await sleepFor(100);
     await clickOn(aliceWindow1, Conversation.sendMessageButton);
-    await waitForSentTick(aliceWindow1, longText);
+    await waitForMessageStatus(aliceWindow1, longText, 'sent');
     await waitForTextMessage(bobWindow1, longText);
     // Wait 30 seconds for long text to disappear
     await sleepFor(30000);

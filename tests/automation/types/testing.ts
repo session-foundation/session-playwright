@@ -74,6 +74,7 @@ export type WithRightButton = { rightButton?: boolean };
 
 export type MediaType = 'audio' | 'file' | 'image' | 'video';
 export type Strategy = ':has-text' | 'class' | 'data-testid';
+export type MessageStatus = 'failed' | 'read' | 'sent';
 
 export type DataTestId =
   | DMTimeOption

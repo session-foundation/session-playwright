@@ -12,7 +12,7 @@ import {
   joinCommunity,
   joinOrOpenCommunity,
 } from './utilities/join_community';
-import { sendMessage, waitForFailedTick } from './utilities/message';
+import { sendMessage, waitForMessageStatus } from './utilities/message';
 import { replyTo } from './utilities/reply_message';
 import { sendMedia } from './utilities/send_media';
 import {
@@ -90,7 +90,7 @@ sessionTestTwoWindows('Ban User', async ([windowA, windowB]) => {
   await clickOn(windowA, Conversation.banUserButton);
   await typeIntoInput(windowB, Conversation.messageInput.selector, msg2);
   await clickOn(windowB, Conversation.sendMessageButton);
-  await waitForFailedTick(windowB, msg2);
+  await waitForMessageStatus(windowB, msg2, 'failed');
   await hasElementPoppedUpThatShouldnt(
     windowA,
     Conversation.messageContent.strategy,
@@ -123,7 +123,7 @@ sessionTestTwoWindows('Unban User', async ([windowA, windowB]) => {
   await clickOn(windowA, Conversation.banUserButton);
   await typeIntoInput(windowB, Conversation.messageInput.selector, msg2);
   await clickOn(windowB, Conversation.sendMessageButton);
-  await waitForFailedTick(windowB, msg2);
+  await waitForMessageStatus(windowB, msg2, 'failed');
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
@@ -169,7 +169,7 @@ sessionTestTwoWindows('Ban And Delete All', async ([windowA, windowB]) => {
   );
   await typeIntoInput(windowB, Conversation.messageInput.selector, msg2);
   await clickOn(windowB, Conversation.sendMessageButton);
-  await waitForFailedTick(windowB, msg2);
+  await waitForMessageStatus(windowB, msg2, 'failed');
   await hasElementPoppedUpThatShouldnt(
     windowA,
     Conversation.messageContent.strategy,

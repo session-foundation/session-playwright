@@ -107,7 +107,6 @@ export class Conversation extends Locator {
   static readonly mentionsItem = this.testId('mentions-container-row'); // This is also the locator for emojis
   static readonly messageContent = this.testId('message-content');
   static readonly messageInput = this.testId('message-input-text-area');
-
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
   );

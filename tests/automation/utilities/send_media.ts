@@ -4,7 +4,7 @@ import { englishStrippedStr } from '../../localization/englishStrippedStr';
 import { sleepFor } from '../../promise_utils';
 import { Conversation, Global, Settings } from '../locators';
 import { MediaType } from '../types/testing';
-import { waitForSentTick } from './message';
+import { waitForMessageStatus } from './message';
 import {
   checkModalStrings,
   clickOn,
@@ -81,7 +81,7 @@ export const sendMedia = async (
     strategy: 'data-testid',
     selector: 'send-message-button',
   });
-  await waitForSentTick(window, testMessage);
+  await waitForMessageStatus(window, testMessage, 'sent');
   if (shouldCheckMediaPreview) {
     await verifyMediaPreviewLoaded(window, testMessage);
   }
@@ -161,7 +161,7 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     selector: 'send-message-button',
   });
 
-  await waitForSentTick(window, testLink);
+  await waitForMessageStatus(window, testLink, 'sent');
 };
 
 export const trustUser = async (
