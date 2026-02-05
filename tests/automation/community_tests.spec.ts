@@ -20,6 +20,7 @@ import {
   clickOnWithText,
   hasElementBeenDeleted,
   hasElementPoppedUpThatShouldnt,
+  scrollToBottomIfNecessary,
   typeIntoInput,
   waitForTestIdWithText,
 } from './utilities/utils';
@@ -79,6 +80,7 @@ sessionTestTwoWindows('Ban User', async ([windowA, windowB]) => {
   await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
   await sendMessage(windowB, msg1);
   await windowA.bringToFront();
+  await scrollToBottomIfNecessary(windowA);
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
@@ -111,6 +113,7 @@ sessionTestTwoWindows('Unban User', async ([windowA, windowB]) => {
   await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
   await sendMessage(windowB, msg1);
   await windowA.bringToFront();
+  await scrollToBottomIfNecessary(windowA);
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });
@@ -149,6 +152,7 @@ sessionTestTwoWindows('Ban And Delete All', async ([windowA, windowB]) => {
   await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
   await sendMessage(windowB, msg1);
   await windowA.bringToFront();
+  await scrollToBottomIfNecessary(windowA);
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
   });

@@ -5,7 +5,7 @@
 import { ElementHandle, Page } from '@playwright/test';
 
 import { sleepFor } from '../../promise_utils';
-import { CTA } from '../locators';
+import { Conversation, CTA } from '../locators';
 import {
   DataTestId,
   DMTimeOption,
@@ -720,5 +720,16 @@ export async function assertUrlIsReachable(url: string): Promise<void> {
     throw new Error(
       `Expected status 200 but got ${response.status} for URL: ${url}`,
     );
+  }
+}
+
+export async function scrollToBottomIfNecessary(window: Page): Promise<void> {
+  const canScroll = await doesElementExist(
+    window,
+    Conversation.scrollToBottomButton.strategy,
+    Conversation.scrollToBottomButton.selector,
+  );
+  if (canScroll) {
+    await clickOn(window, Conversation.scrollToBottomButton);
   }
 }
