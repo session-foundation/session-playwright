@@ -368,22 +368,15 @@ test_Alice_2W_Bob_1W(
         englishStrippedStr('disappearingMessagesTurnedOffYou').toString(),
       ),
     ]);
-    await Promise.all([
-      hasElementBeenDeleted(
-        aliceWindow1,
-        'data-testid',
-        'disappear-messages-type-and-time',
+    await Promise.all(
+      [aliceWindow1, aliceWindow2, bobWindow1].map((w) =>
+        hasElementBeenDeleted(
+          w,
+          'data-testid',
+          'disappear-messages-type-and-time',
+          1_000,
+        ),
       ),
-      hasElementBeenDeleted(
-        aliceWindow2,
-        'data-testid',
-        'disappear-messages-type-and-time',
-      ),
-      hasElementBeenDeleted(
-        bobWindow1,
-        'data-testid',
-        'disappear-messages-type-and-time',
-      ),
-    ]);
+    );
   },
 );

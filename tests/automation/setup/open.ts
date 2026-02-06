@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 const logNodeConsole = process.env.LOG_NODE_CONSOLE === '1';
 
 export const NODE_ENV = 'production';
-export const MULTI_PREFIX = 'test-integration-';
+export const MULTI_PREFIX = 'test-integration';
 const multisAvailable = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let electronPids: Array<number> = [];
 
@@ -76,6 +76,7 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
   console.info('   NODE_APP_INSTANCE', process.env.NODE_APP_INSTANCE);
 
   try {
+    const start = Date.now();
     const electronApp = await electron.launch({
       args: [
         join(getAppRootPath(), 'app', 'ts', 'mains', 'main_node.js'),
@@ -89,6 +90,7 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
         ELECTRON_LOG_LEVEL: 'verbose', // 'verbose', 'info', 'warn', 'error'
       },
     });
+    console.info(`  Electron app launched in ${Date.now() - start}ms`);
 
     if (logNodeConsole) {
       electronApp.on('console', (msg) => {
@@ -127,7 +129,9 @@ const logBrowserConsole = process.env.LOG_BROWSER_CONSOLE === '1';
 const openAppAndWait = async (multi: string, context?: TestContext) => {
   const electronApp = await openElectronAppOnly(multi, context);
   // Get the first window that the app opens, wait if necessary.
+  const start = Date.now();
   const window = await electronApp.firstWindow();
+  console.info(`  Browser window opened in ${Date.now() - start}ms`);
   window.on('console', (msg) => {
     if (!logBrowserConsole) {
       return;

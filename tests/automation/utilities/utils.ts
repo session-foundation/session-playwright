@@ -436,7 +436,7 @@ export async function hasElementBeenDeleted(
   window: Page,
   strategy: Strategy,
   selector: string,
-  maxWait: number = 30000,
+  maxWait: number,
   text?: string,
 ) {
   const start = Date.now();
