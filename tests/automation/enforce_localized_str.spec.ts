@@ -310,7 +310,7 @@ function getExpectedStringFromKey(
   }
 }
 
-test('Enforce localized strings return expected values', async () => {
+test('Enforce localized strings return expected values', () => {
   // Example usage
   const tsFiles = readTsFiles('.');
 

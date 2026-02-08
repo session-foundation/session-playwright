@@ -44,7 +44,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-assignment': 'off',
       '@typescript-eslint/no-redundant-type-constituents': 'off',
       '@typescript-eslint/no-unsafe-enum-comparison': 'off',
-      '@typescript-eslint/require-await': 'off',
+      '@typescript-eslint/require-await': 'error',
       quotes: [
         'error',
         'single',
