@@ -122,7 +122,7 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
   // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
   // Tried to use englishStripped here but Playwright doesn't like it
   // const copyText = englishStrippedStr('copy').toString();
-  // eslint-disable-next-line
+
   const firstCopyBtn = window
     .locator(`[data-testid=context-menu-item]:has-text("Copy")`)
     .nth(0);

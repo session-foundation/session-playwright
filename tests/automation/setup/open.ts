@@ -153,7 +153,7 @@ export async function openApp(windowsToCreate: number, context?: TestContext) {
   // not too sure why, but launching those windows with Promise.all triggers a sqlite error...
   for (let index = 0; index < array.length; index++) {
     const element = array[index];
-    // eslint-disable-next-line no-await-in-loop
+
     const openedWindow = await openAppAndWait(`${element}`, context);
     toRet.push(openedWindow);
   }

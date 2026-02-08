@@ -59,7 +59,7 @@ export const replyTo = async ({
       await sleepFor(200, true);
 
       break;
-    } catch (e) {
+    } catch (_e) {
       console.info(
         `failed to right click & reply to message attempt: ${index}.`,
       );
@@ -99,7 +99,7 @@ export const replyToMedia = async ({
         1000,
       );
       break;
-    } catch (e) {
+    } catch (_e) {
       console.info(
         `failed to right click & reply to message attempt: ${index}.`,
       );

@@ -1,4 +1,3 @@
-/* eslint-disable no-await-in-loop */
 import { Page } from '@playwright/test';
 
 import { englishStrippedStr } from '../localization/englishStrippedStr';
@@ -121,7 +120,7 @@ test_Alice_2W(
             100,
           );
           return true;
-        } catch (e) {
+        } catch (_e) {
           // if waitForTestIdWithText doesn't find the right username, close the window and retry
           return false;
         } finally {
