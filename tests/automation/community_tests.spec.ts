@@ -33,7 +33,7 @@ test_Alice_2W(
   'Join community and sync',
   async ({ aliceWindow1, aliceWindow2 }) => {
     await joinCommunity(aliceWindow1);
-    await clickOn(aliceWindow1, Conversation.scrollToBottomButton);
+    await scrollToBottomIfNecessary(aliceWindow1);
     await sendMessage(aliceWindow1, 'Hello, community!');
     // Check linked device for community
     await clickOnWithText(
@@ -57,7 +57,7 @@ test_Alice_1W_Bob_1W(
     // ]);
     await Promise.all(
       [aliceWindow1, bobWindow1].map((window) =>
-        clickOn(window, Conversation.scrollToBottomButton),
+        scrollToBottomIfNecessary(window),
       ),
     );
     await sendMedia(aliceWindow1, mediaPath, testImageMessage, true);
