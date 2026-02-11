@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import {
   Conversation,
@@ -37,19 +37,17 @@ test_Alice_2W_Bob_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       Conversation.messageRequestAcceptControlMessage.selector,
-      englishStrippedStr('messageRequestYouHaveAccepted')
-        .withArgs({
-          name: bob.userName,
-        })
-        .toString(),
+      tStripped('messageRequestYouHaveAccepted', {
+        name: bob.userName,
+      }),
     );
     await waitForMatchingText(
       aliceWindow1,
-      englishStrippedStr('messageRequestsNonePending').toString(),
+      tStripped('messageRequestsNonePending'),
     );
     await waitForMatchingText(
       aliceWindow2,
-      englishStrippedStr('messageRequestsNonePending').toString(),
+      tStripped('messageRequestsNonePending'),
     );
     await sendMessage(aliceWindow1, testReply);
     await waitForTextMessage(bobWindow1, testReply);
@@ -85,20 +83,20 @@ test_Alice_2W_Bob_1W(
     await clickOnWithText(
       aliceWindow1,
       Conversation.deleteMessageRequestButton,
-      englishStrippedStr('delete').toString(),
+      tStripped('delete'),
     );
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('delete').toString(),
+      tStripped('delete'),
     );
     await waitForMatchingText(
       aliceWindow1,
-      englishStrippedStr('messageRequestsNonePending').toString(),
+      tStripped('messageRequestsNonePending'),
     );
     await waitForMatchingText(
       aliceWindow2,
-      englishStrippedStr('messageRequestsNonePending').toString(),
+      tStripped('messageRequestsNonePending'),
     );
   },
 );
@@ -122,10 +120,8 @@ test_Alice_2W_Bob_1W(
     // Check modal strings
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('block').toString(),
-      englishStrippedStr('blockDescription')
-        .withArgs({ name: bob.userName })
-        .toString(),
+      tStripped('block'),
+      tStripped('blockDescription', { name: bob.userName }),
     );
     // Confirm block
     await clickOn(aliceWindow1, Global.confirmButton);

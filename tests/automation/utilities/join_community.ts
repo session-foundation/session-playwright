@@ -1,6 +1,6 @@
 import { type Page, test } from '@playwright/test';
 
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { tStripped } from '../../localization/lib';
 import {
   type DefaultCommunity,
   testCommunityLink,
@@ -81,7 +81,7 @@ export const joinOrOpenCommunity = async (window: Page) => {
       await waitForTestIdWithText(
         window,
         Global.errorMessage.selector,
-        englishStrippedStr('communityJoinedAlready').toString(),
+        tStripped('communityJoinedAlready'),
       );
       await clickOn(window, Global.backButton);
       await clickOn(window, Global.backButton);

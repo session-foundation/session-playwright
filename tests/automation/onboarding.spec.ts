@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { Global, Onboarding } from './locators';
 import { sessionTestOneWindow } from './setup/sessionTest';
 import {
@@ -13,14 +13,14 @@ sessionTestOneWindow('Warning modal new account', async ([aliceWindow1]) => {
   await clickOn(aliceWindow1, Global.backButton);
   await checkModalStrings(
     aliceWindow1,
-    englishStrippedStr('warning').toString(),
-    englishStrippedStr('onboardingBackAccountCreation').toString(),
+    tStripped('warning'),
+    tStripped('onboardingBackAccountCreation'),
     'confirmModal',
   );
   await clickOnWithText(
     aliceWindow1,
     Global.confirmButton,
-    englishStrippedStr('quitButton').toString(),
+    tStripped('quitButton'),
   );
   // Wait for window to close (confirms restart was triggered)
   await aliceWindow1.waitForEvent('close', { timeout: 5000 });
@@ -41,14 +41,14 @@ sessionTestOneWindow(
     await clickOn(aliceWindow1, Global.backButton);
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('warning').toString(),
-      englishStrippedStr('onboardingBackLoadAccount').toString(),
+      tStripped('warning'),
+      tStripped('onboardingBackLoadAccount'),
       'confirmModal',
     );
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('quitButton').toString(),
+      tStripped('quitButton'),
     );
     // Wait for window to close (confirms restart was triggered)
     await aliceWindow1.waitForEvent('close', { timeout: 5000 });

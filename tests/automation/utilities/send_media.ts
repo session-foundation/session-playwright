@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
 import { Conversation, Global, Settings } from '../locators';
 import { MediaType } from '../types/testing';
@@ -121,17 +121,13 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
   // doesn't pop up if manually typing link (needs to be pasted)
   // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
   // Tried to use englishStripped here but Playwright doesn't like it
-  // const copyText = englishStrippedStr('copy').toString();
+  // const copyText = tStripped('copy');
 
   const firstCopyBtn = window
     .locator(`[data-testid=context-menu-item]:has-text("Copy")`)
     .nth(0);
   await firstCopyBtn.click();
-  await waitForTestIdWithText(
-    window,
-    'session-toast',
-    englishStrippedStr('copied').toString(),
-  );
+  await waitForTestIdWithText(window, 'session-toast', tStripped('copied'));
   // click on the toast and wait for it to be closed to avoid the layout shift
   await clickOn(window, Global.toast);
   await sleepFor(1000);
@@ -140,14 +136,10 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
   await window.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
   await checkModalStrings(
     window,
-    englishStrippedStr('linkPreviewsEnable').toString(),
-    englishStrippedStr('linkPreviewsFirstDescription').toString(),
+    tStripped('linkPreviewsEnable'),
+    tStripped('linkPreviewsFirstDescription'),
   );
-  await clickOnWithText(
-    window,
-    Global.confirmButton,
-    englishStrippedStr('enable').toString(),
-  );
+  await clickOnWithText(window, Global.confirmButton, tStripped('enable'));
   await waitForLoadingAnimationToFinish(window, Global.loadingSpinner.selector);
   await waitForTestIdWithText(window, 'link-preview-image');
   await waitForTestIdWithText(
@@ -171,24 +163,16 @@ export const trustUser = async (
 ) => {
   await clickOnMatchingText(
     window,
-    englishStrippedStr('attachmentsClickToDownload')
-      .withArgs({
-        file_type: englishStrippedStr(mediaType).toString().toLowerCase(),
-      })
-      .toString(),
+    tStripped('attachmentsClickToDownload', {
+      file_type: tStripped(mediaType).toLowerCase(),
+    }),
   );
   await checkModalStrings(
     window,
-    englishStrippedStr('attachmentsAutoDownloadModalTitle').toString(),
-    englishStrippedStr('attachmentsAutoDownloadModalDescription')
-      .withArgs({
-        conversation_name: userName,
-      })
-      .toString(),
+    tStripped('attachmentsAutoDownloadModalTitle'),
+    tStripped('attachmentsAutoDownloadModalDescription', {
+      conversation_name: userName,
+    }),
   );
-  await clickOnWithText(
-    window,
-    Global.confirmButton,
-    englishStrippedStr('yes').toString(),
-  );
+  await clickOnWithText(window, Global.confirmButton, tStripped('yes'));
 };

@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import {
   Conversation,
   Global,
@@ -43,15 +43,13 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       bobWindow1,
       'message-request-response-message',
-      englishStrippedStr('messageRequestYouHaveAccepted')
-        .withArgs({
-          name: alice.userName,
-        })
-        .toString(),
+      tStripped('messageRequestYouHaveAccepted', {
+        name: alice.userName,
+      }),
     );
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('messageRequestsNonePending').toString(),
+      tStripped('messageRequestsNonePending'),
     );
   },
 );
@@ -77,15 +75,13 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       bobWindow1,
       'message-request-response-message',
-      englishStrippedStr('messageRequestYouHaveAccepted')
-        .withArgs({
-          name: alice.userName,
-        })
-        .toString(),
+      tStripped('messageRequestYouHaveAccepted', {
+        name: alice.userName,
+      }),
     );
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('messageRequestsNonePending').toString(),
+      tStripped('messageRequestsNonePending'),
     );
   },
 );
@@ -108,23 +104,23 @@ test_Alice_1W_Bob_1W(
     await clickOnWithText(
       bobWindow1,
       Conversation.deleteMessageRequestButton,
-      englishStrippedStr('delete').toString(),
+      tStripped('delete'),
     );
     // Confirm decline
     await checkModalStrings(
       bobWindow1,
-      englishStrippedStr('delete').toString(),
-      englishStrippedStr('messageRequestsDelete').toString(),
+      tStripped('delete'),
+      tStripped('messageRequestsDelete'),
     );
     await clickOnWithText(
       bobWindow1,
       Global.confirmButton,
-      englishStrippedStr('delete').toString(),
+      tStripped('delete'),
     );
     // Check config message of message request acceptance
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('messageRequestsNonePending').toString(),
+      tStripped('messageRequestsNonePending'),
     );
   },
 );
@@ -138,33 +134,26 @@ test_Alice_1W_Bob_1W(
     // Check the message request banner appears and click on it
     await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select 'Clear All' button
-    await clickOnMatchingText(
-      bobWindow1,
-      englishStrippedStr('clearAll').toString(),
-    );
+    await clickOnMatchingText(bobWindow1, tStripped('clearAll'));
     // Confirm decline
     await checkModalStrings(
       bobWindow1,
-      englishStrippedStr('clearAll').toString(),
-      englishStrippedStr('messageRequestsClearAllExplanation').toString(),
+      tStripped('clearAll'),
+      tStripped('messageRequestsClearAllExplanation'),
     );
-    await clickOnWithText(
-      bobWindow1,
-      Global.confirmButton,
-      englishStrippedStr('clear').toString(),
-    );
+    await clickOnWithText(bobWindow1, Global.confirmButton, tStripped('clear'));
     // Navigate back to message request folder to check
     await clickOn(bobWindow1, LeftPane.settingsButton);
 
     await clickOnWithText(
       bobWindow1,
       Settings.messageRequestsMenuItem,
-      englishStrippedStr('sessionMessageRequests').toString(),
+      tStripped('sessionMessageRequests'),
     );
     // Check config message of message request acceptance
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('messageRequestsNonePending').toString(),
+      tStripped('messageRequestsNonePending'),
     );
   },
 );
@@ -213,11 +202,9 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       bobWindow1,
       'message-request-response-message',
-      englishStrippedStr('messageRequestYouHaveAccepted')
-        .withArgs({
-          name: alice.userName,
-        })
-        .toString(),
+      tStripped('messageRequestYouHaveAccepted', {
+        name: alice.userName,
+      }),
     );
   },
 );

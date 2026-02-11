@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { tStripped } from '../../localization/lib';
 import { Conversation, Global } from '../locators';
 import { Group } from '../types/testing';
 import {
@@ -14,16 +14,9 @@ export const leaveGroup = async (window: Page, group: Group) => {
   // go to three dots menu
   await clickOn(window, Conversation.conversationSettingsIcon);
   // Select Leave Group
-  await clickOnMatchingText(
-    window,
-    englishStrippedStr('groupLeave').toString(),
-  );
+  await clickOnMatchingText(window, tStripped('groupLeave'));
   // Confirm leave group
-  await clickOnWithText(
-    window,
-    Global.confirmButton,
-    englishStrippedStr('leave').toString(),
-  );
+  await clickOnWithText(window, Global.confirmButton, tStripped('leave'));
   // check config message
   await hasElementBeenDeleted(
     window,

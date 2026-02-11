@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { longText, mediaArray, testLink } from './constants/variables';
 import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
@@ -165,19 +165,16 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       waitForTextMessage(charlieWindow1, unsendMessage),
     ]);
     await clickOnTextMessage(aliceWindow1, unsendMessage, true);
+    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
     await clickOnMatchingText(
       aliceWindow1,
-      englishStrippedStr('delete').toString(),
-    );
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('clearMessagesForEveryone').toString(),
+      tStripped('clearMessagesForEveryone'),
     );
     // To be implemented in Standardise Message Deletion feature
     // await checkModalStrings(
     //   aliceWindow1,
-    //   englishStrippedStr('deleteMessage').withArgs({ count: 1 }).toString(),
-    //   englishStrippedStr('deleteMessageConfirm').toString(),
+    //   tStripped('deleteMessage', { count: 1 }),
+    //   tStripped('deleteMessageConfirm'),
     // );
     await clickOnElement({
       window: aliceWindow1,
@@ -187,18 +184,16 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       'session-toast',
-      englishStrippedStr('deleteMessageDeleted')
-        .withArgs({ count: 1 })
-        .toString(),
+      tStripped('deleteMessageDeleted', { count: 1 }),
     );
     await sleepFor(1000);
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+      tStripped('deleteMessageDeletedGlobally'),
     );
     await waitForMatchingText(
       charlieWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+      tStripped('deleteMessageDeletedGlobally'),
     );
   },
 );
@@ -211,14 +206,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await waitForTextMessage(bobWindow1, deletedMessage);
     await waitForTextMessage(charlieWindow1, deletedMessage);
     await clickOnTextMessage(aliceWindow1, deletedMessage, true);
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('delete').toString(),
-    );
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('clearMessagesForMe').toString(),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
+    await clickOnMatchingText(aliceWindow1, tStripped('clearMessagesForMe'));
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
@@ -227,14 +216,12 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       'session-toast',
-      englishStrippedStr('deleteMessageDeleted')
-        .withArgs({ count: 1 })
-        .toString(),
+      tStripped('deleteMessageDeleted', { count: 1 }),
     );
     await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage, 5000);
     await waitForMatchingText(
       aliceWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+      tStripped('deleteMessageDeletedGlobally'),
     );
     // Should still be there for user B and C
     await waitForMatchingText(bobWindow1, deletedMessage);
