@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { testCommunityName } from './constants/community';
 import { Conversation, Global, HomeScreen } from './locators';
 import { newUser } from './setup/new_user';
@@ -26,8 +26,8 @@ import {
   waitForTestIdWithText,
 } from './utilities/utils';
 
-const banUserString = englishStrippedStr('banUser').toString();
-const unbanUserString = englishStrippedStr('banUnbanUser').toString();
+const banUserString = tStripped('banUser');
+const unbanUserString = tStripped('banUnbanUser');
 
 test_Alice_2W(
   'Join community and sync',

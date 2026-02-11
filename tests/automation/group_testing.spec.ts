@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { doForAll, sleepFor } from '../promise_utils';
 import {
   Conversation,
@@ -81,10 +81,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
     // Waiting for animation of right panel to appear
     await sleepFor(1000);
     await clickOnMatchingText(aliceWindow1, dracula.userName);
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('membersInviteTitle').toString(),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('membersInviteTitle'));
     // even if Bob and Charlie do not know Dracula's name,
     // Alice sets Dracula's name in the group members that every one will use as a fallback
     await doForAll(
@@ -92,9 +89,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
         return waitForTestIdWithText(
           w,
           'group-update-message',
-          englishStrippedStr('groupMemberNew')
-            .withArgs({ name: dracula.userName })
-            .toString(),
+          tStripped('groupMemberNew', { name: dracula.userName }),
         );
       },
       [aliceWindow1, bobWindow1, charlieWindow1],
@@ -112,7 +107,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Change group name',
   async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
     const newGroupName = 'New group name';
-    const expectedError = englishStrippedStr('groupNameEnterPlease').toString();
+    const expectedError = tStripped('groupNameEnterPlease');
     // Change the name of the group and check that it syncs to all devices (config messages)
     // Click on already created group
     // Check that renaming a group is working
@@ -121,16 +116,12 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOnMatchingText(bobWindow1, newGroupName);
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('groupNameNew')
-        .withArgs({ group_name: newGroupName })
-        .toString(),
+      tStripped('groupNameNew', { group_name: newGroupName }),
     );
     await clickOnMatchingText(charlieWindow1, newGroupName);
     await waitForMatchingText(
       charlieWindow1,
-      englishStrippedStr('groupNameNew')
-        .withArgs({ group_name: newGroupName })
-        .toString(),
+      tStripped('groupNameNew', { group_name: newGroupName }),
     );
     // Click on conversation options
     // Check to see that you can't change group name to empty string
@@ -149,10 +140,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
         `Expected error message: ${expectedError}, but got: ${actualError}`,
       );
     }
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('cancel').toString(),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('cancel'));
     await clickOn(aliceWindow1, Global.modalCloseButton);
   },
 );
@@ -238,16 +226,12 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       waitForTestIdWithText(
         aliceWindow1,
         'group-update-message',
-        englishStrippedStr('groupMemberLeft')
-          .withArgs({ name: charlie.userName })
-          .toString(),
+        tStripped('groupMemberLeft', { name: charlie.userName }),
       ),
       waitForTestIdWithText(
         bobWindow1,
         'group-update-message',
-        englishStrippedStr('groupMemberLeft')
-          .withArgs({ name: charlie.userName })
-          .toString(),
+        tStripped('groupMemberLeft', { name: charlie.userName }),
       ),
     ]);
   },

@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { tStripped } from '../../localization/lib';
 import { Conversation, ConversationSettings } from '../locators';
 import {
   ConversationType,
@@ -92,27 +92,26 @@ export const setDisappearingMessages = async (
   if (windowB) {
     await clickOnMatchingText(
       windowB,
-      englishStrippedStr('disappearingMessagesFollowSetting').toString(),
+      tStripped('disappearingMessagesFollowSetting'),
     );
 
     let action;
     if (disappearAction === 'read') {
-      action = englishStrippedStr('disappearingMessagesTypeRead').toString();
+      action = tStripped('disappearingMessagesTypeRead');
     } else {
-      action = englishStrippedStr('disappearingMessagesTypeSent').toString();
+      action = tStripped('disappearingMessagesTypeSent');
     }
 
     const formattedTime = formatTimeOption(timerDuration);
 
-    const modalDescription = englishStrippedStr(
-      'disappearingMessagesFollowSettingOn',
-    )
-      .withArgs({ time: formattedTime, disappearing_messages_type: action })
-      .toString();
+    const modalDescription = tStripped('disappearingMessagesFollowSettingOn', {
+      time: formattedTime,
+      disappearing_messages_type: action,
+    });
 
     await checkModalStrings(
       windowB,
-      englishStrippedStr('disappearingMessagesFollowSetting').toString(),
+      tStripped('disappearingMessagesFollowSetting'),
       modalDescription,
     );
     await clickOnElement({

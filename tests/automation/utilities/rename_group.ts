@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { tStripped } from '../../localization/lib';
 import { Conversation, ConversationSettings, Global } from '../locators';
 import {
   clickOn,
@@ -20,14 +20,12 @@ export const renameGroup = async (
   await clickOn(window, ConversationSettings.editGroupButton);
   await typeIntoInput(window, 'update-group-info-name-input', newGroupName);
   await window.keyboard.press('Enter');
-  await clickOnMatchingText(window, englishStrippedStr('save').toString());
+  await clickOnMatchingText(window, tStripped('save'));
   await waitForTestIdWithText(window, 'group-name', newGroupName);
   await clickOn(window, Global.modalCloseButton);
   // Check config message
   await waitForMatchingText(
     window,
-    englishStrippedStr('groupNameNew')
-      .withArgs({ group_name: newGroupName })
-      .toString(),
+    tStripped('groupNameNew', { group_name: newGroupName }),
   );
 };

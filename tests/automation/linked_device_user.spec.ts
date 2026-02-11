@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import {
   Conversation,
@@ -97,10 +97,7 @@ test_Alice_2W(
       newUsername,
     );
     // Press enter to confirm change
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('save').toString(),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('save'));
 
     // Check username change in window B
     // Click on profile settings in window B
@@ -150,10 +147,7 @@ test_Alice_2W(
       aliceWindow1,
       Global.loadingSpinner.selector,
     );
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('save').toString(),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('save'));
     await clickOn(aliceWindow1, Global.modalCloseButton);
 
     const leftpaneAvatarContainer = await waitForTestIdWithText(
@@ -200,21 +194,16 @@ test_Alice_2W_Bob_1W(
       waitForTextMessage(bobWindow1, messageToDelete),
     ]);
     await clickOnTextMessage(aliceWindow1, messageToDelete, true);
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('delete').toString(),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('delete').toString(),
+      tStripped('delete'),
     );
     await waitForTestIdWithText(
       aliceWindow1,
       'session-toast',
-      englishStrippedStr('deleteMessageDeleted')
-        .withArgs({ count: 1 })
-        .toString(),
+      tStripped('deleteMessageDeleted', { count: 1 }),
     );
     await hasTextMessageBeenDeleted(aliceWindow1, messageToDelete, 6_000);
     // linked device for deleted message
@@ -243,13 +232,10 @@ test_Alice_2W_Bob_1W(
       waitForTextMessage(bobWindow1, unsentMessage),
     ]);
     await clickOnTextMessage(aliceWindow1, unsentMessage, true);
+    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
     await clickOnMatchingText(
       aliceWindow1,
-      englishStrippedStr('delete').toString(),
-    );
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('clearMessagesForEveryone').toString(),
+      tStripped('clearMessagesForEveryone'),
     );
     await clickOnElement({
       window: aliceWindow1,
@@ -259,14 +245,12 @@ test_Alice_2W_Bob_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       'session-toast',
-      englishStrippedStr('deleteMessageDeleted')
-        .withArgs({ count: 1 })
-        .toString(),
+      tStripped('deleteMessageDeleted', { count: 1 }),
     );
     await hasTextMessageBeenDeleted(aliceWindow1, unsentMessage, 1000);
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+      tStripped('deleteMessageDeletedGlobally'),
     );
     // linked device for deleted message
     await hasTextMessageBeenDeleted(aliceWindow2, unsentMessage, 5_000);
@@ -291,26 +275,24 @@ test_Alice_2W_Bob_1W(
     await clickOnWithText(
       aliceWindow2,
       Global.contextMenuItem,
-      englishStrippedStr('block').toString(),
+      tStripped('block'),
     );
     // Check modal strings
     await checkModalStrings(
       aliceWindow2,
-      englishStrippedStr('block').toString(),
-      englishStrippedStr('blockDescription')
-        .withArgs({ name: bob.userName })
-        .toString(),
+      tStripped('block'),
+      tStripped('blockDescription', { name: bob.userName }),
     );
     await clickOnWithText(
       aliceWindow2,
       Global.confirmButton,
-      englishStrippedStr('block').toString(),
+      tStripped('block'),
     );
     // Verify the user was moved to the blocked contact list
     await waitForMatchingPlaceholder(
       aliceWindow1,
       Conversation.messageInput.selector,
-      englishStrippedStr('blockBlockedDescription').toString(),
+      tStripped('blockBlockedDescription'),
     );
     // Check linked device for blocked contact in settings screen
     // Click on settings tab
@@ -376,19 +358,17 @@ test_Alice_2W_Bob_1W(
     await clickOnWithText(
       aliceWindow1,
       Global.contextMenuItem,
-      englishStrippedStr('conversationsDelete').toString(),
+      tStripped('conversationsDelete'),
     );
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('conversationsDelete').toString(),
-      englishStrippedStr('deleteConversationDescription')
-        .withArgs({ name: bob.userName })
-        .toString(),
+      tStripped('conversationsDelete'),
+      tStripped('deleteConversationDescription', { name: bob.userName }),
     );
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('delete').toString(),
+      tStripped('delete'),
     );
     // Check if conversation is deleted
     // Need to wait for deletion to propagate to linked device
@@ -420,7 +400,7 @@ test_Alice_2W(
     await waitForTestIdWithText(
       aliceWindow1,
       'header-conversation-name',
-      englishStrippedStr('noteToSelf').toString(),
+      tStripped('noteToSelf'),
     );
     await sendMessage(aliceWindow1, 'Testing note to self');
     // Check if note to self is visible in linked device
@@ -428,28 +408,28 @@ test_Alice_2W(
     await waitForTestIdWithText(
       aliceWindow2,
       HomeScreen.conversationItemName.selector,
-      englishStrippedStr('noteToSelf').toString(),
+      tStripped('noteToSelf'),
     );
     await clickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
-      englishStrippedStr('noteToSelf').toString(),
+      tStripped('noteToSelf'),
       { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,
       Global.contextMenuItem,
-      englishStrippedStr('noteToSelfHide').toString(),
+      tStripped('noteToSelfHide'),
     );
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('noteToSelfHide').toString(),
-      englishStrippedStr('noteToSelfHideDescription').toString(),
+      tStripped('noteToSelfHide'),
+      tStripped('noteToSelfHideDescription'),
     );
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('hide').toString(),
+      tStripped('hide'),
     );
     // Check linked device for hidden note to self
     await sleepFor(1000);
@@ -459,14 +439,14 @@ test_Alice_2W(
         'data-testid',
         HomeScreen.conversationItemName.selector,
         5000,
-        englishStrippedStr('noteToSelf').toString(),
+        tStripped('noteToSelf'),
       ),
       hasElementBeenDeleted(
         aliceWindow2,
         'data-testid',
         HomeScreen.conversationItemName.selector,
         15_000,
-        englishStrippedStr('noteToSelf').toString(),
+        tStripped('noteToSelf'),
       ),
     ]);
   },

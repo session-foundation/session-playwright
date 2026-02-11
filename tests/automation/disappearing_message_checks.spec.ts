@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
 import {
@@ -60,23 +60,19 @@ mediaArray.forEach(
           waitForTestIdWithText(
             aliceWindow1,
             Conversation.disappearingControlMessage.selector,
-            englishStrippedStr('disappearingMessagesSetYou')
-              .withArgs({
-                time: formattedTime,
-                disappearing_messages_type: disappearAction,
-              })
-              .toString(),
+            tStripped('disappearingMessagesSetYou', {
+              time: formattedTime,
+              disappearing_messages_type: disappearAction,
+            }),
           ),
           waitForTestIdWithText(
             bobWindow1,
             Conversation.disappearingControlMessage.selector,
-            englishStrippedStr('disappearingMessagesSet')
-              .withArgs({
-                time: formattedTime,
-                disappearing_messages_type: disappearAction,
-                name: alice.userName,
-              })
-              .toString(),
+            tStripped('disappearingMessagesSet', {
+              time: formattedTime,
+              disappearing_messages_type: disappearAction,
+              name: alice.userName,
+            }),
           ),
         ]);
         // Send media
@@ -128,23 +124,19 @@ test_Alice_1W_Bob_1W(
       waitForTestIdWithText(
         aliceWindow1,
         Conversation.disappearingControlMessage.selector,
-        englishStrippedStr('disappearingMessagesSetYou')
-          .withArgs({
-            time: formattedTime,
-            disappearing_messages_type: disappearAction,
-          })
-          .toString(),
+        tStripped('disappearingMessagesSetYou', {
+          time: formattedTime,
+          disappearing_messages_type: disappearAction,
+        }),
       ),
       waitForTestIdWithText(
         bobWindow1,
         Conversation.disappearingControlMessage.selector,
-        englishStrippedStr('disappearingMessagesSet')
-          .withArgs({
-            time: formattedTime,
-            disappearing_messages_type: disappearAction,
-            name: alice.userName,
-          })
-          .toString(),
+        tStripped('disappearingMessagesSet', {
+          time: formattedTime,
+          disappearing_messages_type: disappearAction,
+          name: alice.userName,
+        }),
       ),
     ]);
     await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
@@ -173,23 +165,19 @@ test_Alice_1W_Bob_1W(
       waitForTestIdWithText(
         aliceWindow1,
         Conversation.disappearingControlMessage.selector,
-        englishStrippedStr('disappearingMessagesSetYou')
-          .withArgs({
-            time: formattedTime,
-            disappearing_messages_type: disappearAction,
-          })
-          .toString(),
+        tStripped('disappearingMessagesSetYou', {
+          time: formattedTime,
+          disappearing_messages_type: disappearAction,
+        }),
       ),
       waitForTestIdWithText(
         bobWindow1,
         Conversation.disappearingControlMessage.selector,
-        englishStrippedStr('disappearingMessagesSet')
-          .withArgs({
-            time: formattedTime,
-            disappearing_messages_type: disappearAction,
-            name: alice.userName,
-          })
-          .toString(),
+        tStripped('disappearingMessagesSet', {
+          time: formattedTime,
+          disappearing_messages_type: disappearAction,
+          name: alice.userName,
+        }),
       ),
     ]);
     await sendLinkPreview(aliceWindow1, testLink);
@@ -227,23 +215,19 @@ test_Alice_1W_Bob_1W(
       waitForTestIdWithText(
         aliceWindow1,
         Conversation.disappearingControlMessage.selector,
-        englishStrippedStr('disappearingMessagesSetYou')
-          .withArgs({
-            time: formattedTime,
-            disappearing_messages_type: disappearAction,
-          })
-          .toString(),
+        tStripped('disappearingMessagesSetYou', {
+          time: formattedTime,
+          disappearing_messages_type: disappearAction,
+        }),
       ),
       waitForTestIdWithText(
         bobWindow1,
         Conversation.disappearingControlMessage.selector,
-        englishStrippedStr('disappearingMessagesSet')
-          .withArgs({
-            time: formattedTime,
-            disappearing_messages_type: disappearAction,
-            name: alice.userName,
-          })
-          .toString(),
+        tStripped('disappearingMessagesSet', {
+          time: formattedTime,
+          disappearing_messages_type: disappearAction,
+          name: alice.userName,
+        }),
       ),
     ]);
     await joinCommunity(aliceWindow1);
@@ -254,7 +238,7 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',
-      englishStrippedStr('membersInvite').toString(),
+      tStripped('membersInvite'),
     );
     await clickOnWithText(aliceWindow1, Global.contactItem, bob.userName);
     await clickOn(aliceWindow1, Global.confirmButton);
@@ -321,23 +305,19 @@ test_Alice_1W_Bob_1W(
       waitForTestIdWithText(
         aliceWindow1,
         Conversation.disappearingControlMessage.selector,
-        englishStrippedStr('disappearingMessagesSetYou')
-          .withArgs({
-            time: formattedTime,
-            disappearing_messages_type: disappearAction,
-          })
-          .toString(),
+        tStripped('disappearingMessagesSetYou', {
+          time: formattedTime,
+          disappearing_messages_type: disappearAction,
+        }),
       ),
       waitForTestIdWithText(
         bobWindow1,
         Conversation.disappearingControlMessage.selector,
-        englishStrippedStr('disappearingMessagesSet')
-          .withArgs({
-            time: formattedTime,
-            disappearing_messages_type: disappearAction,
-            name: alice.userName,
-          })
-          .toString(),
+        tStripped('disappearingMessagesSet', {
+          time: formattedTime,
+          disappearing_messages_type: disappearAction,
+          name: alice.userName,
+        }),
       ),
     ]);
     await makeVoiceCall(aliceWindow1, bobWindow1);
@@ -346,15 +326,13 @@ test_Alice_1W_Bob_1W(
       waitForTestIdWithText(
         bobWindow1,
         'call-notification-answered-a-call',
-        englishStrippedStr('callsInProgress').toString(),
+        tStripped('callsInProgress'),
       ),
       // In the callers window, the message is 'You called {reciverName}'
       waitForTestIdWithText(
         aliceWindow1,
         'call-notification-started-call',
-        englishStrippedStr('callsYouCalled')
-          .withArgs({ name: bob.userName })
-          .toString(),
+        tStripped('callsYouCalled', { name: bob.userName }),
       ),
     ]);
     // Wait 30 seconds for call message to disappear
@@ -365,16 +343,14 @@ test_Alice_1W_Bob_1W(
         'data-testid',
         'call-notification-answered-a-call',
         undefined,
-        englishStrippedStr('callsInProgress').toString(),
+        tStripped('callsInProgress'),
       ),
       hasElementBeenDeleted(
         aliceWindow1,
         'data-testid',
         'call-notification-started-call',
         undefined,
-        englishStrippedStr('callsYouCalled')
-          .withArgs({ name: bob.userName })
-          .toString(),
+        tStripped('callsYouCalled', { name: bob.userName }),
       ),
     ]);
   },

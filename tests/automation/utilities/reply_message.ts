@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
 import { Strategy } from '../types/testing';
 import { sendMessage } from './message';
@@ -49,12 +49,7 @@ export const replyTo = async ({
       // Tried extending this as layout shift still happens sometimes
       await sleepFor(200, true);
 
-      await clickOnMatchingText(
-        senderWindow,
-        englishStrippedStr('reply').toString(),
-        false,
-        1000,
-      );
+      await clickOnMatchingText(senderWindow, tStripped('reply'), false, 1000);
       // Tried extending this as layout shift still happens sometimes
       await sleepFor(200, true);
 
@@ -92,12 +87,7 @@ export const replyToMedia = async ({
     try {
       await selc.click({ button: 'right' });
       await sleepFor(200);
-      await clickOnMatchingText(
-        senderWindow,
-        englishStrippedStr('reply').toString(),
-        false,
-        1000,
-      );
+      await clickOnMatchingText(senderWindow, tStripped('reply'), false, 1000);
       break;
     } catch (_e) {
       console.info(

@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { CTA, Global } from './locators';
 import { test_Alice_1W } from './setup/sessionTest';
 import { mockDBCreationTime } from './utilities/time_travel';
@@ -15,12 +15,9 @@ import {
 async function verifyDonateCTAShows(window: Page) {
   await checkCTAStrings(
     window,
-    englishStrippedStr('donateSessionHelp').toString(),
-    englishStrippedStr('donateSessionDescription').toString(),
-    [
-      englishStrippedStr('donate').toString(),
-      englishStrippedStr('maybeLater').toString(),
-    ],
+    tStripped('donateSessionHelp'),
+    tStripped('donateSessionDescription'),
+    [tStripped('donate'), tStripped('maybeLater')],
   );
 }
 
@@ -63,8 +60,8 @@ urlModalButtons.forEach(({ button, name }) => {
       await clickOn(aliceWindow1, CTA.confirmButton);
       await checkModalStrings(
         aliceWindow1,
-        englishStrippedStr('urlOpen').toString(),
-        englishStrippedStr('urlOpenDescription').withArgs({ url }).toString(),
+        tStripped('urlOpen'),
+        tStripped('urlOpenDescription', { url }),
         'openUrlModal',
       );
 

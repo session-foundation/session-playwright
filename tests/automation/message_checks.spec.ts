@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
 import { longText, mediaArray, testLink } from './constants/variables';
@@ -146,7 +146,7 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       'modal-heading',
-      englishStrippedStr('membersInvite').toString(),
+      tStripped('membersInvite'),
     );
     await clickOnWithText(aliceWindow1, Global.contactItem, bob.userName);
     await clickOn(aliceWindow1, Global.confirmButton);
@@ -190,13 +190,10 @@ test_Alice_1W_Bob_1W(
     await sendMessage(aliceWindow1, unsendMessage);
     await waitForTextMessage(bobWindow1, unsendMessage);
     await clickOnTextMessage(aliceWindow1, unsendMessage, true);
+    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
     await clickOnMatchingText(
       aliceWindow1,
-      englishStrippedStr('delete').toString(),
-    );
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('clearMessagesForEveryone').toString(),
+      tStripped('clearMessagesForEveryone'),
     );
     await clickOnElement({
       window: aliceWindow1,
@@ -206,14 +203,12 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       'session-toast',
-      englishStrippedStr('deleteMessageDeleted')
-        .withArgs({ count: 1 })
-        .toString(),
+      tStripped('deleteMessageDeleted', { count: 1 }),
     );
     await sleepFor(1000);
     await waitForMatchingText(
       bobWindow1,
-      englishStrippedStr('deleteMessageDeletedGlobally').toString(),
+      tStripped('deleteMessageDeletedGlobally'),
     );
   },
 );
@@ -226,10 +221,7 @@ test_Alice_1W_Bob_1W(
     await sendMessage(aliceWindow1, deletedMessage);
     await waitForTextMessage(bobWindow1, deletedMessage);
     await clickOnTextMessage(aliceWindow1, deletedMessage, true);
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('delete').toString(),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
@@ -238,9 +230,7 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       'session-toast',
-      englishStrippedStr('deleteMessageDeleted')
-        .withArgs({ count: 1 })
-        .toString(),
+      tStripped('deleteMessageDeleted', { count: 1 }),
     );
     await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage, 1000);
     // Still should exist in window B
@@ -354,20 +344,13 @@ messageLengthTestCases.forEach((testCase) => {
           // Upgrade to pro
           await checkCTAStrings(
             aliceWindow1,
-            englishStrippedStr('upgradeTo').toString(),
-            englishStrippedStr('proCallToActionLongerMessages').toString(),
+            tStripped('upgradeTo'),
+            tStripped('proCallToActionLongerMessages'),
+            [tStripped('theContinue'), tStripped('cancel')],
             [
-              englishStrippedStr('theContinue').toString(),
-              englishStrippedStr('cancel').toString(),
-            ],
-            [
-              ` ${englishStrippedStr(
-                'proFeatureListLongerMessages',
-              ).toString()}`,
-              ` ${englishStrippedStr(
-                'proFeatureListPinnedConversations',
-              ).toString()}`,
-              englishStrippedStr('proFeatureListLoadsMore').toString(),
+              ` ${tStripped('proFeatureListLongerMessages')}`,
+              ` ${tStripped('proFeatureListPinnedConversations')}`,
+              tStripped('proFeatureListLoadsMore'),
             ],
           );
           await clickOn(aliceWindow1, CTA.cancelButton);
@@ -376,10 +359,10 @@ messageLengthTestCases.forEach((testCase) => {
           // Message Too Long modal
           await checkModalStrings(
             aliceWindow1,
-            englishStrippedStr('modalMessageTooLongTitle').toString(),
-            englishStrippedStr('modalMessageTooLongDescription')
-              .withArgs({ limit: maxChars.toLocaleString('en-AU') }) // Force "2,000" instead of "2000"
-              .toString(),
+            tStripped('modalMessageTooLongTitle'),
+            tStripped('modalMessageTooLongDescription', {
+              limit: maxChars.toLocaleString('en-AU'),
+            }), // Force "2,000" instead of "2000"
           );
           await clickOn(aliceWindow1, Global.confirmButton);
         }
