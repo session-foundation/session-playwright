@@ -9,7 +9,10 @@ dotenv.config({ quiet: true });
 export default defineConfig({
   timeout: 350000,
   globalTimeout: 6000000,
-  reporter: [['./sessionReporter.ts'], ['allure-playwright']],
+  reporter: [
+    [process.stdout.isTTY && process.env.NO_TUI !== '1' ? './tuiReporter.ts' : './sessionReporter.ts'],
+    ['allure-playwright'],
+  ],
   testDir: './tests/automation',
   testIgnore: '*.js',
   outputDir: './tests/automation/test-results',
