@@ -114,7 +114,11 @@ export class TerminalTui {
   private selectedIndex = 0;
   private outputScrollOffset = 0;
   private activePaneFocus: 'list' | 'output' = 'list';
-  private progress: TuiProgress = { completed: 0, estimatedMinsLeft: 0, total: 0 };
+  private progress: TuiProgress = {
+    completed: 0,
+    estimatedMinsLeft: 0,
+    total: 0,
+  };
   private isActive = false;
   private renderScheduled = false;
   private originalStdinRawMode: boolean | undefined;
@@ -192,7 +196,12 @@ export class TerminalTui {
     this.scheduleRender();
   }
 
-  updateTest(id: string, status: TestStatus, duration?: number, retry?: number): void {
+  updateTest(
+    id: string,
+    status: TestStatus,
+    duration?: number,
+    retry?: number,
+  ): void {
     const entry = this.tests.get(id);
     if (!entry) return;
     entry.status = status;
@@ -246,14 +255,21 @@ export class TerminalTui {
     }
   }
 
-  setError(id: string, errors: Array<{ message?: string; snippet?: string; stack?: string }>): void {
+  setError(
+    id: string,
+    errors: Array<{ message?: string; snippet?: string; stack?: string }>,
+  ): void {
     const entry = this.tests.get(id);
     if (!entry) return;
     entry.errors = errors;
     this.scheduleRender();
   }
 
-  setProgress(completed: number, total: number, estimatedMinsLeft: number): void {
+  setProgress(
+    completed: number,
+    total: number,
+    estimatedMinsLeft: number,
+  ): void {
     this.progress = { completed, estimatedMinsLeft, total };
     this.scheduleRender();
   }
@@ -277,7 +293,9 @@ export class TerminalTui {
       const msg = 'Terminal too small (min 60x10)';
       const r = Math.floor(rows / 2);
       const c = Math.max(1, Math.floor((cols - msg.length) / 2));
-      process.stdout.write(MOVE_TO(1, 1) + ESC + '[2J' + MOVE_TO(r, c) + chalk.yellow(msg));
+      process.stdout.write(
+        MOVE_TO(1, 1) + ESC + '[2J' + MOVE_TO(r, c) + chalk.yellow(msg),
+      );
       return;
     }
 
@@ -289,15 +307,27 @@ export class TerminalTui {
 
     // --- Header ---
     const leftHeader = ` Tests (${this.progress.completed}/${this.progress.total}) `;
-    const selectedTest = this.tests.get(this.testOrder[this.selectedIndex] ?? '');
-    const rightHeaderLabel = selectedTest ? ` Output: ${truncate(selectedTest.title, rightWidth - 12)} ` : ' Output ';
+    const selectedTest = this.tests.get(
+      this.testOrder[this.selectedIndex] ?? '',
+    );
+    const rightHeaderLabel = selectedTest
+      ? ` Output: ${truncate(selectedTest.title, rightWidth - 12)} `
+      : ' Output ';
 
     const leftFill = Math.max(0, leftWidth - leftHeader.length - 1);
     const rightFill = Math.max(0, rightWidth - rightHeaderLabel.length - 1);
 
     buf += CLEAR_LINE;
-    buf += chalk.dim('\u250c') + chalk.dim('\u2500') + chalk.bold(leftHeader) + chalk.dim('\u2500'.repeat(leftFill));
-    buf += chalk.dim('\u252c') + chalk.dim('\u2500') + chalk.bold(rightHeaderLabel) + chalk.dim('\u2500'.repeat(rightFill));
+    buf +=
+      chalk.dim('\u250c') +
+      chalk.dim('\u2500') +
+      chalk.bold(leftHeader) +
+      chalk.dim('\u2500'.repeat(leftFill));
+    buf +=
+      chalk.dim('\u252c') +
+      chalk.dim('\u2500') +
+      chalk.bold(rightHeaderLabel) +
+      chalk.dim('\u2500'.repeat(rightFill));
     buf += chalk.dim('\u2510');
 
     // --- Content rows ---
@@ -305,7 +335,13 @@ export class TerminalTui {
     const listLen = this.testOrder.length;
     let listStart = 0;
     if (listLen > contentHeight) {
-      listStart = Math.max(0, Math.min(this.selectedIndex - Math.floor(contentHeight / 2), listLen - contentHeight));
+      listStart = Math.max(
+        0,
+        Math.min(
+          this.selectedIndex - Math.floor(contentHeight / 2),
+          listLen - contentHeight,
+        ),
+      );
     }
     this.lastListStart = listStart;
     this.lastLeftWidth = leftWidth;
@@ -326,16 +362,28 @@ export class TerminalTui {
         const entry = this.tests.get(this.testOrder[testIdx])!;
         const isSelected = testIdx === this.selectedIndex;
         const label = statusLabel(entry.status);
-        const retryStr = entry.retry > 0 ? chalk.dim(`r:${entry.retry}`) + ' ' : '';
-        const durStr = entry.duration !== null ? chalk.dim(formatDuration(entry.duration)) : chalk.dim('--');
-        const maxTitleLen = leftWidth - 4 - 5 - (entry.retry > 0 ? 4 + String(entry.retry).length : 0) - 5;
+        const retryStr =
+          entry.retry > 0 ? chalk.dim(`r:${entry.retry}`) + ' ' : '';
+        const durStr =
+          entry.duration !== null
+            ? chalk.dim(formatDuration(entry.duration))
+            : chalk.dim('--');
+        const maxTitleLen =
+          leftWidth -
+          4 -
+          5 -
+          (entry.retry > 0 ? 4 + String(entry.retry).length : 0) -
+          5;
         const title = truncate(entry.title, Math.max(5, maxTitleLen));
 
         const line = ` ${label} ${retryStr}${title}`;
-        const lineWithDur = padRight(line, leftWidth - visibleLength(durStr) - 2) + durStr + ' ';
+        const lineWithDur =
+          padRight(line, leftWidth - visibleLength(durStr) - 2) + durStr + ' ';
 
         leftCell = isSelected
-          ? (this.activePaneFocus === 'list' ? chalk.inverse(padRight(lineWithDur, leftWidth)) : chalk.bgGray(padRight(lineWithDur, leftWidth)))
+          ? this.activePaneFocus === 'list'
+            ? chalk.inverse(padRight(lineWithDur, leftWidth))
+            : chalk.bgGray(padRight(lineWithDur, leftWidth))
           : padRight(lineWithDur, leftWidth);
       } else {
         leftCell = ' '.repeat(leftWidth);
@@ -358,28 +406,50 @@ export class TerminalTui {
     // --- Bottom divider ---
     const bottomRow = contentHeight + 2;
     buf += MOVE_TO(bottomRow, 1) + CLEAR_LINE;
-    buf += chalk.dim('\u2514' + '\u2500'.repeat(leftWidth) + '\u2534' + '\u2500'.repeat(rightWidth) + '\u2518');
+    buf += chalk.dim(
+      '\u2514' +
+        '\u2500'.repeat(leftWidth) +
+        '\u2534' +
+        '\u2500'.repeat(rightWidth) +
+        '\u2518',
+    );
 
     // --- Status bar ---
     const statusRow = bottomRow + 1;
     buf += MOVE_TO(statusRow, 1) + CLEAR_LINE;
 
-    const listHint = this.activePaneFocus === 'list' ? chalk.bold('\u2191\u2193 navigate') : chalk.dim('\u2191\u2193 scroll');
+    const listHint =
+      this.activePaneFocus === 'list'
+        ? chalk.bold('\u2191\u2193 navigate')
+        : chalk.dim('\u2191\u2193 scroll');
     const tabHint = chalk.dim('Tab') + ' switch';
     const qHint = chalk.dim('q') + ' quit';
     const cHint = chalk.dim('c') + ' copy';
-    const isFollowing = this.autoFollow && Date.now() - this.lastUserInteractionTime > 30_000;
-    const fHint = isFollowing ? chalk.green('f') + chalk.green(' follow') : chalk.dim('f') + ' follow';
-    const progressStr = chalk.dim(`${this.progress.completed}/${this.progress.total} done`);
-    const estStr = this.progress.estimatedMinsLeft > 0 ? chalk.dim(`, ~${this.progress.estimatedMinsLeft}min left`) : '';
+    const isFollowing =
+      this.autoFollow && Date.now() - this.lastUserInteractionTime > 30_000;
+    const fHint = isFollowing
+      ? chalk.green('f') + chalk.green(' follow')
+      : chalk.dim('f') + ' follow';
+    const progressStr = chalk.dim(
+      `${this.progress.completed}/${this.progress.total} done`,
+    );
+    const estStr =
+      this.progress.estimatedMinsLeft > 0
+        ? chalk.dim(`, ~${this.progress.estimatedMinsLeft}min left`)
+        : '';
     const flash = this.flashMessage ? chalk.green(` ${this.flashMessage}`) : '';
 
-    buf += ` ${listHint}  ${tabHint}  ${qHint}  ${cHint}  ${fHint}  ${chalk.dim('|')} ${progressStr}${estStr}${flash}`;
+    buf += ` ${listHint}  ${tabHint}  ${qHint}  ${cHint}  ${fHint}  ${chalk.dim(
+      '|',
+    )} ${progressStr}${estStr}${flash}`;
 
     process.stdout.write(buf);
   }
 
-  private buildOutputLines(entry: TuiTestEntry | undefined, width: number): string[] {
+  private buildOutputLines(
+    entry: TuiTestEntry | undefined,
+    width: number,
+  ): string[] {
     if (!entry) return [chalk.dim('  No test selected')];
 
     const lines: string[] = [];
@@ -467,7 +537,8 @@ export class TerminalTui {
 
     // Tab to switch panes
     if (key === '\t') {
-      this.activePaneFocus = this.activePaneFocus === 'list' ? 'output' : 'list';
+      this.activePaneFocus =
+        this.activePaneFocus === 'list' ? 'output' : 'list';
       this.scheduleRender();
       return;
     }
@@ -509,7 +580,10 @@ export class TerminalTui {
         // Down arrow
         case 0x42:
           if (this.activePaneFocus === 'list') {
-            this.selectedIndex = Math.min(this.testOrder.length - 1, this.selectedIndex + 1);
+            this.selectedIndex = Math.min(
+              this.testOrder.length - 1,
+              this.selectedIndex + 1,
+            );
             this.outputScrollOffset = 0;
             this.lastUserInteractionTime = Date.now();
           } else {
@@ -551,7 +625,10 @@ export class TerminalTui {
           this.outputScrollOffset = 0;
           this.lastUserInteractionTime = Date.now();
         } else {
-          this.outputScrollOffset = Math.max(0, this.outputScrollOffset - contentHeight);
+          this.outputScrollOffset = Math.max(
+            0,
+            this.outputScrollOffset - contentHeight,
+          );
         }
         this.scheduleRender();
         return;
@@ -559,7 +636,10 @@ export class TerminalTui {
       if (data[2] === 0x36 && data[3] === 0x7e) {
         // Page Down
         if (this.activePaneFocus === 'list') {
-          this.selectedIndex = Math.min(this.testOrder.length - 1, this.selectedIndex + contentHeight);
+          this.selectedIndex = Math.min(
+            this.testOrder.length - 1,
+            this.selectedIndex + contentHeight,
+          );
           this.outputScrollOffset = 0;
           this.lastUserInteractionTime = Date.now();
         } else {

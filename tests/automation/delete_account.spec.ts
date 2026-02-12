@@ -100,7 +100,7 @@ sessionTestTwoWindows(
         restoringWindow,
         'data-testid',
         HomeScreen.conversationItemName.selector,
-        5_000
+        5_000,
       );
 
       await clickOn(restoringWindow, HomeScreen.plusButton); // Expect contacts list to be empty

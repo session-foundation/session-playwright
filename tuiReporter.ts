@@ -80,14 +80,22 @@ class TuiReporter implements Reporter {
     this.tui.setProgress(completedCount, this.allTestsCount, estimatedMinsLeft);
   }
 
-  onStdOut(chunk: Buffer | string, test: TestCase | void, _result: TestResult | void) {
+  onStdOut(
+    chunk: Buffer | string,
+    test: TestCase | void,
+    _result: TestResult | void,
+  ) {
     if (test) {
       const text = isString(chunk) ? chunk : chunk.toString('utf-8');
       this.tui.appendOutput(test.id, text);
     }
   }
 
-  onStdErr(chunk: Buffer | string, test: TestCase | void, _result: TestResult | void) {
+  onStdErr(
+    chunk: Buffer | string,
+    test: TestCase | void,
+    _result: TestResult | void,
+  ) {
     if (test) {
       const text = isString(chunk) ? chunk : chunk.toString('utf-8');
       this.tui.appendOutput(test.id, text);
@@ -152,10 +160,12 @@ class TuiReporter implements Reporter {
 
     // Summary line
     const parts: string[] = [];
-    if (passedCount > 0) parts.push(chalk.green(`\u2713 ${passedCount} passed`));
+    if (passedCount > 0)
+      parts.push(chalk.green(`\u2713 ${passedCount} passed`));
     if (failedCount > 0) parts.push(chalk.red(`\u2717 ${failedCount} failed`));
     if (flakyCount > 0) parts.push(chalk.yellow(`\u21bb ${flakyCount} flaky`));
-    if (skippedCount > 0) parts.push(chalk.blue(`\u25cb ${skippedCount} skipped`));
+    if (skippedCount > 0)
+      parts.push(chalk.blue(`\u25cb ${skippedCount} skipped`));
     console.log(`  ${parts.join('  ')}`);
     console.log('');
 
@@ -165,12 +175,19 @@ class TuiReporter implements Reporter {
       for (const { results, title } of sortBy(failedTests, (t) => t.title)) {
         const attempts = results.length;
         console.log(
-          chalk.red(`    \u2717 ${title} (${attempts} attempt${attempts > 1 ? 's' : ''})`),
+          chalk.red(
+            `    \u2717 ${title} (${attempts} attempt${
+              attempts > 1 ? 's' : ''
+            })`,
+          ),
         );
         const lastResult = results[results.length - 1];
-        const lastError = lastResult.result.errors[lastResult.result.errors.length - 1];
+        const lastError =
+          lastResult.result.errors[lastResult.result.errors.length - 1];
         if (lastError?.message) {
-          console.log(chalk.dim(`      Error: ${lastError.message.split('\n')[0]}`));
+          console.log(
+            chalk.dim(`      Error: ${lastError.message.split('\n')[0]}`),
+          );
         }
       }
       console.log('');
@@ -183,7 +200,9 @@ class TuiReporter implements Reporter {
         const passedResult = results.find((r) => r.result.status === 'passed');
         const retryNum = passedResult ? passedResult.result.retry + 1 : '?';
         console.log(
-          chalk.yellow(`    \u21bb ${title} (passed on attempt ${retryNum}/${results.length})`),
+          chalk.yellow(
+            `    \u21bb ${title} (passed on attempt ${retryNum}/${results.length})`,
+          ),
         );
       }
       console.log('');
