@@ -77,17 +77,20 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
 
   try {
     const start = Date.now();
+    const useXvfb = process.env.USE_XVFB === '1';
     const electronApp = await electron.launch({
       args: [
         join(getAppRootPath(), 'app', 'ts', 'mains', 'main_node.js'),
         '--disable-gpu',
         '--force-device-scale-factor=1', // Normalizes Retina and non-Retina mac screens
+        ...(useXvfb ? ['--ozone-platform=x11'] : []),
       ],
       env: {
         ...process.env,
         ELECTRON_ENABLE_LOGGING: '1',
         // Optional: control log level
         ELECTRON_LOG_LEVEL: 'verbose', // 'verbose', 'info', 'warn', 'error'
+        ...(useXvfb && { WAYLAND_DISPLAY: '' }),
       },
     });
     console.info(`  Electron app launched in ${Date.now() - start}ms`);

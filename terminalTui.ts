@@ -126,6 +126,8 @@ export class TerminalTui {
   private onStopCallback: StopCallback | null = null;
   private lastListStart = 0; // saved from render() for mouse click mapping
   private lastLeftWidth = 30; // saved from render() for mouse click mapping
+  private autoFollow = true;
+  private lastUserInteractionTime = 0;
 
   start(): void {
     if (!process.stdout.isTTY) return;
@@ -196,6 +198,20 @@ export class TerminalTui {
     entry.status = status;
     if (duration !== undefined) entry.duration = duration;
     if (retry !== undefined) entry.retry = retry;
+
+    // Auto-follow: scroll to the test that just started running
+    if (
+      this.autoFollow &&
+      (status === 'running' || status === 'retrying') &&
+      Date.now() - this.lastUserInteractionTime > 30_000
+    ) {
+      const idx = this.testOrder.indexOf(id);
+      if (idx >= 0) {
+        this.selectedIndex = idx;
+        this.outputScrollOffset = 0;
+      }
+    }
+
     this.scheduleRender();
   }
 
@@ -316,7 +332,7 @@ export class TerminalTui {
         const title = truncate(entry.title, Math.max(5, maxTitleLen));
 
         const line = ` ${label} ${retryStr}${title}`;
-        const lineWithDur = padRight(line, leftWidth - durStr.length - 2) + durStr + ' ';
+        const lineWithDur = padRight(line, leftWidth - visibleLength(durStr) - 2) + durStr + ' ';
 
         leftCell = isSelected
           ? (this.activePaneFocus === 'list' ? chalk.inverse(padRight(lineWithDur, leftWidth)) : chalk.bgGray(padRight(lineWithDur, leftWidth)))
@@ -352,11 +368,13 @@ export class TerminalTui {
     const tabHint = chalk.dim('Tab') + ' switch';
     const qHint = chalk.dim('q') + ' quit';
     const cHint = chalk.dim('c') + ' copy';
+    const isFollowing = this.autoFollow && Date.now() - this.lastUserInteractionTime > 30_000;
+    const fHint = isFollowing ? chalk.green('f') + chalk.green(' follow') : chalk.dim('f') + ' follow';
     const progressStr = chalk.dim(`${this.progress.completed}/${this.progress.total} done`);
     const estStr = this.progress.estimatedMinsLeft > 0 ? chalk.dim(`, ~${this.progress.estimatedMinsLeft}min left`) : '';
     const flash = this.flashMessage ? chalk.green(` ${this.flashMessage}`) : '';
 
-    buf += ` ${listHint}  ${tabHint}  ${qHint}  ${cHint}  ${chalk.dim('|')} ${progressStr}${estStr}${flash}`;
+    buf += ` ${listHint}  ${tabHint}  ${qHint}  ${cHint}  ${fHint}  ${chalk.dim('|')} ${progressStr}${estStr}${flash}`;
 
     process.stdout.write(buf);
   }
@@ -439,6 +457,7 @@ export class TerminalTui {
             this.selectedIndex = testIdx;
             this.outputScrollOffset = 0;
             this.activePaneFocus = 'list';
+            this.lastUserInteractionTime = Date.now();
             this.scheduleRender();
           }
         }
@@ -459,6 +478,16 @@ export class TerminalTui {
       return;
     }
 
+    // f to toggle auto-follow
+    if (key === 'f' || key === 'F') {
+      this.autoFollow = !this.autoFollow;
+      if (this.autoFollow) {
+        this.lastUserInteractionTime = 0;
+      }
+      this.showFlash(this.autoFollow ? 'Auto-follow ON' : 'Auto-follow OFF');
+      return;
+    }
+
     // Escape sequences (arrows, page up/down, home/end)
     if (data[0] === 0x1b && data[1] === 0x5b) {
       const rows = process.stdout.rows || 24;
@@ -470,6 +499,7 @@ export class TerminalTui {
           if (this.activePaneFocus === 'list') {
             this.selectedIndex = Math.max(0, this.selectedIndex - 1);
             this.outputScrollOffset = 0;
+            this.lastUserInteractionTime = Date.now();
           } else {
             this.outputScrollOffset = Math.max(0, this.outputScrollOffset - 1);
           }
@@ -481,6 +511,7 @@ export class TerminalTui {
           if (this.activePaneFocus === 'list') {
             this.selectedIndex = Math.min(this.testOrder.length - 1, this.selectedIndex + 1);
             this.outputScrollOffset = 0;
+            this.lastUserInteractionTime = Date.now();
           } else {
             this.outputScrollOffset += 1; // clamped in render
           }
@@ -492,6 +523,7 @@ export class TerminalTui {
           if (this.activePaneFocus === 'list') {
             this.selectedIndex = 0;
             this.outputScrollOffset = 0;
+            this.lastUserInteractionTime = Date.now();
           } else {
             this.outputScrollOffset = 0;
           }
@@ -503,6 +535,7 @@ export class TerminalTui {
           if (this.activePaneFocus === 'list') {
             this.selectedIndex = Math.max(0, this.testOrder.length - 1);
             this.outputScrollOffset = 0;
+            this.lastUserInteractionTime = Date.now();
           } else {
             this.outputScrollOffset = Number.MAX_SAFE_INTEGER; // clamped in render
           }
@@ -516,6 +549,7 @@ export class TerminalTui {
         if (this.activePaneFocus === 'list') {
           this.selectedIndex = Math.max(0, this.selectedIndex - contentHeight);
           this.outputScrollOffset = 0;
+          this.lastUserInteractionTime = Date.now();
         } else {
           this.outputScrollOffset = Math.max(0, this.outputScrollOffset - contentHeight);
         }
@@ -527,6 +561,7 @@ export class TerminalTui {
         if (this.activePaneFocus === 'list') {
           this.selectedIndex = Math.min(this.testOrder.length - 1, this.selectedIndex + contentHeight);
           this.outputScrollOffset = 0;
+          this.lastUserInteractionTime = Date.now();
         } else {
           this.outputScrollOffset += contentHeight; // clamped in render
         }
@@ -560,35 +595,59 @@ export class TerminalTui {
       if (err.stack) text += err.stack + '\n';
     }
 
-    // Try platform clipboard tools
-    const platform = process.platform;
-    let cmd: string;
-    let args: string[];
-    if (platform === 'darwin') {
-      cmd = 'pbcopy';
-      args = [];
-    } else if (platform === 'win32') {
-      cmd = 'clip';
-      args = [];
+    // Build ordered list of clipboard commands to try
+    const candidates: Array<{ cmd: string; args: string[] }> = [];
+    if (process.platform === 'darwin') {
+      candidates.push({ cmd: 'pbcopy', args: [] });
+    } else if (process.platform === 'win32') {
+      candidates.push({ cmd: 'clip', args: [] });
     } else {
-      cmd = 'xclip';
-      args = ['-selection', 'clipboard'];
+      if (process.env.WAYLAND_DISPLAY) {
+        candidates.push({ cmd: 'wl-copy', args: [] });
+      }
+      candidates.push({ cmd: 'xclip', args: ['-selection', 'clipboard'] });
+      candidates.push({ cmd: 'xsel', args: ['--clipboard', '--input'] });
     }
 
+    this.tryCopyWithCandidates(text, candidates, 0);
+  }
+
+  private tryCopyWithCandidates(
+    text: string,
+    candidates: Array<{ cmd: string; args: string[] }>,
+    index: number,
+  ): void {
+    if (index >= candidates.length) {
+      // All clipboard tools failed — try OSC 52 escape sequence as last resort
+      this.copyViaOsc52(text);
+      return;
+    }
+
+    const { cmd, args } = candidates[index];
     try {
       const proc = spawn(cmd, args, { stdio: ['pipe', 'ignore', 'ignore'] });
       proc.stdin.write(text);
       proc.stdin.end();
       proc.on('error', () => {
-        this.showFlash('Copy failed (install xclip)');
+        this.tryCopyWithCandidates(text, candidates, index + 1);
       });
       proc.on('close', (code) => {
         if (code === 0) {
           this.showFlash('Copied!');
         } else {
-          this.showFlash('Copy failed');
+          this.tryCopyWithCandidates(text, candidates, index + 1);
         }
       });
+    } catch {
+      this.tryCopyWithCandidates(text, candidates, index + 1);
+    }
+  }
+
+  private copyViaOsc52(text: string): void {
+    try {
+      const encoded = Buffer.from(text).toString('base64');
+      process.stdout.write(`\x1b]52;c;${encoded}\x07`);
+      this.showFlash('Copied (OSC 52)');
     } catch {
       this.showFlash('Copy failed');
     }
