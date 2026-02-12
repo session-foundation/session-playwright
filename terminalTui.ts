@@ -357,7 +357,7 @@ export class TerminalTui {
 
       // Left cell
       const testIdx = listStart + row;
-      let leftCell = '';
+      let leftCell;
       if (testIdx < listLen) {
         const entry = this.tests.get(this.testOrder[testIdx])!;
         const isSelected = testIdx === this.selectedIndex;
@@ -510,6 +510,7 @@ export class TerminalTui {
     }
 
     // SGR mouse: ESC [ < Cb ; Cx ; Cy M (press) or m (release)
+    // eslint-disable-next-line no-control-regex
     const sgrMatch = key.match(/^\x1b\[<(\d+);(\d+);(\d+)([Mm])$/);
     if (sgrMatch) {
       const button = parseInt(sgrMatch[1], 10);

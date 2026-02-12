@@ -21,10 +21,10 @@ function getChalkColorForStatus(result: Pick<TestResult, 'status'>) {
   return result.status === 'passed'
     ? chalk.green
     : result.status === 'interrupted'
-    ? chalk.yellow
-    : result.status === 'skipped'
-    ? chalk.blue
-    : chalk.red;
+      ? chalk.yellow
+      : result.status === 'skipped'
+        ? chalk.blue
+        : chalk.red;
 }
 
 function testResultToDurationStr(tests: Array<Pick<TestAndResult, 'result'>>) {
@@ -45,17 +45,17 @@ function formatGroupedByResults(testAndResults: Array<TestAndResult>) {
     testAndResults.length === 1
       ? 'once'
       : testAndResults.length === 2
-      ? 'twice'
-      : `${testAndResults.length} times`;
+        ? 'twice'
+        : `${testAndResults.length} times`;
   console.log(
     `${getChalkColorForStatus(
       allPassed
         ? { status: 'passed' }
         : allFailed
-        ? { status: 'failed' }
-        : allSkipped
-        ? { status: 'skipped' }
-        : { status: 'interrupted' },
+          ? { status: 'failed' }
+          : allSkipped
+            ? { status: 'skipped' }
+            : { status: 'interrupted' },
     )(
       `\t\t\t"${
         firstItem.test.title
