@@ -190,6 +190,7 @@ export type DataTestId =
   | 'path-light-container'
   | 'privacy-settings-menu-item'
   | 'profile-name-input'
+  | 'quote-text'
   | 'recovery-password-seed-modal'
   | 'recovery-password-settings-menu-item'
   | 'recovery-phrase-input'

@@ -100,6 +100,7 @@ export class Conversation extends Locator {
   static readonly disappearingControlMessage = this.testId(
     'disappear-control-message',
   );
+  static readonly quoteText = this.testId('quote-text');
   static readonly endCallButton = this.testId('end-call');
   static readonly endVoiceMessageButton = this.testId('end-voice-message');
   static readonly mentionsContainer = this.testId('mentions-container'); // This is also the locator for emojis
