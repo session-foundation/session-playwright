@@ -74,7 +74,7 @@ export const sendMedia = async (
   shouldCheckMediaPreview: boolean = false,
 ) => {
   // Send media
-  await window.setInputFiles("input[type='file']", `${path}`);
+  await window.setInputFiles("input[type='file']", path);
   await typeIntoInput(window, 'message-input-text-area', testMessage);
   await clickOnElement({
     window,
