@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { Global, HomeScreen } from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
@@ -22,13 +22,13 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       bobWindow1,
       'call-notification-answered-a-call',
-      englishStrippedStr('callsInProgress').toString(),
+      tStripped('callsInProgress'),
     );
     // Control message should be '{callerName} called you'
     // await waitForTestIdWithText(
     //   bobWindow1,
     //   'call-notification-answered-a-call',
-    //   englishStrippedStr('callsCalledYou')
+    //   tStripped('callsCalledYou')
     //     .withArgs({ name: caller.userName })
     //     .toString(),
     // );
@@ -36,9 +36,7 @@ test_Alice_1W_Bob_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       'call-notification-started-call',
-      englishStrippedStr('callsYouCalled')
-        .withArgs({ name: bob.userName })
-        .toString(),
+      tStripped('callsYouCalled', { name: bob.userName }),
     );
   },
 );

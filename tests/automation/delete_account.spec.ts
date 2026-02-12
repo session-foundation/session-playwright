@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { Global, HomeScreen, LeftPane, Onboarding, Settings } from './locators';
 import { forceCloseAllWindows } from './setup/closeWindows';
@@ -43,23 +43,17 @@ sessionTestTwoWindows(
       await clickOnWithText(
         windowA,
         Settings.clearDataMenuItem,
-        englishStrippedStr('sessionClearData').toString(),
+        tStripped('sessionClearData'),
       );
       // Select entire account
       await clickOnWithText(
         windowA,
         Settings.clearDeviceAndNetworkRadial,
-        englishStrippedStr('clearDeviceAndNetwork').toString(),
+        tStripped('clearDeviceAndNetwork'),
       );
       // Confirm deletion by clicking Clear, twice
-      await clickOnMatchingText(
-        windowA,
-        englishStrippedStr('clear').toString(),
-      );
-      await clickOnMatchingText(
-        windowA,
-        englishStrippedStr('clear').toString(),
-      );
+      await clickOnMatchingText(windowA, tStripped('clear'));
+      await clickOnMatchingText(windowA, tStripped('clear'));
       await waitForLoadingAnimationToFinish(
         windowA,
         Global.loadingSpinner.selector,
@@ -137,18 +131,12 @@ sessionTestTwoWindows(
       await clickOnWithText(
         windowA,
         Settings.clearDataMenuItem,
-        englishStrippedStr('sessionClearData').toString(),
+        tStripped('sessionClearData'),
       );
       // Keep 'Clear Device only' selection
       // Confirm deletion by clicking Clear, twice
-      await clickOnMatchingText(
-        windowA,
-        englishStrippedStr('clear').toString(),
-      );
-      await clickOnMatchingText(
-        windowA,
-        englishStrippedStr('clear').toString(),
-      );
+      await clickOnMatchingText(windowA, tStripped('clear'));
+      await clickOnMatchingText(windowA, tStripped('clear'));
       restoringWindows = await openApp(1);
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores

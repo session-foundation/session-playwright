@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import {
   isPluralToken,
   MergedLocalizerTokens,
@@ -39,7 +39,7 @@ function readTsFiles(dir: string): Record<string, string> {
 }
 
 function extractAllTokens(text: string) {
-  const pattern = /englishStrippedStr\(\s*'([^']*)'\s*\)/g;
+  const pattern = /tStripped\(\s*'([^']*)'\s*\)/g;
 
   const matches = [...text.matchAll(pattern)];
 
@@ -303,6 +303,18 @@ function getExpectedStringFromKey(
       return 'Ban User';
     case 'banUnbanUser':
       return 'Unban User';
+    case 'recoveryPasswordErrorMessageIncorrect':
+      return 'Some of the words in your Recovery Password are incorrect. Please check and try again.';
+    case 'recoveryPasswordErrorMessageShort':
+      return 'The Recovery Password you entered is not long enough. Please check and try again.';
+    case 'recoveryPasswordErrorMessageGeneric':
+      return 'Please check your recovery password and try again.';
+    case 'displayNameErrorDescriptionShorter':
+      return 'Please enter a shorter display name';
+    case 'proFeatureListLongerMessages':
+      return 'Messages up to 10,000 characters';
+    case 'proFeatureListPinnedConversations':
+      return 'Pin unlimited conversations';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
@@ -335,9 +347,7 @@ test('Enforce localized strings return expected values', () => {
         const count = counts[countIndex];
         const expectedStr = getExpectedStringFromKey({ key: token, count });
 
-        const foundStr = englishStrippedStr(token)
-          .withArgs({ count })
-          .toString();
+        const foundStr = tStripped(token, { count });
         if (!expectedStr) {
           unknownKeys.push(token);
           return;
@@ -348,7 +358,7 @@ test('Enforce localized strings return expected values', () => {
       }
     } else {
       const expectedStr = getExpectedStringFromKey({ key: token });
-      const foundStr = englishStrippedStr(token).toString();
+      const foundStr = tStripped(token as TokenSimpleNoArgs);
       if (!expectedStr) {
         unknownKeys.push(token);
         continue;

@@ -1,6 +1,6 @@
 import { expect } from '@playwright/test';
 
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import {
   Conversation,
@@ -33,9 +33,9 @@ import {
   waitForTestIdWithText,
 } from './utilities/utils';
 
-const cancelString = englishStrippedStr('cancel').toString();
-const saveString = englishStrippedStr('save').toString();
-const removeString = englishStrippedStr('remove').toString();
+const cancelString = tStripped('cancel');
+const saveString = tStripped('save');
+const removeString = tStripped('remove');
 
 // Send message in one to one conversation with new contact
 sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
@@ -49,11 +49,9 @@ sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
   await waitForTestIdWithText(
     windowB,
     Conversation.messageRequestAcceptControlMessage.selector,
-    englishStrippedStr('messageRequestYouHaveAccepted')
-      .withArgs({
-        name: userA.userName,
-      })
-      .toString(),
+    tStripped('messageRequestYouHaveAccepted', {
+      name: userA.userName,
+    }),
   );
   await clickOn(windowB, Global.backButton);
   await Promise.all([
@@ -99,20 +97,18 @@ test_Alice_1W_Bob_1W(
     await clickOnWithText(
       aliceWindow1,
       Global.contextMenuItem,
-      englishStrippedStr('block').toString(),
+      tStripped('block'),
     );
     // Check modal strings
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('block').toString(),
-      englishStrippedStr('blockDescription')
-        .withArgs({ name: bob.userName })
-        .toString(),
+      tStripped('block'),
+      tStripped('blockDescription', { name: bob.userName }),
     );
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('block').toString(),
+      tStripped('block'),
     );
     // Verify the user was moved to the blocked contact list
     // Click on settings tab
@@ -128,23 +124,18 @@ test_Alice_1W_Bob_1W(
     // make sure the confirm dialogs shows up
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('blockUnblock').toString(),
-      englishStrippedStr('blockUnblockName')
-        .withArgs({ name: bob.userName })
-        .toString(),
+      tStripped('blockUnblock'),
+      tStripped('blockUnblockName', { name: bob.userName }),
       'blockOrUnblockModal',
     );
     // click on the unblock button
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('blockUnblock').toString(),
+      tStripped('blockUnblock'),
     );
     // make sure no blocked contacts are listed
-    await waitForMatchingText(
-      aliceWindow1,
-      englishStrippedStr('blockBlockedNone').toString(),
-    );
+    await waitForMatchingText(aliceWindow1, tStripped('blockBlockedNone'));
   },
 );
 
@@ -255,10 +246,7 @@ test_Alice_1W_Bob_1W(
       bob.userName,
       { rightButton: true },
     );
-    await clickOnMatchingText(
-      aliceWindow1,
-      englishStrippedStr('nicknameSet').toString(),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('nicknameSet'));
     await sleepFor(1000);
 
     await typeIntoInput(aliceWindow1, 'nickname-input', nickname);
@@ -374,19 +362,17 @@ test_Alice_1W_Bob_1W(
     await clickOnWithText(
       aliceWindow1,
       Global.contextMenuItem,
-      englishStrippedStr('conversationsDelete').toString(),
+      tStripped('conversationsDelete'),
     );
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('conversationsDelete').toString(),
-      englishStrippedStr('deleteConversationDescription')
-        .withArgs({ name: bob.userName })
-        .toString(),
+      tStripped('conversationsDelete'),
+      tStripped('deleteConversationDescription', { name: bob.userName }),
     );
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('delete').toString(),
+      tStripped('delete'),
     );
     // Check if conversation is deleted
     await hasElementBeenDeleted(
@@ -408,31 +394,23 @@ test_Alice_2W(
     // Check first modal
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('recoveryPasswordHidePermanently').toString(),
-      englishStrippedStr(
-        'recoveryPasswordHidePermanentlyDescription1',
-      ).toString(),
+      tStripped('recoveryPasswordHidePermanently'),
+      tStripped('recoveryPasswordHidePermanentlyDescription1'),
       'hideRecoveryPasswordModal',
     );
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('theContinue').toString(),
+      tStripped('theContinue'),
     );
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('recoveryPasswordHidePermanently').toString(),
-      englishStrippedStr(
-        'recoveryPasswordHidePermanentlyDescription2',
-      ).toString(),
+      tStripped('recoveryPasswordHidePermanently'),
+      tStripped('recoveryPasswordHidePermanentlyDescription2'),
       'hideRecoveryPasswordModal',
     );
     // Click yes
-    await clickOnWithText(
-      aliceWindow1,
-      Global.confirmButton,
-      englishStrippedStr('yes').toString(),
-    );
+    await clickOnWithText(aliceWindow1, Global.confirmButton, tStripped('yes'));
     await doesElementExist(
       aliceWindow1,
       'data-testid',
@@ -456,17 +434,14 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   await waitForTestIdWithText(
     aliceWindow1,
     Global.toast.selector,
-    englishStrippedStr('copied').toString(),
+    tStripped('copied'),
   );
   // Wait for copy to resolve
   await sleepFor(1000);
+  await waitForMatchingText(aliceWindow1, tStripped('accountIdCopied'));
   await waitForMatchingText(
     aliceWindow1,
-    englishStrippedStr('accountIdCopied').toString(),
-  );
-  await waitForMatchingText(
-    aliceWindow1,
-    englishStrippedStr('shareAccountIdDescriptionCopied').toString(),
+    tStripped('shareAccountIdDescriptionCopied'),
   );
   // To exit invite a friend
   await clickOn(aliceWindow1, Global.backButton);
@@ -480,7 +455,7 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   await waitForTestIdWithText(
     aliceWindow1,
     Conversation.conversationHeader.selector,
-    englishStrippedStr('noteToSelf').toString(),
+    tStripped('noteToSelf'),
   );
 });
 
@@ -498,35 +473,35 @@ test_Alice_1W_no_network(
     await waitForTestIdWithText(
       aliceWindow1,
       Conversation.conversationHeader.selector,
-      englishStrippedStr('noteToSelf').toString(),
+      tStripped('noteToSelf'),
     );
     await clickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
-      englishStrippedStr('noteToSelf').toString(),
+      tStripped('noteToSelf'),
       { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,
       Global.contextMenuItem,
-      englishStrippedStr('noteToSelfHide').toString(),
+      tStripped('noteToSelfHide'),
     );
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('noteToSelfHide').toString(),
-      englishStrippedStr('noteToSelfHideDescription').toString(),
+      tStripped('noteToSelfHide'),
+      tStripped('noteToSelfHideDescription'),
     );
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
-      englishStrippedStr('hide').toString(),
+      tStripped('hide'),
     );
     await hasElementBeenDeleted(
       aliceWindow1,
       'data-testid',
       'module-conversation__user__profile-name',
       5000,
-      englishStrippedStr('noteToSelf').toString(),
+      tStripped('noteToSelf'),
     );
   },
 );
@@ -538,20 +513,14 @@ test_Alice_1W_no_network('Toggle password', async ({ aliceWindow1 }) => {
     aliceWindow1,
     Settings.recoveryPasswordContainer.selector,
   );
-  await clickOnMatchingText(
-    aliceWindow1,
-    englishStrippedStr('qrView').toString(),
-  );
+  await clickOnMatchingText(aliceWindow1, tStripped('qrView'));
   // Wait for QR code to be visible
   await waitForTestIdWithText(
     aliceWindow1,
     Settings.recoveryPasswordQRCode.selector,
   );
   // Then toggle back to text seed password
-  await clickOnMatchingText(
-    aliceWindow1,
-    englishStrippedStr('recoveryPasswordView').toString(),
-  );
+  await clickOnMatchingText(aliceWindow1, tStripped('recoveryPasswordView'));
   await waitForTestIdWithText(
     aliceWindow1,
     Settings.recoveryPasswordContainer.selector,

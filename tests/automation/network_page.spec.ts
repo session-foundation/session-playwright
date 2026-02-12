@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { Global, LeftPane, Settings } from './locators';
 import { test_Alice_1W } from './setup/sessionTest';
@@ -60,8 +60,8 @@ test_Alice_1W('Network page network link', async ({ aliceWindow1 }) => {
   await clickOn(aliceWindow1, Settings.learnMoreNetworkLink);
   await checkModalStrings(
     aliceWindow1,
-    englishStrippedStr('urlOpen').toString(),
-    englishStrippedStr('urlOpenDescription').withArgs({ url }).toString(),
+    tStripped('urlOpen'),
+    tStripped('urlOpenDescription', { url }),
     'openUrlModal',
   );
   await assertUrlIsReachable(url);
@@ -74,20 +74,16 @@ test_Alice_1W('Network page staking link', async ({ aliceWindow1 }) => {
   await clickOn(aliceWindow1, Settings.learnMoreAboutStakingLink);
   await checkModalStrings(
     aliceWindow1,
-    englishStrippedStr('urlOpen').toString(),
-    englishStrippedStr('urlOpenDescription').withArgs({ url }).toString(),
+    tStripped('urlOpen'),
+    tStripped('urlOpenDescription', { url }),
     'openUrlModal',
   );
   await assertUrlIsReachable(url);
 });
 
 test_Alice_1W('Network page refresh', async ({ aliceWindow1 }) => {
-  const zeroMinAgoText = englishStrippedStr('updated')
-    .withArgs({ relative_time: '0m' })
-    .toString();
-  const oneMinAgoText = englishStrippedStr('updated')
-    .withArgs({ relative_time: '1m' })
-    .toString();
+  const zeroMinAgoText = tStripped('updated', { relative_time: '0m' });
+  const oneMinAgoText = tStripped('updated', { relative_time: '1m' });
   await clickOn(aliceWindow1, LeftPane.settingsButton);
   await clickOn(aliceWindow1, Settings.networkPageMenuItem);
   await waitForLoadingAnimationToFinish(

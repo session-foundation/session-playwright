@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { tStripped } from '../../localization/lib';
 import { sortByPubkey } from '../../pubkey';
 import { HomeScreen } from '../locators';
 import { Group, User } from '../types/testing';
@@ -82,9 +82,7 @@ export const createGroup = async (
   await waitForTestIdWithText(
     windowA,
     'group-update-message',
-    englishStrippedStr('groupMemberNewTwo')
-      .withArgs({ name: firstUser, other_name: secondUser })
-      .toString(),
+    tStripped('groupMemberNewTwo', { name: firstUser, other_name: secondUser }),
   );
   // Click on test group
   await Promise.all(
@@ -97,16 +95,14 @@ export const createGroup = async (
     waitForTestIdWithText(
       windowB,
       'group-update-message',
-      englishStrippedStr('groupInviteYouAndOtherNew')
-        .withArgs({ other_name: userThree.userName })
-        .toString(),
+      tStripped('groupInviteYouAndOtherNew', {
+        other_name: userThree.userName,
+      }),
     ),
     waitForTestIdWithText(
       windowC,
       'group-update-message',
-      englishStrippedStr('groupInviteYouAndOtherNew')
-        .withArgs({ other_name: userTwo.userName })
-        .toString(),
+      tStripped('groupInviteYouAndOtherNew', { other_name: userTwo.userName }),
     ),
   ]);
   // Send message in group chat from user A

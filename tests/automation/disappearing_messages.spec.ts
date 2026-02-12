@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { defaultDisappearingOptions } from './constants/variables';
 import { Conversation, HomeScreen } from './locators';
@@ -33,14 +33,10 @@ test_Alice_2W_Bob_1W(
     const formattedTime = formatTimeOption(timeOption);
     const testMessage =
       'Testing disappearing messages timer is working correctly';
-    const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
-      .withArgs({
-        time: formattedTime,
-        disappearing_messages_type: englishStrippedStr(
-          'disappearingMessagesTypeRead',
-        ).toString(),
-      })
-      .toString();
+    const controlMessage = tStripped('disappearingMessagesSetYou', {
+      time: formattedTime,
+      disappearing_messages_type: tStripped('disappearingMessagesTypeRead'),
+    });
     // Create Contact
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Click on conversation in linked device
@@ -92,14 +88,10 @@ test_Alice_2W_Bob_1W(
     const formattedTime = formatTimeOption(timeOption);
     const testMessage =
       'Testing disappearing messages timer is working correctly';
-    const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
-      .withArgs({
-        time: formattedTime,
-        disappearing_messages_type: englishStrippedStr(
-          'disappearingMessagesTypeSent',
-        ).toString(),
-      })
-      .toString();
+    const controlMessage = tStripped('disappearingMessagesSetYou', {
+      time: formattedTime,
+      disappearing_messages_type: tStripped('disappearingMessagesTypeSent'),
+    });
     // Create Contact
     await createContact(aliceWindow1, bobWindow1, alice, bob);
 
@@ -148,14 +140,10 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     const { timeOption, disappearingMessagesType, disappearAction } =
       defaultDisappearingOptions.group;
     const formattedTime = formatTimeOption(timeOption);
-    const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
-      .withArgs({
-        time: formattedTime,
-        disappearing_messages_type: englishStrippedStr(
-          'disappearingMessagesTypeSent',
-        ).toString(),
-      })
-      .toString();
+    const controlMessage = tStripped('disappearingMessagesSetYou', {
+      time: formattedTime,
+      disappearing_messages_type: tStripped('disappearingMessagesTypeSent'),
+    });
     const testMessage = 'Testing disappearing messages in groups';
 
     await clickOnWithText(
@@ -200,21 +188,17 @@ test_Alice_2W(
     const testMessage = 'Message to test note to self';
     const testMessageDisappear = 'Message testing disappearing messages';
     const formattedTime = formatTimeOption(timeOption);
-    const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
-      .withArgs({
-        time: formattedTime,
-        disappearing_messages_type: englishStrippedStr(
-          'disappearingMessagesTypeSent',
-        ).toString(),
-      })
-      .toString();
+    const controlMessage = tStripped('disappearingMessagesSetYou', {
+      time: formattedTime,
+      disappearing_messages_type: tStripped('disappearingMessagesTypeSent'),
+    });
     // Open Note to self conversation
     await sendNewMessage(aliceWindow1, alice.accountid, testMessage);
     // Check messages are syncing across linked devices
     await clickOnWithText(
       aliceWindow2,
       HomeScreen.conversationItemName,
-      englishStrippedStr('noteToSelf').toString(),
+      tStripped('noteToSelf'),
     );
     await waitForTextMessage(aliceWindow2, testMessage);
     // Enable disappearing messages
@@ -260,14 +244,10 @@ test_Alice_2W_Bob_1W(
       bobWindow1,
     );
     // Check control message is visible and correct
-    const controlMessage = englishStrippedStr('disappearingMessagesSetYou')
-      .withArgs({
-        time: formattedTime,
-        disappearing_messages_type: englishStrippedStr(
-          'disappearingMessagesTypeSent',
-        ).toString(),
-      })
-      .toString();
+    const controlMessage = tStripped('disappearingMessagesSetYou', {
+      time: formattedTime,
+      disappearing_messages_type: tStripped('disappearingMessagesTypeSent'),
+    });
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow1,
@@ -282,15 +262,11 @@ test_Alice_2W_Bob_1W(
       waitForTestIdWithText(
         bobWindow1,
         'disappear-control-message',
-        englishStrippedStr('disappearingMessagesSet')
-          .withArgs({
-            name: alice.userName,
-            time: formattedTime,
-            disappearing_messages_type: englishStrippedStr(
-              'disappearingMessagesTypeSent',
-            ).toString(),
-          })
-          .toString(),
+        tStripped('disappearingMessagesSet', {
+          name: alice.userName,
+          time: formattedTime,
+          disappearing_messages_type: tStripped('disappearingMessagesTypeSent'),
+        }),
       ),
     ]);
     await sendMessage(aliceWindow1, testMessage);
@@ -321,7 +297,7 @@ test_Alice_2W_Bob_1W(
     // Select Follow setting in Bob's window
     await clickOnMatchingText(
       bobWindow1,
-      englishStrippedStr('disappearingMessagesFollowSetting').toString(),
+      tStripped('disappearingMessagesFollowSetting'),
     );
     await clickOnElement({
       window: bobWindow1,
@@ -334,38 +310,32 @@ test_Alice_2W_Bob_1W(
       waitForTestIdWithText(
         aliceWindow1,
         'disappear-control-message',
-        englishStrippedStr('disappearingMessagesTurnedOffYou').toString(),
+        tStripped('disappearingMessagesTurnedOffYou'),
       ),
       waitForTestIdWithText(
         aliceWindow1,
         'disappear-control-message',
-        englishStrippedStr('disappearingMessagesTurnedOff')
-          .withArgs({ name: bob.userName })
-          .toString(),
+        tStripped('disappearingMessagesTurnedOff', { name: bob.userName }),
       ),
       waitForTestIdWithText(
         aliceWindow2,
         'disappear-control-message',
-        englishStrippedStr('disappearingMessagesTurnedOffYou').toString(),
+        tStripped('disappearingMessagesTurnedOffYou'),
       ),
       waitForTestIdWithText(
         aliceWindow2,
         'disappear-control-message',
-        englishStrippedStr('disappearingMessagesTurnedOff')
-          .withArgs({ name: bob.userName })
-          .toString(),
+        tStripped('disappearingMessagesTurnedOff', { name: bob.userName }),
       ),
       waitForTestIdWithText(
         bobWindow1,
         'disappear-control-message',
-        englishStrippedStr('disappearingMessagesTurnedOff')
-          .withArgs({ name: alice.userName })
-          .toString(),
+        tStripped('disappearingMessagesTurnedOff', { name: alice.userName }),
       ),
       waitForTestIdWithText(
         bobWindow1,
         'disappear-control-message',
-        englishStrippedStr('disappearingMessagesTurnedOffYou').toString(),
+        tStripped('disappearingMessagesTurnedOffYou'),
       ),
     ]);
     await Promise.all(

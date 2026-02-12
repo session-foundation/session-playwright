@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { test_Alice_2W } from './setup/sessionTest';
 import {
   hasElementPoppedUpThatShouldnt,
@@ -16,12 +16,12 @@ test_Alice_2W(
     // Check that the account created has all the required strings displayed
     await Promise.all(
       [
-        englishStrippedStr('onboardingAccountCreated'),
-        englishStrippedStr('onboardingBubbleWelcomeToSession').withArgs({
+        tStripped('onboardingAccountCreated'),
+        tStripped('onboardingBubbleWelcomeToSession', {
           emoji: '👋',
         }),
-        englishStrippedStr('conversationsNone'),
-        englishStrippedStr('onboardingHitThePlusButton'),
+        tStripped('conversationsNone'),
+        tStripped('onboardingHitThePlusButton'),
       ].map(async (builder) =>
         waitForElement(
           aliceWindow1,
@@ -36,8 +36,8 @@ test_Alice_2W(
     // Check that the account restored has all the required strings displayed
     await Promise.all(
       [
-        englishStrippedStr('conversationsNone'),
-        englishStrippedStr('onboardingHitThePlusButton'),
+        tStripped('conversationsNone'),
+        tStripped('onboardingHitThePlusButton'),
       ].map(async (builder) =>
         waitForElement(
           aliceWindow2,
@@ -52,8 +52,8 @@ test_Alice_2W(
     // Make sure the "account created" part is not visible on the restored window
     await Promise.all(
       [
-        englishStrippedStr('onboardingAccountCreated'),
-        englishStrippedStr('onboardingBubbleWelcomeToSession').withArgs({
+        tStripped('onboardingAccountCreated'),
+        tStripped('onboardingBubbleWelcomeToSession', {
           emoji: '👋',
         }),
       ].map(async (builder) =>

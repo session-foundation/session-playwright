@@ -1,4 +1,4 @@
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { Global, Onboarding } from './locators';
 import { sessionTestOneWindow } from './setup/sessionTest';
 import {
@@ -14,25 +14,19 @@ import {
     // the word 'zork' is not on the mnemonic word list which triggers the expected error
     incorrectSeed:
       'ruby bakery illness push rift reef nabbing bawled hope zork silk lobster hope',
-    expectedError: englishStrippedStr(
-      'recoveryPasswordErrorMessageIncorrect',
-    ).toString(),
+    expectedError: tStripped('recoveryPasswordErrorMessageIncorrect'),
   },
   {
     testName: 'Too short seed',
     incorrectSeed: 'zork',
-    expectedError: englishStrippedStr(
-      'recoveryPasswordErrorMessageShort',
-    ).toString(),
+    expectedError: tStripped('recoveryPasswordErrorMessageShort'),
   },
   {
     testName: 'Wrong seed',
     // the seed phrase is too long but contains only valid mnemonics which triggers the generic error
     incorrectSeed:
       'ruby bakery illness push rift reef nabbing bawled hope ruby silk lobster hope ruby ruby ruby',
-    expectedError: englishStrippedStr(
-      'recoveryPasswordErrorMessageGeneric',
-    ).toString(),
+    expectedError: tStripped('recoveryPasswordErrorMessageGeneric'),
   },
 ].forEach(({ testName, incorrectSeed, expectedError }) => {
   sessionTestOneWindow(`Seed validation: "${testName}"`, async ([window]) => {
@@ -58,15 +52,13 @@ import {
     testName: 'No name',
     // This currently fails - displays wrong error message
     displayName: ' ',
-    expectedError: englishStrippedStr('displayNameErrorDescription').toString(),
+    expectedError: tStripped('displayNameErrorDescription'),
   },
   {
     testName: 'Too long name',
     displayName:
       'One morning, when Gregor Samsa woke from troubled dreams, he found himself transformed in his bed int',
-    expectedError: englishStrippedStr(
-      'displayNameErrorDescriptionShorter',
-    ).toString(),
+    expectedError: tStripped('displayNameErrorDescriptionShorter'),
   },
 ].forEach(({ testName, displayName, expectedError }) => {
   sessionTestOneWindow(

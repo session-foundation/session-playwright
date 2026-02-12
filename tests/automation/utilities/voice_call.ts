@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../../localization/englishStrippedStr';
+import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
 import { Conversation, Global, Settings } from '../locators';
 import { checkModalStrings, clickOn, clickOnMatchingText } from './utils';
@@ -14,8 +14,8 @@ export const makeVoiceCall = async (
   await clickOn(callerWindow, Settings.enableCalls);
   await checkModalStrings(
     callerWindow,
-    englishStrippedStr('callsVoiceAndVideoBeta').toString(),
-    englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
+    tStripped('callsVoiceAndVideoBeta'),
+    tStripped('callsVoiceAndVideoModalDescription'),
     'confirmModal',
   );
   await clickOn(callerWindow, Global.confirmButton);
@@ -26,15 +26,12 @@ export const makeVoiceCall = async (
   await clickOn(receiverWindow, Settings.enableCalls);
   await checkModalStrings(
     receiverWindow,
-    englishStrippedStr('callsVoiceAndVideoBeta').toString(),
-    englishStrippedStr('callsVoiceAndVideoModalDescription').toString(),
+    tStripped('callsVoiceAndVideoBeta'),
+    tStripped('callsVoiceAndVideoModalDescription'),
     'confirmModal',
   );
   await clickOn(receiverWindow, Global.confirmButton);
-  await clickOnMatchingText(
-    receiverWindow,
-    englishStrippedStr('accept').toString(),
-  );
+  await clickOnMatchingText(receiverWindow, tStripped('accept'));
   await clickOn(receiverWindow, Global.modalCloseButton);
   await sleepFor(5000);
   await clickOn(callerWindow, Conversation.endCallButton);

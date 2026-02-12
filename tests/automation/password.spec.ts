@@ -1,6 +1,6 @@
 import { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { Global, LeftPane, Settings } from './locators';
 import { test_Alice_1W_no_network } from './setup/sessionTest';
@@ -51,7 +51,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   await waitForTestIdWithText(
     aliceWindow1,
     Global.toast.selector,
-    englishStrippedStr('passwordSetDescriptionToast').toString(),
+    tStripped('passwordSetDescriptionToast'),
   );
   // Click on settings tab
   await sleepFor(300, true);
@@ -67,10 +67,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
     testPassword,
   );
   // Click Done
-  await clickOnMatchingText(
-    aliceWindow1,
-    englishStrippedStr('enter').toString(),
-  );
+  await clickOnMatchingText(aliceWindow1, tStripped('enter'));
 
   // check that the seed is visible now
   await expectRecoveryPhraseToBeVisible(aliceWindow1, alice.recoveryPassword);
@@ -104,7 +101,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   await waitForTestIdWithText(
     aliceWindow1,
     Global.toast.selector,
-    englishStrippedStr('passwordChangedDescriptionToast').toString(),
+    tStripped('passwordChangedDescriptionToast'),
   );
 });
 
@@ -171,7 +168,7 @@ test_Alice_1W_no_network(
     await waitForTestIdWithText(
       aliceWindow1,
       Global.errorMessage.selector,
-      englishStrippedStr('passwordIncorrect').toString(),
+      tStripped('passwordIncorrect'),
     );
     await clickOn(aliceWindow1, Global.modalCloseButton);
     await sleepFor(100);
@@ -183,7 +180,7 @@ test_Alice_1W_no_network(
     await waitForTestIdWithText(
       aliceWindow1,
       Global.errorMessage.selector,
-      englishStrippedStr('passwordIncorrect').toString(),
+      tStripped('passwordIncorrect'),
     );
   },
 );

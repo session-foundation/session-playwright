@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-import { englishStrippedStr } from '../localization/englishStrippedStr';
+import { tStripped } from '../localization/lib';
 import {
   Conversation,
   ConversationSettings,
@@ -54,11 +54,9 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     await waitForTestIdWithText(
       aliceWindow1,
       'group-update-message',
-      englishStrippedStr('groupMemberLeft')
-        .withArgs({
-          name: charlie.userName,
-        })
-        .toString(),
+      tStripped('groupMemberLeft', {
+        name: charlie.userName,
+      }),
     );
     // Check for linked device (userA)
     await clickOnWithText(
@@ -69,21 +67,17 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     await waitForTestIdWithText(
       aliceWindow2,
       'group-update-message',
-      englishStrippedStr('groupMemberLeft')
-        .withArgs({
-          name: charlie.userName,
-        })
-        .toString(),
+      tStripped('groupMemberLeft', {
+        name: charlie.userName,
+      }),
     );
     // Check for user B
     await waitForTestIdWithText(
       bobWindow1,
       'group-update-message',
-      englishStrippedStr('groupMemberLeft')
-        .withArgs({
-          name: charlie.userName,
-        })
-        .toString(),
+      tStripped('groupMemberLeft', {
+        name: charlie.userName,
+      }),
     );
   },
 );
@@ -121,14 +115,14 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await waitForTestIdWithText(
       aliceWindow2,
       'modal-heading',
-      englishStrippedStr('manageMembers').toString(),
+      tStripped('manageMembers'),
     );
     // Check for You, Bob and Charlie
     await Promise.all([
       waitForTestIdWithText(
         aliceWindow2,
         Global.contactItem.selector,
-        englishStrippedStr('you').toString(),
+        tStripped('you'),
       ),
       waitForTestIdWithText(
         aliceWindow2,
@@ -150,26 +144,22 @@ async function clearDataOnWindow(window: Page) {
   await clickOnWithText(
     window,
     Settings.clearDataMenuItem,
-    englishStrippedStr('sessionClearData').toString(),
+    tStripped('sessionClearData'),
   );
   await checkModalStrings(
     window,
-    englishStrippedStr('clearDataAll').toString(),
-    englishStrippedStr('clearDataAllDescription').toString(),
+    tStripped('clearDataAll'),
+    tStripped('clearDataAllDescription'),
     'deleteAccountModal',
   );
-  await clickOnWithText(
-    window,
-    Global.confirmButton,
-    englishStrippedStr('clear').toString(),
-  );
+  await clickOnWithText(window, Global.confirmButton, tStripped('clear'));
   await checkModalStrings(
     window,
-    englishStrippedStr('clearDataAll').toString(),
-    englishStrippedStr('clearDeviceDescription').toString(),
+    tStripped('clearDataAll'),
+    tStripped('clearDeviceDescription'),
     'deleteAccountModal',
   );
-  await clickOnMatchingText(window, englishStrippedStr('clear').toString());
+  await clickOnMatchingText(window, tStripped('clear'));
 }
 
 // Delete device data > Restore account
@@ -206,7 +196,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       waitForTestIdWithText(
         aliceWindow2,
         Global.contactItem.selector,
-        englishStrippedStr('you').toString(),
+        tStripped('you'),
       ),
       waitForTestIdWithText(
         aliceWindow2,
@@ -251,7 +241,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       waitForTestIdWithText(
         restoredWindow,
         Global.contactItem.selector,
-        englishStrippedStr('you').toString(),
+        tStripped('you'),
       ),
       waitForTestIdWithText(
         restoredWindow,
@@ -297,7 +287,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       waitForTestIdWithText(
         restoredWindow2,
         Global.contactItem.selector,
-        englishStrippedStr('you').toString(),
+        tStripped('you'),
       ),
       waitForTestIdWithText(
         restoredWindow2,
@@ -326,10 +316,10 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     await clickOn(aliceWindow1, ConversationSettings.leaveOrDeleteGroupOption);
     await checkModalStrings(
       aliceWindow1,
-      englishStrippedStr('groupDelete').toString(),
-      englishStrippedStr('groupDeleteDescription')
-        .withArgs({ group_name: groupCreated.userName })
-        .toString(),
+      tStripped('groupDelete'),
+      tStripped('groupDeleteDescription', {
+        group_name: groupCreated.userName,
+      }),
       'confirmModal',
     );
     await clickOn(aliceWindow1, Global.confirmButton);
@@ -338,9 +328,9 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
         await waitForTestIdWithText(
           w,
           'empty-conversation-control-message',
-          englishStrippedStr('groupDeletedMemberDescription')
-            .withArgs({ group_name: groupCreated.userName })
-            .toString(),
+          tStripped('groupDeletedMemberDescription', {
+            group_name: groupCreated.userName,
+          }),
         );
       }),
     );
