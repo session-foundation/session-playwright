@@ -736,9 +736,7 @@ export class TerminalTui {
         this.scheduleRender();
       } else if (row === 1 && isInRightPanel) {
         // Click on header right panel — copy test title
-        const entry = this.tests.get(
-          this.testOrder[this.selectedIndex] ?? '',
-        );
+        const entry = this.tests.get(this.testOrder[this.selectedIndex] ?? '');
         if (entry) {
           this.copyToClipboard(entry.title);
         }
