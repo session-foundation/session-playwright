@@ -133,15 +133,15 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await Promise.all([
       waitForElement(
         bobWindow1,
-        'class',
-        'module-message__link-preview__title',
+        'data-testid',
+        'msg-link-preview-title',
         undefined,
         'Session | Send Messages, Not Metadata. | Private Messenger',
       ),
       waitForElement(
         charlieWindow1,
-        'class',
-        'module-message__link-preview__title',
+        'data-testid',
+        'msg-link-preview-title',
         undefined,
         'Session | Send Messages, Not Metadata. | Private Messenger',
       ),

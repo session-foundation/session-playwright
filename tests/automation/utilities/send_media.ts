@@ -3,6 +3,7 @@ import { Page } from '@playwright/test';
 import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
 import { Conversation, Global, Settings } from '../locators';
+import { isRunningOnDevNet } from '../setup/open';
 import { MediaType } from '../types/testing';
 import { waitForMessageStatus } from './message';
 import {
@@ -11,6 +12,7 @@ import {
   clickOnElement,
   clickOnMatchingText,
   clickOnWithText,
+  controlOrMetaFor,
   typeIntoInput,
   waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
@@ -75,7 +77,17 @@ export const sendMedia = async (
 ) => {
   // Send media
   await window.setInputFiles("input[type='file']", path);
-  await typeIntoInput(window, 'message-input-text-area', testMessage);
+  await typeIntoInput(window, 'message-input-text-area', testMessage, true);
+  // make sure that both the staged attachment container and message content we expect are there before we hit "send"
+  await Promise.all([
+    waitForTestIdWithText(window, 'message-input-text-area', testMessage, 1000),
+    waitForTestIdWithText(
+      window,
+      'staged-attachments-container',
+      undefined,
+      1000,
+    ),
+  ]);
   await clickOnElement({
     window,
     strategy: 'data-testid',
@@ -108,39 +120,34 @@ export const sendVoiceMessage = async (window: Page) => {
 };
 
 export const sendLinkPreview = async (window: Page, testLink: string) => {
-  await typeIntoInput(window, 'message-input-text-area', testLink);
+  // The clipboard is shared across the system so multiple tests can write to it and break each others.
+  // I have made the copy and paste as fast as possible here so that this happens as little as possible.
+  await typeIntoInput(window, 'search-input', testLink);
   await clickOnElement({
     window,
     strategy: 'data-testid',
-    selector: 'send-message-button',
+    selector: 'search-input',
   });
-  await clickOnWithText(window, Conversation.messageContent, testLink, {
-    rightButton: true,
-  });
+
   // Need to copy link to clipboard, as the enable link preview modal
   // doesn't pop up if manually typing link (needs to be pasted)
-  // Need to have a nth(0) here to account for Copy Account ID, Appium was getting confused
-  // Tried to use englishStripped here but Playwright doesn't like it
-  // const copyText = tStripped('copy');
-
-  const firstCopyBtn = window
-    .locator(`[data-testid=context-menu-item]:has-text("Copy")`)
-    .nth(0);
-  await firstCopyBtn.click();
-  await waitForTestIdWithText(window, 'session-toast', tStripped('copied'));
-  // click on the toast and wait for it to be closed to avoid the layout shift
-  await clickOn(window, Global.toast);
-  await sleepFor(1000);
+  await window.keyboard.press(`${controlOrMetaFor()}+A`);
+  await window.keyboard.press(`${controlOrMetaFor()}+X`);
   await clickOn(window, Conversation.messageInput);
-  const isMac = process.platform === 'darwin';
-  await window.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
+  await window.keyboard.press(`${controlOrMetaFor()}+V`);
   await checkModalStrings(
     window,
     tStripped('linkPreviewsEnable'),
     tStripped('linkPreviewsFirstDescription'),
   );
   await clickOnWithText(window, Global.confirmButton, tStripped('enable'));
-  await waitForLoadingAnimationToFinish(window, Global.loadingSpinner.selector);
+  if (!isRunningOnDevNet()) {
+    // when on devnet, often we don't even see the loading spinner
+    await waitForLoadingAnimationToFinish(
+      window,
+      Global.loadingSpinner.selector,
+    );
+  }
   await waitForTestIdWithText(window, 'link-preview-image');
   await waitForTestIdWithText(
     window,

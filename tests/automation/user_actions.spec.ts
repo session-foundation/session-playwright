@@ -25,6 +25,7 @@ import {
   clickOnElement,
   clickOnMatchingText,
   clickOnWithText,
+  controlOrMetaFor,
   doesElementExist,
   hasElementBeenDeleted,
   typeIntoInput,
@@ -189,6 +190,7 @@ test_Alice_1W_no_network('Add avatar', async ({ aliceWindow1 }, testInfo) => {
     element: leftpaneAvatarContainer,
     snapshotName: 'avatar-updated-blue.jpeg',
     testInfo,
+    maxRetryDurationMs: 4_000,
   });
 });
 
@@ -448,8 +450,8 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   // New message
   await clickOn(aliceWindow1, HomeScreen.newMessageOption);
   await clickOn(aliceWindow1, HomeScreen.newMessageAccountIDInput);
-  const isMac = process.platform === 'darwin';
-  await aliceWindow1.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
+
+  await aliceWindow1.keyboard.press(`${controlOrMetaFor()}+V`);
   await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
   // Did the copied text create note to self?
   await waitForTestIdWithText(

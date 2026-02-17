@@ -177,3 +177,7 @@ export function getTrackedElectronPids(): Array<number> {
 export function resetTrackedElectronPids() {
   electronPids = [];
 }
+
+export function isRunningOnDevNet() {
+  return !!process.env.LOCAL_DEVNET_SEED_URL;
+}

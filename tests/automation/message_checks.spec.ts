@@ -122,8 +122,8 @@ test_Alice_1W_Bob_1W(
     await sendLinkPreview(aliceWindow1, testLink);
     await waitForElement(
       bobWindow1,
-      'class',
-      'module-message__link-preview__title',
+      'data-testid',
+      'msg-link-preview-title',
       undefined,
       'Session | Send Messages, Not Metadata. | Private Messenger',
     );

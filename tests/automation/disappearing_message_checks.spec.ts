@@ -184,17 +184,17 @@ test_Alice_1W_Bob_1W(
     await sendLinkPreview(aliceWindow1, testLink);
     await waitForElement(
       bobWindow1,
-      'class',
-      'module-message__link-preview__title',
+      'data-testid',
+      'msg-link-preview-title',
       3_000,
       'Session | Send Messages, Not Metadata. | Private Messenger',
     );
     // Wait 30 seconds for link preview to disappear
-    await sleepFor(30000);
+    await sleepFor(30_000);
     await hasElementBeenDeleted(
       bobWindow1,
-      'class',
-      'module-message__link-preview__title',
+      'data-testid',
+      'msg-link-preview-title',
       1_000, // no need to wait too long here, it should have disappeared already
       'Session | Send Messages, Not Metadata. | Private Messenger',
     );

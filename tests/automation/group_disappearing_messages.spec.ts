@@ -120,15 +120,15 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await Promise.all([
       waitForElement(
         bobWindow1,
-        'class',
-        'module-message__link-preview__title',
+        'data-testid',
+        'msg-link-preview-title',
         undefined,
         'Session | Send Messages, Not Metadata. | Private Messenger',
       ),
       waitForElement(
         charlieWindow1,
-        'class',
-        'module-message__link-preview__title',
+        'data-testid',
+        'msg-link-preview-title',
         undefined,
         'Session | Send Messages, Not Metadata. | Private Messenger',
       ),
@@ -138,8 +138,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       [bobWindow1, charlieWindow1].map((w) =>
         hasElementBeenDeleted(
           w,
-          'class',
-          'module-message__link-preview__title',
+          'data-testid',
+          'msg-link-preview-title',
           1_000,
           'Session | Send Messages, Not Metadata. | Private Messenger',
         ),

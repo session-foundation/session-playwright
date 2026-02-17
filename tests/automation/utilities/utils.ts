@@ -22,6 +22,8 @@ type ElementOptions = {
   strictMode?: boolean;
 };
 
+
+
 // TODO Unify element interaction functions to use locator objects the way clickOn and clickOnWithText do
 // Remaining functions to migrate: waitForElement, typeIntoInput, grabTextFromElement etc.
 
@@ -730,4 +732,10 @@ export async function scrollToBottomIfNecessary(window: Page): Promise<void> {
   if (canScroll) {
     await clickOn(window, Conversation.scrollToBottomButton);
   }
+}
+
+
+
+export function controlOrMetaFor() {
+  return process.platform === 'darwin' ? 'Meta' : 'Control';
 }
