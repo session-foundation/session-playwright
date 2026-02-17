@@ -5,8 +5,8 @@ import { spawn } from 'child_process';
 const ESC = '\x1b';
 const ALT_SCREEN_ON = `${ESC}[?1049h`;
 const ALT_SCREEN_OFF = `${ESC}[?1049l`;
-const MOUSE_ON = `${ESC}[?1000h${ESC}[?1006h`; // X10 + SGR extended mouse
-const MOUSE_OFF = `${ESC}[?1000l${ESC}[?1006l`;
+const MOUSE_ON = `${ESC}[?1002h${ESC}[?1006h`; // Button-event tracking + SGR extended mouse
+const MOUSE_OFF = `${ESC}[?1002l${ESC}[?1006l`;
 const CURSOR_HIDE = `${ESC}[?25l`;
 const CURSOR_SHOW = `${ESC}[?25h`;
 const MOVE_TO = (row: number, col: number) => `${ESC}[${row};${col}H`;
@@ -98,11 +98,37 @@ function wrapLine(line: string, width: number): string[] {
   if (width <= 0) return [line];
   const stripped = stripAnsi(line);
   if (stripped.length <= width) return [line];
-  // Simple character-level wrap on the raw visible text
+
+  // Walk the original string preserving ANSI codes, splitting at visible width
+  // eslint-disable-next-line no-control-regex
+  const tokenRegex = /(\x1b\[[0-9;]*[a-zA-Z])|(.)/g;
   const result: string[] = [];
-  for (let i = 0; i < stripped.length; i += width) {
-    result.push(stripped.slice(i, i + width));
+  let current = '';
+  let activeAnsi = ''; // accumulated ANSI state to prepend on new lines
+  let visCount = 0;
+  let match;
+
+  while ((match = tokenRegex.exec(line)) !== null) {
+    if (match[1]) {
+      // ANSI escape — append to current line and track for continuation
+      current += match[1];
+      activeAnsi += match[1];
+    } else {
+      // Visible character
+      if (visCount >= width) {
+        result.push(current + RESET);
+        current = activeAnsi; // re-apply active ANSI state on new line
+        visCount = 0;
+      }
+      current += match[2];
+      visCount++;
+    }
   }
+
+  if (visCount > 0) {
+    result.push(current + RESET);
+  }
+
   return result;
 }
 
@@ -132,6 +158,8 @@ export class TerminalTui {
   private lastLeftWidth = 30; // saved from render() for mouse click mapping
   private autoFollow = true;
   private lastUserInteractionTime = 0;
+  private selection: { startRow: number; endRow: number } | null = null;
+  private lastOutputLines: string[] = []; // cached from last render for selection copy
 
   start(): void {
     if (!process.stdout.isTTY) return;
@@ -217,7 +245,8 @@ export class TerminalTui {
       const idx = this.testOrder.indexOf(id);
       if (idx >= 0) {
         this.selectedIndex = idx;
-        this.outputScrollOffset = 0;
+        this.outputScrollOffset = Number.MAX_SAFE_INTEGER; // clamped in render
+        // Don't update lastUserInteractionTime — this is auto-follow, not user action
       }
     }
 
@@ -240,6 +269,8 @@ export class TerminalTui {
     }
 
     if (this.testOrder[this.selectedIndex] === id) {
+      // Auto-scroll output to bottom for the selected test
+      this.outputScrollOffset = Number.MAX_SAFE_INTEGER; // clamped in render
       this.scheduleRender();
     }
   }
@@ -274,7 +305,57 @@ export class TerminalTui {
     this.scheduleRender();
   }
 
+  /** Re-sort the test list for summary view: passed → flaky → failed, each sorted by title */
+  reorderForSummary(): void {
+    const statusPriority = (entry: TuiTestEntry): number => {
+      if (entry.status === 'passed' && entry.retry === 0) return 0; // passed first try
+      if (entry.status === 'passed') return 1; // flaky
+      if (entry.status === 'skipped') return 2;
+      return 3; // failed / timedOut / interrupted
+    };
+
+    this.testOrder.sort((a, b) => {
+      const ea = this.tests.get(a)!;
+      const eb = this.tests.get(b)!;
+      const pa = statusPriority(ea);
+      const pb = statusPriority(eb);
+      if (pa !== pb) return pa - pb;
+      return ea.title.localeCompare(eb.title);
+    });
+
+    this.selectedIndex = 0;
+    this.outputScrollOffset = 0;
+    this.autoFollow = false;
+    this.scheduleRender();
+  }
+
+  /** Returns a promise that resolves when the user closes the TUI (q / Ctrl+C) */
+  waitForClose(): Promise<void> {
+    return new Promise((resolve) => {
+      this.onStopCallback = () => {
+        resolve();
+      };
+    });
+  }
+
   // --- Private ---
+
+  /** Select a test by index (clamped), scroll output to bottom, mark as user interaction */
+  private selectTest(index: number): void {
+    this.selectedIndex = Math.max(
+      0,
+      Math.min(index, this.testOrder.length - 1),
+    );
+    this.outputScrollOffset = Number.MAX_SAFE_INTEGER; // clamped in render
+    this.lastUserInteractionTime = Date.now();
+    this.scheduleRender();
+  }
+
+  /** Adjust output scroll offset (clamped in render) */
+  private scrollOutput(offset: number): void {
+    this.outputScrollOffset = Math.max(0, offset);
+    this.scheduleRender();
+  }
 
   private scheduleRender(): void {
     if (!this.isActive || this.renderScheduled) return;
@@ -348,8 +429,17 @@ export class TerminalTui {
 
     // Right pane: build wrapped output lines
     const outputLines = this.buildOutputLines(selectedTest, rightWidth - 2);
+    this.lastOutputLines = outputLines;
     const maxScroll = Math.max(0, outputLines.length - contentHeight);
     this.outputScrollOffset = Math.min(this.outputScrollOffset, maxScroll);
+
+    // Selection range (normalized)
+    const selLo = this.selection
+      ? Math.min(this.selection.startRow, this.selection.endRow)
+      : -1;
+    const selHi = this.selection
+      ? Math.max(this.selection.startRow, this.selection.endRow)
+      : -1;
 
     for (let row = 0; row < contentHeight; row++) {
       const screenRow = row + 2;
@@ -400,7 +490,10 @@ export class TerminalTui {
       if (outIdx < outputLines.length) {
         rightCell = ' ' + truncate(outputLines[outIdx], rightWidth - 2) + RESET;
       }
-      buf += padRight(rightCell, rightWidth);
+      const isSelected = outIdx >= selLo && outIdx <= selHi;
+      buf += isSelected
+        ? chalk.inverse(padRight(rightCell, rightWidth))
+        : padRight(rightCell, rightWidth);
     }
 
     // --- Bottom divider ---
@@ -510,28 +603,17 @@ export class TerminalTui {
     }
 
     // SGR mouse: ESC [ < Cb ; Cx ; Cy M (press) or m (release)
+    // Use matchAll to handle batched events (fast drag can concatenate multiple events)
     // eslint-disable-next-line no-control-regex
-    const sgrMatch = key.match(/^\x1b\[<(\d+);(\d+);(\d+)([Mm])$/);
-    if (sgrMatch) {
-      const button = parseInt(sgrMatch[1], 10);
-      const col = parseInt(sgrMatch[2], 10);
-      const row = parseInt(sgrMatch[3], 10);
-      const isPress = sgrMatch[4] === 'M';
-
-      // Only handle left-click press (button 0)
-      if (button === 0 && isPress) {
-        // Content rows start at screen row 2, left pane is cols 1..leftWidth+1
-        if (row >= 2 && col <= this.lastLeftWidth + 1) {
-          const contentRow = row - 2;
-          const testIdx = this.lastListStart + contentRow;
-          if (testIdx >= 0 && testIdx < this.testOrder.length) {
-            this.selectedIndex = testIdx;
-            this.outputScrollOffset = 0;
-            this.activePaneFocus = 'list';
-            this.lastUserInteractionTime = Date.now();
-            this.scheduleRender();
-          }
-        }
+    const sgrMatches = [...key.matchAll(/\x1b\[<(\d+);(\d+);(\d+)([Mm])/g)];
+    if (sgrMatches.length > 0) {
+      for (const sgrMatch of sgrMatches) {
+        this.handleMouseEvent(
+          parseInt(sgrMatch[1], 10),
+          parseInt(sgrMatch[2], 10),
+          parseInt(sgrMatch[3], 10),
+          sgrMatch[4] === 'M',
+        );
       }
       return;
     }
@@ -562,93 +644,138 @@ export class TerminalTui {
 
     // Escape sequences (arrows, page up/down, home/end)
     if (data[0] === 0x1b && data[1] === 0x5b) {
-      const rows = process.stdout.rows || 24;
-      const contentHeight = rows - 3;
+      const contentHeight = (process.stdout.rows || 24) - 3;
 
-      switch (data[2]) {
-        // Up arrow
-        case 0x41:
-          if (this.activePaneFocus === 'list') {
-            this.selectedIndex = Math.max(0, this.selectedIndex - 1);
-            this.outputScrollOffset = 0;
-            this.lastUserInteractionTime = Date.now();
-          } else {
-            this.outputScrollOffset = Math.max(0, this.outputScrollOffset - 1);
-          }
-          this.scheduleRender();
-          return;
+      // Map key codes to [listDelta, outputDelta] actions
+      // listDelta: new selectedIndex value or delta for selectTest
+      // outputDelta: adjustment for scrollOutput
+      type NavAction = {
+        listIndex: number;
+        outputOffset: number;
+      };
 
-        // Down arrow
-        case 0x42:
-          if (this.activePaneFocus === 'list') {
-            this.selectedIndex = Math.min(
-              this.testOrder.length - 1,
-              this.selectedIndex + 1,
-            );
-            this.outputScrollOffset = 0;
-            this.lastUserInteractionTime = Date.now();
-          } else {
-            this.outputScrollOffset += 1; // clamped in render
-          }
-          this.scheduleRender();
-          return;
-
-        // Home (ESC [ H)
-        case 0x48:
-          if (this.activePaneFocus === 'list') {
-            this.selectedIndex = 0;
-            this.outputScrollOffset = 0;
-            this.lastUserInteractionTime = Date.now();
-          } else {
-            this.outputScrollOffset = 0;
-          }
-          this.scheduleRender();
-          return;
-
-        // End (ESC [ F)
-        case 0x46:
-          if (this.activePaneFocus === 'list') {
-            this.selectedIndex = Math.max(0, this.testOrder.length - 1);
-            this.outputScrollOffset = 0;
-            this.lastUserInteractionTime = Date.now();
-          } else {
-            this.outputScrollOffset = Number.MAX_SAFE_INTEGER; // clamped in render
-          }
-          this.scheduleRender();
-          return;
-      }
-
-      // Page Up (ESC [ 5 ~) / Page Down (ESC [ 6 ~)
-      if (data[2] === 0x35 && data[3] === 0x7e) {
-        // Page Up
-        if (this.activePaneFocus === 'list') {
-          this.selectedIndex = Math.max(0, this.selectedIndex - contentHeight);
-          this.outputScrollOffset = 0;
-          this.lastUserInteractionTime = Date.now();
-        } else {
-          this.outputScrollOffset = Math.max(
-            0,
-            this.outputScrollOffset - contentHeight,
-          );
+      const navAction = ((): NavAction | null => {
+        switch (data[2]) {
+          case 0x41: // Up
+            return {
+              listIndex: this.selectedIndex - 1,
+              outputOffset: this.outputScrollOffset - 1,
+            };
+          case 0x42: // Down
+            return {
+              listIndex: this.selectedIndex + 1,
+              outputOffset: this.outputScrollOffset + 1,
+            };
+          case 0x48: // Home
+            return { listIndex: 0, outputOffset: 0 };
+          case 0x46: // End
+            return {
+              listIndex: this.testOrder.length - 1,
+              outputOffset: Number.MAX_SAFE_INTEGER,
+            };
         }
-        this.scheduleRender();
+        // Page Up / Page Down (ESC [ 5~ / ESC [ 6~)
+        if (data[3] === 0x7e) {
+          if (data[2] === 0x35)
+            return {
+              listIndex: this.selectedIndex - contentHeight,
+              outputOffset: this.outputScrollOffset - contentHeight,
+            };
+          if (data[2] === 0x36)
+            return {
+              listIndex: this.selectedIndex + contentHeight,
+              outputOffset: this.outputScrollOffset + contentHeight,
+            };
+        }
+        return null;
+      })();
+
+      if (navAction) {
+        if (this.activePaneFocus === 'list') {
+          this.selectTest(navAction.listIndex);
+        } else {
+          this.scrollOutput(navAction.outputOffset);
+        }
         return;
       }
-      if (data[2] === 0x36 && data[3] === 0x7e) {
-        // Page Down
-        if (this.activePaneFocus === 'list') {
-          this.selectedIndex = Math.min(
-            this.testOrder.length - 1,
-            this.selectedIndex + contentHeight,
-          );
-          this.outputScrollOffset = 0;
-          this.lastUserInteractionTime = Date.now();
-        } else {
-          this.outputScrollOffset += contentHeight; // clamped in render
-        }
-        this.scheduleRender();
-        return;
+    }
+  }
+
+  private handleMouseEvent(
+    button: number,
+    col: number,
+    row: number,
+    isPress: boolean,
+  ): void {
+    const isMotion = button >= 32; // motion events have +32 on button code
+    const realButton = isMotion ? button - 32 : button;
+
+    const rightPaneStart = this.lastLeftWidth + 3; // left border + left width + divider
+    const isInRightPanel = col >= rightPaneStart;
+    const isInContentArea = row >= 2;
+    const contentRow = row - 2;
+    const outputLineIdx = this.outputScrollOffset + contentRow;
+
+    // Scroll wheel: 64 = scroll up, 65 = scroll down
+    if (button === 64 || button === 65) {
+      const scrollDelta = button === 64 ? -3 : 3;
+      if (isInRightPanel || this.activePaneFocus === 'output') {
+        this.scrollOutput(this.outputScrollOffset + scrollDelta);
+      } else {
+        this.selectTest(this.selectedIndex + scrollDelta);
       }
+      return;
+    }
+
+    if (realButton !== 0) return;
+
+    if (isPress && !isMotion) {
+      // Left-click press
+      if (isInContentArea && isInRightPanel) {
+        this.selection = { startRow: outputLineIdx, endRow: outputLineIdx };
+        this.scheduleRender();
+      } else if (row === 1 && isInRightPanel) {
+        // Click on header right panel — copy test title
+        const entry = this.tests.get(
+          this.testOrder[this.selectedIndex] ?? '',
+        );
+        if (entry) {
+          this.copyToClipboard(entry.title);
+        }
+      } else if (isInContentArea && !isInRightPanel) {
+        // Click in left panel — select test
+        const testIdx = this.lastListStart + contentRow;
+        if (testIdx >= 0 && testIdx < this.testOrder.length) {
+          this.selection = null;
+          this.activePaneFocus = 'list';
+          this.selectTest(testIdx);
+        }
+      }
+    } else if (isMotion && this.selection) {
+      // Drag — extend selection
+      if (isInContentArea) {
+        this.selection.endRow = outputLineIdx;
+        this.scheduleRender();
+      }
+    }
+
+    if (!isPress && !isMotion && this.selection) {
+      // Release — copy selected lines
+      const { startRow, endRow } = this.selection;
+      const lo = Math.max(0, Math.min(startRow, endRow));
+      const hi = Math.min(
+        this.lastOutputLines.length - 1,
+        Math.max(startRow, endRow),
+      );
+      if (lo <= hi) {
+        const selectedText = this.lastOutputLines
+          .slice(lo, hi + 1)
+          .map(stripAnsi)
+          .join('\n');
+        this.copyToClipboard(selectedText);
+      }
+      this.selection = null;
+      this.scheduleRender();
     }
   }
 
@@ -676,7 +803,10 @@ export class TerminalTui {
       if (err.stack) text += err.stack + '\n';
     }
 
-    // Build ordered list of clipboard commands to try
+    this.copyToClipboard(text);
+  }
+
+  private copyToClipboard(text: string): void {
     const candidates: Array<{ cmd: string; args: string[] }> = [];
     if (process.platform === 'darwin') {
       candidates.push({ cmd: 'pbcopy', args: [] });
@@ -689,7 +819,6 @@ export class TerminalTui {
       candidates.push({ cmd: 'xclip', args: ['-selection', 'clipboard'] });
       candidates.push({ cmd: 'xsel', args: ['--clipboard', '--input'] });
     }
-
     this.tryCopyWithCandidates(text, candidates, 0);
   }
 

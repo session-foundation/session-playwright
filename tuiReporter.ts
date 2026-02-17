@@ -33,7 +33,8 @@ class TuiReporter implements Reporter {
 
     this.tui.start();
     this.tui.onStop(() => {
-      // User pressed q or Ctrl+C — print summary and terminate
+      // User pressed q or Ctrl+C during test run — print summary and terminate
+      // (after onEnd, waitForClose() replaces this callback for graceful exit)
       this.printSummary();
       process.exit(1);
     });
@@ -117,7 +118,9 @@ class TuiReporter implements Reporter {
     this.tui.updateTest(globalId, 'failed');
   }
 
-  onEnd(_result: FullResult) {
+  async onEnd(_result: FullResult) {
+    this.tui.reorderForSummary();
+    await this.tui.waitForClose();
     this.tui.stop();
     this.printSummary();
   }
@@ -137,6 +140,7 @@ class TuiReporter implements Reporter {
     let failedCount = 0;
     let flakyCount = 0;
     let skippedCount = 0;
+    let interruptedCount = 0;
     const failedTests: Array<{ results: TestAndResult[]; title: string }> = [];
     const flakyTests: Array<{ results: TestAndResult[]; title: string }> = [];
 
@@ -144,9 +148,14 @@ class TuiReporter implements Reporter {
       const allPassed = results.every((r) => r.result.status === 'passed');
       const anyPassed = results.some((r) => r.result.status === 'passed');
       const allSkipped = results.every((r) => r.result.status === 'skipped');
+      const allInterrupted = results.every(
+        (r) => r.result.status === 'interrupted',
+      );
 
       if (allSkipped) {
         skippedCount++;
+      } else if (allInterrupted) {
+        interruptedCount++;
       } else if (allPassed) {
         passedCount++;
       } else if (anyPassed) {
@@ -158,12 +167,20 @@ class TuiReporter implements Reporter {
       }
     }
 
+    // Tests that never finished (still running/pending when stopped)
+    const finishedTitles = new Set(Object.keys(grouped));
+    const cancelledCount = this.allTestsCount - finishedTitles.size;
+
     // Summary line
     const parts: string[] = [];
     if (passedCount > 0)
       parts.push(chalk.green(`\u2713 ${passedCount} passed`));
     if (failedCount > 0) parts.push(chalk.red(`\u2717 ${failedCount} failed`));
     if (flakyCount > 0) parts.push(chalk.yellow(`\u21bb ${flakyCount} flaky`));
+    if (interruptedCount > 0)
+      parts.push(chalk.yellow(`\u2716 ${interruptedCount} interrupted`));
+    if (cancelledCount > 0)
+      parts.push(chalk.dim(`\u25a0 ${cancelledCount} cancelled`));
     if (skippedCount > 0)
       parts.push(chalk.blue(`\u25cb ${skippedCount} skipped`));
     console.log(`  ${parts.join('  ')}`);
