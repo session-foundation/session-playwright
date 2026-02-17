@@ -15,7 +15,7 @@ export default defineConfig({
         ? './tuiReporter.ts'
         : './sessionReporter.ts',
     ],
-    ['allure-playwright'],
+    // ['allure-playwright'], // enabling starts generating reports to the allure-results folder
   ],
   testDir: './tests/automation',
   testIgnore: '*.js',
