@@ -85,9 +85,6 @@ export async function compareElementScreenshot(
     console.error(
       `Screenshot matching of "${snapshotName}" failed after ${tryNumber} attempt(s) (${maxRetryDurationMs}ms)`,
     );
-    console.warn(
-      `Screenshot matching of "${snapshotName}" failed after ${tryNumber} attempt(s) (${maxRetryDurationMs}ms).`,
-    );
     console.warn(`\n\texpected:${snapshotPath}\n\treceived: ${tempPath}`);
   }
 
