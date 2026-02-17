@@ -50,7 +50,7 @@ const urlModalButtons = [
 
 urlModalButtons.forEach(({ button, name }) => {
   test_Alice_1W(
-    `Donate CTA, never shows after clicking ${name} in URL modal`,
+    `Donate CTA, never shows after ${name}`,
     async ({ aliceWindow1 }) => {
       const url = 'https://getsession.org/donate';
 

@@ -380,7 +380,7 @@ messageLengthTestCases.forEach((testCase) => {
 });
 
 test_Alice_1W(
-  'Emoji container does not show for links',
+  'Emoji does not show for links',
   async ({ aliceWindow1, alice }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);
     await clickOn(aliceWindow1, HomeScreen.newMessageOption);
@@ -425,7 +425,7 @@ test_Alice_1W(
 );
 
 test_Alice_1W(
-  'Emoji container closes when clicking away',
+  'Emoji closes when clicking away',
   async ({ aliceWindow1, alice }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);
     await clickOn(aliceWindow1, HomeScreen.newMessageOption);

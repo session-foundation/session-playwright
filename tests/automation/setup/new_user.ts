@@ -45,9 +45,9 @@ export const newUser = async (
   accountid = accountid.replace(/[^0-9a-fA-F]/g, ''); // keep only hex characters
 
   console.log(
-    `${userName}: Account ID: "${chalk.blue(
+    `${userName}: \n\tAccount ID: "${chalk.bgBlue(
       accountid,
-    )}" and Recovery password: "${chalk.green(recoveryPassword)}"`,
+    )}" \n\tRecovery password: "${chalk.bgGreen(recoveryPassword)}"`,
   );
   await clickOn(window, Global.modalCloseButton);
   if (awaitOnionPath) {
