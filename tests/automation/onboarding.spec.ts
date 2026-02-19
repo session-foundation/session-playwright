@@ -5,7 +5,7 @@ import {
   checkModalStrings,
   clickOn,
   clickOnWithText,
-  typeIntoInput,
+  pasteIntoInput,
 } from './utilities/utils';
 
 sessionTestOneWindow('Warning modal new account', async ([aliceWindow1]) => {
@@ -36,7 +36,7 @@ sessionTestOneWindow(
     const seedPhrase =
       'eldest fazed hybrid buzzer nasty domestic digit pager unusual purged makeup assorted domestic';
     await clickOn(aliceWindow1, Onboarding.iHaveAnAccountButton);
-    await typeIntoInput(aliceWindow1, 'recovery-phrase-input', seedPhrase);
+    await pasteIntoInput(aliceWindow1, 'recovery-phrase-input', seedPhrase);
     await clickOn(aliceWindow1, Global.continueButton);
     await clickOn(aliceWindow1, Global.backButton);
     await checkModalStrings(

@@ -13,7 +13,7 @@ import {
   clickOnMatchingText,
   clickOnWithText,
   controlOrMetaFor,
-  typeIntoInput,
+  pasteIntoInput,
   waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
   waitForTextMessage,
@@ -77,7 +77,7 @@ export const sendMedia = async (
 ) => {
   // Send media
   await window.setInputFiles("input[type='file']", path);
-  await typeIntoInput(window, 'message-input-text-area', testMessage, true);
+  await pasteIntoInput(window, 'message-input-text-area', testMessage);
   // make sure that both the staged attachment container and message content we expect are there before we hit "send"
   await Promise.all([
     waitForTestIdWithText(window, 'message-input-text-area', testMessage, 1000),
@@ -122,7 +122,7 @@ export const sendVoiceMessage = async (window: Page) => {
 export const sendLinkPreview = async (window: Page, testLink: string) => {
   // The clipboard is shared across the system so multiple tests can write to it and break each others.
   // I have made the copy and paste as fast as possible here so that this happens as little as possible.
-  await typeIntoInput(window, 'search-input', testLink);
+  await pasteIntoInput(window, 'search-input', testLink);
   await clickOnElement({
     window,
     strategy: 'data-testid',

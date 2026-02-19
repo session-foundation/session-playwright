@@ -22,7 +22,7 @@ import {
   hasElementBeenDeleted,
   hasElementPoppedUpThatShouldnt,
   scrollToBottomIfNecessary,
-  typeIntoInput,
+  pasteIntoInput,
   waitForTestIdWithText,
 } from './utilities/utils';
 
@@ -93,7 +93,7 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
     strictMode: false,
   });
   await clickOn(windowA, Conversation.banUserButton);
-  await typeIntoInput(windowB, Conversation.messageInput.selector, msg2);
+  await pasteIntoInput(windowB, Conversation.messageInput.selector, msg2);
   await clickOn(windowB, Conversation.sendMessageButton);
   await waitForMessageStatus(windowB, msg2, 'failed');
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
@@ -139,7 +139,7 @@ sessionTestTwoWindows('Ban And delete all', async ([windowA, windowB]) => {
     10_000,
     msg1,
   );
-  await typeIntoInput(windowB, Conversation.messageInput.selector, msg2);
+  await pasteIntoInput(windowB, Conversation.messageInput.selector, msg2);
   await clickOn(windowB, Conversation.sendMessageButton);
   await waitForMessageStatus(windowB, msg2, 'failed');
   await hasElementPoppedUpThatShouldnt(

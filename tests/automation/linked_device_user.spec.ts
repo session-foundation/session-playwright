@@ -30,7 +30,7 @@ import {
   doWhileWithMax,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForLoadingAnimationToFinish,
   waitForMatchingPlaceholder,
   waitForMatchingText,
@@ -91,7 +91,7 @@ test_Alice_2W(
     // Click on pencil icon
     await clickOn(aliceWindow1, Settings.displayName);
     // Replace old username with new username
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       Settings.displayNameInput.selector,
       newUsername,
@@ -391,7 +391,7 @@ test_Alice_2W(
   async ({ alice, aliceWindow1, aliceWindow2 }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);
     await clickOn(aliceWindow1, HomeScreen.newMessageOption);
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       HomeScreen.newMessageAccountIDInput.selector,
       alice.accountid,

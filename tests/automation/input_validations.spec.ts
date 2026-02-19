@@ -4,7 +4,7 @@ import { sessionTestOneWindow } from './setup/sessionTest';
 import {
   clickOn,
   grabTextFromElement,
-  typeIntoInput,
+  pasteIntoInput,
   waitForTestIdWithText,
 } from './utilities/utils';
 
@@ -31,7 +31,7 @@ import {
 ].forEach(({ testName, incorrectSeed, expectedError }) => {
   sessionTestOneWindow(`Seed validation: "${testName}"`, async ([window]) => {
     await clickOn(window, Onboarding.iHaveAnAccountButton);
-    await typeIntoInput(window, 'recovery-phrase-input', incorrectSeed);
+    await pasteIntoInput(window, 'recovery-phrase-input', incorrectSeed);
     await clickOn(window, Global.continueButton);
     await waitForTestIdWithText(window, 'error-message');
     const actualError = await grabTextFromElement(
@@ -65,7 +65,7 @@ import {
     `Display name validation: "${testName}"`,
     async ([window]) => {
       await clickOn(window, Onboarding.createAccountButton);
-      await typeIntoInput(window, 'display-name-input', displayName);
+      await pasteIntoInput(window, 'display-name-input', displayName);
       await clickOn(window, Global.continueButton);
       await waitForTestIdWithText(window, Global.errorMessage.selector);
       const actualError = await grabTextFromElement(

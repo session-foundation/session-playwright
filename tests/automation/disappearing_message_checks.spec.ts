@@ -30,7 +30,7 @@ import {
   formatTimeOption,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
@@ -140,7 +140,11 @@ test_Alice_1W_Bob_1W(
         }),
       ),
     ]);
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
+    await pasteIntoInput(
+      aliceWindow1,
+      'message-input-text-area',
+      longText,
+    );
     await sleepFor(100);
     await clickOn(aliceWindow1, Conversation.sendMessageButton);
     await waitForMessageStatus(aliceWindow1, longText, 'sent');

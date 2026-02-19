@@ -28,7 +28,7 @@ import {
   controlOrMetaFor,
   doesElementExist,
   hasElementBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -147,7 +147,7 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   // Click on current username to open edit field
   await clickOn(aliceWindow1, Settings.displayName);
   // Type in new username
-  await typeIntoInput(
+  await pasteIntoInput(
     aliceWindow1,
     Settings.displayNameInput.selector,
     newUsername,
@@ -251,7 +251,7 @@ test_Alice_1W_Bob_1W(
     await clickOnMatchingText(aliceWindow1, tStripped('nicknameSet'));
     await sleepFor(1000);
 
-    await typeIntoInput(aliceWindow1, 'nickname-input', nickname);
+    await pasteIntoInput(aliceWindow1, 'nickname-input', nickname);
     await sleepFor(100);
     await clickOnWithText(
       aliceWindow1,
@@ -466,7 +466,7 @@ test_Alice_1W_no_network(
   async ({ aliceWindow1, alice }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);
     await clickOn(aliceWindow1, HomeScreen.newMessageOption);
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       'new-session-conversation',
       alice.accountid,

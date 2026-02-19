@@ -23,7 +23,7 @@ type ElementOptions = {
 };
 
 // TODO Unify element interaction functions to use locator objects the way clickOn and clickOnWithText do
-// Remaining functions to migrate: waitForElement, typeIntoInput, grabTextFromElement etc.
+// Remaining functions to migrate: waitForElement, pasteIntoInput, grabTextFromElement etc.
 
 // WAIT FOR FUNCTIONS
 
@@ -385,13 +385,12 @@ export function getMessageTextContentNow() {
   return `Test message timestamp: ${Date.now()}`;
 }
 
-export async function typeIntoInput(
+export async function pasteIntoInput(
   window: Page,
   dataTestId: DataTestId,
   text: string,
-  paste?: boolean, // typing long messages hits the runner timeout
 ) {
-  console.info(`typeIntoInput testId: ${dataTestId} : "${text}"`);
+  console.info(`pasteIntoInput testId: ${dataTestId} : "${text}"`);
   const builtSelector = `css=[data-testid=${dataTestId}]`;
   // the new input made with onboarding element needs a click to reveal the input in the DOM
   // Convert DataTestId to locator object for clickOn
@@ -399,11 +398,7 @@ export async function typeIntoInput(
   await clickOn(window, locator);
   // reset the content to be empty before typing into the input
   await window.fill(builtSelector, '');
-  if (paste) {
-    await window.fill(builtSelector, text);
-  } else {
-    await window.type(builtSelector, text);
-  }
+  await window.fill(builtSelector, text);
 }
 
 export async function doesTextIncludeString(

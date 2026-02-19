@@ -7,7 +7,7 @@ import {
   checkPathLight,
   clickOn,
   grabTextFromElement,
-  typeIntoInput,
+  pasteIntoInput,
   waitForTestIdWithText,
 } from '../utilities/utils';
 
@@ -19,7 +19,7 @@ export const newUser = async (
   // Create User
   await clickOn(window, Onboarding.createAccountButton);
   // Input username = testuser
-  await typeIntoInput(window, Onboarding.displayNameInput.selector, userName);
+  await pasteIntoInput(window, Onboarding.displayNameInput.selector, userName);
   await clickOn(window, Global.continueButton);
   // save recovery phrase
   await clickOn(window, LeftPane.profileButton);

@@ -12,7 +12,7 @@ import {
   clickOnMatchingText,
   clickOnWithText,
   hasElementBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -22,7 +22,7 @@ export const joinCommunity = async (window: Page) => {
   await clickOn(window, HomeScreen.plusButton);
   await clickOn(window, HomeScreen.joinCommunityOption);
   //   The follow two test tags are pending implementation
-  await typeIntoInput(
+  await pasteIntoInput(
     window,
     HomeScreen.joinCommunityInput.selector,
     testCommunityLink,

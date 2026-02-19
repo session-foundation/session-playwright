@@ -120,6 +120,8 @@ class TuiReporter implements Reporter {
 
   async onEnd(_result: FullResult) {
     this.tui.reorderForSummary();
+    // Workers are already cleaned up by the time onEnd is called.
+    // Block here to keep the TUI open for browsing results.
     await this.tui.waitForClose();
     this.tui.stop();
     this.printSummary();
@@ -169,8 +171,8 @@ class TuiReporter implements Reporter {
 
     // Tests that never finished (still running/pending when stopped)
     const finishedTitles = new Set(Object.keys(grouped));
-    const cancelledCount = this.allTestsCount - finishedTitles.size;
 
+    const cancelledCount = this.allTestsCount - finishedTitles.size;
     // Summary line
     const parts: string[] = [];
     if (passedCount > 0)

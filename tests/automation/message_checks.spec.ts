@@ -36,7 +36,7 @@ import {
   hasElementPoppedUpThatShouldnt,
   hasTextMessageBeenDeleted,
   measureSendingTime,
-  typeIntoInput,
+  pasteIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
@@ -95,7 +95,7 @@ test_Alice_1W_Bob_1W(
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testReply = `${bob.userName} replying to long text message from ${alice.userName}`;
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
+    await pasteIntoInput(aliceWindow1, 'message-input-text-area', longText);
     await sleepFor(100);
     await clickOnElement({
       window: aliceWindow1,
@@ -296,11 +296,10 @@ messageLengthTestCases.forEach((testCase) => {
           : (maxChars - testCase.length).toString();
       const message = testCase.char.repeat(testCase.length);
       // Type the message
-      await typeIntoInput(
+      await pasteIntoInput(
         aliceWindow1,
         'message-input-text-area',
         message,
-        true, // Paste because otherwise Playwright times out
       );
 
       // Check countdown behavior
@@ -384,14 +383,17 @@ test_Alice_1W(
   async ({ aliceWindow1, alice }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);
     await clickOn(aliceWindow1, HomeScreen.newMessageOption);
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       HomeScreen.newMessageAccountIDInput.selector,
       alice.accountid,
-      true,
     );
     await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
-    await typeIntoInput(aliceWindow1, Conversation.messageInput.selector, ':a');
+    await pasteIntoInput(
+      aliceWindow1,
+      Conversation.messageInput.selector,
+      ':a',
+    );
     await waitForTestIdWithText(
       aliceWindow1,
       Conversation.mentionsContainer.selector,
@@ -401,7 +403,7 @@ test_Alice_1W(
       Conversation.mentionsItem.selector,
       ':a:',
     );
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       Conversation.messageInput.selector,
       'https:/',
@@ -411,7 +413,7 @@ test_Alice_1W(
       Conversation.mentionsContainer.strategy,
       Conversation.mentionsContainer.selector,
     );
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       Conversation.messageInput.selector,
       'check this out https:/',
@@ -429,14 +431,13 @@ test_Alice_1W(
   async ({ aliceWindow1, alice }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);
     await clickOn(aliceWindow1, HomeScreen.newMessageOption);
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       HomeScreen.newMessageAccountIDInput.selector,
-      alice.accountid,
-      true,
+      alice.accountid
     );
     await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       Conversation.messageInput.selector,
       'hey check this out :a',

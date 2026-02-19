@@ -14,7 +14,7 @@ import {
   clickOnMatchingText,
   clickOnTextMessage,
   hasTextMessageBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
@@ -100,7 +100,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     groupCreated,
   }) => {
     const testReply = `${bob.userName} replying to long text message from ${alice.userName} in ${groupCreated.userName}`;
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
+    await pasteIntoInput(aliceWindow1, 'message-input-text-area', longText);
     await sleepFor(100);
     await clickOnElement({
       window: aliceWindow1,
