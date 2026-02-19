@@ -21,8 +21,8 @@ import {
   clickOnWithText,
   hasElementBeenDeleted,
   hasElementPoppedUpThatShouldnt,
-  scrollToBottomIfNecessary,
   pasteIntoInput,
+  scrollToBottomIfNecessary,
   waitForTestIdWithText,
 } from './utilities/utils';
 

@@ -296,11 +296,7 @@ messageLengthTestCases.forEach((testCase) => {
           : (maxChars - testCase.length).toString();
       const message = testCase.char.repeat(testCase.length);
       // Type the message
-      await pasteIntoInput(
-        aliceWindow1,
-        'message-input-text-area',
-        message,
-      );
+      await pasteIntoInput(aliceWindow1, 'message-input-text-area', message);
 
       // Check countdown behavior
       if (expectedCount) {
@@ -434,7 +430,7 @@ test_Alice_1W(
     await pasteIntoInput(
       aliceWindow1,
       HomeScreen.newMessageAccountIDInput.selector,
-      alice.accountid
+      alice.accountid,
     );
     await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
     await pasteIntoInput(
