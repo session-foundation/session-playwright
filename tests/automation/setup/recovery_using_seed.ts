@@ -4,7 +4,7 @@ import { Global, Onboarding } from '../locators';
 import {
   clickOn,
   doesElementExist,
-  typeIntoInput,
+  pasteIntoInput,
   waitForLoadingAnimationToFinish,
 } from '../utilities/utils';
 
@@ -14,7 +14,7 @@ export async function recoverFromSeed(
   options?: { fallbackName?: string },
 ) {
   await clickOn(window, Onboarding.iHaveAnAccountButton);
-  await typeIntoInput(window, 'recovery-phrase-input', recoveryPhrase);
+  await pasteIntoInput(window, 'recovery-phrase-input', recoveryPhrase);
   await clickOn(window, Global.continueButton);
   await waitForLoadingAnimationToFinish(window, 'loading-animation');
   const displayNameInput = await doesElementExist(
@@ -27,7 +27,7 @@ export async function recoverFromSeed(
       throw new Error(`Display name was not found when restoring from seed`);
     }
     // Fallback for when name might be missing (but it's okay)
-    await typeIntoInput(
+    await pasteIntoInput(
       window,
       Onboarding.displayNameInput.selector,
       options.fallbackName,

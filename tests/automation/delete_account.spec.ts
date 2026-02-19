@@ -15,7 +15,7 @@ import {
   clickOnMatchingText,
   clickOnWithText,
   hasElementBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
 } from './utilities/utils';
@@ -67,7 +67,7 @@ sessionTestTwoWindows(
       // Sign in with deleted account and check that nothing restores
       await clickOn(restoringWindow, Onboarding.iHaveAnAccountButton);
       // Fill in recovery phrase
-      await typeIntoInput(
+      await pasteIntoInput(
         restoringWindow,
         Onboarding.recoveryPhraseInput.selector,
         userA.recoveryPassword,
@@ -79,7 +79,7 @@ sessionTestTwoWindows(
         'loading-animation',
       );
 
-      await typeIntoInput(
+      await pasteIntoInput(
         restoringWindow,
         Onboarding.displayNameInput.selector,
         userA.userName,
@@ -94,6 +94,7 @@ sessionTestTwoWindows(
         restoringWindow,
         'data-testid',
         HomeScreen.conversationItemName.selector,
+        5_000,
       );
 
       await clickOn(restoringWindow, HomeScreen.plusButton); // Expect contacts list to be empty

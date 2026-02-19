@@ -53,13 +53,15 @@ export async function compareElementScreenshot(
   let tryNumber = 0;
   let lastError: Error | undefined;
 
+  let lastScreenshot: Buffer<ArrayBufferLike> | undefined;
+
   while (Date.now() - start <= maxRetryDurationMs) {
     try {
-      const screenshot = await element.screenshot({
+      lastScreenshot = await element.screenshot({
         type: imageType,
       });
 
-      expect(screenshot).toMatchSnapshot({
+      expect(lastScreenshot).toMatchSnapshot({
         name: snapshotName,
         maxDiffPixelRatio,
       });
@@ -74,6 +76,16 @@ export async function compareElementScreenshot(
         await sleepFor(POLL_INTERVAL_MS);
       }
     }
+  }
+
+  if (lastScreenshot) {
+    // save the snapshot to a temp folder for inspection
+    const tempPath = testInfo.snapshotPath(`temp-${snapshotName}`);
+    fs.writeFileSync(tempPath, lastScreenshot);
+    console.error(
+      `Screenshot matching of "${snapshotName}" failed after ${tryNumber} attempt(s) (${maxRetryDurationMs}ms)`,
+    );
+    console.warn(`\n\texpected:${snapshotPath}\n\treceived: ${tempPath}`);
   }
 
   // Only reach here if we timed out

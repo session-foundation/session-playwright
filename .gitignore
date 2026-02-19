@@ -23,3 +23,6 @@ dist/
 *-difference.png
 *-current*.png
 *-diff*.png
+**/.DS_Store
+
+temp-*.jpeg

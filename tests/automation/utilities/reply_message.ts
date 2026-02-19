@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 
 import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
+import { Conversation } from '../locators';
 import { Strategy } from '../types/testing';
 import { sendMessage } from './message';
 import { verifyMediaPreviewLoaded } from './send_media';
@@ -9,6 +10,7 @@ import {
   clickOnMatchingText,
   clickOnTextMessage,
   waitForElement,
+  waitForTestIdWithText,
   waitForTextMessage,
 } from './utils';
 
@@ -62,8 +64,18 @@ export const replyTo = async ({
     }
   }
   await sendMessage(senderWindow, replyText);
+  await waitForTestIdWithText(
+    senderWindow,
+    Conversation.quoteText.selector,
+    textMessage,
+  );
   if (receiverWindow) {
     await waitForTextMessage(receiverWindow, replyText);
+    await waitForTestIdWithText(
+      receiverWindow,
+      Conversation.quoteText.selector,
+      textMessage,
+    );
   }
 };
 

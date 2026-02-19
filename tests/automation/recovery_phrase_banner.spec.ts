@@ -33,33 +33,27 @@ async function bannerShouldAppear(window: Page) {
   console.log('On home screen, banner is visible');
 }
 
-test_Alice_1W(
-  'Recovery password banner appears after >2 conversations',
-  async ({ aliceWindow1 }) => {
-    await bannerShouldNotAppear(aliceWindow1);
-    await joinDefaultCommunity(aliceWindow1, 'Lokinet Updates');
-    await bannerShouldNotAppear(aliceWindow1);
-    await joinDefaultCommunity(aliceWindow1, 'Session Network Updates');
-    await bannerShouldNotAppear(aliceWindow1);
-    await joinDefaultCommunity(aliceWindow1, 'Session Updates');
-    await bannerShouldAppear(aliceWindow1);
-  },
-);
+test_Alice_1W('Recovery banner shows with >2', async ({ aliceWindow1 }) => {
+  await bannerShouldNotAppear(aliceWindow1);
+  await joinDefaultCommunity(aliceWindow1, 'Lokinet Updates');
+  await bannerShouldNotAppear(aliceWindow1);
+  await joinDefaultCommunity(aliceWindow1, 'Session Network Updates');
+  await bannerShouldNotAppear(aliceWindow1);
+  await joinDefaultCommunity(aliceWindow1, 'Session Updates');
+  await bannerShouldAppear(aliceWindow1);
+});
+
+test_Alice_1W('Recovery banner 2 windows', async ({ aliceWindow1, alice }) => {
+  await joinDefaultCommunity(aliceWindow1, 'Lokinet Updates');
+  await joinDefaultCommunity(aliceWindow1, 'Session Network Updates');
+  await joinDefaultCommunity(aliceWindow1, 'Session Updates');
+  const aliceWindow2 = await linkedDevice(alice.recoveryPassword);
+  await sleepFor(2_000);
+  await bannerShouldNotAppear(aliceWindow2);
+});
 
 test_Alice_1W(
-  'Recovery password banner 2 windows',
-  async ({ aliceWindow1, alice }) => {
-    await joinDefaultCommunity(aliceWindow1, 'Lokinet Updates');
-    await joinDefaultCommunity(aliceWindow1, 'Session Network Updates');
-    await joinDefaultCommunity(aliceWindow1, 'Session Updates');
-    const aliceWindow2 = await linkedDevice(alice.recoveryPassword);
-    await sleepFor(2_000);
-    await bannerShouldNotAppear(aliceWindow2);
-  },
-);
-
-test_Alice_1W(
-  'Recovery password banner persists when conversation count drops below 3',
+  'Recovery banner persists with drop',
   async ({ aliceWindow1 }) => {
     await joinDefaultCommunity(aliceWindow1, 'Lokinet Updates');
     await joinDefaultCommunity(aliceWindow1, 'Session Network Updates');
@@ -72,7 +66,7 @@ test_Alice_1W(
 );
 
 test_Alice_1W(
-  'Recovery password banner disappears after being opened',
+  'Recovery banner closes once opened',
   async ({ aliceWindow1 }) => {
     await joinDefaultCommunity(aliceWindow1, 'Lokinet Updates');
     await joinDefaultCommunity(aliceWindow1, 'Session Network Updates');

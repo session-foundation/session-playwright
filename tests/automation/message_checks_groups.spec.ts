@@ -14,7 +14,7 @@ import {
   clickOnMatchingText,
   clickOnTextMessage,
   hasTextMessageBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
@@ -100,7 +100,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     groupCreated,
   }) => {
     const testReply = `${bob.userName} replying to long text message from ${alice.userName} in ${groupCreated.userName}`;
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
+    await pasteIntoInput(aliceWindow1, 'message-input-text-area', longText);
     await sleepFor(100);
     await clickOnElement({
       window: aliceWindow1,
@@ -133,15 +133,15 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await Promise.all([
       waitForElement(
         bobWindow1,
-        'class',
-        'module-message__link-preview__title',
+        'data-testid',
+        'msg-link-preview-title',
         undefined,
         'Session | Send Messages, Not Metadata. | Private Messenger',
       ),
       waitForElement(
         charlieWindow1,
-        'class',
-        'module-message__link-preview__title',
+        'data-testid',
+        'msg-link-preview-title',
         undefined,
         'Session | Send Messages, Not Metadata. | Private Messenger',
       ),

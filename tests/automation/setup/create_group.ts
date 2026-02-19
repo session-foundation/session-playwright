@@ -10,7 +10,7 @@ import {
   clickOn,
   clickOnMatchingText,
   clickOnWithText,
-  typeIntoInput,
+  pasteIntoInput,
   waitForTestIdWithText,
   waitForTextMessages,
 } from '../utilities/utils';
@@ -57,7 +57,7 @@ export const createGroup = async (
   await clickOn(windowA, HomeScreen.plusButton);
   await clickOn(windowA, HomeScreen.createGroupOption);
   // Enter group name
-  await typeIntoInput(
+  await pasteIntoInput(
     windowA,
     HomeScreen.createGroupGroupName.selector,
     group.userName,

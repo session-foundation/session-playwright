@@ -7,7 +7,7 @@ import { v4 } from 'uuid';
 const logNodeConsole = process.env.LOG_NODE_CONSOLE === '1';
 
 export const NODE_ENV = 'production';
-export const MULTI_PREFIX = 'test-integration-';
+export const MULTI_PREFIX = 'test-integration';
 const multisAvailable = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 let electronPids: Array<number> = [];
 
@@ -76,19 +76,24 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
   console.info('   NODE_APP_INSTANCE', process.env.NODE_APP_INSTANCE);
 
   try {
+    const start = Date.now();
+    const useXvfb = process.env.USE_XVFB === '1';
     const electronApp = await electron.launch({
       args: [
         join(getAppRootPath(), 'app', 'ts', 'mains', 'main_node.js'),
         '--disable-gpu',
         '--force-device-scale-factor=1', // Normalizes Retina and non-Retina mac screens
+        ...(useXvfb ? ['--ozone-platform=x11'] : []),
       ],
       env: {
         ...process.env,
         ELECTRON_ENABLE_LOGGING: '1',
         // Optional: control log level
         ELECTRON_LOG_LEVEL: 'verbose', // 'verbose', 'info', 'warn', 'error'
+        ...(useXvfb && { WAYLAND_DISPLAY: '' }),
       },
     });
+    console.info(`  Electron app launched in ${Date.now() - start}ms`);
 
     if (logNodeConsole) {
       electronApp.on('console', (msg) => {
@@ -127,7 +132,9 @@ const logBrowserConsole = process.env.LOG_BROWSER_CONSOLE === '1';
 const openAppAndWait = async (multi: string, context?: TestContext) => {
   const electronApp = await openElectronAppOnly(multi, context);
   // Get the first window that the app opens, wait if necessary.
+  const start = Date.now();
   const window = await electronApp.firstWindow();
+  console.info(`  Browser window opened in ${Date.now() - start}ms`);
   window.on('console', (msg) => {
     if (!logBrowserConsole) {
       return;
@@ -169,4 +176,8 @@ export function getTrackedElectronPids(): Array<number> {
 
 export function resetTrackedElectronPids() {
   electronPids = [];
+}
+
+export function isRunningOnDevNet() {
+  return !!process.env.LOCAL_DEVNET_SEED_URL;
 }

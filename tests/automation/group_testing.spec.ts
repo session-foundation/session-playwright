@@ -22,7 +22,7 @@ import {
   clickOnMatchingText,
   clickOnWithText,
   grabTextFromElement,
-  typeIntoInput,
+  pasteIntoInput,
   waitForMatchingText,
   waitForTestIdWithText,
   waitForTextMessage,
@@ -176,7 +176,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     // All users type @ to open mentions
     await Promise.all(
       members.map((m) =>
-        typeIntoInput(m.window, 'message-input-text-area', '@'),
+        pasteIntoInput(m.window, 'message-input-text-area', '@'),
       ),
     );
 

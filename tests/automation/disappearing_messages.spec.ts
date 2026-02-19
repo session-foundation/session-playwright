@@ -20,7 +20,7 @@ import {
   formatTimeOption,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
@@ -72,7 +72,7 @@ test_Alice_2W_Bob_1W(
     // Check window B (need to refocus window)
     console.log(`Bring window B to front`);
     const message = 'Forcing window to front';
-    await typeIntoInput(bobWindow1, 'message-input-text-area', message);
+    await pasteIntoInput(bobWindow1, 'message-input-text-area', message);
     // click up arrow (send)
     await clickOn(bobWindow1, Conversation.sendMessageButton);
     await sleepFor(10000);
@@ -338,22 +338,15 @@ test_Alice_2W_Bob_1W(
         tStripped('disappearingMessagesTurnedOffYou'),
       ),
     ]);
-    await Promise.all([
-      hasElementBeenDeleted(
-        aliceWindow1,
-        'data-testid',
-        'disappear-messages-type-and-time',
+    await Promise.all(
+      [aliceWindow1, aliceWindow2, bobWindow1].map((w) =>
+        hasElementBeenDeleted(
+          w,
+          'data-testid',
+          'disappear-messages-type-and-time',
+          1_000,
+        ),
       ),
-      hasElementBeenDeleted(
-        aliceWindow2,
-        'data-testid',
-        'disappear-messages-type-and-time',
-      ),
-      hasElementBeenDeleted(
-        bobWindow1,
-        'data-testid',
-        'disappear-messages-type-and-time',
-      ),
-    ]);
+    );
   },
 );

@@ -30,7 +30,7 @@ import {
   formatTimeOption,
   hasElementBeenDeleted,
   hasTextMessageBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
@@ -97,6 +97,7 @@ mediaArray.forEach(
             bobWindow1,
             'data-testid',
             'audio-player',
+            1_000,
           );
         } else {
           await waitForTextMessage(bobWindow1, testMessage);
@@ -139,7 +140,7 @@ test_Alice_1W_Bob_1W(
         }),
       ),
     ]);
-    await typeIntoInput(aliceWindow1, 'message-input-text-area', longText);
+    await pasteIntoInput(aliceWindow1, 'message-input-text-area', longText);
     await sleepFor(100);
     await clickOn(aliceWindow1, Conversation.sendMessageButton);
     await waitForMessageStatus(aliceWindow1, longText, 'sent');
@@ -183,18 +184,18 @@ test_Alice_1W_Bob_1W(
     await sendLinkPreview(aliceWindow1, testLink);
     await waitForElement(
       bobWindow1,
-      'class',
-      'module-message__link-preview__title',
-      undefined,
+      'data-testid',
+      'msg-link-preview-title',
+      3_000,
       'Session | Send Messages, Not Metadata. | Private Messenger',
     );
     // Wait 30 seconds for link preview to disappear
-    await sleepFor(30000);
+    await sleepFor(30_000);
     await hasElementBeenDeleted(
       bobWindow1,
-      'class',
-      'module-message__link-preview__title',
-      undefined,
+      'data-testid',
+      'msg-link-preview-title',
+      1_000, // no need to wait too long here, it should have disappeared already
       'Session | Send Messages, Not Metadata. | Private Messenger',
     );
   },
@@ -271,22 +272,17 @@ test_Alice_1W_Bob_1W(
     ]);
     // Wait 30 seconds for community invite to disappear
     await sleepFor(30000);
-    await Promise.all([
-      hasElementBeenDeleted(
-        bobWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
+    await Promise.all(
+      [bobWindow1, aliceWindow1].map((w) =>
+        hasElementBeenDeleted(
+          w,
+          'class',
+          'group-name',
+          1_000,
+          testCommunityName,
+        ),
       ),
-      hasElementBeenDeleted(
-        aliceWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
-      ),
-    ]);
+    );
   },
 );
 
@@ -328,7 +324,7 @@ test_Alice_1W_Bob_1W(
         'call-notification-answered-a-call',
         tStripped('callsInProgress'),
       ),
-      // In the callers window, the message is 'You called {reciverName}'
+      // In the callers window, the message is 'You called {receiverName}'
       waitForTestIdWithText(
         aliceWindow1,
         'call-notification-started-call',
@@ -337,19 +333,20 @@ test_Alice_1W_Bob_1W(
     ]);
     // Wait 30 seconds for call message to disappear
     await sleepFor(30000);
+
     await Promise.all([
       hasElementBeenDeleted(
         bobWindow1,
         'data-testid',
         'call-notification-answered-a-call',
-        undefined,
+        1_000,
         tStripped('callsInProgress'),
       ),
       hasElementBeenDeleted(
         aliceWindow1,
         'data-testid',
         'call-notification-started-call',
-        undefined,
+        1_000,
         tStripped('callsYouCalled', { name: bob.userName }),
       ),
     ]);

@@ -22,7 +22,7 @@ export const leaveGroup = async (window: Page, group: Group) => {
     window,
     'data-testid',
     'module-conversation__user__profile-name',
-    undefined,
+    5_000,
     group.userName,
   );
 };

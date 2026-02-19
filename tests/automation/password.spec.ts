@@ -8,7 +8,7 @@ import {
   clickOn,
   clickOnMatchingText,
   hasElementPoppedUpThatShouldnt,
-  typeIntoInput,
+  pasteIntoInput,
   waitForTestIdWithText,
 } from './utilities/utils';
 
@@ -35,13 +35,13 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   // Click set password
   await clickOn(aliceWindow1, Settings.setPasswordSettingsButton);
   // Enter password
-  await typeIntoInput(
+  await pasteIntoInput(
     aliceWindow1,
     Settings.passwordInput.selector,
     testPassword,
   );
   // Confirm password
-  await typeIntoInput(
+  await pasteIntoInput(
     aliceWindow1,
     Settings.confirmPasswordInput.selector,
     testPassword,
@@ -61,7 +61,7 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   await sleepFor(300, true);
 
   // Type password into input field and validate it
-  await typeIntoInput(
+  await pasteIntoInput(
     aliceWindow1,
     Settings.passwordInput.selector,
     testPassword,
@@ -78,19 +78,19 @@ test_Alice_1W_no_network('Set Password', async ({ alice, aliceWindow1 }) => {
   await clickOn(aliceWindow1, Settings.changePasswordSettingsButton);
 
   // Enter old password
-  await typeIntoInput(
+  await pasteIntoInput(
     aliceWindow1,
     Settings.passwordInput.selector,
     testPassword,
   );
   // Enter new password
-  await typeIntoInput(
+  await pasteIntoInput(
     aliceWindow1,
     Settings.confirmPasswordInput.selector,
     newTestPassword,
   );
   // Confirm new password
-  await typeIntoInput(
+  await pasteIntoInput(
     aliceWindow1,
     Settings.reConfirmPasswordInput.selector,
     newTestPassword,
@@ -116,13 +116,13 @@ test_Alice_1W_no_network(
     // Click set password
     await clickOn(aliceWindow1, Settings.setPasswordSettingsButton);
     // Enter password
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       Settings.passwordInput.selector,
       testPassword,
     );
     // Confirm password
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       Settings.confirmPasswordInput.selector,
       testPassword,
@@ -133,7 +133,7 @@ test_Alice_1W_no_network(
     await clickOn(aliceWindow1, Global.modalBackButton);
     await clickOn(aliceWindow1, Settings.recoveryPasswordMenuItem);
     // Type password into input field
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       Settings.passwordInput.selector,
       testPassword,
@@ -148,7 +148,7 @@ test_Alice_1W_no_network(
     // Click on recovery phrase tab
     await clickOn(aliceWindow1, Settings.recoveryPasswordMenuItem);
     // Try with incorrect password
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       Settings.passwordInput.selector,
       newTestPassword,

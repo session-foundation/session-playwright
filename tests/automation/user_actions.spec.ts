@@ -25,9 +25,10 @@ import {
   clickOnElement,
   clickOnMatchingText,
   clickOnWithText,
+  controlOrMetaFor,
   doesElementExist,
   hasElementBeenDeleted,
-  typeIntoInput,
+  pasteIntoInput,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -146,7 +147,7 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   // Click on current username to open edit field
   await clickOn(aliceWindow1, Settings.displayName);
   // Type in new username
-  await typeIntoInput(
+  await pasteIntoInput(
     aliceWindow1,
     Settings.displayNameInput.selector,
     newUsername,
@@ -189,6 +190,7 @@ test_Alice_1W_no_network('Add avatar', async ({ aliceWindow1 }, testInfo) => {
     element: leftpaneAvatarContainer,
     snapshotName: 'avatar-updated-blue.jpeg',
     testInfo,
+    maxRetryDurationMs: 4_000,
   });
 });
 
@@ -249,7 +251,7 @@ test_Alice_1W_Bob_1W(
     await clickOnMatchingText(aliceWindow1, tStripped('nicknameSet'));
     await sleepFor(1000);
 
-    await typeIntoInput(aliceWindow1, 'nickname-input', nickname);
+    await pasteIntoInput(aliceWindow1, 'nickname-input', nickname);
     await sleepFor(100);
     await clickOnWithText(
       aliceWindow1,
@@ -448,8 +450,8 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   // New message
   await clickOn(aliceWindow1, HomeScreen.newMessageOption);
   await clickOn(aliceWindow1, HomeScreen.newMessageAccountIDInput);
-  const isMac = process.platform === 'darwin';
-  await aliceWindow1.keyboard.press(`${isMac ? 'Meta' : 'Control'}+V`);
+
+  await aliceWindow1.keyboard.press(`${controlOrMetaFor()}+V`);
   await clickOn(aliceWindow1, HomeScreen.newMessageNextButton);
   // Did the copied text create note to self?
   await waitForTestIdWithText(
@@ -464,7 +466,7 @@ test_Alice_1W_no_network(
   async ({ aliceWindow1, alice }) => {
     await clickOn(aliceWindow1, HomeScreen.plusButton);
     await clickOn(aliceWindow1, HomeScreen.newMessageOption);
-    await typeIntoInput(
+    await pasteIntoInput(
       aliceWindow1,
       'new-session-conversation',
       alice.accountid,

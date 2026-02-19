@@ -111,7 +111,7 @@ test_Alice_1W('Network page refresh', async ({ aliceWindow1 }) => {
 // Cycle through all valid node counts and check count + graph
 for (let nodeCount = 1; nodeCount <= 10; nodeCount++) {
   test_Alice_1W(
-    `Network page node count: ${nodeCount} - dark theme`,
+    `Network page with ${nodeCount}/dark`,
     async ({ aliceWindow1 }, testInfo) => {
       await clickOn(aliceWindow1, LeftPane.settingsButton);
       await clickOn(aliceWindow1, Settings.networkPageMenuItem);
@@ -147,7 +147,7 @@ for (let nodeCount = 1; nodeCount <= 10; nodeCount++) {
 // Single check to verify light mode svg also renders correctly
 const LIGHT_THEME_TEST_NODE_COUNT = 7;
 test_Alice_1W(
-  `Network page node count: ${LIGHT_THEME_TEST_NODE_COUNT} - light theme`,
+  `Network page with ${LIGHT_THEME_TEST_NODE_COUNT}/light`,
   async ({ aliceWindow1 }, testInfo) => {
     await clickOn(aliceWindow1, LeftPane.settingsButton);
     await clickOn(aliceWindow1, Settings.appearanceMenuItem);

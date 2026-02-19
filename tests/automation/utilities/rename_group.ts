@@ -5,7 +5,7 @@ import { Conversation, ConversationSettings, Global } from '../locators';
 import {
   clickOn,
   clickOnMatchingText,
-  typeIntoInput,
+  pasteIntoInput,
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utils';
@@ -18,7 +18,7 @@ export const renameGroup = async (
   await clickOnMatchingText(window, oldGroupName);
   await clickOn(window, Conversation.conversationSettingsIcon);
   await clickOn(window, ConversationSettings.editGroupButton);
-  await typeIntoInput(window, 'update-group-info-name-input', newGroupName);
+  await pasteIntoInput(window, 'update-group-info-name-input', newGroupName);
   await window.keyboard.press('Enter');
   await clickOnMatchingText(window, tStripped('save'));
   await waitForTestIdWithText(window, 'group-name', newGroupName);

@@ -138,15 +138,26 @@ test_Alice_2W_Bob_1W(
     );
     // Check that the blocked contacts is on alicewindow2
     // Check blocked status in blocked contacts list
-    await sleepFor(5000);
     await clickOn(aliceWindow2, LeftPane.settingsButton);
     await clickOn(aliceWindow2, Settings.conversationsMenuItem);
-    await clickOn(aliceWindow2, Settings.blockedContactsButton);
-    await waitForTestIdWithText(
-      aliceWindow2,
-      Global.contactItem.selector,
-      bob.userName,
-    );
-    await waitForMatchingText(aliceWindow2, bob.userName);
+    // the blocked conversation list UI does not refresh automatically
+    // so we need to refresh it manually
+    const maxAttempts = 10;
+    for (let i = 0; i < maxAttempts; i++) {
+      try {
+        await clickOn(aliceWindow2, Settings.blockedContactsButton);
+        await waitForMatchingText(aliceWindow2, bob.userName, 1_000);
+        break;
+      } catch (e) {
+        console.info(
+          `failed to find blocked contact "${bob.userName}", attempt: ${i}`,
+        );
+        if (i === maxAttempts - 1) {
+          throw e;
+        }
+        await sleepFor(1000);
+        await clickOn(aliceWindow2, Global.modalBackButton);
+      }
+    }
   },
 );

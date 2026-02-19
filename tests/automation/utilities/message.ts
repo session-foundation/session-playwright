@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { MessageStatus } from '../types/testing';
-import { clickOnElement, typeIntoInput } from './utils';
+import { clickOnElement, pasteIntoInput } from './utils';
 
 export const waitForMessageStatus = async (
   window: Page,
@@ -20,7 +20,7 @@ export const waitForMessageStatus = async (
 
 export const sendMessage = async (window: Page, message: string) => {
   // type into message input box
-  await typeIntoInput(window, 'message-input-text-area', message);
+  await pasteIntoInput(window, 'message-input-text-area', message);
   // click up arrow (send)
   await clickOnElement({
     window,

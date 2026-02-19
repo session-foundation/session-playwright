@@ -18,6 +18,7 @@ import {
   clickOnMatchingText,
   clickOnWithText,
   grabTextFromElement,
+  scrollToBottomIfNecessary,
   waitForMatchingText,
   waitForTestIdWithText,
 } from './utilities/utils';
@@ -168,7 +169,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([joinCommunity(aliceWindow1), joinCommunity(bobWindow1)]);
     const communityMsg = `I accept message requests + ${Date.now()}`;
     await sendMessage(bobWindow1, communityMsg);
-    await clickOn(aliceWindow1, Conversation.scrollToBottomButton);
+    await scrollToBottomIfNecessary(aliceWindow1);
     // Using native methods to locate the author corresponding to the sent message
     await aliceWindow1
       .locator('.module-message__container', { hasText: communityMsg })
@@ -214,7 +215,7 @@ test_Alice_1W_Bob_1W(
     await Promise.all([joinCommunity(aliceWindow1), joinCommunity(bobWindow1)]);
     const communityMsg = `I do not accept message requests + ${Date.now()}`;
     await sendMessage(bobWindow1, communityMsg);
-    await clickOn(aliceWindow1, Conversation.scrollToBottomButton);
+    await scrollToBottomIfNecessary(aliceWindow1);
     // Using native methods to locate the author corresponding to the sent message
     await aliceWindow1
       .locator('.module-message__container', { hasText: communityMsg })

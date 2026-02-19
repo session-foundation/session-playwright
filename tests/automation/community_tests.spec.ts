@@ -21,8 +21,8 @@ import {
   clickOnWithText,
   hasElementBeenDeleted,
   hasElementPoppedUpThatShouldnt,
+  pasteIntoInput,
   scrollToBottomIfNecessary,
-  typeIntoInput,
   waitForTestIdWithText,
 } from './utilities/utils';
 
@@ -33,7 +33,7 @@ test_Alice_2W(
   'Join community and sync',
   async ({ aliceWindow1, aliceWindow2 }) => {
     await joinCommunity(aliceWindow1);
-    await clickOn(aliceWindow1, Conversation.scrollToBottomButton);
+    await scrollToBottomIfNecessary(aliceWindow1);
     await sendMessage(aliceWindow1, 'Hello, community!');
     // Check linked device for community
     await clickOnWithText(
@@ -57,7 +57,7 @@ test_Alice_1W_Bob_1W(
     // ]);
     await Promise.all(
       [aliceWindow1, bobWindow1].map((window) =>
-        clickOn(window, Conversation.scrollToBottomButton),
+        scrollToBottomIfNecessary(window),
       ),
     );
     await sendMedia(aliceWindow1, mediaPath, testImageMessage, true);
@@ -93,7 +93,7 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
     strictMode: false,
   });
   await clickOn(windowA, Conversation.banUserButton);
-  await typeIntoInput(windowB, Conversation.messageInput.selector, msg2);
+  await pasteIntoInput(windowB, Conversation.messageInput.selector, msg2);
   await clickOn(windowB, Conversation.sendMessageButton);
   await waitForMessageStatus(windowB, msg2, 'failed');
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
@@ -139,7 +139,7 @@ sessionTestTwoWindows('Ban And delete all', async ([windowA, windowB]) => {
     10_000,
     msg1,
   );
-  await typeIntoInput(windowB, Conversation.messageInput.selector, msg2);
+  await pasteIntoInput(windowB, Conversation.messageInput.selector, msg2);
   await clickOn(windowB, Conversation.sendMessageButton);
   await waitForMessageStatus(windowB, msg2, 'failed');
   await hasElementPoppedUpThatShouldnt(
