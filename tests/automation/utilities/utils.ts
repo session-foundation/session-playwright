@@ -763,5 +763,7 @@ export function assertPinOrder(
   }
   const expected = [...pinnedExpected, ...unpinnedExpected];
 
-  expect(afterOrder, 'Conversations are not in the correct order').toEqual(expected);
+  expect(afterOrder, 'Conversations are not in the correct order').toEqual(
+    expected,
+  );
 }
