@@ -4,6 +4,7 @@ import * as path from 'path';
 
 import { tStripped } from '../localization/lib';
 import {
+  isDevTokenNoArgs,
   isPluralToken,
   MergedLocalizerTokens,
   TokenPluralWithArgs,
@@ -340,6 +341,10 @@ test('Enforce localized strings', () => {
   const tokensToValidate = [...tokensToValidateSet];
   for (let index = 0; index < tokensToValidate.length; index++) {
     const token = tokensToValidate[index];
+    // Ignore dev only tokens
+    if (isDevTokenNoArgs(token)) {
+      continue;
+    }
 
     if (isPluralToken(token)) {
       const counts = [1, 3];
