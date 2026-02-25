@@ -40,7 +40,7 @@ export const newUser = async (
   await clickOn(window, LeftPane.profileButton);
   // Save Account ID to a variable
   let accountid = await window.innerText(
-    `[data-testid=${Settings.accountId.selector}]`,
+    `[data-testid="${Settings.accountId.selector}"]`,
   );
   accountid = accountid.replace(/[^0-9a-fA-F]/g, ''); // keep only hex characters
 

@@ -61,7 +61,7 @@ test_Alice_1W(
     const pinIcon = aliceWindow1
       .locator(`css=.${HomeScreen.conversationItemHeader.selector}`)
       .filter({ hasText: lastConversation })
-      .locator(`[data-testid=${HomeScreen.pinnedConversationIcon.selector}]`);
+      .locator(`[data-testid="${HomeScreen.pinnedConversationIcon.selector}"]`);
 
     await pinConversation(aliceWindow1, lastConversation);
     await pinIcon.waitFor({ state: 'visible' });

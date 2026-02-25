@@ -33,7 +33,7 @@ export async function waitForTestIdWithText(
   text?: string,
   maxWait?: number,
 ) {
-  let builtSelector = `css=[data-testid=${dataTestId}]`;
+  let builtSelector = `css=[data-testid="${dataTestId}"]`;
   if (text) {
     // " =>  \\\"
     /* prettier-ignore */
@@ -391,7 +391,7 @@ export async function pasteIntoInput(
   text: string,
 ) {
   console.info(`pasteIntoInput testId: ${dataTestId} : "${text}"`);
-  const builtSelector = `css=[data-testid=${dataTestId}]`;
+  const builtSelector = `css=[data-testid="${dataTestId}"]`;
   // the new input made with onboarding element needs a click to reveal the input in the DOM
   // Convert DataTestId to locator object for clickOn
   const locator = { strategy: 'data-testid' as const, selector: dataTestId };
@@ -737,7 +737,7 @@ export function controlOrMetaFor() {
 // which breaks Playwright's underlying evaluateAll.
 export async function getConversationOrder(window: Page): Promise<string[]> {
   const items = await window.$$(
-    `[data-testid=${HomeScreen.conversationItemName.selector}]`,
+    `[data-testid="${HomeScreen.conversationItemName.selector}"]`,
   );
   const texts = await Promise.all(items.map((item) => item.innerText()));
   return texts.map((t) => t.trim()).filter((t) => t.length > 0);
@@ -751,10 +751,25 @@ export function assertPinOrder(
   pinnedNames: string[],
   afterOrder: string[],
 ): void {
-  const expected = [
-    ...beforeOrder.filter((n) => pinnedNames.includes(n)),
-    ...beforeOrder.filter((n) => !pinnedNames.includes(n)),
-  ];
+  const pinnedSet = new Set(pinnedNames);
+  const pinnedExpected: string[] = [];
+  const unpinnedExpected: string[] = [];
+  for (const name of beforeOrder) {
+    if (pinnedSet.has(name)) {
+      pinnedExpected.push(name);
+    } else {
+      unpinnedExpected.push(name);
+    }
+  }
+  const expected = [...pinnedExpected, ...unpinnedExpected];
+
+  if (afterOrder.length !== expected.length) {
+    throw new Error(
+      `Conversation count mismatch after (un)pinning. ` +
+        `Expected ${expected.length} but got ${afterOrder.length}. ` +
+        `Expected: [${expected.join(', ')}], got: [${afterOrder.join(', ')}]`,
+    );
+  }
 
   for (let i = 0; i < expected.length; i++) {
     if (afterOrder[i] !== expected[i]) {
