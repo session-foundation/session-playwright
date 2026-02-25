@@ -64,8 +64,14 @@ export class HomeScreen extends Locator {
     'join-community-conversation',
   );
   // Home Screen items
+  static readonly conversationItemHeader = this.className(
+    'module-conversation-list-item__header',
+  );
   static readonly conversationItemName = this.testId(
     'module-conversation__user__profile-name',
+  );
+  static readonly pinnedConversationIcon = this.testId(
+    'conversation-item-pinned',
   );
   static readonly messageRequestBanner = this.testId('message-request-banner');
   static readonly plusButton = this.testId('new-conversation-button');

@@ -316,6 +316,10 @@ function getExpectedStringFromKey(
       return 'Messages up to 10,000 characters';
     case 'proFeatureListPinnedConversations':
       return 'Pin unlimited conversations';
+    case 'pin':
+      return 'Pin';
+    case 'pinUnpin':
+      return 'Unpin';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
