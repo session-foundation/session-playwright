@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
 
-import { ElementHandle, Page } from '@playwright/test';
+import { ElementHandle, expect, Page } from '@playwright/test';
 
 import { sleepFor } from '../../promise_utils';
 import { Conversation, CTA, HomeScreen } from '../locators';
@@ -763,21 +763,5 @@ export function assertPinOrder(
   }
   const expected = [...pinnedExpected, ...unpinnedExpected];
 
-  if (afterOrder.length !== expected.length) {
-    throw new Error(
-      `Conversation count mismatch after (un)pinning. ` +
-        `Expected ${expected.length} but got ${afterOrder.length}. ` +
-        `Expected: [${expected.join(', ')}], got: [${afterOrder.join(', ')}]`,
-    );
-  }
-
-  for (let i = 0; i < expected.length; i++) {
-    if (afterOrder[i] !== expected[i]) {
-      throw new Error(
-        `Conversations are not in the correct order after (un)pinning. ` +
-          `Position ${i + 1}: expected "${expected[i]}" but got "${afterOrder[i]}". ` +
-          `Full order: [${afterOrder.join(', ')}]`,
-      );
-    }
-  }
+  expect(afterOrder, 'Conversations are not in the correct order').toEqual(expected);
 }
