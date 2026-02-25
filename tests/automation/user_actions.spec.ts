@@ -157,7 +157,7 @@ test_Alice_1W_no_network('Change username', async ({ aliceWindow1 }) => {
   // verify name change
   expect(
     await aliceWindow1.innerText(
-      `[data-testid=${Settings.displayName.selector}]`,
+      `[data-testid="${Settings.displayName.selector}"]`,
     ),
   ).toBe(newUsername);
   // Exit profile modal
