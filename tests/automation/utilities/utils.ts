@@ -201,6 +201,7 @@ export async function waitForLoadingAnimationToFinish(
     shouldLog: false,
   });
 
+  let hasLoggedAlready = false;
   do {
     try {
       loadingAnimation = await waitForElement({
@@ -211,7 +212,10 @@ export async function waitForLoadingAnimationToFinish(
         shouldLog: false,
       });
       await sleepFor(500);
-      console.info(`${loader} was found, waiting for it to be gone`);
+      if (!hasLoggedAlready) {
+        console.info(`${loader} was found, waiting for it to be gone`);
+        hasLoggedAlready = true;
+      }
     } catch (_e) {
       loadingAnimation = undefined;
     }
@@ -470,18 +474,22 @@ export async function hasElementBeenDeleted(
   console.info(
     `waiting for element to be deleted "${strategy}:${selector}:${text}", maxWait: ${maxWait}ms`,
   );
+  let hasLoggedAlready = false;
   do {
     try {
       el = await waitForElement({
         window,
         strategy,
         selector,
-        maxWaitMs: maxWait,
+        maxWaitMs: 100,
         text,
         shouldLog: false,
       });
       await sleepFor(100);
-      console.info(`Element has been found, waiting for deletion`);
+      if (!hasLoggedAlready) {
+        console.info(`Element has been found, waiting for deletion`);
+        hasLoggedAlready = true;
+      }
     } catch (_e) {
       el = undefined;
       console.info(`Element has been deleted, woohoo!`);

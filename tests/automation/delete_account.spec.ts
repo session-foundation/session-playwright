@@ -124,6 +124,8 @@ sessionTestTwoWindows(
       ]);
       // Create contact and send new message
       await createContact(windowA, windowB, userA, userB);
+      // Allow some time so that Alice gets to push her first config message to the network
+      await sleepFor(5000, true);
       // Delete all data from device
       // Click on settings tab
       await clickOn(windowA, LeftPane.settingsButton);
@@ -134,6 +136,7 @@ sessionTestTwoWindows(
         tStripped('sessionClearData'),
       );
       // Keep 'Clear Device only' selection
+
       await clickOnMatchingText(windowA, tStripped('clearDeviceOnly'));
       // Confirm deletion by clicking Clear, twice
       await clickOnMatchingText(windowA, tStripped('clear'));

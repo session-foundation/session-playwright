@@ -124,6 +124,8 @@ function getExpectedStringFromKey(
       return 'Clear All';
     case 'deleteMessageDeviceOnly':
       return 'Delete on this device only';
+    case 'clearDeviceOnly':
+      return 'Clear device only';
     case 'deleteMessageDevicesAll':
       return 'Delete on all my devices';
     case 'deleteMessageDeletedLocally':

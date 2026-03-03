@@ -73,8 +73,8 @@ test_Alice_1W_Bob_1W(
 
 sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
   assertAdminIsKnown();
-  const msg1 = `Ban me but unban me later! - ${Date.now()}`;
-  const msg2 = `I'm banned :( - ${Date.now()}`;
+  const banMeUnbanLaterMsg = `Ban me but unban me later! - ${Date.now()}`;
+  const bannedCheckMsg = `I'm banned :( - ${Date.now()}`;
   const msg3 = `Freedom! - ${Date.now()}`;
   await Promise.all([
     recoverFromSeed(windowA, process.env.SOGS_ADMIN_SEED!, {
@@ -83,24 +83,38 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
     newUser(windowB, 'Bob'),
   ]);
   await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
-  await sendMessage(windowB, msg1);
+  await sendMessage(windowB, banMeUnbanLaterMsg);
   await windowA.bringToFront();
   await scrollToBottomIfNecessary(windowA);
-  await clickOnWithText(windowA, Conversation.messageContent, msg1, {
-    rightButton: true,
-    maxWait: 15_000,
-  });
+  await clickOnWithText(
+    windowA,
+    Conversation.messageContent,
+    banMeUnbanLaterMsg,
+    {
+      rightButton: true,
+      maxWait: 15_000,
+    },
+  );
   await clickOnWithText(windowA, Global.contextMenuItem, banUserString, {
     strictMode: false,
     maxWait: 10_000,
   });
   await clickOn(windowA, Conversation.banUserButton);
-  await pasteIntoInput(windowB, Conversation.messageInput.selector, msg2);
+  await pasteIntoInput(
+    windowB,
+    Conversation.messageInput.selector,
+    bannedCheckMsg,
+  );
   await clickOn(windowB, Conversation.sendMessageButton);
-  await waitForMessageStatus(windowB, msg2, 'failed');
-  await clickOnWithText(windowA, Conversation.messageContent, msg1, {
-    rightButton: true,
-  });
+  await waitForMessageStatus(windowB, bannedCheckMsg, 'failed');
+  await clickOnWithText(
+    windowA,
+    Conversation.messageContent,
+    banMeUnbanLaterMsg,
+    {
+      rightButton: true,
+    },
+  );
   await clickOnWithText(windowA, Global.contextMenuItem, unbanUserString, {
     strictMode: false,
   });
@@ -111,26 +125,23 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
     Conversation.messageContent.selector,
     msg3,
   );
-});
 
-sessionTestTwoWindows('Ban And delete all', async ([windowA, windowB]) => {
-  assertAdminIsKnown();
-  const msg1 = `Ban and delete! - ${Date.now()}`;
-  const msg2 = `Did that work? - ${Date.now()}`;
-  await Promise.all([
-    recoverFromSeed(windowA, process.env.SOGS_ADMIN_SEED!, {
-      fallbackName: 'Admin',
-    }),
-    newUser(windowB, 'Bob'),
-  ]);
-  await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
-  await sendMessage(windowB, msg1);
+  // Now that the user is unban, check that we can ban and delete all.
+  // Note: a single test is doing all of those steps because having two of them on the same seed turns out to make both unreliable
+  const banAndDeleteAllMsg = `Ban and delete! - ${Date.now()}`;
+  const bannedCheckMsg2 = `Did that work? - ${Date.now()}`;
+  await sendMessage(windowB, banAndDeleteAllMsg);
   await windowA.bringToFront();
   await scrollToBottomIfNecessary(windowA);
-  await clickOnWithText(windowA, Conversation.messageContent, msg1, {
-    rightButton: true,
-    maxWait: 15_000,
-  });
+  await clickOnWithText(
+    windowA,
+    Conversation.messageContent,
+    banAndDeleteAllMsg,
+    {
+      rightButton: true,
+      maxWait: 15_000,
+    },
+  );
   await clickOnWithText(windowA, Global.contextMenuItem, banUserString, {
     strictMode: false,
     maxWait: 10_000,
@@ -141,15 +152,19 @@ sessionTestTwoWindows('Ban And delete all', async ([windowA, windowB]) => {
     Conversation.messageContent.strategy,
     Conversation.messageContent.selector,
     10_000,
-    msg1,
+    banAndDeleteAllMsg,
   );
-  await pasteIntoInput(windowB, Conversation.messageInput.selector, msg2);
+  await pasteIntoInput(
+    windowB,
+    Conversation.messageInput.selector,
+    bannedCheckMsg2,
+  );
   await clickOn(windowB, Conversation.sendMessageButton);
-  await waitForMessageStatus(windowB, msg2, 'failed');
+  await waitForMessageStatus(windowB, bannedCheckMsg2, 'failed');
   await hasElementPoppedUpThatShouldnt(
     windowA,
     Conversation.messageContent.strategy,
     Conversation.messageContent.selector,
-    msg2,
+    bannedCheckMsg2,
   );
 });
