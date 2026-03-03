@@ -1,8 +1,12 @@
 import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { longText, mediaArray, testLink } from './constants/variables';
-import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
-import { sendMessage } from './utilities/message';
+import { HomeScreen } from './locators';
+import {
+  test_group_Alice_1W_Bob_1W_Charlie_1W,
+  test_group_Alice_2W_Bob_1W_Charlie_1W,
+} from './setup/sessionTest';
+import { deleteMessageFor, sendMessage } from './utilities/message';
 import { replyTo, replyToMedia } from './utilities/reply_message';
 import {
   sendLinkPreview,
@@ -11,8 +15,7 @@ import {
 } from './utilities/send_media';
 import {
   clickOnElement,
-  clickOnMatchingText,
-  clickOnTextMessage,
+  clickOnWithText,
   hasTextMessageBeenDeleted,
   pasteIntoInput,
   waitForElement,
@@ -155,76 +158,140 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   },
 );
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
-  'Unsend message to group',
-  async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
-    const unsendMessage = `Testing unsend functionality in ${groupCreated.userName}`;
-    await sendMessage(aliceWindow1, unsendMessage);
-    await Promise.all([
-      waitForTextMessage(bobWindow1, unsendMessage),
-      waitForTextMessage(charlieWindow1, unsendMessage),
-    ]);
-    await clickOnTextMessage(aliceWindow1, unsendMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(
-      aliceWindow1,
-      tStripped('clearMessagesForEveryone'),
+test_group_Alice_2W_Bob_1W_Charlie_1W(
+  'Delete message for everyone in group',
+  async ({
+    aliceWindow1,
+    aliceWindow2,
+    bobWindow1,
+    charlieWindow1,
+    groupCreated,
+    alice,
+    bob,
+  }) => {
+    // Note: Alice is the admin in this group, Bob is a member without admin rights
+    const unsendMessageFromBob1 = `Testing unsend functionality in ${groupCreated.userName} from ${bob.userName} at ${new Date().toISOString()}`;
+    // focus the conversation on aliceWindow2 (not done as restored from seed)
+    await clickOnWithText(
+      aliceWindow2,
+      HomeScreen.conversationItemName,
+      groupCreated.userName,
     );
-    // To be implemented in Standardise Message Deletion feature
-    // await checkModalStrings(
-    //   aliceWindow1,
-    //   tStripped('deleteMessage', { count: 1 }),
-    //   tStripped('deleteMessageConfirm'),
-    // );
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
+
+    await sendMessage(bobWindow1, unsendMessageFromBob1);
+    await Promise.all(
+      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
+        waitForTextMessage(w, unsendMessageFromBob1, 15_000),
+      ),
     );
-    await sleepFor(1000);
-    await waitForMatchingText(
-      bobWindow1,
-      tStripped('deleteMessageDeletedGlobally'),
+
+    // Bob sent this message, so should be able to delete it for everyone
+    await deleteMessageFor(bobWindow1, unsendMessageFromBob1, 'for_everyone');
+    // message should be marked as deleted on all devices of all members
+    await Promise.all(
+      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
+        waitForMatchingText(
+          w,
+          tStripped('deleteMessageDeletedGlobally'),
+          15_000,
+        ),
+      ),
     );
-    await waitForMatchingText(
-      charlieWindow1,
-      tStripped('deleteMessageDeletedGlobally'),
+
+    // Now, try to remove a new message as Alice (admin) sent by Bob
+    console.log(
+      `Now, try to remove a new message as ${alice.userName} (admin) sent by ${bob.userName}`,
+    );
+    const unsendMessageFromBob2 = `Testing unsend functionality in ${groupCreated.userName} from ${bob.userName} at ${new Date().toISOString()}`;
+    await sendMessage(bobWindow1, unsendMessageFromBob2);
+
+    await Promise.all(
+      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
+        waitForTextMessage(w, unsendMessageFromBob2),
+      ),
+    );
+    // Bob sent this message, so should be able to delete it for everyone
+    await deleteMessageFor(aliceWindow1, unsendMessageFromBob2, 'for_everyone');
+    // message should be marked as deleted on all devices of all members
+    await Promise.all(
+      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
+        waitForMatchingText(
+          w,
+          tStripped('deleteMessageDeletedGlobally'),
+          15_000,
+        ),
+      ),
     );
   },
 );
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
-  'Delete message to group',
-  async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
-    const deletedMessage = `Testing delete message functionality in ${groupCreated.userName}`;
-    await sendMessage(aliceWindow1, deletedMessage);
-    await waitForTextMessage(bobWindow1, deletedMessage);
-    await waitForTextMessage(charlieWindow1, deletedMessage);
-    await clickOnTextMessage(aliceWindow1, deletedMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(aliceWindow1, tStripped('clearMessagesForMe'));
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
+test_group_Alice_2W_Bob_1W_Charlie_1W(
+  'Delete message locally in group',
+  async ({
+    aliceWindow1,
+    aliceWindow2,
+    bobWindow1,
+    charlieWindow1,
+    groupCreated,
+    bob,
+  }) => {
+    const deletedMessageFromBob1 = `Testing delete message functionality in ${groupCreated.userName} from ${bob.userName} at ${new Date().toISOString()}`;
+    // focus the conversation on aliceWindow2 (not done as restored from seed)
+    await clickOnWithText(
+      aliceWindow2,
+      HomeScreen.conversationItemName,
+      groupCreated.userName,
     );
-    await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage, 5000);
+
+    await sendMessage(bobWindow1, deletedMessageFromBob1);
+    await Promise.all(
+      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
+        waitForTextMessage(w, deletedMessageFromBob1, 15_000),
+      ),
+    );
+    // bob can remove locally his own message
+    await deleteMessageFor(bobWindow1, deletedMessageFromBob1, 'device_only');
+    await hasTextMessageBeenDeleted(bobWindow1, deletedMessageFromBob1, 5000);
     await waitForMatchingText(
-      aliceWindow1,
-      tStripped('deleteMessageDeletedGlobally'),
+      bobWindow1,
+      tStripped('deleteMessageDeletedLocally'),
+      15_000,
     );
-    // Should still be there for user B and C
-    await waitForMatchingText(bobWindow1, deletedMessage);
-    await waitForMatchingText(charlieWindow1, deletedMessage);
+    // Should still be there for Alice and Charlie
+    await Promise.all(
+      [aliceWindow1, aliceWindow2, charlieWindow1].map((w) =>
+        waitForMatchingText(w, deletedMessageFromBob1, 15_000),
+      ),
+    );
+
+    // Charlie (another normal member) can remove locally messages he didn't send
+    const deletedMessageFromBob2 = `Testing delete message functionality in ${groupCreated.userName} from ${bob.userName} at ${new Date().toISOString()}`;
+    await sendMessage(bobWindow1, deletedMessageFromBob2);
+    await Promise.all(
+      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
+        waitForTextMessage(w, deletedMessageFromBob2, 15_000),
+      ),
+    );
+    await deleteMessageFor(
+      charlieWindow1,
+      deletedMessageFromBob2,
+      'device_only',
+    );
+    await hasTextMessageBeenDeleted(
+      charlieWindow1,
+      deletedMessageFromBob2,
+      5000,
+    );
+    await waitForMatchingText(
+      charlieWindow1,
+      tStripped('deleteMessageDeletedLocally'),
+      15_000,
+    );
+    // Should still be there for Alice and Bob
+    await Promise.all(
+      [aliceWindow1, aliceWindow1, bobWindow1].map((w) =>
+        waitForMatchingText(w, deletedMessageFromBob2, 15_000),
+      ),
+    );
   },
 );

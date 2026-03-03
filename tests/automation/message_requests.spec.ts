@@ -51,6 +51,7 @@ test_Alice_1W_Bob_1W(
     await waitForMatchingText(
       bobWindow1,
       tStripped('messageRequestsNonePending'),
+      15_000,
     );
   },
 );
@@ -83,6 +84,7 @@ test_Alice_1W_Bob_1W(
     await waitForMatchingText(
       bobWindow1,
       tStripped('messageRequestsNonePending'),
+      15_000,
     );
   },
 );
@@ -122,6 +124,7 @@ test_Alice_1W_Bob_1W(
     await waitForMatchingText(
       bobWindow1,
       tStripped('messageRequestsNonePending'),
+      15_000,
     );
   },
 );
@@ -155,6 +158,7 @@ test_Alice_1W_Bob_1W(
     await waitForMatchingText(
       bobWindow1,
       tStripped('messageRequestsNonePending'),
+      15_000,
     );
   },
 );

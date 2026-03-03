@@ -20,6 +20,7 @@ import { createContact } from './utilities/create_contact';
 import { linkedDevice } from './utilities/linked_device';
 import { sendMessage } from './utilities/message';
 import { compareElementScreenshot } from './utilities/screenshot';
+import { sendNewMessage } from './utilities/send_message';
 import {
   checkModalStrings,
   clickOn,
@@ -178,7 +179,7 @@ test_Alice_2W_Bob_1W(
 );
 
 test_Alice_2W_Bob_1W(
-  'Deleted message syncs',
+  'Delete message locally 1:1',
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     const messageToDelete = 'Testing deletion functionality for linked device';
     await createContact(aliceWindow1, bobWindow1, alice, bob);
@@ -190,11 +191,16 @@ test_Alice_2W_Bob_1W(
       bob.userName,
     );
     await Promise.all([
-      waitForTextMessage(aliceWindow2, messageToDelete),
-      waitForTextMessage(bobWindow1, messageToDelete),
+      waitForTextMessage(aliceWindow2, messageToDelete, 15_000),
+      waitForTextMessage(bobWindow1, messageToDelete, 15_000),
     ]);
-    await clickOnTextMessage(aliceWindow1, messageToDelete, true);
+    await clickOnTextMessage(aliceWindow1, messageToDelete, true, 1_000);
     await clickOnMatchingText(aliceWindow1, tStripped('delete'));
+    await clickOnMatchingText(
+      aliceWindow1,
+      tStripped('deleteMessageDeviceOnly'),
+    );
+
     await clickOnWithText(
       aliceWindow1,
       Global.confirmButton,
@@ -205,18 +211,16 @@ test_Alice_2W_Bob_1W(
       'session-toast',
       tStripped('deleteMessageDeleted', { count: 1 }),
     );
-    await hasTextMessageBeenDeleted(aliceWindow1, messageToDelete, 6_000);
-    // linked device for deleted message
-    // Waiting for message to be removed
-    // Check for linked device
-    await hasTextMessageBeenDeleted(aliceWindow2, messageToDelete, 30_000);
-    // Still should exist for user B
-    await waitForMatchingText(bobWindow1, messageToDelete);
+    await Promise.all([
+      hasTextMessageBeenDeleted(aliceWindow1, messageToDelete, 6_000), // should only be deleted locally
+      waitForMatchingText(aliceWindow2, messageToDelete, 15_000), // should still be here on linked device
+      waitForMatchingText(bobWindow1, messageToDelete, 15_000), // should still be here on bob
+    ]);
   },
 );
 
 test_Alice_2W_Bob_1W(
-  'Unsent message syncs',
+  'Delete message for everyone 1:1',
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     const unsentMessage = 'Testing unsending functionality for linked device';
     await createContact(aliceWindow1, bobWindow1, alice, bob);
@@ -233,10 +237,7 @@ test_Alice_2W_Bob_1W(
     ]);
     await clickOnTextMessage(aliceWindow1, unsentMessage, true);
     await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(
-      aliceWindow1,
-      tStripped('clearMessagesForEveryone'),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('deleteMessageEveryone'));
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
@@ -251,9 +252,50 @@ test_Alice_2W_Bob_1W(
     await waitForMatchingText(
       bobWindow1,
       tStripped('deleteMessageDeletedGlobally'),
+      15_000,
     );
     // linked device for deleted message
     await hasTextMessageBeenDeleted(aliceWindow2, unsentMessage, 5_000);
+  },
+);
+
+test_Alice_2W(
+  'Delete message for all my devices NTS',
+  async ({ alice, aliceWindow1, aliceWindow2 }) => {
+    const unsentMessage = `Testing unsending functionality for NTS ${new Date().toISOString()}`;
+    await sendNewMessage(aliceWindow1, alice.accountid, unsentMessage);
+    // Navigate to conversation on linked device and for message from user A to user B
+    await clickOnWithText(
+      aliceWindow2,
+      HomeScreen.conversationItemName,
+      tStripped('noteToSelf'),
+    );
+    await Promise.all([
+      waitForTextMessage(aliceWindow1, unsentMessage),
+      waitForTextMessage(aliceWindow2, unsentMessage),
+    ]);
+    await clickOnTextMessage(aliceWindow1, unsentMessage, true);
+    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
+    await clickOnMatchingText(
+      aliceWindow1,
+      tStripped('deleteMessageDevicesAll'),
+    );
+    await clickOnElement({
+      window: aliceWindow1,
+      strategy: 'data-testid',
+      selector: 'session-confirm-ok-button',
+    });
+    await waitForTestIdWithText(
+      aliceWindow1,
+      'session-toast',
+      tStripped('deleteMessageDeleted', { count: 1 }),
+    );
+    // in NTS, a message deleted on all our devices is removed entirely (the tombstone is not left)
+    await Promise.all(
+      [aliceWindow1, aliceWindow2].map((w) =>
+        hasTextMessageBeenDeleted(w, unsentMessage, 15_000),
+      ),
+    );
   },
 );
 
@@ -316,7 +358,6 @@ test_Alice_2W_Bob_1W(
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await clickOn(bobWindow1, Global.backButton);
     await Promise.all(
       [aliceWindow1, aliceWindow2, bobWindow1].map((w) =>
         clickOnElement({

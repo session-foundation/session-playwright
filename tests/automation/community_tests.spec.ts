@@ -88,9 +88,11 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
   await scrollToBottomIfNecessary(windowA);
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
+    maxWait: 15_000,
   });
   await clickOnWithText(windowA, Global.contextMenuItem, banUserString, {
     strictMode: false,
+    maxWait: 10_000,
   });
   await clickOn(windowA, Conversation.banUserButton);
   await pasteIntoInput(windowB, Conversation.messageInput.selector, msg2);
@@ -127,9 +129,11 @@ sessionTestTwoWindows('Ban And delete all', async ([windowA, windowB]) => {
   await scrollToBottomIfNecessary(windowA);
   await clickOnWithText(windowA, Conversation.messageContent, msg1, {
     rightButton: true,
+    maxWait: 15_000,
   });
   await clickOnWithText(windowA, Global.contextMenuItem, banUserString, {
     strictMode: false,
+    maxWait: 10_000,
   });
   await clickOn(windowA, Conversation.banAndDeleteAllButton);
   await hasElementBeenDeleted(

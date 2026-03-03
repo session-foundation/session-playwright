@@ -94,7 +94,6 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
       },
       [aliceWindow1, bobWindow1, charlieWindow1],
     );
-    await clickOn(draculaWindow1, Global.backButton);
     await clickOnWithText(
       draculaWindow1,
       HomeScreen.conversationItemName,
@@ -117,11 +116,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await waitForMatchingText(
       bobWindow1,
       tStripped('groupNameNew', { group_name: newGroupName }),
+      15_000,
     );
     await clickOnMatchingText(charlieWindow1, newGroupName);
     await waitForMatchingText(
       charlieWindow1,
       tStripped('groupNameNew', { group_name: newGroupName }),
+      15_000,
     );
     // Click on conversation options
     // Check to see that you can't change group name to empty string

@@ -14,10 +14,11 @@ import {
   sessionTestTwoWindows,
   test_Alice_1W,
   test_Alice_1W_Bob_1W,
+  test_Alice_2W_Bob_1W,
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
-import { sendMessage } from './utilities/message';
+import { deleteMessageFor, sendMessage } from './utilities/message';
 import { replyTo, replyToMedia } from './utilities/reply_message';
 import {
   sendLinkPreview,
@@ -191,10 +192,7 @@ test_Alice_1W_Bob_1W(
     await waitForTextMessage(bobWindow1, unsendMessage);
     await clickOnTextMessage(aliceWindow1, unsendMessage, true);
     await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(
-      aliceWindow1,
-      tStripped('clearMessagesForEveryone'),
-    );
+    await clickOnMatchingText(aliceWindow1, tStripped('deleteMessageEveryone'));
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
@@ -209,32 +207,56 @@ test_Alice_1W_Bob_1W(
     await waitForMatchingText(
       bobWindow1,
       tStripped('deleteMessageDeletedGlobally'),
+      15_000,
     );
   },
 );
 
-test_Alice_1W_Bob_1W(
-  'Delete message 1:1',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const deletedMessage = 'Testing deletion functionality';
+test_Alice_2W_Bob_1W(
+  'Delete message locally in 1:1',
+  async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
+    // send a message from alice to Bob, and then try to delete it locally from Alice's side
+    const deletedMessage1 = `Testing deletion functionality from ${alice.userName} to ${bob.userName} in 1:1 at ${new Date().toISOString()}`;
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await sendMessage(aliceWindow1, deletedMessage);
-    await waitForTextMessage(bobWindow1, deletedMessage);
-    await clickOnTextMessage(aliceWindow1, deletedMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
+    await sendMessage(aliceWindow1, deletedMessage1);
+    // focus the conversation on aliceWindow2 (not done as restored from seed)
+    await clickOnWithText(
+      aliceWindow2,
+      HomeScreen.conversationItemName,
+      bob.userName,
     );
-    await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage, 1000);
-    // Still should exist in window B
-    await waitForMatchingText(bobWindow1, deletedMessage);
+
+    await Promise.all(
+      [aliceWindow2, bobWindow1].map((w) =>
+        waitForTextMessage(w, deletedMessage1),
+      ),
+    );
+    await deleteMessageFor(aliceWindow1, deletedMessage1, 'device_only');
+    await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage1, 1_000);
+    // Still should exist in Bob and aliceWindow2
+    await Promise.all(
+      [aliceWindow2, bobWindow1].map((w) =>
+        waitForMatchingText(w, deletedMessage1, 15_000),
+      ),
+    );
+
+    // same, but we know want validate that Bob can also delete locally Alice's message
+    const deletedMessage2 = `Testing deletion functionality from ${alice.userName} to ${bob.userName} in 1:1 at ${new Date().toISOString()}`;
+    await sendMessage(aliceWindow1, deletedMessage2); // alice sends it again
+    await Promise.all(
+      [aliceWindow2, bobWindow1].map((w) =>
+        waitForTextMessage(w, deletedMessage2),
+      ),
+    );
+    await deleteMessageFor(bobWindow1, deletedMessage2, 'device_only'); // Bob deletes Alice's message locally
+
+    await hasTextMessageBeenDeleted(bobWindow1, deletedMessage2, 1_000);
+    // Still should exist in Bob and aliceWindow2
+    await Promise.all(
+      [aliceWindow1, aliceWindow2].map((w) =>
+        waitForMatchingText(w, deletedMessage2, 15_000),
+      ),
+    );
   },
 );
 

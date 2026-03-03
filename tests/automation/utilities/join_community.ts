@@ -37,7 +37,7 @@ export const joinDefaultCommunity = async (
 ) => {
   await clickOn(window, HomeScreen.plusButton);
   await clickOn(window, HomeScreen.joinCommunityOption);
-  await waitForMatchingText(window, communityName);
+  await waitForMatchingText(window, communityName, 15_000);
   await clickOnMatchingText(window, communityName);
   // Deliberately do not wait for loading spinner to finish because this takes forever
   await waitForTestIdWithText(

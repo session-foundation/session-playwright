@@ -44,10 +44,12 @@ test_Alice_2W_Bob_1W(
     await waitForMatchingText(
       aliceWindow1,
       tStripped('messageRequestsNonePending'),
+      15_000,
     );
     await waitForMatchingText(
       aliceWindow2,
       tStripped('messageRequestsNonePending'),
+      15_000,
     );
     await sendMessage(aliceWindow1, testReply);
     await waitForTextMessage(bobWindow1, testReply);
@@ -90,13 +92,11 @@ test_Alice_2W_Bob_1W(
       Global.confirmButton,
       tStripped('delete'),
     );
-    await waitForMatchingText(
-      aliceWindow1,
-      tStripped('messageRequestsNonePending'),
-    );
-    await waitForMatchingText(
-      aliceWindow2,
-      tStripped('messageRequestsNonePending'),
+
+    await Promise.all(
+      [aliceWindow1, aliceWindow2].map((w) =>
+        waitForMatchingText(w, tStripped('messageRequestsNonePending'), 15_000),
+      ),
     );
   },
 );

@@ -1,7 +1,15 @@
 import { Page } from '@playwright/test';
 
+import { tStripped } from '../../localization/lib';
 import { MessageStatus } from '../types/testing';
-import { clickOnElement, pasteIntoInput } from './utils';
+import {
+  checkModalStrings,
+  clickOnElement,
+  clickOnMatchingText,
+  clickOnTextMessage,
+  pasteIntoInput,
+  waitForTestIdWithText,
+} from './utils';
 
 export const waitForMessageStatus = async (
   window: Page,
@@ -29,3 +37,35 @@ export const sendMessage = async (window: Page, message: string) => {
   });
   await waitForMessageStatus(window, message, 'sent');
 };
+
+export async function deleteMessageFor(
+  window: Page,
+  message: string,
+  deletionType: 'device_only' | 'for_all_my_devices' | 'for_everyone',
+) {
+  await clickOnTextMessage(window, message, true);
+  await clickOnMatchingText(window, tStripped('delete'));
+  switch (deletionType) {
+    case 'device_only':
+      await clickOnMatchingText(window, tStripped('deleteMessageDeviceOnly'));
+      break;
+    case 'for_everyone':
+      await clickOnMatchingText(window, tStripped('deleteMessageEveryone'));
+      break;
+    case 'for_all_my_devices':
+      await clickOnMatchingText(window, tStripped('deleteMessageDevicesAll'));
+      break;
+  }
+
+  await checkModalStrings(window, tStripped('deleteMessage', { count: 1 }));
+  await clickOnElement({
+    window,
+    strategy: 'data-testid',
+    selector: 'session-confirm-ok-button',
+  });
+  await waitForTestIdWithText(
+    window,
+    'session-toast',
+    tStripped('deleteMessageDeleted', { count: 1 }),
+  );
+}

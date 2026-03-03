@@ -27,5 +27,6 @@ export const renameGroup = async (
   await waitForMatchingText(
     window,
     tStripped('groupNameNew', { group_name: newGroupName }),
+    5_000,
   );
 };

@@ -13,8 +13,6 @@ test_Alice_1W_Bob_1W(
   'Voice calls',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    // Unfocus current conversation on receiver's end
-    await clickOn(bobWindow1, Global.backButton);
     await clickOn(bobWindow1, HomeScreen.plusButton);
     await clickOnWithText(bobWindow1, Global.contactItem, 'Note to Self');
     await makeVoiceCall(aliceWindow1, bobWindow1);

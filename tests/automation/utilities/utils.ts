@@ -116,13 +116,20 @@ export async function waitForControlMessageWithText(
 export async function waitForMatchingText(
   window: Page,
   text: string,
-  maxWait?: number,
+  maxWait: number,
 ) {
   const builtSelector = `css=:has-text("${text}")`;
   const maxTimeout = maxWait ?? 55000;
-  console.info(`waitForMatchingText: ${text}`);
+  console.info(`waitForMatchingText: ${text} for maxWait: ${maxTimeout}ms`);
+  const start = Date.now();
 
-  return window.waitForSelector(builtSelector, { timeout: maxTimeout });
+  const found = await window.waitForSelector(builtSelector, {
+    timeout: maxTimeout,
+  });
+  console.info(
+    `waitForMatchingText: found "${text}" in ${Date.now() - start}ms`,
+  );
+  return found;
 }
 
 export async function waitForMatchingPlaceholder(
@@ -565,7 +572,7 @@ function assertTextMatches(
 export async function checkModalStrings(
   window: Page,
   expectedHeading: string,
-  expectedDescription: string,
+  expectedDescription?: string,
   modalId?: ModalId,
 ) {
   let modalSelector = '[data-modal-id]'; // Base selector for modals
@@ -583,16 +590,24 @@ export async function checkModalStrings(
 
   // Get elements within this specific modal
   const heading = targetModal.locator('[data-testid="modal-heading"]');
-  const description = targetModal.locator('[data-testid="modal-description"]');
 
   // Wait for these elements to be visible
   await heading.waitFor({ state: 'visible' });
-  await description.waitFor({ state: 'visible' });
 
   const headingText = await heading.innerText();
-  const descriptionText = await description.innerText();
   assertTextMatches(headingText, expectedHeading, 'Modal heading');
-  assertTextMatches(descriptionText, expectedDescription, 'Modal description');
+  if (expectedDescription) {
+    const description = targetModal.locator(
+      '[data-testid="modal-description"]',
+    );
+    await description.waitFor({ state: 'visible' });
+    const descriptionText = await description.innerText();
+    assertTextMatches(
+      descriptionText,
+      expectedDescription,
+      'Modal description',
+    );
+  }
 }
 
 export async function verifyNoCTAShows(window: Page) {

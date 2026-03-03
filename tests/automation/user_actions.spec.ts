@@ -9,9 +9,7 @@ import {
   LeftPane,
   Settings,
 } from './locators';
-import { newUser } from './setup/new_user';
 import {
-  sessionTestTwoWindows,
   test_Alice_1W_Bob_1W,
   test_Alice_1W_no_network,
   test_Alice_2W,
@@ -37,41 +35,6 @@ import {
 const cancelString = tStripped('cancel');
 const saveString = tStripped('save');
 const removeString = tStripped('remove');
-
-// Send message in one to one conversation with new contact
-sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
-  // no fixture for that one
-  const [userA, userB] = await Promise.all([
-    newUser(windowA, 'Alice'),
-    newUser(windowB, 'Bob'),
-  ]);
-  await createContact(windowA, windowB, userA, userB);
-  // Navigate to contacts tab in User B's window
-  await waitForTestIdWithText(
-    windowB,
-    Conversation.messageRequestAcceptControlMessage.selector,
-    tStripped('messageRequestYouHaveAccepted', {
-      name: userA.userName,
-    }),
-  );
-  await clickOn(windowB, Global.backButton);
-  await Promise.all([
-    clickOnElement({
-      window: windowA,
-      strategy: 'data-testid',
-      selector: 'new-conversation-button',
-    }),
-    clickOnElement({
-      window: windowB,
-      strategy: 'data-testid',
-      selector: 'new-conversation-button',
-    }),
-  ]);
-  await Promise.all([
-    waitForTestIdWithText(windowA, Global.contactItem.selector, userB.userName),
-    waitForTestIdWithText(windowB, Global.contactItem.selector, userA.userName),
-  ]);
-});
 
 test_Alice_1W_Bob_1W(
   'Block user in conversation list',
@@ -136,7 +99,11 @@ test_Alice_1W_Bob_1W(
       tStripped('blockUnblock'),
     );
     // make sure no blocked contacts are listed
-    await waitForMatchingText(aliceWindow1, tStripped('blockBlockedNone'));
+    await waitForMatchingText(
+      aliceWindow1,
+      tStripped('blockBlockedNone'),
+      1_000,
+    );
   },
 );
 
@@ -314,7 +281,6 @@ test_Alice_1W_Bob_1W(
     });
     await clickOn(bobWindow1, Global.modalCloseButton);
     await sendMessage(aliceWindow1, 'Testing read receipts');
-    await clickOn(bobWindow1, Global.backButton);
     await clickOnWithText(
       bobWindow1,
       HomeScreen.conversationItemName,
@@ -329,7 +295,6 @@ test_Alice_1W_Bob_1W(
   async ({ aliceWindow1, bobWindow1, alice, bob }) => {
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await clickOn(bobWindow1, Global.backButton);
     await Promise.all(
       [aliceWindow1, bobWindow1].map((w) =>
         clickOnElement({
@@ -351,9 +316,11 @@ test_Alice_1W_Bob_1W(
         alice.userName,
       ),
     ]);
+
     await Promise.all(
       [aliceWindow1, bobWindow1].map((w) => clickOn(w, Global.backButton)),
     );
+
     // Delete contact
     await clickOnWithText(
       aliceWindow1,
@@ -440,10 +407,11 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   );
   // Wait for copy to resolve
   await sleepFor(1000);
-  await waitForMatchingText(aliceWindow1, tStripped('accountIdCopied'));
+  await waitForMatchingText(aliceWindow1, tStripped('accountIdCopied'), 1_000);
   await waitForMatchingText(
     aliceWindow1,
     tStripped('shareAccountIdDescriptionCopied'),
+    1_000,
   );
   // To exit invite a friend
   await clickOn(aliceWindow1, Global.backButton);
