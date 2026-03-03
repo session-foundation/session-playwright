@@ -1,4 +1,7 @@
+import type { Page } from '@playwright/test';
+
 import { tStripped } from '../localization/lib';
+import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
 import { Conversation, Global, HomeScreen } from './locators';
 import { newUser } from './setup/new_user';
@@ -71,6 +74,42 @@ test_Alice_1W_Bob_1W(
   },
 );
 
+async function scrollToBottomLookingForMessage({
+  window,
+  msg,
+}: {
+  window: Page;
+  msg: string;
+}) {
+  // It seems that for communities, we sometimes need to press multiple times the scroll to bottom
+  // button for the message to be visible.
+  const start = Date.now();
+  do {
+    try {
+      await window.bringToFront();
+
+      await scrollToBottomIfNecessary(window);
+      await waitForTestIdWithText(
+        window,
+        Conversation.messageContent.selector,
+        msg,
+        1_000,
+      );
+    } catch (_e) {
+      // nothing to do here
+    }
+    await sleepFor(1000, true);
+  } while (Date.now() - start < 15_000);
+
+  // this just checks if the message is visible or not after exiting the loop. i.e. this will throw if the message is not visible
+  await waitForTestIdWithText(
+    window,
+    Conversation.messageContent.selector,
+    msg,
+    1_000,
+  );
+}
+
 sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
   assertAdminIsKnown();
   const banMeUnbanLaterMsg = `Ban me but unban me later! - ${Date.now()}`;
@@ -84,15 +123,16 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
   ]);
   await Promise.all([joinOrOpenCommunity(windowA), joinCommunity(windowB)]);
   await sendMessage(windowB, banMeUnbanLaterMsg);
-  await windowA.bringToFront();
-  await scrollToBottomIfNecessary(windowA);
+  await scrollToBottomLookingForMessage({
+    window: windowA,
+    msg: banMeUnbanLaterMsg,
+  });
   await clickOnWithText(
     windowA,
     Conversation.messageContent,
     banMeUnbanLaterMsg,
     {
       rightButton: true,
-      maxWait: 15_000,
     },
   );
   await clickOnWithText(windowA, Global.contextMenuItem, banUserString, {
@@ -131,20 +171,22 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
   const banAndDeleteAllMsg = `Ban and delete! - ${Date.now()}`;
   const bannedCheckMsg2 = `Did that work? - ${Date.now()}`;
   await sendMessage(windowB, banAndDeleteAllMsg);
-  await windowA.bringToFront();
-  await scrollToBottomIfNecessary(windowA);
+  await scrollToBottomLookingForMessage({
+    window: windowA,
+    msg: banMeUnbanLaterMsg,
+  });
   await clickOnWithText(
     windowA,
     Conversation.messageContent,
     banAndDeleteAllMsg,
     {
       rightButton: true,
-      maxWait: 15_000,
+      maxWait: 1_000,
     },
   );
   await clickOnWithText(windowA, Global.contextMenuItem, banUserString, {
     strictMode: false,
-    maxWait: 10_000,
+    maxWait: 1_000,
   });
   await clickOn(windowA, Conversation.banAndDeleteAllButton);
   await hasElementBeenDeleted(
