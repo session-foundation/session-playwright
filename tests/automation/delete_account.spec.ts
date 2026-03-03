@@ -134,6 +134,7 @@ sessionTestTwoWindows(
         tStripped('sessionClearData'),
       );
       // Keep 'Clear Device only' selection
+      await clickOnMatchingText(windowA, tStripped('clearDeviceOnly'));
       // Confirm deletion by clicking Clear, twice
       await clickOnMatchingText(windowA, tStripped('clear'));
       await clickOnMatchingText(windowA, tStripped('clear'));
@@ -143,22 +144,25 @@ sessionTestTwoWindows(
       await recoverFromSeed(restoringWindow, userA.recoveryPassword);
       await sleepFor(5000, true); // just to allow any messages from our swarm to show up
       // Check if message from user B is restored
-      await waitForElement(
-        restoringWindow,
-        'data-testid',
-        HomeScreen.conversationItemName.selector,
-        10000,
-        userB.userName,
-      );
+
+      await waitForElement({
+        window: restoringWindow,
+        strategy: 'data-testid',
+        selector: HomeScreen.conversationItemName.selector,
+        maxWaitMs: 10_000,
+        shouldLog: true,
+        text: userB.userName,
+      });
       // Check if contact is available in contacts section
       await clickOn(restoringWindow, HomeScreen.plusButton);
-      await waitForElement(
-        restoringWindow,
-        'data-testid',
-        Global.contactItem.selector,
-        1000,
-        userB.userName,
-      );
+      await waitForElement({
+        window: restoringWindow,
+        strategy: 'data-testid',
+        selector: Global.contactItem.selector,
+        maxWaitMs: 1000,
+        shouldLog: true,
+        text: userB.userName,
+      });
       console.log('Contacts have been restored');
     } finally {
       if (restoringWindows) {

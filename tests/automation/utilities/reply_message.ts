@@ -92,7 +92,13 @@ export const replyToMedia = async ({
   receiverWindow: Page;
   senderWindow: Page;
 }) => {
-  const selc = await waitForElement(senderWindow, strategy, selector);
+  const selc = await waitForElement({
+    window: senderWindow,
+    strategy,
+    selector,
+    shouldLog: true,
+    maxWaitMs: 20_000,
+  });
   // the right click context menu, for some reasons, often doesn't show up on the first try. Let's loop a few times
 
   for (let index = 0; index < 5; index++) {

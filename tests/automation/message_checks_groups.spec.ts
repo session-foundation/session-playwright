@@ -133,22 +133,19 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   }) => {
     const testReply = `${bob.userName} replying to link from ${alice.userName} in ${groupCreated.userName}`;
     await sendLinkPreview(aliceWindow1, testLink);
-    await Promise.all([
-      waitForElement(
-        bobWindow1,
-        'data-testid',
-        'msg-link-preview-title',
-        undefined,
-        'Session | Send Messages, Not Metadata. | Private Messenger',
+    await Promise.all(
+      [bobWindow1, charlieWindow1].map((w) =>
+        waitForElement({
+          window: w,
+          strategy: 'data-testid',
+          selector: 'msg-link-preview-title',
+          maxWaitMs: 3_000,
+          shouldLog: true,
+          text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+        }),
       ),
-      waitForElement(
-        charlieWindow1,
-        'data-testid',
-        'msg-link-preview-title',
-        undefined,
-        'Session | Send Messages, Not Metadata. | Private Messenger',
-      ),
-    ]);
+    );
+
     await replyTo({
       senderWindow: bobWindow1,
       textMessage: testLink,

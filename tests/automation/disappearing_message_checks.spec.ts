@@ -182,13 +182,14 @@ test_Alice_1W_Bob_1W(
       ),
     ]);
     await sendLinkPreview(aliceWindow1, testLink);
-    await waitForElement(
-      bobWindow1,
-      'data-testid',
-      'msg-link-preview-title',
-      3_000,
-      'Session | Send Messages, Not Metadata. | Private Messenger',
-    );
+    await waitForElement({
+      window: bobWindow1,
+      strategy: 'data-testid',
+      selector: 'msg-link-preview-title',
+      maxWaitMs: 3_000,
+      shouldLog: true,
+      text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+    });
     // Wait 30 seconds for link preview to disappear
     await sleepFor(30_000);
     await hasElementBeenDeleted(
@@ -254,22 +255,18 @@ test_Alice_1W_Bob_1W(
       HomeScreen.conversationItemName,
       bob.userName,
     );
-    await Promise.all([
-      waitForElement(
-        aliceWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
+    await Promise.all(
+      [aliceWindow1, bobWindow1].map((w) =>
+        waitForElement({
+          window: w,
+          strategy: 'class',
+          selector: 'group-name',
+          maxWaitMs: 15_000,
+          shouldLog: true,
+          text: testCommunityName,
+        }),
       ),
-      waitForElement(
-        bobWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
-      ),
-    ]);
+    );
     // Wait 30 seconds for community invite to disappear
     await sleepFor(30000);
     await Promise.all(

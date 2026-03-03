@@ -8,10 +8,17 @@ import {
 test_Alice_2W(
   `Landing page states`,
   async ({ aliceWindow1, aliceWindow2 }, _testInfo) => {
-    await Promise.all([
-      waitForElement(aliceWindow1, 'class', 'session-conversation'),
-      waitForElement(aliceWindow2, 'class', 'session-conversation'),
-    ]);
+    await Promise.all(
+      [aliceWindow1, aliceWindow2].map((w) =>
+        waitForElement({
+          window: w,
+          strategy: 'class',
+          selector: 'session-conversation',
+          maxWaitMs: 1000,
+          shouldLog: true,
+        }),
+      ),
+    );
 
     // Check that the account created has all the required strings displayed
     await Promise.all(
@@ -23,13 +30,14 @@ test_Alice_2W(
         tStripped('conversationsNone'),
         tStripped('onboardingHitThePlusButton'),
       ].map(async (builder) =>
-        waitForElement(
-          aliceWindow1,
-          'data-testid',
-          'empty-msg-view-account-created',
-          1000,
-          builder.toString(),
-        ),
+        waitForElement({
+          window: aliceWindow1,
+          strategy: 'data-testid',
+          selector: 'empty-msg-view-account-created',
+          maxWaitMs: 1_000,
+          shouldLog: true,
+          text: builder.toString(),
+        }),
       ),
     );
 
@@ -39,13 +47,14 @@ test_Alice_2W(
         tStripped('conversationsNone'),
         tStripped('onboardingHitThePlusButton'),
       ].map(async (builder) =>
-        waitForElement(
-          aliceWindow2,
-          'data-testid',
-          'empty-msg-view-welcome',
-          1000,
-          builder.toString(),
-        ),
+        waitForElement({
+          window: aliceWindow2,
+          strategy: 'data-testid',
+          selector: 'empty-msg-view-welcome',
+          maxWaitMs: 1_000,
+          shouldLog: true,
+          text: builder.toString(),
+        }),
       ),
     );
 

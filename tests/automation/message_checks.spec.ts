@@ -121,13 +121,14 @@ test_Alice_1W_Bob_1W(
 
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await sendLinkPreview(aliceWindow1, testLink);
-    await waitForElement(
-      bobWindow1,
-      'data-testid',
-      'msg-link-preview-title',
-      undefined,
-      'Session | Send Messages, Not Metadata. | Private Messenger',
-    );
+    await waitForElement({
+      window: bobWindow1,
+      strategy: 'data-testid',
+      selector: 'msg-link-preview-title',
+      maxWaitMs: 3_000,
+      shouldLog: true,
+      text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+    });
     await replyTo({
       senderWindow: bobWindow1,
       textMessage: testLink,
@@ -163,22 +164,18 @@ test_Alice_1W_Bob_1W(
       HomeScreen.conversationItemName,
       bob.userName,
     );
-    await Promise.all([
-      waitForElement(
-        aliceWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
+    await Promise.all(
+      [aliceWindow1, bobWindow1].map((w) =>
+        waitForElement({
+          window: w,
+          strategy: 'class',
+          selector: 'group-name',
+          maxWaitMs: 15_000,
+          shouldLog: true,
+          text: testCommunityName,
+        }),
       ),
-      waitForElement(
-        bobWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
-      ),
-    ]);
+    );
   },
 );
 
@@ -330,12 +327,13 @@ messageLengthTestCases.forEach((testCase) => {
       } else {
         // Verify countdown tooltip is not present
         try {
-          await waitForElement(
-            aliceWindow1,
-            'data-testid',
-            'tooltip-character-count',
-            1000,
-          );
+          await waitForElement({
+            window: aliceWindow1,
+            strategy: 'data-testid',
+            selector: 'tooltip-character-count',
+            maxWaitMs: 1_000,
+            shouldLog: true,
+          });
           throw new Error(
             `Countdown should not be visible for messages under ${countdownThreshold} chars`,
           );

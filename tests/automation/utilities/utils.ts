@@ -53,26 +53,34 @@ export async function waitForTestIdWithText(
   return found;
 }
 
-export async function waitForElement(
-  window: Page,
-  strategy: Strategy,
-  selector: string,
-  maxWaitMs?: number,
-  text?: string,
-) {
+export async function waitForElement({
+  selector,
+  strategy,
+  window,
+  maxWaitMs,
+  shouldLog,
+  text,
+}: {
+  window: Page;
+  strategy: Strategy;
+  selector: string;
+  maxWaitMs?: number;
+  text?: string;
+  shouldLog: boolean;
+}) {
   const builtSelector = !text
     ? `css=[${strategy}=${selector}]`
     : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
 
   const start = Date.now();
-  if (!selector.includes('path-light-svg')) {
+  if (shouldLog) {
     console.log(`waitForElement: ${builtSelector} for maxMs ${maxWaitMs}`);
   }
 
   const el = await window.waitForSelector(builtSelector, {
     timeout: maxWaitMs,
   });
-  if (!selector.includes('path-light-svg')) {
+  if (shouldLog) {
     console.log(
       `waitForElement: got ${builtSelector} after ${Date.now() - start}ms`,
     );
@@ -146,7 +154,13 @@ export async function waitForMatchingPlaceholder(
 
   do {
     try {
-      const elem = await waitForElement(window, 'data-testid', dataTestId);
+      const elem = await waitForElement({
+        window,
+        strategy: 'data-testid',
+        selector: dataTestId,
+        shouldLog: false,
+        maxWaitMs: 100,
+      });
       const elemPlaceholder = await elem.getAttribute('placeholder');
       if (elemPlaceholder === placeholder) {
         console.info(
@@ -179,16 +193,23 @@ export async function waitForLoadingAnimationToFinish(
 ) {
   let loadingAnimation: ElementHandle<HTMLElement | SVGElement> | undefined;
 
-  await waitForElement(window, 'data-testid', `${loader}`, maxWait);
+  await waitForElement({
+    window,
+    strategy: 'data-testid',
+    selector: `${loader}`,
+    maxWaitMs: maxWait,
+    shouldLog: false,
+  });
 
   do {
     try {
-      loadingAnimation = await waitForElement(
+      loadingAnimation = await waitForElement({
         window,
-        'data-testid',
-        `${loader}`,
-        100,
-      );
+        strategy: 'data-testid',
+        selector: `${loader}`,
+        maxWaitMs: 100,
+        shouldLog: false,
+      });
       await sleepFor(500);
       console.info(`${loader} was found, waiting for it to be gone`);
     } catch (_e) {
@@ -234,12 +255,14 @@ export async function checkPathLight(window: Page, maxWait?: number) {
   let pathFilter: string | null = null;
 
   await doWhileWithMax(maxWaitTime, waitPerLoop, 'checkPathLight', async () => {
-    const pathLight = await waitForElement(
+    const pathLight = await waitForElement({
       window,
-      'data-testid',
-      'path-light-svg',
-      maxWait,
-    );
+      strategy: 'data-testid',
+      selector: 'path-light-svg',
+      maxWaitMs: maxWait,
+      shouldLog: false,
+    });
+
     pathFilter = await pathLight.getAttribute('style');
 
     if (Date.now() - start >= maxWaitTime / 10) {
@@ -444,9 +467,19 @@ export async function hasElementBeenDeleted(
   const start = Date.now();
 
   let el: ElementHandle<HTMLElement | SVGElement> | undefined;
+  console.info(
+    `waiting for element to be deleted "${strategy}:${selector}:${text}", maxWait: ${maxWait}ms`,
+  );
   do {
     try {
-      el = await waitForElement(window, strategy, selector, maxWait, text);
+      el = await waitForElement({
+        window,
+        strategy,
+        selector,
+        maxWaitMs: maxWait,
+        text,
+        shouldLog: false,
+      });
       await sleepFor(100);
       console.info(`Element has been found, waiting for deletion`);
     } catch (_e) {
@@ -455,7 +488,14 @@ export async function hasElementBeenDeleted(
     }
   } while (Date.now() - start <= maxWait && el);
   try {
-    el = await waitForElement(window, strategy, selector, 1000, text);
+    el = await waitForElement({
+      window,
+      strategy,
+      selector,
+      maxWaitMs: 1_000,
+      text,
+      shouldLog: false,
+    });
   } catch (_e) {
     // if we did throw here it's actually because the element is gone, so it's ok
   }
@@ -465,7 +505,9 @@ export async function hasElementBeenDeleted(
       `hasElementBeenDeleted: element with selector ${selector} was expected to be gone but is still there`,
     );
   }
-  console.info(`Element has been deleted yay`);
+  console.info(
+    `Element "${strategy}:${selector}:${text}" has been deleted yay`,
+  );
 }
 
 export async function hasTextMessageBeenDeleted(
@@ -479,13 +521,14 @@ export async function hasTextMessageBeenDeleted(
     'waiting for text message to be deleted',
     async () => {
       try {
-        await waitForElement(
+        await waitForElement({
           window,
-          'data-testid',
-          'message-content',
-          maxWait,
+          strategy: 'data-testid',
+          selector: 'message-content',
+          maxWaitMs: maxWait,
           text,
-        );
+          shouldLog: false,
+        });
         return false;
       } catch (_e) {
         console.info(`Text message not found, yay!`);

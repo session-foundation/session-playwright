@@ -49,20 +49,25 @@ export const setDisappearingMessages = async (
     let defaultTime;
     if (timerType === 'disappear-after-read-option') {
       // making explicit DataTestId here as `waitForElement` currently allows a string
-      // TODO: add explicit typing to waitForElement
       const dataTestId: DataTestId = 'input-time-option-12-hours';
-      defaultTime = await waitForElement(windowA, 'data-testid', dataTestId);
+      defaultTime = await waitForElement({
+        window: windowA,
+        strategy: 'data-testid',
+        selector: dataTestId,
+        maxWaitMs: 1_000,
+        shouldLog: true,
+      });
     } else {
       // making explicit DataTestId here as `waitForElement` currently allows a string
-      // TODO: add explicit typing to waitForElement
       const dataTestId: DataTestId = 'input-time-option-1-days';
 
-      defaultTime = await waitForElement(
-        windowA,
-        'data-testid',
-        dataTestId,
-        1000,
-      );
+      defaultTime = await waitForElement({
+        window: windowA,
+        strategy: 'data-testid',
+        selector: dataTestId,
+        maxWaitMs: 1_000,
+        shouldLog: true,
+      });
     }
     const checked = await isChecked(defaultTime);
     if (checked) {
