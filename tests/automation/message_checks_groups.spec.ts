@@ -1,12 +1,21 @@
-import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
-import { longText, mediaArray, testLink } from './constants/variables';
-import { Conversation, HomeScreen } from './locators';
+import {
+  longText,
+  mediaArray,
+  testLink,
+  testLinkTitle,
+} from './constants/variables';
+import { Conversation } from './locators';
 import {
   test_group_Alice_1W_Bob_1W_Charlie_1W,
   test_group_Alice_2W_Bob_1W_Charlie_1W,
 } from './setup/sessionTest';
-import { deleteMessageFor, sendMessage } from './utilities/message';
+import { openConversationWith } from './utilities/conversation';
+import {
+  confirmMessageDeletedFor,
+  deleteMessageFor,
+  sendMessage,
+} from './utilities/message';
 import { replyTo, replyToMedia } from './utilities/reply_message';
 import {
   sendLinkPreview,
@@ -15,12 +24,9 @@ import {
 } from './utilities/send_media';
 import {
   clickOnElement,
-  clickOnWithText,
-  hasTextMessageBeenDeleted,
   pasteIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
-  waitForMatchingText,
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
@@ -121,7 +127,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 );
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
-  'Send link to group',
+  'Send link preview to group',
   async ({
     alice,
     bob,
@@ -140,7 +146,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
           options: {
             maxWaitMs: 3_000,
             shouldLog: true,
-            text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+            text: testLinkTitle,
           },
         }),
       ),
@@ -155,140 +161,83 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   },
 );
 
-test_group_Alice_2W_Bob_1W_Charlie_1W(
-  'Delete message for everyone in group',
-  async ({
-    aliceWindow1,
-    aliceWindow2,
-    bobWindow1,
-    charlieWindow1,
-    groupCreated,
-    alice,
-    bob,
-  }) => {
-    // Note: Alice is the admin in this group, Bob is a member without admin rights
-    const unsendMessageFromBob1 = `Testing unsend functionality in ${groupCreated.userName} from ${bob.userName} at ${new Date().toISOString()}`;
-    // focus the conversation on aliceWindow2 (not done as restored from seed)
-    await clickOnWithText(
+const deleteGroupTypeArray = [
+  'device_only',
+  // as normal user, delete one of our own messages
+  'for_everyone',
+  // as an admin, delete someone else message
+  'as_admin_for_everyone',
+] as const;
+
+deleteGroupTypeArray.forEach((deleteType) =>
+  test_group_Alice_2W_Bob_1W_Charlie_1W(
+    `Delete message in group ${deleteType}`,
+    async ({
+      aliceWindow1,
       aliceWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
-
-    await sendMessage(bobWindow1, unsendMessageFromBob1);
-    await Promise.all(
-      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
-        waitForTextMessage(w, unsendMessageFromBob1, 15_000),
-      ),
-    );
-
-    // Bob sent this message, so should be able to delete it for everyone
-    await deleteMessageFor(bobWindow1, unsendMessageFromBob1, 'for_everyone');
-    // message should be marked as deleted on all devices of all members
-    await Promise.all(
-      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
-        waitForMatchingText(
-          w,
-          tStripped('deleteMessageDeletedGlobally'),
-          15_000,
-        ),
-      ),
-    );
-
-    // Now, try to remove a new message as Alice (admin) sent by Bob
-    console.log(
-      `Now, try to remove a new message as ${alice.userName} (admin) sent by ${bob.userName}`,
-    );
-    const unsendMessageFromBob2 = `Testing unsend functionality in ${groupCreated.userName} from ${bob.userName} at ${new Date().toISOString()}`;
-    await sendMessage(bobWindow1, unsendMessageFromBob2);
-
-    await Promise.all(
-      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
-        waitForTextMessage(w, unsendMessageFromBob2),
-      ),
-    );
-    // Bob sent this message, so should be able to delete it for everyone
-    await deleteMessageFor(aliceWindow1, unsendMessageFromBob2, 'for_everyone');
-    // message should be marked as deleted on all devices of all members
-    await Promise.all(
-      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
-        waitForMatchingText(
-          w,
-          tStripped('deleteMessageDeletedGlobally'),
-          15_000,
-        ),
-      ),
-    );
-  },
-);
-
-test_group_Alice_2W_Bob_1W_Charlie_1W(
-  'Delete message locally in group',
-  async ({
-    aliceWindow1,
-    aliceWindow2,
-    bobWindow1,
-    charlieWindow1,
-    groupCreated,
-    bob,
-  }) => {
-    const deletedMessageFromBob1 = `Testing delete message functionality in ${groupCreated.userName} from ${bob.userName} at ${new Date().toISOString()}`;
-    // focus the conversation on aliceWindow2 (not done as restored from seed)
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
-
-    await sendMessage(bobWindow1, deletedMessageFromBob1);
-    await Promise.all(
-      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
-        waitForTextMessage(w, deletedMessageFromBob1, 15_000),
-      ),
-    );
-    // bob can remove locally his own message
-    await deleteMessageFor(bobWindow1, deletedMessageFromBob1, 'device_only');
-    await hasTextMessageBeenDeleted(bobWindow1, deletedMessageFromBob1, 5000);
-    await waitForMatchingText(
       bobWindow1,
-      tStripped('deleteMessageDeletedLocally'),
-      15_000,
-    );
-    // Should still be there for Alice and Charlie
-    await Promise.all(
-      [aliceWindow1, aliceWindow2, charlieWindow1].map((w) =>
-        waitForMatchingText(w, deletedMessageFromBob1, 15_000),
-      ),
-    );
+      charlieWindow1,
+      groupCreated,
+      bob,
+    }) => {
+      // Note: Alice is the admin in this group, Bob is a member without admin rights
+      const unsendMessageFromBob = `Testing delete ${deleteType} in group from ${bob.userName}`;
+      // focus the conversation on aliceWindow2 (not done as restored from seed)
+      await openConversationWith(aliceWindow2, groupCreated.userName);
 
-    // Charlie (another normal member) can remove locally messages he didn't send
-    const deletedMessageFromBob2 = `Testing delete message functionality in ${groupCreated.userName} from ${bob.userName} at ${new Date().toISOString()}`;
-    await sendMessage(bobWindow1, deletedMessageFromBob2);
-    await Promise.all(
-      [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1].map((w) =>
-        waitForTextMessage(w, deletedMessageFromBob2, 15_000),
-      ),
-    );
-    await deleteMessageFor(
-      charlieWindow1,
-      deletedMessageFromBob2,
-      'device_only',
-    );
-    await hasTextMessageBeenDeleted(
-      charlieWindow1,
-      deletedMessageFromBob2,
-      5000,
-    );
-    await waitForMatchingText(
-      charlieWindow1,
-      tStripped('deleteMessageDeletedLocally'),
-      15_000,
-    );
-    // Should still be there for Alice and Bob
-    await Promise.all(
-      [aliceWindow1, aliceWindow1, bobWindow1].map((w) =>
-        waitForMatchingText(w, deletedMessageFromBob2, 15_000),
-      ),
-    );
-  },
+      await sendMessage(bobWindow1, unsendMessageFromBob);
+      await waitForTextMessage(
+        [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1],
+        unsendMessageFromBob,
+        15_000,
+      );
+
+      if (deleteType === 'device_only' || deleteType === 'for_everyone') {
+        // Bob sent this message, so should be able to delete it locally or for everyone
+        await deleteMessageFor(bobWindow1, unsendMessageFromBob, deleteType);
+        await confirmMessageDeletedFor({
+          deleteType,
+          messageToDelete: unsendMessageFromBob,
+          windowInitiatingDelete: bobWindow1,
+          otherWindows: [aliceWindow1, aliceWindow2, charlieWindow1],
+        });
+      } else {
+        // Delete the message as Alice (admin) sent by Bob
+        await deleteMessageFor(
+          aliceWindow1,
+          unsendMessageFromBob,
+          'for_everyone',
+        );
+        await confirmMessageDeletedFor({
+          deleteType: 'for_everyone',
+          messageToDelete: unsendMessageFromBob,
+          windowInitiatingDelete: aliceWindow1,
+          otherWindows: [aliceWindow2, bobWindow1, charlieWindow1],
+        });
+      }
+
+      if (deleteType === 'device_only') {
+        // when testing the device_only deletion, we also want to check that
+        // an incoming message can be deleted locally.
+        const messageToDelete2 = `Testing delete ${deleteType} in group from ${bob.userName} #2`;
+
+        await sendMessage(bobWindow1, messageToDelete2);
+        await waitForTextMessage(
+          [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1],
+          messageToDelete2,
+          15_000,
+        );
+
+        // Charlie now deletes Bob's message locally
+        await deleteMessageFor(charlieWindow1, messageToDelete2, deleteType);
+
+        await confirmMessageDeletedFor({
+          deleteType,
+          messageToDelete: messageToDelete2,
+          otherWindows: [aliceWindow1, aliceWindow2, bobWindow1],
+          windowInitiatingDelete: charlieWindow1,
+        });
+      }
+    },
+  ),
 );

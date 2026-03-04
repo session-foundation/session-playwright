@@ -14,6 +14,7 @@ import {
   test_Alice_1W_no_network,
   test_Alice_2W,
 } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { createContact } from './utilities/create_contact';
 import { sendMessage, waitForMessageStatus } from './utilities/message';
 import { compareElementScreenshot } from './utilities/screenshot';
@@ -262,11 +263,8 @@ test_Alice_1W_Bob_1W(
       selector: Settings.enableReadReceipts.selector,
     });
     await clickOn(aliceWindow1, Global.modalCloseButton);
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
+    await openConversationWith(aliceWindow1, bob.userName);
+
     await clickOnElement({
       window: bobWindow1,
       strategy: 'data-testid',
@@ -281,11 +279,7 @@ test_Alice_1W_Bob_1W(
     });
     await clickOn(bobWindow1, Global.modalCloseButton);
     await sendMessage(aliceWindow1, 'Testing read receipts');
-    await clickOnWithText(
-      bobWindow1,
-      HomeScreen.conversationItemName,
-      alice.userName,
-    );
+    await openConversationWith(bobWindow1, alice.userName);
     await waitForMessageStatus(aliceWindow1, 'Testing read receipts', 'read');
   },
 );

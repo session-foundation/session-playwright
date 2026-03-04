@@ -4,12 +4,12 @@ import { tStripped } from '../../localization/lib';
 import { sortByPubkey } from '../../pubkey';
 import { HomeScreen } from '../locators';
 import { Group, User } from '../types/testing';
+import { openConversationWith } from '../utilities/conversation';
 import { sendMessage } from '../utilities/message';
 import { sendNewMessage } from '../utilities/send_message';
 import {
   clickOn,
   clickOnMatchingText,
-  clickOnWithText,
   pasteIntoInput,
   waitForTestIdWithText,
   waitForTextMessages,
@@ -86,9 +86,7 @@ export const createGroup = async (
   );
   // Click on test group
   await Promise.all(
-    [windowB, windowC].map((w) =>
-      clickOnWithText(w, HomeScreen.conversationItemName, group.userName),
-    ),
+    [windowB, windowC].map((w) => openConversationWith(w, group.userName)),
   );
   // Make sure the empty state is in windowB & windowC
   await Promise.all([

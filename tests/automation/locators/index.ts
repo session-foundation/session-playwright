@@ -109,7 +109,7 @@ export class Conversation extends Locator {
   static readonly mentionsContainer = this.testId('mentions-container'); // This is also the locator for emojis
   static readonly mentionsItem = this.testId('mentions-container-row'); // This is also the locator for emojis
   static readonly messageContent = this.testId('message-content');
-  static readonly linkPreviewTitle = this.className('msg-link-preview-title');
+  static readonly linkPreviewTitle = this.testId('msg-link-preview-title');
 
   static readonly messageInput = this.testId('message-input-text-area');
   static readonly messageRequestAcceptControlMessage = this.testId(
@@ -120,7 +120,10 @@ export class Conversation extends Locator {
   static readonly sendMessageButton = this.testId('send-message-button');
   static readonly unbanUserButton = this.testId('unban-user-confirm-button');
 
-  static readonly groupName = this.className('group-name');
+  static readonly groupName = this.testId('group-name');
+  static readonly communityInvitationDetails = this.testId(
+    'community-invitation-details',
+  );
 
   static readonly audioPlayer = this.testId('audio-player');
   static readonly callNotificationAnswered = this.testId(

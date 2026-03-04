@@ -22,6 +22,12 @@ type ElementOptions = {
   strictMode?: boolean;
 };
 
+export function escapeText(text: string) {
+  /* prettier-ignore */
+
+  return text.replace(/"/g, '\\\"');
+}
+
 // TODO Unify element interaction functions to use locator objects the way clickOn and clickOnWithText do
 // Remaining functions to migrate: waitForElement, pasteIntoInput, grabTextFromElement etc.
 
@@ -35,10 +41,11 @@ export async function waitForTestIdWithText(
 ) {
   let builtSelector = `css=[data-testid=${dataTestId}]`;
   if (text) {
-    // " =>  \\\"
     /* prettier-ignore */
 
-    const escapedText = text.replace(/"/g, '\\\"');
+    // " =>  \\\"
+
+    const escapedText = escapeText(text);
 
     builtSelector += `:has-text("${escapedText}")`;
     // console.info('builtSelector:', builtSelector);
@@ -86,7 +93,7 @@ export async function waitForElement({
 }
 
 export async function waitForTextMessage(
-  window: Page,
+  window: Array<Page> | Page,
   text: string,
   maxWait?: number,
 ) {
@@ -95,18 +102,23 @@ export async function waitForTextMessage(
   const builtSelector = `css=[data-testid=message-content]:has-text("${escapedText}")`;
 
   console.info('waitForTextMessage: builtSelector:', builtSelector);
-  const el = await window.waitForSelector(builtSelector, { timeout: maxWait });
+  const windows = Array.isArray(window) ? window : [window];
+  const el = await Promise.all(
+    windows.map((w) => w.waitForSelector(builtSelector, { timeout: maxWait })),
+  );
   console.info(`Text message found. Text: "${text}"`);
-  return el;
+  return el[0];
 }
 
 export async function waitForTextMessages(
-  window: Page,
+  window: Array<Page> | Page,
   texts: Array<string>,
   maxWait?: number,
 ) {
+  const windows = Array.isArray(window) ? window : [window];
+
   return Promise.all(
-    texts.map(async (t) => waitForTextMessage(window, t, maxWait)),
+    texts.map(async (t) => waitForTextMessage(windows, t, maxWait)),
   );
 }
 
@@ -118,7 +130,7 @@ export async function waitForControlMessageWithText(
 }
 
 export async function waitForMatchingText(
-  window: Page,
+  window: Array<Page> | Page,
   text: string,
   maxWait: number,
 ) {
@@ -127,13 +139,17 @@ export async function waitForMatchingText(
   console.info(`waitForMatchingText: ${text} for maxWait: ${maxTimeout}ms`);
   const start = Date.now();
 
-  const found = await window.waitForSelector(builtSelector, {
-    timeout: maxTimeout,
-  });
+  const windows = Array.isArray(window) ? window : [window];
+  const found = await Promise.all(
+    windows.map((w) =>
+      w.waitForSelector(builtSelector, { timeout: maxTimeout }),
+    ),
+  );
+
   console.info(
     `waitForMatchingText: found "${text}" in ${Date.now() - start}ms`,
   );
-  return found;
+  return found[0];
 }
 
 export async function waitForMatchingPlaceholder(

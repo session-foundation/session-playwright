@@ -4,6 +4,7 @@ import {
   longText,
   mediaArray,
   testLink,
+  testLinkTitle,
 } from './constants/variables';
 import { Conversation } from './locators';
 import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
@@ -111,7 +112,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 );
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
-  'Send disappearing link to groups',
+  'Send disappearing link preview to groups',
   async ({ aliceWindow1, bobWindow1, charlieWindow1 }) => {
     await setDisappearingMessages(aliceWindow1, [
       'group',
@@ -128,7 +129,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
           options: {
             maxWaitMs: 3_000,
             shouldLog: true,
-            text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+            text: testLinkTitle,
           },
         }),
       ),
@@ -139,7 +140,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       [bobWindow1, charlieWindow1].map((w) =>
         hasElementBeenDeleted(w, Conversation.linkPreviewTitle, {
           maxWait: 1_000,
-          text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+          text: testLinkTitle,
         }),
       ),
     );

@@ -1,6 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { tStripped } from '../../localization/lib';
+import { sleepFor } from '../../promise_utils';
 import { Global } from '../locators';
 import { MessageStatus } from '../types/testing';
 import {
@@ -9,23 +10,29 @@ import {
   clickOnElement,
   clickOnMatchingText,
   clickOnTextMessage,
+  hasTextMessageBeenDeleted,
   pasteIntoInput,
+  waitForMatchingText,
   waitForTestIdWithText,
 } from './utils';
+
+export type MessageDeleteType =
+  | 'device_only'
+  | 'for_all_my_devices'
+  | 'for_everyone';
 
 export const waitForMessageStatus = async (
   window: Page,
   message: string,
   status: MessageStatus,
 ) => {
-  const selc = `css=[data-testid=message-content]:has-text("${message}"):has([data-testid=msg-status][data-testtype=${status}])`;
+  const selector = `css=[data-testid=message-container]:has-text("${message}"):has([data-testid=msg-status][data-testtype=${status}])`;
   const logSig = `${status} status of message '${message}'`;
-  console.info(`waiting for ${logSig}`);
 
-  const messageStatus = await window.waitForSelector(selc, {
-    timeout: 20_000,
+  const messageStatus = await window.waitForSelector(selector, {
+    timeout: 20_000, // a gif on mainnet can take a long time to upload
   });
-  console.info(`${logSig} is ${Boolean(messageStatus)}`);
+  console.info(`${logSig} is ${!!messageStatus}`);
 };
 
 export const sendMessage = async (window: Page, message: string) => {
@@ -43,7 +50,7 @@ export const sendMessage = async (window: Page, message: string) => {
 export async function deleteMessageFor(
   window: Page,
   message: string,
-  deletionType: 'device_only' | 'for_all_my_devices' | 'for_everyone',
+  deletionType: MessageDeleteType,
 ) {
   await clickOnTextMessage(window, message, true);
   await clickOnMatchingText(window, tStripped('delete'));
@@ -68,4 +75,56 @@ export async function deleteMessageFor(
     'session-toast',
     tStripped('deleteMessageDeleted', { count: 1 }),
   );
+}
+
+/**
+ * Wait 15s and then confirms that all of the windows have the message is the expected state, depending on the delete type.
+ *
+ * A local deletion
+ */
+export async function confirmMessageDeletedFor({
+  deleteType,
+  messageToDelete,
+  otherWindows,
+  windowInitiatingDelete,
+}: {
+  windowInitiatingDelete: Page;
+  otherWindows: Array<Page>;
+  messageToDelete: string;
+  deleteType: MessageDeleteType;
+}) {
+  // explicit wait to make sure a deleted locally that was wrongly deleted globally had time to propagate
+  await sleepFor(15_000, true);
+  if (deleteType === 'device_only') {
+    await Promise.all([
+      // the content of the original message should be removed on the device that removed it
+      hasTextMessageBeenDeleted(windowInitiatingDelete, messageToDelete, 1_000),
+      // and should have been replaced with a tombstone (local version)
+      waitForMatchingText(
+        windowInitiatingDelete,
+        tStripped('deleteMessageDeletedLocally'),
+        1_000,
+      ),
+
+      // the other devices should have the message still visible
+      ...otherWindows.map((w) =>
+        waitForMatchingText(w, messageToDelete, 1_000),
+      ),
+    ]);
+  } else {
+    await Promise.all([
+      // all of the devices should have the message content removed
+      ...[windowInitiatingDelete, ...otherWindows].map((w) =>
+        hasTextMessageBeenDeleted(w, messageToDelete, 1_000),
+      ),
+      // all of the devices should have the tombstone shown (global version)
+      ...[windowInitiatingDelete, ...otherWindows].map((w) =>
+        waitForMatchingText(
+          w,
+          tStripped('deleteMessageDeletedGlobally'),
+          1_000,
+        ),
+      ),
+    ]);
+  }
 }

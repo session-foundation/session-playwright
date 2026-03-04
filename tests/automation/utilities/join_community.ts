@@ -7,6 +7,7 @@ import {
   testCommunityName,
 } from '../constants/community';
 import { Global, HomeScreen } from '../locators';
+import { openConversationWith } from './conversation';
 import {
   clickOn,
   clickOnMatchingText,
@@ -82,11 +83,8 @@ export const joinOrOpenCommunity = async (window: Page) => {
       );
       await clickOn(window, Global.backButton);
       await clickOn(window, Global.backButton);
-      await clickOnWithText(
-        window,
-        HomeScreen.conversationItemName,
-        testCommunityName,
-      );
+
+      await openConversationWith(window, testCommunityName);
     } catch (waitError) {
       // The error message we expected wasn't there, so this is a real failure
       throw joinError; // Throw the original join error, not the wait timeout

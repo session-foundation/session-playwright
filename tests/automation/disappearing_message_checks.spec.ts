@@ -6,14 +6,11 @@ import {
   longText,
   mediaArray,
   testLink,
+  testLinkTitle,
 } from './constants/variables';
-import {
-  Conversation,
-  ConversationSettings,
-  Global,
-  HomeScreen,
-} from './locators';
+import { Conversation, ConversationSettings, Global } from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
 import { waitForMessageStatus } from './utilities/message';
@@ -182,18 +179,17 @@ test_Alice_1W_Bob_1W(
     await waitForElement({
       window: bobWindow1,
       locator: Conversation.linkPreviewTitle,
-
       options: {
-        maxWaitMs: 3_000,
+        maxWaitMs: 10_000,
         shouldLog: true,
-        text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+        text: testLinkTitle,
       },
     });
     // Wait 30 seconds for link preview to disappear
     await sleepFor(30_000);
     await hasElementBeenDeleted(bobWindow1, Conversation.linkPreviewTitle, {
       maxWait: 1_000, // no need to wait too long here, it should have disappeared already
-      text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+      text: testLinkTitle,
     });
   },
 );
@@ -246,16 +242,13 @@ test_Alice_1W_Bob_1W(
       .getByTestId('modal-close-button')
       .click();
     await clickOn(aliceWindow1, Global.modalCloseButton);
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
+
+    await openConversationWith(aliceWindow1, bob.userName);
     await Promise.all(
       [aliceWindow1, bobWindow1].map((w) =>
         waitForElement({
           window: w,
-          locator: Conversation.groupName,
+          locator: Conversation.communityInvitationDetails,
           options: {
             maxWaitMs: 15_000,
             shouldLog: true,
@@ -268,7 +261,7 @@ test_Alice_1W_Bob_1W(
     await sleepFor(30000);
     await Promise.all(
       [bobWindow1, aliceWindow1].map((w) =>
-        hasElementBeenDeleted(w, Conversation.groupName, {
+        hasElementBeenDeleted(w, Conversation.communityInvitationDetails, {
           maxWait: 1_000,
           text: testCommunityName,
         }),

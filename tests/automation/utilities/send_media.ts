@@ -2,6 +2,7 @@ import { Page } from '@playwright/test';
 
 import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
+import { testLinkTitle } from '../constants/variables';
 import { Conversation, Global, Settings } from '../locators';
 import { isRunningOnDevNet } from '../setup/open';
 import { MediaType } from '../types/testing';
@@ -133,7 +134,9 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
   // doesn't pop up if manually typing link (needs to be pasted)
   await window.keyboard.press(`${controlOrMetaFor()}+A`);
   await window.keyboard.press(`${controlOrMetaFor()}+X`);
+  await sleepFor(100);
   await clickOn(window, Conversation.messageInput);
+  await sleepFor(100);
   await window.keyboard.press(`${controlOrMetaFor()}+V`);
   await checkModalStrings(
     window,
@@ -149,11 +152,7 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     );
   }
   await waitForTestIdWithText(window, 'link-preview-image');
-  await waitForTestIdWithText(
-    window,
-    'link-preview-title',
-    'Session | Send Messages, Not Metadata. | Private Messenger',
-  );
+  await waitForTestIdWithText(window, 'link-preview-title', testLinkTitle);
   await clickOnElement({
     window,
     strategy: 'data-testid',

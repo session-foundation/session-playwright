@@ -8,6 +8,7 @@ import {
   Settings,
 } from './locators';
 import { test_Alice_2W_Bob_1W } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
 import {
@@ -28,11 +29,8 @@ test_Alice_2W_Bob_1W(
     // Accept request in aliceWindow1
     await clickOn(aliceWindow1, HomeScreen.messageRequestBanner);
     await clickOn(aliceWindow2, HomeScreen.messageRequestBanner);
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
+    await openConversationWith(aliceWindow1, bob.userName);
+
     await clickOn(aliceWindow1, Conversation.acceptMessageRequestButton);
     await waitForTestIdWithText(
       aliceWindow1,
@@ -70,11 +68,8 @@ test_Alice_2W_Bob_1W(
     await sendNewMessage(bobWindow1, alice.accountid, testMessage);
     // Decline request in aliceWindow1
     await clickOn(aliceWindow1, HomeScreen.messageRequestBanner);
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
+    await openConversationWith(aliceWindow1, bob.userName);
+
     await clickOn(aliceWindow2, HomeScreen.messageRequestBanner);
     await waitForTestIdWithText(
       aliceWindow2,
@@ -110,11 +105,7 @@ test_Alice_2W_Bob_1W(
     // Check the message request banner appears and click on it
     await clickOn(aliceWindow1, HomeScreen.messageRequestBanner);
     // Select message request from Bob
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
+    await openConversationWith(aliceWindow1, bob.userName);
     // Block Bob
     await clickOn(aliceWindow1, Conversation.blockMessageRequestButton);
     // Check modal strings
@@ -136,7 +127,7 @@ test_Alice_2W_Bob_1W(
       Global.contactItem.selector,
       bob.userName,
     );
-    // Check that the blocked contacts is on alicewindow2
+    // Check that the blocked contacts is on aliceWindow2
     // Check blocked status in blocked contacts list
     await clickOn(aliceWindow2, LeftPane.settingsButton);
     await clickOn(aliceWindow2, Settings.conversationsMenuItem);

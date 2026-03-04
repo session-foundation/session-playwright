@@ -6,13 +6,13 @@ import { clickOn, pasteIntoInput } from './utils';
 
 export const sendNewMessage = async (
   window: Page,
-  sessionid: string,
+  sessionId: string,
   message: string,
 ) => {
   await clickOn(window, HomeScreen.plusButton);
   await clickOn(window, HomeScreen.newMessageOption);
   // Enter session ID of USER B
-  await pasteIntoInput(window, 'new-session-conversation', sessionid);
+  await pasteIntoInput(window, 'new-session-conversation', sessionId);
   // click next
   await clickOn(window, HomeScreen.newMessageNextButton);
   await sendMessage(window, message);

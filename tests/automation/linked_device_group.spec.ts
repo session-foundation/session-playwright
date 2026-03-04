@@ -15,6 +15,7 @@ import {
   test_group_Alice_1W_Bob_1W_Charlie_1W,
   test_group_Alice_2W_Bob_1W_Charlie_1W,
 } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { leaveGroup } from './utilities/leave_group';
 import {
   checkModalStrings,
@@ -46,11 +47,8 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     // Check for user A for control message that userC left group
     // await sleepFor(1000);
     // Click on group
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(aliceWindow1, groupCreated.userName);
+
     await waitForTestIdWithText(
       aliceWindow1,
       'group-update-message',
@@ -59,11 +57,7 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
       }),
     );
     // Check for linked device (userA)
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(aliceWindow2, groupCreated.userName);
     await waitForTestIdWithText(
       aliceWindow2,
       'group-update-message',
@@ -96,11 +90,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(aliceWindow2, groupCreated.userName);
+
     // Check header name
     await waitForTestIdWithText(
       aliceWindow2,
@@ -177,11 +168,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(aliceWindow2, groupCreated.userName);
     // Check header name
     await waitForTestIdWithText(
       aliceWindow2,
@@ -222,11 +209,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnWithText(
-      restoredWindow,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(restoredWindow, groupCreated.userName);
     // Check header name
     await waitForTestIdWithText(
       restoredWindow,
@@ -268,11 +251,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnWithText(
-      restoredWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(restoredWindow2, groupCreated.userName);
     // Check header name
     await waitForTestIdWithText(
       restoredWindow2,

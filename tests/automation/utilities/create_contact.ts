@@ -15,7 +15,6 @@ export const createContact = async (
   // User A sends message to User B
   await Promise.all([
     sendNewMessage(windowA, userB.accountid, testMessage),
-
     sendNewMessage(windowB, userA.accountid, testReply),
   ]);
   console.warn(`createContact took ${Date.now() - start}ms`);

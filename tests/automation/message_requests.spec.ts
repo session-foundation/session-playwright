@@ -9,6 +9,7 @@ import {
   Settings,
 } from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { joinCommunity } from './utilities/join_community';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -33,11 +34,7 @@ test_Alice_1W_Bob_1W(
     // Check the message request banner appears and click on it
     await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select message request from User A
-    await clickOnWithText(
-      bobWindow1,
-      HomeScreen.conversationItemName,
-      alice.userName,
-    );
+    await openConversationWith(bobWindow1, alice.userName);
     // Check that using the accept button has intended use
     await clickOn(bobWindow1, Conversation.acceptMessageRequestButton);
     // Check config message of message request acceptance
@@ -66,11 +63,8 @@ test_Alice_1W_Bob_1W(
     // Check the message request banner appears and click on it
     await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select message request from User A
-    await clickOnWithText(
-      bobWindow1,
-      HomeScreen.conversationItemName,
-      alice.userName,
-    );
+    await openConversationWith(bobWindow1, alice.userName);
+
     await sendMessage(bobWindow1, testReply);
     // Check config message of message request acceptance
 
@@ -98,11 +92,7 @@ test_Alice_1W_Bob_1W(
     // Check the message request banner appears and click on it
     await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select message request from User A
-    await clickOnWithText(
-      bobWindow1,
-      HomeScreen.conversationItemName,
-      alice.userName,
-    );
+    await openConversationWith(bobWindow1, alice.userName);
 
     await clickOnWithText(
       bobWindow1,
@@ -197,11 +187,7 @@ test_Alice_1W_Bob_1W(
     await sendMessage(aliceWindow1, messageRequestMsg);
     await clickOn(bobWindow1, HomeScreen.messageRequestBanner);
     // Select message request from User A
-    await clickOnWithText(
-      bobWindow1,
-      HomeScreen.conversationItemName,
-      alice.userName,
-    );
+    await openConversationWith(bobWindow1, alice.userName);
     await sendMessage(bobWindow1, messageRequestResponse);
     // Check config message of message request acceptance
     await waitForTestIdWithText(

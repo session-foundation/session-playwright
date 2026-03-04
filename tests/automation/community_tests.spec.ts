@@ -3,7 +3,7 @@ import type { Page } from '@playwright/test';
 import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
-import { Conversation, Global, HomeScreen } from './locators';
+import { Conversation, Global } from './locators';
 import { newUser } from './setup/new_user';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import {
@@ -11,6 +11,7 @@ import {
   test_Alice_1W_Bob_1W,
   test_Alice_2W,
 } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import {
   assertAdminIsKnown,
   joinCommunity,
@@ -39,11 +40,8 @@ test_Alice_2W(
     await scrollToBottomIfNecessary(aliceWindow1);
     await sendMessage(aliceWindow1, 'Hello, community!');
     // Check linked device for community
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      testCommunityName,
-    );
+
+    await openConversationWith(aliceWindow2, testCommunityName);
   },
 );
 
