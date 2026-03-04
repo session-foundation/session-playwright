@@ -100,12 +100,17 @@ export class Conversation extends Locator {
   static readonly disappearingControlMessage = this.testId(
     'disappear-control-message',
   );
+  static readonly DisappearMessagesTypeAndTime = this.testId(
+    'disappear-messages-type-and-time',
+  );
   static readonly quoteText = this.testId('quote-text');
   static readonly endCallButton = this.testId('end-call');
   static readonly endVoiceMessageButton = this.testId('end-voice-message');
   static readonly mentionsContainer = this.testId('mentions-container'); // This is also the locator for emojis
   static readonly mentionsItem = this.testId('mentions-container-row'); // This is also the locator for emojis
   static readonly messageContent = this.testId('message-content');
+  static readonly linkPreviewTitle = this.className('msg-link-preview-title');
+
   static readonly messageInput = this.testId('message-input-text-area');
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
@@ -114,6 +119,28 @@ export class Conversation extends Locator {
   static readonly scrollToBottomButton = this.testId('scroll-to-bottom-button');
   static readonly sendMessageButton = this.testId('send-message-button');
   static readonly unbanUserButton = this.testId('unban-user-confirm-button');
+
+  static readonly groupName = this.className('group-name');
+
+  static readonly audioPlayer = this.testId('audio-player');
+  static readonly callNotificationAnswered = this.testId(
+    'call-notification-answered-a-call',
+  );
+  static readonly callNotificationStarted = this.testId(
+    'call-notification-started-call',
+  );
+
+  static readonly tooltipCharacterCount = this.testId(
+    'tooltip-character-count',
+  );
+
+  static readonly SessionConversation = this.className('session-conversation');
+  static readonly EmptyMessageViewCreated = this.testId(
+    'empty-msg-view-account-created',
+  );
+  static readonly EmptyMessageViewWelcome = this.testId(
+    'empty-msg-view-welcome',
+  );
 }
 
 export class ConversationSettings extends Locator {

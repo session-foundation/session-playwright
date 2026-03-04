@@ -1,7 +1,7 @@
 import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { longText, mediaArray, testLink } from './constants/variables';
-import { HomeScreen } from './locators';
+import { Conversation, HomeScreen } from './locators';
 import {
   test_group_Alice_1W_Bob_1W_Charlie_1W,
   test_group_Alice_2W_Bob_1W_Charlie_1W,
@@ -71,8 +71,7 @@ mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
       if (mediaType === 'voice') {
         await replyToMedia({
           senderWindow: bobWindow1,
-          strategy: 'data-testid',
-          selector: 'audio-player',
+          locator: Conversation.audioPlayer,
           replyText: testReply,
           receiverWindow: aliceWindow1,
         });
@@ -137,11 +136,12 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       [bobWindow1, charlieWindow1].map((w) =>
         waitForElement({
           window: w,
-          strategy: 'data-testid',
-          selector: 'msg-link-preview-title',
-          maxWaitMs: 3_000,
-          shouldLog: true,
-          text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+          locator: Conversation.linkPreviewTitle,
+          options: {
+            maxWaitMs: 3_000,
+            shouldLog: true,
+            text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+          },
         }),
       ),
     );

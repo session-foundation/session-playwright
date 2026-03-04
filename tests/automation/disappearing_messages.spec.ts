@@ -1,7 +1,7 @@
 import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { defaultDisappearingOptions } from './constants/variables';
-import { Conversation, HomeScreen } from './locators';
+import { Conversation, Global, HomeScreen } from './locators';
 import {
   test_Alice_2W,
   test_Alice_2W_Bob_1W,
@@ -299,11 +299,9 @@ test_Alice_2W_Bob_1W(
       bobWindow1,
       tStripped('disappearingMessagesFollowSetting'),
     );
-    await clickOnElement({
-      window: bobWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
+
+    await clickOn(bobWindow1, Global.confirmButton);
+
     // Check control message are visible and correct
     // Each window has two control messages: You turned off and other user turned off (because we're following settings)
     await Promise.all([
@@ -340,12 +338,9 @@ test_Alice_2W_Bob_1W(
     ]);
     await Promise.all(
       [aliceWindow1, aliceWindow2, bobWindow1].map((w) =>
-        hasElementBeenDeleted(
-          w,
-          'data-testid',
-          'disappear-messages-type-and-time',
-          1_000,
-        ),
+        hasElementBeenDeleted(w, Conversation.DisappearMessagesTypeAndTime, {
+          maxWait: 1_000,
+        }),
       ),
     );
   },

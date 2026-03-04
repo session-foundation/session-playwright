@@ -344,13 +344,10 @@ test_Alice_1W_Bob_1W(
       tStripped('delete'),
     );
     // Check if conversation is deleted
-    await hasElementBeenDeleted(
-      aliceWindow1,
-      'data-testid',
-      Global.contactItem.selector,
-      1000,
-      bob.userName,
-    );
+    await hasElementBeenDeleted(aliceWindow1, Global.contactItem, {
+      maxWait: 1000,
+      text: bob.userName,
+    });
   },
 );
 
@@ -466,13 +463,10 @@ test_Alice_1W_no_network(
       Global.confirmButton,
       tStripped('hide'),
     );
-    await hasElementBeenDeleted(
-      aliceWindow1,
-      'data-testid',
-      'module-conversation__user__profile-name',
-      5000,
-      tStripped('noteToSelf'),
-    );
+    await hasElementBeenDeleted(aliceWindow1, HomeScreen.conversationItemName, {
+      maxWait: 5000,
+      text: tStripped('noteToSelf'),
+    });
   },
 );
 

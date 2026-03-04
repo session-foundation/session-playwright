@@ -18,7 +18,7 @@ import {
 } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
 import { linkedDevice } from './utilities/linked_device';
-import { sendMessage } from './utilities/message';
+import { deleteMessageFor, sendMessage } from './utilities/message';
 import { compareElementScreenshot } from './utilities/screenshot';
 import { sendNewMessage } from './utilities/send_message';
 import {
@@ -26,7 +26,6 @@ import {
   clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTextMessage,
   clickOnWithText,
   doWhileWithMax,
   hasElementBeenDeleted,
@@ -194,25 +193,18 @@ test_Alice_2W_Bob_1W(
       waitForTextMessage(aliceWindow2, messageToDelete, 15_000),
       waitForTextMessage(bobWindow1, messageToDelete, 15_000),
     ]);
-    await clickOnTextMessage(aliceWindow1, messageToDelete, true, 1_000);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(
-      aliceWindow1,
-      tStripped('deleteMessageDeviceOnly'),
-    );
+    await deleteMessageFor(aliceWindow1, messageToDelete, 'device_only');
 
-    await clickOnWithText(
-      aliceWindow1,
-      Global.confirmButton,
-      tStripped('delete'),
-    );
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
+    await sleepFor(15_000, true); // explicit wait to make the delete was a local delete only (and had time to propagate if not)
     await Promise.all([
-      hasTextMessageBeenDeleted(aliceWindow1, messageToDelete, 6_000), // should only be deleted locally
+      // the content of the original message should be removed on device that removed it
+      hasTextMessageBeenDeleted(aliceWindow1, messageToDelete, 6_000),
+      // tombstone should be visible on device that removed it
+      waitForMatchingText(
+        aliceWindow1,
+        tStripped('deleteMessageDeletedLocally'),
+        6_000,
+      ),
       waitForMatchingText(aliceWindow2, messageToDelete, 15_000), // should still be here on linked device
       waitForMatchingText(bobWindow1, messageToDelete, 15_000), // should still be here on bob
     ]);
@@ -235,19 +227,8 @@ test_Alice_2W_Bob_1W(
       waitForTextMessage(aliceWindow2, unsentMessage),
       waitForTextMessage(bobWindow1, unsentMessage),
     ]);
-    await clickOnTextMessage(aliceWindow1, unsentMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(aliceWindow1, tStripped('deleteMessageEveryone'));
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
+    await deleteMessageFor(aliceWindow1, unsentMessage, 'for_everyone');
+
     await hasTextMessageBeenDeleted(aliceWindow1, unsentMessage, 1000);
     await waitForMatchingText(
       bobWindow1,
@@ -274,22 +255,10 @@ test_Alice_2W(
       waitForTextMessage(aliceWindow1, unsentMessage),
       waitForTextMessage(aliceWindow2, unsentMessage),
     ]);
-    await clickOnTextMessage(aliceWindow1, unsentMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(
-      aliceWindow1,
-      tStripped('deleteMessageDevicesAll'),
-    );
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
+
+    await clickOn(aliceWindow1, Global.confirmButton);
+    await deleteMessageFor(aliceWindow1, unsentMessage, 'for_all_my_devices');
+
     // in NTS, a message deleted on all our devices is removed entirely (the tombstone is not left)
     await Promise.all(
       [aliceWindow1, aliceWindow2].map((w) =>
@@ -415,13 +384,10 @@ test_Alice_2W_Bob_1W(
     // Need to wait for deletion to propagate to linked device
     await Promise.all(
       [aliceWindow1, aliceWindow2].map((w) =>
-        hasElementBeenDeleted(
-          w,
-          'data-testid',
-          HomeScreen.conversationItemName.selector,
-          10_000,
-          bob.userName,
-        ),
+        hasElementBeenDeleted(w, HomeScreen.conversationItemName, {
+          maxWait: 10_000,
+          text: bob.userName,
+        }),
       ),
     );
   },
@@ -475,20 +441,14 @@ test_Alice_2W(
     // Check linked device for hidden note to self
     await sleepFor(1000);
     await Promise.all([
-      hasElementBeenDeleted(
-        aliceWindow1,
-        'data-testid',
-        HomeScreen.conversationItemName.selector,
-        5000,
-        tStripped('noteToSelf'),
-      ),
-      hasElementBeenDeleted(
-        aliceWindow2,
-        'data-testid',
-        HomeScreen.conversationItemName.selector,
-        15_000,
-        tStripped('noteToSelf'),
-      ),
+      hasElementBeenDeleted(aliceWindow1, HomeScreen.conversationItemName, {
+        maxWait: 5000,
+        text: tStripped('noteToSelf'),
+      }),
+      hasElementBeenDeleted(aliceWindow2, HomeScreen.conversationItemName, {
+        maxWait: 15_000,
+        text: tStripped('noteToSelf'),
+      }),
     ]);
   },
 );

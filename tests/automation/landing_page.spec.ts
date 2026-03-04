@@ -1,4 +1,5 @@
 import { tStripped } from '../localization/lib';
+import { Conversation } from './locators';
 import { test_Alice_2W } from './setup/sessionTest';
 import {
   hasElementPoppedUpThatShouldnt,
@@ -12,10 +13,8 @@ test_Alice_2W(
       [aliceWindow1, aliceWindow2].map((w) =>
         waitForElement({
           window: w,
-          strategy: 'class',
-          selector: 'session-conversation',
-          maxWaitMs: 1000,
-          shouldLog: true,
+          locator: Conversation.SessionConversation,
+          options: { maxWaitMs: 1000, shouldLog: true },
         }),
       ),
     );
@@ -32,11 +31,12 @@ test_Alice_2W(
       ].map(async (builder) =>
         waitForElement({
           window: aliceWindow1,
-          strategy: 'data-testid',
-          selector: 'empty-msg-view-account-created',
-          maxWaitMs: 1_000,
-          shouldLog: true,
-          text: builder.toString(),
+          locator: Conversation.EmptyMessageViewCreated,
+          options: {
+            maxWaitMs: 1_000,
+            shouldLog: true,
+            text: builder.toString(),
+          },
         }),
       ),
     );
@@ -49,11 +49,12 @@ test_Alice_2W(
       ].map(async (builder) =>
         waitForElement({
           window: aliceWindow2,
-          strategy: 'data-testid',
-          selector: 'empty-msg-view-welcome',
-          maxWaitMs: 1_000,
-          shouldLog: true,
-          text: builder.toString(),
+          locator: Conversation.EmptyMessageViewWelcome,
+          options: {
+            maxWaitMs: 1_000,
+            shouldLog: true,
+            text: builder.toString(),
+          },
         }),
       ),
     );

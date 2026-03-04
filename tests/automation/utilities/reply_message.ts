@@ -3,7 +3,7 @@ import { Page } from '@playwright/test';
 import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
 import { Conversation } from '../locators';
-import { Strategy } from '../types/testing';
+import { type StrategyExtractionObj } from '../types/testing';
 import { sendMessage } from './message';
 import { verifyMediaPreviewLoaded } from './send_media';
 import {
@@ -81,23 +81,22 @@ export const replyTo = async ({
 
 export const replyToMedia = async ({
   replyText,
-  strategy,
-  selector,
+  locator,
   receiverWindow,
   senderWindow,
 }: {
   replyText: string;
-  strategy: Strategy;
-  selector: string;
+  locator: StrategyExtractionObj;
   receiverWindow: Page;
   senderWindow: Page;
 }) => {
   const selc = await waitForElement({
     window: senderWindow,
-    strategy,
-    selector,
-    shouldLog: true,
-    maxWaitMs: 20_000,
+    locator,
+    options: {
+      shouldLog: true,
+      maxWaitMs: 20_000,
+    },
   });
   // the right click context menu, for some reasons, often doesn't show up on the first try. Let's loop a few times
 

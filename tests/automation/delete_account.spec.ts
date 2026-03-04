@@ -92,18 +92,19 @@ sessionTestTwoWindows(
 
       await hasElementBeenDeleted(
         restoringWindow,
-        'data-testid',
-        HomeScreen.conversationItemName.selector,
-        5_000,
+        HomeScreen.conversationItemName,
+        { maxWait: 5_000 },
       );
 
       await clickOn(restoringWindow, HomeScreen.plusButton); // Expect contacts list to be empty
 
       await hasElementBeenDeleted(
         restoringWindow,
-        'data-testid',
-        Global.contactItem.selector,
-        10000,
+
+        Global.contactItem,
+        {
+          maxWait: 10_000,
+        },
       );
     } finally {
       if (restoringWindows) {
@@ -150,21 +151,23 @@ sessionTestTwoWindows(
 
       await waitForElement({
         window: restoringWindow,
-        strategy: 'data-testid',
-        selector: HomeScreen.conversationItemName.selector,
-        maxWaitMs: 10_000,
-        shouldLog: true,
-        text: userB.userName,
+        locator: HomeScreen.conversationItemName,
+        options: {
+          maxWaitMs: 10_000,
+          shouldLog: true,
+          text: userB.userName,
+        },
       });
       // Check if contact is available in contacts section
       await clickOn(restoringWindow, HomeScreen.plusButton);
       await waitForElement({
         window: restoringWindow,
-        strategy: 'data-testid',
-        selector: Global.contactItem.selector,
-        maxWaitMs: 1000,
-        shouldLog: true,
-        text: userB.userName,
+        locator: Global.contactItem,
+        options: {
+          maxWaitMs: 1000,
+          shouldLog: true,
+          text: userB.userName,
+        },
       });
       console.log('Contacts have been restored');
     } finally {

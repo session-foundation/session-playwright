@@ -114,7 +114,7 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
   assertAdminIsKnown();
   const banMeUnbanLaterMsg = `Ban me but unban me later! - ${Date.now()}`;
   const bannedCheckMsg = `I'm banned :( - ${Date.now()}`;
-  const msg3 = `Freedom! - ${Date.now()}`;
+  const freedomNowMsg = `Freedom! - ${Date.now()}`;
   await Promise.all([
     recoverFromSeed(windowA, process.env.SOGS_ADMIN_SEED!, {
       fallbackName: 'Admin',
@@ -159,11 +159,11 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
     strictMode: false,
   });
   await clickOn(windowA, Conversation.unbanUserButton);
-  await sendMessage(windowB, msg3);
+  await sendMessage(windowB, freedomNowMsg);
   await waitForTestIdWithText(
     windowA,
     Conversation.messageContent.selector,
-    msg3,
+    freedomNowMsg,
   );
 
   // Now that the user is unban, check that we can ban and delete all.
@@ -189,13 +189,10 @@ sessionTestTwoWindows('Ban and unban user', async ([windowA, windowB]) => {
     maxWait: 1_000,
   });
   await clickOn(windowA, Conversation.banAndDeleteAllButton);
-  await hasElementBeenDeleted(
-    windowA,
-    Conversation.messageContent.strategy,
-    Conversation.messageContent.selector,
-    10_000,
-    banAndDeleteAllMsg,
-  );
+  await hasElementBeenDeleted(windowA, Conversation.messageContent, {
+    maxWait: 10_000,
+    text: banAndDeleteAllMsg,
+  });
   await pasteIntoInput(
     windowB,
     Conversation.messageInput.selector,

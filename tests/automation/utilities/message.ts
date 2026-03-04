@@ -1,9 +1,11 @@
 import { Page } from '@playwright/test';
 
 import { tStripped } from '../../localization/lib';
+import { Global } from '../locators';
 import { MessageStatus } from '../types/testing';
 import {
   checkModalStrings,
+  clickOn,
   clickOnElement,
   clickOnMatchingText,
   clickOnTextMessage,
@@ -58,11 +60,9 @@ export async function deleteMessageFor(
   }
 
   await checkModalStrings(window, tStripped('deleteMessage', { count: 1 }));
-  await clickOnElement({
-    window,
-    strategy: 'data-testid',
-    selector: 'session-confirm-ok-button',
-  });
+
+  await clickOn(window, Global.confirmButton);
+
   await waitForTestIdWithText(
     window,
     'session-toast',

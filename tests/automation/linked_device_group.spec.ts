@@ -211,7 +211,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     ]);
     await clickOn(aliceWindow2, Global.cancelButton);
     await clickOn(aliceWindow2, Global.modalCloseButton);
-    // Delete device data on alicewindow2
+    // Delete device data on aliceWindow2
     await clearDataOnWindow(aliceWindow2);
     const [restoredWindow] = await openApp(1);
     await recoverFromSeed(restoredWindow, alice.recoveryPassword);
@@ -336,13 +336,10 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     );
     await Promise.all(
       [aliceWindow1, aliceWindow2].map(async (w) => {
-        await hasElementBeenDeleted(
-          w,
-          'data-testid',
-          HomeScreen.conversationItemName.selector,
-          10_000,
-          groupCreated.userName,
-        );
+        await hasElementBeenDeleted(w, HomeScreen.conversationItemName, {
+          maxWait: 10_000,
+          text: groupCreated.userName,
+        });
       }),
     );
   },

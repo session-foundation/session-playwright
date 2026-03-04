@@ -31,8 +31,6 @@ import {
   checkModalStrings,
   clickOn,
   clickOnElement,
-  clickOnMatchingText,
-  clickOnTextMessage,
   clickOnWithText,
   hasElementPoppedUpThatShouldnt,
   hasTextMessageBeenDeleted,
@@ -72,8 +70,7 @@ mediaArray.forEach(
         if (mediaType === 'voice') {
           await replyToMedia({
             senderWindow: bobWindow1,
-            strategy: 'data-testid',
-            selector: 'audio-player',
+            locator: Conversation.audioPlayer,
             replyText: testReply,
             receiverWindow: aliceWindow1,
           });
@@ -123,11 +120,12 @@ test_Alice_1W_Bob_1W(
     await sendLinkPreview(aliceWindow1, testLink);
     await waitForElement({
       window: bobWindow1,
-      strategy: 'data-testid',
-      selector: 'msg-link-preview-title',
-      maxWaitMs: 3_000,
-      shouldLog: true,
-      text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+      locator: Conversation.linkPreviewTitle,
+      options: {
+        maxWaitMs: 3_000,
+        shouldLog: true,
+        text: 'Session | Send Messages, Not Metadata. | Private Messenger',
+      },
     });
     await replyTo({
       senderWindow: bobWindow1,
@@ -168,11 +166,13 @@ test_Alice_1W_Bob_1W(
       [aliceWindow1, bobWindow1].map((w) =>
         waitForElement({
           window: w,
-          strategy: 'class',
-          selector: 'group-name',
-          maxWaitMs: 15_000,
-          shouldLog: true,
-          text: testCommunityName,
+          locator: Conversation.groupName,
+
+          options: {
+            maxWaitMs: 15_000,
+            shouldLog: true,
+            text: testCommunityName,
+          },
         }),
       ),
     );
@@ -187,19 +187,8 @@ test_Alice_1W_Bob_1W(
 
     await sendMessage(aliceWindow1, unsendMessage);
     await waitForTextMessage(bobWindow1, unsendMessage);
-    await clickOnTextMessage(aliceWindow1, unsendMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(aliceWindow1, tStripped('deleteMessageEveryone'));
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
+    await deleteMessageFor(aliceWindow1, unsendMessage, 'for_everyone');
+
     await sleepFor(1000);
     await waitForMatchingText(
       bobWindow1,
@@ -319,20 +308,21 @@ messageLengthTestCases.forEach((testCase) => {
 
       // Check countdown behavior
       if (expectedCount) {
-        await waitForTestIdWithText(
-          aliceWindow1,
-          'tooltip-character-count',
-          expectedCount,
-        );
+        await waitForElement({
+          window: aliceWindow1,
+          locator: Conversation.tooltipCharacterCount,
+          options: { text: expectedCount },
+        });
       } else {
         // Verify countdown tooltip is not present
         try {
           await waitForElement({
             window: aliceWindow1,
-            strategy: 'data-testid',
-            selector: 'tooltip-character-count',
-            maxWaitMs: 1_000,
-            shouldLog: true,
+            locator: Conversation.tooltipCharacterCount,
+            options: {
+              maxWaitMs: 1_000,
+              shouldLog: true,
+            },
           });
           throw new Error(
             `Countdown should not be visible for messages under ${countdownThreshold} chars`,

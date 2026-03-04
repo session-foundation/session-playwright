@@ -56,13 +56,10 @@ export const leaveCommunity = async (window: Page, communityName: string) => {
   );
   await clickOnWithText(window, Global.contextMenuItem, 'Leave Community');
   await clickOn(window, Global.confirmButton);
-  await hasElementBeenDeleted(
-    window,
-    HomeScreen.conversationItemName.strategy,
-    HomeScreen.conversationItemName.selector,
-    5_000,
-    communityName,
-  );
+  await hasElementBeenDeleted(window, HomeScreen.conversationItemName, {
+    maxWait: 5_000,
+    text: communityName,
+  });
   console.log('Left community');
 };
 
