@@ -31,15 +31,17 @@ export default defineConfig({
   snapshotPathTemplate: `${screenshotFolder}/{testName}/{arg}-{platform}{ext}`,
   projects: [
     {
-      name: 'Community admin tests',
-      // those needs to be run sequentially
-      testMatch: '**/community_admin_tests.spec.ts',
+      name: 'Community tests',
+      // Those needs to be run sequentially as they are making each others unreliable
+      // (they all are using the same community)
+      testMatch: '**/*community*tests.spec.ts',
       fullyParallel: false,
       workers: 1,
+      repeatEach: 3,
     },
     {
       name: 'All other tests',
-      testMatch: '**/!(community_admin_tests).spec.ts',
+      testMatch: '**/!(*community*tests).spec.ts',
       fullyParallel: true, // otherwise, tests in the same file are not run in parallel
       workers: toNumber(process.env.PLAYWRIGHT_WORKERS_COUNT) || 1,
     },
