@@ -85,7 +85,6 @@ export class Conversation extends Locator {
     'ban-user-delete-all-confirm-button',
   );
   static readonly banUserButton = this.testId('ban-user-confirm-button');
-  static readonly unbanUserButton = this.testId('unban-user-confirm-button');
   static readonly banUserInput = this.testId('ban-user-input');
   static readonly unbanUserInput = this.testId('unban-user-input');
   static readonly blockMessageRequestButton = this.testId(

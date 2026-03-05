@@ -223,6 +223,7 @@ export type DataTestId =
   | 'theme-section'
   | 'tooltip-character-count'
   | 'unban-user-confirm-button'
+  | 'unban-user-input'
   | 'unblock-button-settings-screen'
   | 'update-group-info-name-input'
   | 'update-profile-info-name-input'
