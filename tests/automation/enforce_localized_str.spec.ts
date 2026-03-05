@@ -4,6 +4,7 @@ import * as path from 'path';
 
 import { tStripped } from '../localization/lib';
 import {
+  isDevTokenNoArgs,
   isPluralToken,
   MergedLocalizerTokens,
   TokenPluralWithArgs,
@@ -322,6 +323,10 @@ function getExpectedStringFromKey(
       return 'Messages up to 10,000 characters';
     case 'proFeatureListPinnedConversations':
       return 'Pin unlimited conversations';
+    case 'pin':
+      return 'Pin';
+    case 'pinUnpin':
+      return 'Unpin';
     default:
       // returning null means we don't have an expected string yet for this key.
       // This will make the test fail
@@ -347,6 +352,10 @@ test('Enforce localized strings', () => {
   const tokensToValidate = [...tokensToValidateSet];
   for (let index = 0; index < tokensToValidate.length; index++) {
     const token = tokensToValidate[index];
+    // Ignore dev only tokens
+    if (isDevTokenNoArgs(token)) {
+      continue;
+    }
 
     if (isPluralToken(token)) {
       const counts = [1, 3];

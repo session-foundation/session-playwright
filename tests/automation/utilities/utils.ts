@@ -1,9 +1,9 @@
 /* eslint-disable no-useless-escape */
 
-import { ElementHandle, Page } from '@playwright/test';
+import { ElementHandle, expect, Page } from '@playwright/test';
 
 import { sleepFor } from '../../promise_utils';
-import { Conversation, CTA } from '../locators';
+import { Conversation, CTA, HomeScreen } from '../locators';
 import {
   DataTestId,
   DMTimeOption,
@@ -50,7 +50,7 @@ export async function waitForTestIdWithText(
   text?: string,
   maxWait?: number,
 ) {
-  let builtSelector = `css=[data-testid=${dataTestId}]`;
+  let builtSelector = `css=[data-testid="${dataTestId}"]`;
   if (text) {
     /* prettier-ignore */
 
@@ -506,7 +506,7 @@ export async function pasteIntoInput(
   text: string,
 ) {
   console.info(`pasteIntoInput testId: ${dataTestId} : "${text}"`);
-  const builtSelector = `css=[data-testid=${dataTestId}]`;
+  const builtSelector = `css=[data-testid="${dataTestId}"]`;
   // the new input made with onboarding element needs a click to reveal the input in the DOM
   // Convert DataTestId to locator object for clickOn
   const locator = { strategy: 'data-testid' as const, selector: dataTestId };
@@ -880,4 +880,41 @@ export async function scrollToBottomIfNecessary(window: Page): Promise<void> {
 
 export function controlOrMetaFor() {
   return process.platform === 'darwin' ? 'Meta' : 'Control';
+}
+
+// Grab the inner text of every conversation item to establish order.
+// Playwright suggests locator.allInnerTexts() but that doesn't work:
+// Session Desktop sets window.eval = () => null in preload.js,
+// which breaks Playwright's underlying evaluateAll.
+export async function getConversationOrder(window: Page): Promise<string[]> {
+  const items = await window.$$(
+    `[data-testid="${HomeScreen.conversationItemName.selector}"]`,
+  );
+  const texts = await Promise.all(items.map((item) => item.innerText()));
+  return texts.map((t) => t.trim()).filter((t) => t.length > 0);
+}
+
+// Asserts pinned conversations float to the top maintaining relative order,
+// followed by unpinned in their original order.
+// Pass an empty pinnedNames array to assert the order is fully restored (e.g. after unpinning).
+export function assertPinOrder(
+  beforeOrder: string[],
+  pinnedNames: string[],
+  afterOrder: string[],
+): void {
+  const pinnedSet = new Set(pinnedNames);
+  const pinnedExpected: string[] = [];
+  const unpinnedExpected: string[] = [];
+  for (const name of beforeOrder) {
+    if (pinnedSet.has(name)) {
+      pinnedExpected.push(name);
+    } else {
+      unpinnedExpected.push(name);
+    }
+  }
+  const expected = [...pinnedExpected, ...unpinnedExpected];
+
+  expect(afterOrder, 'Conversations are not in the correct order').toEqual(
+    expected,
+  );
 }

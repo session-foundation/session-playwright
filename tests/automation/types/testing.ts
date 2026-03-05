@@ -105,6 +105,7 @@ export type DataTestId =
   | 'continue-button'
   | 'continue-session-button'
   | 'control-message'
+  | 'conversation-item-pinned'
   | 'conversation-options-avatar'
   | 'conversations-settings-menu-item'
   | 'copy-button-account-id'
