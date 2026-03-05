@@ -18,6 +18,7 @@ type TestAndResult = { test: TestCase; result: TestResult };
 class TuiReporter implements Reporter {
   private tui = new TerminalTui();
   private allResults: Array<TestAndResult> = [];
+  private allTests: TestCase[] = [];
   private allTestsCount = 0;
   private countWorkers = 1;
   private startTime = 0;
@@ -27,7 +28,8 @@ class TuiReporter implements Reporter {
   }
 
   onBegin(config: FullConfig, suite: Suite) {
-    this.allTestsCount = suite.allTests().length;
+    this.allTests = suite.allTests();
+    this.allTestsCount = this.allTests.length;
     this.countWorkers = config.workers;
     this.startTime = Date.now();
 
@@ -39,7 +41,7 @@ class TuiReporter implements Reporter {
       process.exit(1);
     });
 
-    for (const test of suite.allTests()) {
+    for (const test of this.allTests) {
       this.tui.addTest(test.id, test.title);
     }
 
@@ -170,9 +172,9 @@ class TuiReporter implements Reporter {
     }
 
     // Tests that never finished (still running/pending when stopped)
-    const finishedTitles = new Set(Object.keys(grouped));
-
-    const cancelledCount = this.allTestsCount - finishedTitles.size;
+    const finishedIds = new Set(this.allResults.map((r) => r.test.id));
+    const cancelledTests = this.allTests.filter((t) => !finishedIds.has(t.id));
+    const cancelledCount = cancelledTests.length;
     // Summary line
     const parts: string[] = [];
     if (passedCount > 0)
@@ -200,14 +202,6 @@ class TuiReporter implements Reporter {
             })`,
           ),
         );
-        const lastResult = results[results.length - 1];
-        const lastError =
-          lastResult.result.errors[lastResult.result.errors.length - 1];
-        if (lastError?.message) {
-          console.log(
-            chalk.dim(`      Error: ${lastError.message.split('\n')[0]}`),
-          );
-        }
       }
       console.log('');
     }
@@ -223,6 +217,15 @@ class TuiReporter implements Reporter {
             `    \u21bb ${title} (passed on attempt ${retryNum}/${results.length})`,
           ),
         );
+      }
+      console.log('');
+    }
+
+    // Cancelled details
+    if (cancelledTests.length > 0) {
+      console.log(chalk.dim.bold('  Cancelled:'));
+      for (const test of sortBy(cancelledTests, (t) => t.title)) {
+        console.log(chalk.dim(`    \u25a0 ${test.title}`));
       }
       console.log('');
     }

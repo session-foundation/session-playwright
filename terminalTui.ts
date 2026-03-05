@@ -160,6 +160,9 @@ export class TerminalTui {
   private lastUserInteractionTime = 0;
   private selection: { startRow: number; endRow: number } | null = null;
   private lastOutputLines: string[] = []; // cached from last render for selection copy
+  private startTime: number | null = null;
+  private frozenElapsedMs: number | null = null; // set when suite finishes
+  private elapsedTimer: ReturnType<typeof setInterval> | null = null;
 
   start(): void {
     if (!process.stdout.isTTY) return;
@@ -190,12 +193,19 @@ export class TerminalTui {
     };
     process.on('exit', this.exitHandler);
 
+    this.startTime = Date.now();
+    this.elapsedTimer = setInterval(() => this.scheduleRender(), 1000);
     this.scheduleRender();
   }
 
   stop(): void {
     if (!this.isActive) return;
     this.isActive = false;
+
+    if (this.elapsedTimer) {
+      clearInterval(this.elapsedTimer);
+      this.elapsedTimer = null;
+    }
 
     if (this.flashTimeout) {
       clearTimeout(this.flashTimeout);
@@ -326,6 +336,16 @@ export class TerminalTui {
     this.selectedIndex = 0;
     this.outputScrollOffset = 0;
     this.autoFollow = false;
+
+    // Freeze elapsed time and stop the live ticker
+    if (this.startTime !== null) {
+      this.frozenElapsedMs = Date.now() - this.startTime;
+    }
+    if (this.elapsedTimer) {
+      clearInterval(this.elapsedTimer);
+      this.elapsedTimer = null;
+    }
+
     this.scheduleRender();
   }
 
@@ -364,6 +384,29 @@ export class TerminalTui {
       this.renderScheduled = false;
       if (this.isActive) this.render();
     });
+  }
+
+  /** Returns a 1-char scrollbar indicator for a given row in the track. */
+  private scrollbarChar(
+    total: number,
+    visible: number,
+    offset: number,
+    trackHeight: number,
+    row: number,
+  ): string {
+    if (total <= visible) {
+      return chalk.dim('\u2502'); // │ — no scrolling needed
+    }
+    const thumbSize = Math.max(1, Math.round((visible / total) * trackHeight));
+    const maxOffset = total - visible;
+    const clampedOffset = Math.min(offset, maxOffset);
+    const thumbStart = Math.round(
+      (clampedOffset / maxOffset) * (trackHeight - thumbSize),
+    );
+    if (row >= thumbStart && row < thumbStart + thumbSize) {
+      return chalk.white('\u2588'); // █ thumb
+    }
+    return chalk.dim('\u2591'); // ░ track
   }
 
   private render(): void {
@@ -427,8 +470,8 @@ export class TerminalTui {
     this.lastListStart = listStart;
     this.lastLeftWidth = leftWidth;
 
-    // Right pane: build wrapped output lines
-    const outputLines = this.buildOutputLines(selectedTest, rightWidth - 2);
+    // Right pane: build wrapped output lines (−1 for scrollbar column)
+    const outputLines = this.buildOutputLines(selectedTest, rightWidth - 3);
     this.lastOutputLines = outputLines;
     const maxScroll = Math.max(0, outputLines.length - contentHeight);
     this.outputScrollOffset = Math.min(this.outputScrollOffset, maxScroll);
@@ -460,6 +503,7 @@ export class TerminalTui {
             : chalk.dim('--');
         const maxTitleLen =
           leftWidth -
+          1 - // scrollbar column
           4 -
           5 -
           (entry.retry > 0 ? 4 + String(entry.retry).length : 0) -
@@ -468,32 +512,49 @@ export class TerminalTui {
 
         const line = ` ${label} ${retryStr}${title}`;
         const lineWithDur =
-          padRight(line, leftWidth - visibleLength(durStr) - 2) + durStr + ' ';
+          padRight(line, leftWidth - 1 - visibleLength(durStr) - 2) +
+          durStr +
+          ' ';
 
         leftCell = isSelected
           ? this.activePaneFocus === 'list'
-            ? chalk.inverse(padRight(lineWithDur, leftWidth))
-            : chalk.bgGray(padRight(lineWithDur, leftWidth))
-          : padRight(lineWithDur, leftWidth);
+            ? chalk.inverse(padRight(lineWithDur, leftWidth - 1))
+            : chalk.bgGray(padRight(lineWithDur, leftWidth - 1))
+          : padRight(lineWithDur, leftWidth - 1);
       } else {
-        leftCell = ' '.repeat(leftWidth);
+        leftCell = ' '.repeat(leftWidth - 1);
       }
 
-      buf += chalk.dim('\u2502') + leftCell;
+      const leftScrollbar = this.scrollbarChar(
+        listLen,
+        contentHeight,
+        listStart,
+        contentHeight,
+        row,
+      );
+      buf += chalk.dim('\u2502') + leftCell + leftScrollbar;
 
       // Divider
       buf += chalk.dim('\u2502');
 
-      // Right cell
+      // Right cell (−1 for scrollbar column)
       const outIdx = this.outputScrollOffset + row;
       let rightCell = '';
       if (outIdx < outputLines.length) {
-        rightCell = ' ' + truncate(outputLines[outIdx], rightWidth - 2) + RESET;
+        rightCell = ' ' + truncate(outputLines[outIdx], rightWidth - 3) + RESET;
       }
       const isSelected = outIdx >= selLo && outIdx <= selHi;
-      buf += isSelected
-        ? chalk.inverse(padRight(rightCell, rightWidth))
-        : padRight(rightCell, rightWidth);
+      const rightScrollbar = this.scrollbarChar(
+        outputLines.length,
+        contentHeight,
+        this.outputScrollOffset,
+        contentHeight,
+        row,
+      );
+      buf +=
+        (isSelected
+          ? chalk.inverse(padRight(rightCell, rightWidth - 1))
+          : padRight(rightCell, rightWidth - 1)) + rightScrollbar;
     }
 
     // --- Bottom divider ---
@@ -517,12 +578,20 @@ export class TerminalTui {
         : chalk.dim('\u2191\u2193 scroll');
     const tabHint = chalk.dim('Tab') + ' switch';
     const qHint = chalk.dim('q') + ' quit';
-    const cHint = chalk.dim('c') + ' copy';
+    const cHint =
+      chalk.dim('c') + ' copy output  ' + chalk.dim('C') + ' copy list';
     const isFollowing =
       this.autoFollow && Date.now() - this.lastUserInteractionTime > 30_000;
     const fHint = isFollowing
       ? chalk.green('f') + chalk.green(' follow')
       : chalk.dim('f') + ' follow';
+    const elapsedMs =
+      this.frozenElapsedMs ??
+      (this.startTime !== null ? Date.now() - this.startTime : null);
+    const elapsedStr =
+      elapsedMs !== null
+        ? chalk.dim(` ${formatDuration(elapsedMs)} elapsed`)
+        : '';
     const progressStr = chalk.dim(
       `${this.progress.completed}/${this.progress.total} done`,
     );
@@ -534,7 +603,7 @@ export class TerminalTui {
 
     buf += ` ${listHint}  ${tabHint}  ${qHint}  ${cHint}  ${fHint}  ${chalk.dim(
       '|',
-    )} ${progressStr}${estStr}${flash}`;
+    )} ${progressStr}${elapsedStr}${estStr}${flash}`;
 
     process.stdout.write(buf);
   }
@@ -626,9 +695,13 @@ export class TerminalTui {
       return;
     }
 
-    // c to copy
-    if (key === 'c' || key === 'C') {
+    // c to copy output, C to copy left pane
+    if (key === 'c') {
       this.copySelectedOutput();
+      return;
+    }
+    if (key === 'C') {
+      this.copyLeftPane();
       return;
     }
 
@@ -802,6 +875,29 @@ export class TerminalTui {
     }
 
     this.copyToClipboard(text);
+  }
+
+  private copyLeftPane(): void {
+    if (this.testOrder.length === 0) {
+      this.showFlash('No tests');
+      return;
+    }
+
+    const lines: string[] = [
+      `Tests: ${this.progress.completed}/${this.progress.total}`,
+      '',
+    ];
+
+    for (const id of this.testOrder) {
+      const entry = this.tests.get(id)!;
+      const status = entry.status.toUpperCase().padEnd(10);
+      const retry = entry.retry > 0 ? ` (retry #${entry.retry})` : '';
+      const dur =
+        entry.duration !== null ? ` [${formatDuration(entry.duration)}]` : '';
+      lines.push(`${status} ${entry.title}${retry}${dur}`);
+    }
+
+    this.copyToClipboard(lines.join('\n'));
   }
 
   private copyToClipboard(text: string): void {
