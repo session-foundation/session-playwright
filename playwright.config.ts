@@ -26,9 +26,22 @@ export default defineConfig({
   repeatEach: process.env.PLAYWRIGHT_REPEAT_COUNT
     ? toNumber(process.env.PLAYWRIGHT_REPEAT_COUNT)
     : 0,
-  workers: toNumber(process.env.PLAYWRIGHT_WORKERS_COUNT) || 1,
   reportSlowTests: null,
-  fullyParallel: true, // otherwise, tests in the same file are not run in parallel
   globalSetup: './global.setup', // clean leftovers of previous test runs on start, runs only once
   snapshotPathTemplate: `${screenshotFolder}/{testName}/{arg}-{platform}{ext}`,
+  projects: [
+    {
+      name: 'Community admin tests',
+      // those needs to be run sequentially
+      testMatch: '**/community_admin_tests.spec.ts',
+      fullyParallel: false,
+      workers: 1,
+    },
+    {
+      name: 'All other tests',
+      testMatch: '**/!(community_admin_tests).spec.ts',
+      fullyParallel: true, // otherwise, tests in the same file are not run in parallel
+      workers: toNumber(process.env.PLAYWRIGHT_WORKERS_COUNT) || 1,
+    },
+  ],
 });

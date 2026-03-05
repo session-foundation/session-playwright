@@ -14,6 +14,7 @@ import {
   clickOnWithText,
   hasElementBeenDeleted,
   pasteIntoInput,
+  rightClickOnWithText,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -49,11 +50,10 @@ export const joinDefaultCommunity = async (
 };
 
 export const leaveCommunity = async (window: Page, communityName: string) => {
-  await clickOnWithText(
+  await rightClickOnWithText(
     window,
     HomeScreen.conversationItemName,
     communityName,
-    { rightButton: true },
   );
   await clickOnWithText(window, Global.contextMenuItem, 'Leave Community');
   await clickOn(window, Global.confirmButton);

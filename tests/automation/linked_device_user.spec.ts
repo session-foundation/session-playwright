@@ -29,6 +29,7 @@ import {
   doWhileWithMax,
   hasElementBeenDeleted,
   pasteIntoInput,
+  rightClickOnWithText,
   waitForLoadingAnimationToFinish,
   waitForMatchingPlaceholder,
   waitForTestIdWithText,
@@ -181,11 +182,10 @@ test_Alice_2W_Bob_1W(
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await sendMessage(aliceWindow1, testMessage);
     // Navigate to conversation on linked device and check for message from user A to user B
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow2,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     // Select block
     await clickOnWithText(
@@ -264,11 +264,10 @@ test_Alice_2W_Bob_1W(
       ),
     );
     // Delete contact
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,
@@ -322,11 +321,10 @@ test_Alice_2W(
       HomeScreen.conversationItemName.selector,
       tStripped('noteToSelf'),
     );
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       tStripped('noteToSelf'),
-      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,

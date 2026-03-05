@@ -110,6 +110,8 @@ function getExpectedStringFromKey(
       return 'Unblock this contact to send a message';
     case 'attachmentsClickToDownload':
       return 'Click to download {file_type}';
+    case 'banUnbanUserUnbanned':
+      return 'User unbanned';
     case 'media':
       return 'Media';
     case 'file':

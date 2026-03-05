@@ -28,6 +28,7 @@ import {
   doesElementExist,
   hasElementBeenDeleted,
   pasteIntoInput,
+  rightClickOnWithText,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -52,11 +53,10 @@ test_Alice_1W_Bob_1W(
     // he is a contact, close the new conversation button tab as there is no right click allowed on it
     await clickOn(aliceWindow1, Global.backButton);
     // then right click on the contact conversation list item to show the menu
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     // Select block
     await clickOnWithText(
@@ -210,11 +210,10 @@ test_Alice_1W_Bob_1W(
     const nickname = 'new nickname for Bob';
 
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     await clickOnMatchingText(aliceWindow1, tStripped('nicknameSet'));
     await sleepFor(1000);
@@ -316,11 +315,10 @@ test_Alice_1W_Bob_1W(
     );
 
     // Delete contact
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,
@@ -436,11 +434,10 @@ test_Alice_1W_no_network(
       Conversation.conversationHeader.selector,
       tStripped('noteToSelf'),
     );
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       tStripped('noteToSelf'),
-      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,

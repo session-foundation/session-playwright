@@ -95,36 +95,63 @@ export async function confirmMessageDeletedFor({
 }) {
   // explicit wait to make sure a deleted locally that was wrongly deleted globally had time to propagate
   await sleepFor(15_000, true);
-  if (deleteType === 'device_only') {
-    await Promise.all([
-      // the content of the original message should be removed on the device that removed it
-      hasTextMessageBeenDeleted(windowInitiatingDelete, messageToDelete, 1_000),
-      // and should have been replaced with a tombstone (local version)
-      waitForMatchingText(
-        windowInitiatingDelete,
-        tStripped('deleteMessageDeletedLocally'),
-        1_000,
-      ),
-
-      // the other devices should have the message still visible
-      ...otherWindows.map((w) =>
-        waitForMatchingText(w, messageToDelete, 1_000),
-      ),
-    ]);
-  } else {
-    await Promise.all([
-      // all of the devices should have the message content removed
-      ...[windowInitiatingDelete, ...otherWindows].map((w) =>
-        hasTextMessageBeenDeleted(w, messageToDelete, 1_000),
-      ),
-      // all of the devices should have the tombstone shown (global version)
-      ...[windowInitiatingDelete, ...otherWindows].map((w) =>
-        waitForMatchingText(
-          w,
-          tStripped('deleteMessageDeletedGlobally'),
+  switch (deleteType) {
+    case 'device_only':
+      await Promise.all([
+        // the content of the original message should be removed on the device that removed it
+        hasTextMessageBeenDeleted(
+          windowInitiatingDelete,
+          messageToDelete,
           1_000,
         ),
-      ),
-    ]);
+        // and should have been replaced with a tombstone (local version)
+        waitForMatchingText(
+          windowInitiatingDelete,
+          tStripped('deleteMessageDeletedLocally'),
+          1_000,
+        ),
+
+        // the other devices should have the message still visible
+        ...otherWindows.map((w) =>
+          waitForMatchingText(w, messageToDelete, 1_000),
+        ),
+      ]);
+      break;
+    case 'for_everyone':
+      await Promise.all([
+        // all of the devices should have the message content removed
+        ...[windowInitiatingDelete, ...otherWindows].map((w) =>
+          hasTextMessageBeenDeleted(w, messageToDelete, 1_000),
+        ),
+        // all of the devices should have the tombstone shown (global version)
+        ...[windowInitiatingDelete, ...otherWindows].map((w) =>
+          waitForMatchingText(
+            w,
+            tStripped('deleteMessageDeletedGlobally'),
+            1_000,
+          ),
+        ),
+      ]);
+      break;
+    case 'for_all_my_devices':
+      // NTS for_all_my_devices does not leave tombstones, it removes the messages completely from all clients
+      await Promise.all([
+        // all of our devices should have the message removed
+        ...[windowInitiatingDelete, ...otherWindows].map((w) =>
+          hasTextMessageBeenDeleted(w, messageToDelete, 1_000),
+        ),
+        // and no tombstones at all
+        ...[windowInitiatingDelete, ...otherWindows].map((w) =>
+          hasTextMessageBeenDeleted(
+            w,
+            tStripped('deleteMessageDeletedGlobally'),
+            1_000,
+          ),
+        ),
+      ]);
+      break;
+
+    default:
+      break;
   }
 }

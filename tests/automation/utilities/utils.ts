@@ -28,6 +28,17 @@ export function escapeText(text: string) {
   return text.replace(/"/g, '\\\"');
 }
 
+/**
+ * This function can be used to make sure all the possible values as input of a switch as taken care off, without having a default case.
+ */
+export function assertUnreachable(_x: never, message: string): never {
+  const msg = `assertUnreachable: Didn't expect to get here with "${message}"`;
+  // eslint:disable: no-console
+
+  console.info(msg);
+  throw new Error(msg);
+}
+
 // TODO Unify element interaction functions to use locator objects the way clickOn and clickOnWithText do
 // Remaining functions to migrate: waitForElement, pasteIntoInput, grabTextFromElement etc.
 
@@ -350,18 +361,9 @@ export async function clickOn(
   );
 }
 
-/**
- * Clicks on an element that contains specific text
- * @param window - Playwright page instance
- * @param locator - Element locator with strategy and selector
- * @param text - Text content to match within the element
- * @param options - Optional element interaction configuration
- */
-export async function clickOnWithText(
-  window: Page,
+function buildSelectorForClickWithText(
   locator: StrategyExtractionObj,
   text: string,
-  options?: ElementOptions,
 ) {
   let builtSelector: string;
 
@@ -376,15 +378,65 @@ export async function clickOnWithText(
     }]:has-text("${text.replace(/"/g, '\\"')}")`;
   }
 
+  return builtSelector;
+}
+
+/**
+ * Clicks on an element that contains specific text
+ * @param window - Playwright page instance
+ * @param locator - Element locator with strategy and selector
+ * @param text - Text content to match within the element
+ * @param options - Optional element interaction configuration
+ */
+export async function clickOnWithText(
+  window: Page,
+  locator: StrategyExtractionObj,
+  text: string,
+  options?: Omit<ElementOptions, 'rightButton'>,
+) {
+  const builtSelector = buildSelectorForClickWithText(locator, text);
+
   const sharedOpts = {
     timeout: options?.maxWait,
     strict: options?.strictMode ?? true,
   };
-  await window.click(
-    builtSelector,
-    options?.rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
+  await window.click(builtSelector, sharedOpts);
+}
+
+export async function rightClickOnWithText(
+  window: Page,
+  locator: StrategyExtractionObj,
+  text: string,
+  options?: Omit<ElementOptions, 'rightButton'>,
+) {
+  const builtSelector = buildSelectorForClickWithText(locator, text);
+
+  const sharedOpts = {
+    timeout: options?.maxWait,
+    strict: options?.strictMode ?? true,
+    button: 'right' as const,
+  };
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await window.click(builtSelector, sharedOpts);
+    // This is a hack, but sometimes the right click makes the window move slightly, and close the context menu.
+    // So we wait for the context menu to appear (and to stay visible for 100ms), and if it doesn't, we try again.
+    await sleepFor(100, false);
+    const menuVisible = await window
+      .waitForSelector('[data-testid="context-menu-item"]', { timeout: 100 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (menuVisible) {
+      return;
+    }
+    await sleepFor(500, true);
+  }
+  throw new Error(
+    `rightClickOnWithText: context menu never appeared for "${text}"`,
   );
 }
+
 // Legacy wrapper for backwards compatibility
 export async function clickOnElement({
   window,

@@ -1,3 +1,5 @@
+import type { Page } from '@playwright/test';
+
 import { sleepFor } from '../promise_utils';
 import {
   longText,
@@ -14,6 +16,7 @@ import { openConversationWith } from './utilities/conversation';
 import {
   confirmMessageDeletedFor,
   deleteMessageFor,
+  type MessageDeleteType,
   sendMessage,
 } from './utilities/message';
 import { replyTo, replyToMedia } from './utilities/reply_message';
@@ -23,6 +26,7 @@ import {
   sendVoiceMessage,
 } from './utilities/send_media';
 import {
+  assertUnreachable,
   clickOnElement,
   pasteIntoInput,
   waitForElement,
@@ -162,7 +166,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 );
 
 const deleteGroupTypeArray = [
-  'device_only',
+  'device_only_outgoing',
+  'device_only_incoming',
   // as normal user, delete one of our own messages
   'for_everyone',
   // as an admin, delete someone else message
@@ -192,52 +197,50 @@ deleteGroupTypeArray.forEach((deleteType) =>
         15_000,
       );
 
-      if (deleteType === 'device_only' || deleteType === 'for_everyone') {
-        // Bob sent this message, so should be able to delete it locally or for everyone
-        await deleteMessageFor(bobWindow1, unsendMessageFromBob, deleteType);
-        await confirmMessageDeletedFor({
-          deleteType,
-          messageToDelete: unsendMessageFromBob,
-          windowInitiatingDelete: bobWindow1,
-          otherWindows: [aliceWindow1, aliceWindow2, charlieWindow1],
-        });
-      } else {
-        // Delete the message as Alice (admin) sent by Bob
-        await deleteMessageFor(
-          aliceWindow1,
-          unsendMessageFromBob,
-          'for_everyone',
-        );
-        await confirmMessageDeletedFor({
-          deleteType: 'for_everyone',
-          messageToDelete: unsendMessageFromBob,
-          windowInitiatingDelete: aliceWindow1,
-          otherWindows: [aliceWindow2, bobWindow1, charlieWindow1],
-        });
+      let windowInitiatingDelete: Page | undefined;
+      let fallbackDeleteType: MessageDeleteType | undefined;
+      switch (deleteType) {
+        case 'device_only_incoming':
+          // make Charlie delete Bob's message locally
+          windowInitiatingDelete = charlieWindow1;
+          fallbackDeleteType = 'device_only';
+
+          break;
+        case 'device_only_outgoing':
+        case 'for_everyone':
+          // Bob sent this message, so should be able to delete it both locally and for everyone
+          windowInitiatingDelete = bobWindow1;
+          fallbackDeleteType =
+            deleteType === 'for_everyone' ? 'for_everyone' : 'device_only';
+          break;
+        case 'as_admin_for_everyone':
+          // Alice (admin) is deleting Bob's message
+          windowInitiatingDelete = aliceWindow1;
+          fallbackDeleteType = 'for_everyone';
+          break;
+        default:
+          assertUnreachable(deleteType, `assertUnreachable for deleteType`);
+          break;
       }
+      const otherWindows = [
+        aliceWindow1,
+        aliceWindow2,
+        bobWindow1,
+        charlieWindow1,
+      ].filter((m) => m !== windowInitiatingDelete);
 
-      if (deleteType === 'device_only') {
-        // when testing the device_only deletion, we also want to check that
-        // an incoming message can be deleted locally.
-        const messageToDelete2 = `Testing delete ${deleteType} in group from ${bob.userName} #2`;
-
-        await sendMessage(bobWindow1, messageToDelete2);
-        await waitForTextMessage(
-          [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1],
-          messageToDelete2,
-          15_000,
-        );
-
-        // Charlie now deletes Bob's message locally
-        await deleteMessageFor(charlieWindow1, messageToDelete2, deleteType);
-
-        await confirmMessageDeletedFor({
-          deleteType,
-          messageToDelete: messageToDelete2,
-          otherWindows: [aliceWindow1, aliceWindow2, bobWindow1],
-          windowInitiatingDelete: charlieWindow1,
-        });
-      }
+      // Bob sent this message, so should be able to delete it locally or for everyone
+      await deleteMessageFor(
+        windowInitiatingDelete,
+        unsendMessageFromBob,
+        fallbackDeleteType,
+      );
+      await confirmMessageDeletedFor({
+        deleteType: fallbackDeleteType,
+        messageToDelete: unsendMessageFromBob,
+        windowInitiatingDelete,
+        otherWindows,
+      });
     },
   ),
 );

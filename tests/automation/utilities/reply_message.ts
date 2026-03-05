@@ -4,6 +4,7 @@ import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
 import { Conversation } from '../locators';
 import { type StrategyExtractionObj } from '../types/testing';
+import { scrollToBottomLookingForMessage } from './conversation';
 import { sendMessage } from './message';
 import { verifyMediaPreviewLoaded } from './send_media';
 import {
@@ -36,7 +37,10 @@ export const replyTo = async ({
   receiverWindow: Page | null;
   shouldCheckMediaPreview?: boolean;
 }) => {
-  await waitForTextMessage(senderWindow, textMessage);
+  await scrollToBottomLookingForMessage({
+    msg: textMessage,
+    window: senderWindow,
+  });
 
   // If the original message has media, verify sender sees it before replying
   if (shouldCheckMediaPreview) {

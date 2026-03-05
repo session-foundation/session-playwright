@@ -37,6 +37,7 @@ import {
   sendVoiceMessage,
   trustUser,
 } from './utilities/send_media';
+import { sendNewMessage } from './utilities/send_message';
 import {
   checkCTAStrings,
   checkModalStrings,
@@ -241,9 +242,9 @@ const deleteNtsTypeArray = ['device_only', 'for_all_my_devices'] as const;
 deleteNtsTypeArray.forEach((deleteType) => {
   test_Alice_2W(
     `Delete message NTS ${deleteType}`,
-    async ({ aliceWindow1, aliceWindow2 }) => {
+    async ({ aliceWindow1, aliceWindow2, alice }) => {
       const messageToDelete = `Testing deletion functionality for NTS ${deleteType}`;
-      await sendMessage(aliceWindow1, messageToDelete);
+      await sendNewMessage(aliceWindow1, alice.accountid, messageToDelete);
       // Navigate to conversation on linked device
       await openConversationWith(aliceWindow2, tStripped('noteToSelf'));
       await Promise.all([
