@@ -16,18 +16,16 @@ import { TerminalTui } from './terminalTui';
 type TestAndResult = { test: TestCase; result: TestResult };
 
 class TuiReporter implements Reporter {
-  private tui = new TerminalTui();
   private allResults: Array<TestAndResult> = [];
+  private allTests: TestCase[] = [];
   private allTestsCount = 0;
   private countWorkers = 1;
   private startTime = 0;
-
-  printsToStdio(): boolean {
-    return true;
-  }
+  private tui = new TerminalTui();
 
   onBegin(config: FullConfig, suite: Suite) {
-    this.allTestsCount = suite.allTests().length;
+    this.allTests = suite.allTests();
+    this.allTestsCount = this.allTests.length;
     this.countWorkers = config.workers;
     this.startTime = Date.now();
 
@@ -39,11 +37,57 @@ class TuiReporter implements Reporter {
       process.exit(1);
     });
 
-    for (const test of suite.allTests()) {
+    for (const test of this.allTests) {
       this.tui.addTest(test.id, test.title);
     }
 
     this.tui.setProgress(0, this.allTestsCount, 0);
+  }
+
+  async onEnd(_result: FullResult) {
+    this.tui.reorderForSummary();
+    // Workers are already cleaned up by the time onEnd is called.
+    // Block here to keep the TUI open for browsing results.
+    await this.tui.waitForClose();
+    this.tui.stop();
+    this.printSummary();
+  }
+
+  onError(error: TestError) {
+    // Global errors: show in a pseudo-test entry
+    const globalId = '__global_errors__';
+    const existing = this.allResults.find((r) => r.test.id === globalId);
+    if (!existing) {
+      this.tui.addTest(globalId, '[Global Errors]');
+    }
+    const msg = error.message || 'Unknown error';
+    this.tui.appendOutput(globalId, `${chalk.red('Error:')} ${msg}\n`);
+    if (error.stack) {
+      this.tui.appendOutput(globalId, chalk.dim(error.stack) + '\n');
+    }
+    this.tui.updateTest(globalId, 'failed');
+  }
+
+  onStdErr(
+    chunk: Buffer | string,
+    test: TestCase | void,
+    _result: TestResult | void,
+  ) {
+    if (test) {
+      const text = isString(chunk) ? chunk : chunk.toString('utf-8');
+      this.tui.appendOutput(test.id, text);
+    }
+  }
+
+  onStdOut(
+    chunk: Buffer | string,
+    test: TestCase | void,
+    _result: TestResult | void,
+  ) {
+    if (test) {
+      const text = isString(chunk) ? chunk : chunk.toString('utf-8');
+      this.tui.appendOutput(test.id, text);
+    }
   }
 
   onTestBegin(test: TestCase, result: TestResult) {
@@ -81,50 +125,8 @@ class TuiReporter implements Reporter {
     this.tui.setProgress(completedCount, this.allTestsCount, estimatedMinsLeft);
   }
 
-  onStdOut(
-    chunk: Buffer | string,
-    test: TestCase | void,
-    _result: TestResult | void,
-  ) {
-    if (test) {
-      const text = isString(chunk) ? chunk : chunk.toString('utf-8');
-      this.tui.appendOutput(test.id, text);
-    }
-  }
-
-  onStdErr(
-    chunk: Buffer | string,
-    test: TestCase | void,
-    _result: TestResult | void,
-  ) {
-    if (test) {
-      const text = isString(chunk) ? chunk : chunk.toString('utf-8');
-      this.tui.appendOutput(test.id, text);
-    }
-  }
-
-  onError(error: TestError) {
-    // Global errors: show in a pseudo-test entry
-    const globalId = '__global_errors__';
-    const existing = this.allResults.find((r) => r.test.id === globalId);
-    if (!existing) {
-      this.tui.addTest(globalId, '[Global Errors]');
-    }
-    const msg = error.message || 'Unknown error';
-    this.tui.appendOutput(globalId, `${chalk.red('Error:')} ${msg}\n`);
-    if (error.stack) {
-      this.tui.appendOutput(globalId, chalk.dim(error.stack) + '\n');
-    }
-    this.tui.updateTest(globalId, 'failed');
-  }
-
-  async onEnd(_result: FullResult) {
-    this.tui.reorderForSummary();
-    // Workers are already cleaned up by the time onEnd is called.
-    // Block here to keep the TUI open for browsing results.
-    await this.tui.waitForClose();
-    this.tui.stop();
-    this.printSummary();
+  printsToStdio(): boolean {
+    return true;
   }
 
   private printSummary() {
@@ -170,9 +172,9 @@ class TuiReporter implements Reporter {
     }
 
     // Tests that never finished (still running/pending when stopped)
-    const finishedTitles = new Set(Object.keys(grouped));
-
-    const cancelledCount = this.allTestsCount - finishedTitles.size;
+    const finishedIds = new Set(this.allResults.map((r) => r.test.id));
+    const cancelledTests = this.allTests.filter((t) => !finishedIds.has(t.id));
+    const cancelledCount = cancelledTests.length;
     // Summary line
     const parts: string[] = [];
     if (passedCount > 0)
@@ -200,14 +202,6 @@ class TuiReporter implements Reporter {
             })`,
           ),
         );
-        const lastResult = results[results.length - 1];
-        const lastError =
-          lastResult.result.errors[lastResult.result.errors.length - 1];
-        if (lastError?.message) {
-          console.log(
-            chalk.dim(`      Error: ${lastError.message.split('\n')[0]}`),
-          );
-        }
       }
       console.log('');
     }
@@ -223,6 +217,15 @@ class TuiReporter implements Reporter {
             `    \u21bb ${title} (passed on attempt ${retryNum}/${results.length})`,
           ),
         );
+      }
+      console.log('');
+    }
+
+    // Cancelled details
+    if (cancelledTests.length > 0) {
+      console.log(chalk.dim.bold('  Cancelled:'));
+      for (const test of sortBy(cancelledTests, (t) => t.title)) {
+        console.log(chalk.dim(`    \u25a0 ${test.title}`));
       }
       console.log('');
     }

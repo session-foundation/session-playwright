@@ -1,8 +1,24 @@
-import { tStripped } from '../localization/lib';
+import type { Page } from '@playwright/test';
+
 import { sleepFor } from '../promise_utils';
-import { longText, mediaArray, testLink } from './constants/variables';
-import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
-import { sendMessage } from './utilities/message';
+import {
+  longText,
+  mediaArray,
+  testLink,
+  testLinkTitle,
+} from './constants/variables';
+import { Conversation } from './locators';
+import {
+  test_group_Alice_1W_Bob_1W_Charlie_1W,
+  test_group_Alice_2W_Bob_1W_Charlie_1W,
+} from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
+import {
+  confirmMessageDeletedFor,
+  deleteMessageFor,
+  type MessageDeleteType,
+  sendMessage,
+} from './utilities/message';
 import { replyTo, replyToMedia } from './utilities/reply_message';
 import {
   sendLinkPreview,
@@ -10,14 +26,11 @@ import {
   sendVoiceMessage,
 } from './utilities/send_media';
 import {
+  assertUnreachable,
   clickOnElement,
-  clickOnMatchingText,
-  clickOnTextMessage,
-  hasTextMessageBeenDeleted,
   pasteIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
-  waitForMatchingText,
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
@@ -68,8 +81,7 @@ mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
       if (mediaType === 'voice') {
         await replyToMedia({
           senderWindow: bobWindow1,
-          strategy: 'data-testid',
-          selector: 'audio-player',
+          locator: Conversation.audioPlayer,
           replyText: testReply,
           receiverWindow: aliceWindow1,
         });
@@ -119,7 +131,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 );
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
-  'Send link to group',
+  'Send link preview to group',
   async ({
     alice,
     bob,
@@ -130,22 +142,20 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   }) => {
     const testReply = `${bob.userName} replying to link from ${alice.userName} in ${groupCreated.userName}`;
     await sendLinkPreview(aliceWindow1, testLink);
-    await Promise.all([
-      waitForElement(
-        bobWindow1,
-        'data-testid',
-        'msg-link-preview-title',
-        undefined,
-        'Session | Send Messages, Not Metadata. | Private Messenger',
+    await Promise.all(
+      [bobWindow1, charlieWindow1].map((w) =>
+        waitForElement({
+          window: w,
+          locator: Conversation.linkPreviewTitle,
+          options: {
+            maxWaitMs: 3_000,
+            shouldLog: true,
+            text: testLinkTitle,
+          },
+        }),
       ),
-      waitForElement(
-        charlieWindow1,
-        'data-testid',
-        'msg-link-preview-title',
-        undefined,
-        'Session | Send Messages, Not Metadata. | Private Messenger',
-      ),
-    ]);
+    );
+
     await replyTo({
       senderWindow: bobWindow1,
       textMessage: testLink,
@@ -155,76 +165,82 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
   },
 );
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
-  'Unsend message to group',
-  async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
-    const unsendMessage = `Testing unsend functionality in ${groupCreated.userName}`;
-    await sendMessage(aliceWindow1, unsendMessage);
-    await Promise.all([
-      waitForTextMessage(bobWindow1, unsendMessage),
-      waitForTextMessage(charlieWindow1, unsendMessage),
-    ]);
-    await clickOnTextMessage(aliceWindow1, unsendMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(
-      aliceWindow1,
-      tStripped('clearMessagesForEveryone'),
-    );
-    // To be implemented in Standardise Message Deletion feature
-    // await checkModalStrings(
-    //   aliceWindow1,
-    //   tStripped('deleteMessage', { count: 1 }),
-    //   tStripped('deleteMessageConfirm'),
-    // );
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
-    await sleepFor(1000);
-    await waitForMatchingText(
-      bobWindow1,
-      tStripped('deleteMessageDeletedGlobally'),
-    );
-    await waitForMatchingText(
-      charlieWindow1,
-      tStripped('deleteMessageDeletedGlobally'),
-    );
-  },
-);
+const deleteGroupTypeArray = [
+  'device_only_outgoing',
+  'device_only_incoming',
+  // as normal user, delete one of our own messages
+  'for_everyone',
+  // as an admin, delete someone else message
+  'as_admin_for_everyone',
+] as const;
 
-test_group_Alice_1W_Bob_1W_Charlie_1W(
-  'Delete message to group',
-  async ({ aliceWindow1, bobWindow1, charlieWindow1, groupCreated }) => {
-    const deletedMessage = `Testing delete message functionality in ${groupCreated.userName}`;
-    await sendMessage(aliceWindow1, deletedMessage);
-    await waitForTextMessage(bobWindow1, deletedMessage);
-    await waitForTextMessage(charlieWindow1, deletedMessage);
-    await clickOnTextMessage(aliceWindow1, deletedMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(aliceWindow1, tStripped('clearMessagesForMe'));
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
+deleteGroupTypeArray.forEach((deleteType) =>
+  test_group_Alice_2W_Bob_1W_Charlie_1W(
+    `Delete message in group ${deleteType}`,
+    async ({
       aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
-    await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage, 5000);
-    await waitForMatchingText(
-      aliceWindow1,
-      tStripped('deleteMessageDeletedGlobally'),
-    );
-    // Should still be there for user B and C
-    await waitForMatchingText(bobWindow1, deletedMessage);
-    await waitForMatchingText(charlieWindow1, deletedMessage);
-  },
+      aliceWindow2,
+      bobWindow1,
+      charlieWindow1,
+      groupCreated,
+      bob,
+    }) => {
+      // Note: Alice is the admin in this group, Bob is a member without admin rights
+      const unsendMessageFromBob = `Testing delete ${deleteType} in group from ${bob.userName}`;
+      // focus the conversation on aliceWindow2 (not done as restored from seed)
+      await openConversationWith(aliceWindow2, groupCreated.userName);
+
+      await sendMessage(bobWindow1, unsendMessageFromBob);
+      await waitForTextMessage(
+        [aliceWindow1, aliceWindow2, bobWindow1, charlieWindow1],
+        unsendMessageFromBob,
+        15_000,
+      );
+
+      let windowInitiatingDelete: Page | undefined;
+      let fallbackDeleteType: MessageDeleteType | undefined;
+      switch (deleteType) {
+        case 'device_only_incoming':
+          // make Charlie delete Bob's message locally
+          windowInitiatingDelete = charlieWindow1;
+          fallbackDeleteType = 'device_only';
+
+          break;
+        case 'device_only_outgoing':
+        case 'for_everyone':
+          // Bob sent this message, so should be able to delete it both locally and for everyone
+          windowInitiatingDelete = bobWindow1;
+          fallbackDeleteType =
+            deleteType === 'for_everyone' ? 'for_everyone' : 'device_only';
+          break;
+        case 'as_admin_for_everyone':
+          // Alice (admin) is deleting Bob's message
+          windowInitiatingDelete = aliceWindow1;
+          fallbackDeleteType = 'for_everyone';
+          break;
+        default:
+          assertUnreachable(deleteType, `assertUnreachable for deleteType`);
+          break;
+      }
+      const otherWindows = [
+        aliceWindow1,
+        aliceWindow2,
+        bobWindow1,
+        charlieWindow1,
+      ].filter((m) => m !== windowInitiatingDelete);
+
+      // Bob sent this message, so should be able to delete it locally or for everyone
+      await deleteMessageFor(
+        windowInitiatingDelete,
+        unsendMessageFromBob,
+        fallbackDeleteType,
+      );
+      await confirmMessageDeletedFor({
+        deleteType: fallbackDeleteType,
+        messageToDelete: unsendMessageFromBob,
+        windowInitiatingDelete,
+        otherWindows,
+      });
+    },
+  ),
 );

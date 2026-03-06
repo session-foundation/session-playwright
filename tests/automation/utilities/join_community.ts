@@ -7,12 +7,14 @@ import {
   testCommunityName,
 } from '../constants/community';
 import { Global, HomeScreen } from '../locators';
+import { openConversationWith } from './conversation';
 import {
   clickOn,
   clickOnMatchingText,
   clickOnWithText,
   hasElementBeenDeleted,
   pasteIntoInput,
+  rightClickOnWithText,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -37,7 +39,7 @@ export const joinDefaultCommunity = async (
 ) => {
   await clickOn(window, HomeScreen.plusButton);
   await clickOn(window, HomeScreen.joinCommunityOption);
-  await waitForMatchingText(window, communityName);
+  await waitForMatchingText(window, communityName, 15_000);
   await clickOnMatchingText(window, communityName);
   // Deliberately do not wait for loading spinner to finish because this takes forever
   await waitForTestIdWithText(
@@ -48,21 +50,17 @@ export const joinDefaultCommunity = async (
 };
 
 export const leaveCommunity = async (window: Page, communityName: string) => {
-  await clickOnWithText(
+  await rightClickOnWithText(
     window,
     HomeScreen.conversationItemName,
     communityName,
-    { rightButton: true },
   );
   await clickOnWithText(window, Global.contextMenuItem, 'Leave Community');
   await clickOn(window, Global.confirmButton);
-  await hasElementBeenDeleted(
-    window,
-    HomeScreen.conversationItemName.strategy,
-    HomeScreen.conversationItemName.selector,
-    5_000,
-    communityName,
-  );
+  await hasElementBeenDeleted(window, HomeScreen.conversationItemName, {
+    maxWait: 5_000,
+    text: communityName,
+  });
   console.log('Left community');
 };
 
@@ -85,11 +83,8 @@ export const joinOrOpenCommunity = async (window: Page) => {
       );
       await clickOn(window, Global.backButton);
       await clickOn(window, Global.backButton);
-      await clickOnWithText(
-        window,
-        HomeScreen.conversationItemName,
-        testCommunityName,
-      );
+
+      await openConversationWith(window, testCommunityName);
     } catch (waitError) {
       // The error message we expected wasn't there, so this is a real failure
       throw joinError; // Throw the original join error, not the wait timeout

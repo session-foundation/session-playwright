@@ -4,7 +4,9 @@ import {
   longText,
   mediaArray,
   testLink,
+  testLinkTitle,
 } from './constants/variables';
+import { Conversation } from './locators';
 import { test_group_Alice_1W_Bob_1W_Charlie_1W } from './setup/sessionTest';
 import { sendMessage } from './utilities/message';
 import {
@@ -64,7 +66,9 @@ mediaArray.forEach(({ mediaType, path, shouldCheckMediaPreview }) => {
         await sleepFor(10000);
         await Promise.all(
           [bobWindow1, charlieWindow1].map((w) =>
-            hasElementBeenDeleted(w, 'data-testid', 'audio-player', 1_000),
+            hasElementBeenDeleted(w, Conversation.audioPlayer, {
+              maxWait: 1_000,
+            }),
           ),
         );
       } else {
@@ -108,7 +112,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 );
 
 test_group_Alice_1W_Bob_1W_Charlie_1W(
-  'Send disappearing link to groups',
+  'Send disappearing link preview to groups',
   async ({ aliceWindow1, bobWindow1, charlieWindow1 }) => {
     await setDisappearingMessages(aliceWindow1, [
       'group',
@@ -117,32 +121,27 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       disappearAction,
     ]);
     await sendLinkPreview(aliceWindow1, testLink);
-    await Promise.all([
-      waitForElement(
-        bobWindow1,
-        'data-testid',
-        'msg-link-preview-title',
-        undefined,
-        'Session | Send Messages, Not Metadata. | Private Messenger',
+    await Promise.all(
+      [bobWindow1, charlieWindow1].map((w) =>
+        waitForElement({
+          window: w,
+          locator: Conversation.linkPreviewTitle,
+          options: {
+            maxWaitMs: 3_000,
+            shouldLog: true,
+            text: testLinkTitle,
+          },
+        }),
       ),
-      waitForElement(
-        charlieWindow1,
-        'data-testid',
-        'msg-link-preview-title',
-        undefined,
-        'Session | Send Messages, Not Metadata. | Private Messenger',
-      ),
-    ]);
+    );
+
     await sleepFor(30000);
     await Promise.all(
       [bobWindow1, charlieWindow1].map((w) =>
-        hasElementBeenDeleted(
-          w,
-          'data-testid',
-          'msg-link-preview-title',
-          1_000,
-          'Session | Send Messages, Not Metadata. | Private Messenger',
-        ),
+        hasElementBeenDeleted(w, Conversation.linkPreviewTitle, {
+          maxWait: 1_000,
+          text: testLinkTitle,
+        }),
       ),
     );
   },

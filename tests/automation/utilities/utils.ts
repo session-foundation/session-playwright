@@ -22,8 +22,25 @@ type ElementOptions = {
   strictMode?: boolean;
 };
 
+export function escapeText(text: string) {
+  /* prettier-ignore */
+
+  return text.replace(/"/g, '\\\"');
+}
+
+/**
+ * This function can be used to make sure all the possible values as input of a switch is taken care off, without having a default case.
+ */
+export function assertUnreachable(_x: never, message: string): never {
+  const msg = `assertUnreachable: Didn't expect to get here with "${message}"`;
+  // eslint:disable: no-console
+
+  console.info(msg);
+  throw new Error(msg);
+}
+
 // TODO Unify element interaction functions to use locator objects the way clickOn and clickOnWithText do
-// Remaining functions to migrate: waitForElement, pasteIntoInput, grabTextFromElement etc.
+// Remaining functions to migrate: pasteIntoInput, grabTextFromElement etc.
 
 // WAIT FOR FUNCTIONS
 
@@ -33,46 +50,39 @@ export async function waitForTestIdWithText(
   text?: string,
   maxWait?: number,
 ) {
-  let builtSelector = `css=[data-testid="${dataTestId}"]`;
-  if (text) {
-    // " =>  \\\"
-    /* prettier-ignore */
-
-    const escapedText = text.replace(/"/g, '\\\"');
-
-    builtSelector += `:has-text("${escapedText}")`;
-    // console.info('builtSelector:', builtSelector);
-    // console.info('Text is tiny bubble: ', escapedText);
-  }
-  // console.info('looking for selector', builtSelector);
+  const builtSelector = buildSelectorEscapeText(
+    { strategy: 'data-testid', selector: dataTestId },
+    text,
+  );
   const found = await window.waitForSelector(builtSelector, {
     timeout: maxWait,
   });
-  // console.info('found selector', builtSelector);
 
   return found;
 }
 
-export async function waitForElement(
-  window: Page,
-  strategy: Strategy,
-  selector: string,
-  maxWaitMs?: number,
-  text?: string,
-) {
-  const builtSelector = !text
-    ? `css=[${strategy}=${selector}]`
-    : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
+export async function waitForElement({
+  window,
+  locator,
+  options,
+}: {
+  window: Page;
+  locator: StrategyExtractionObj;
+  options?: { maxWaitMs?: number; text?: string; shouldLog?: boolean };
+}) {
+  const builtSelector = buildSelectorEscapeText(locator, options?.text);
 
   const start = Date.now();
-  if (!selector.includes('path-light-svg')) {
-    console.log(`waitForElement: ${builtSelector} for maxMs ${maxWaitMs}`);
+  if (options?.shouldLog) {
+    console.log(
+      `waitForElement: ${builtSelector} for maxMs ${options?.maxWaitMs}`,
+    );
   }
 
   const el = await window.waitForSelector(builtSelector, {
-    timeout: maxWaitMs,
+    timeout: options?.maxWaitMs,
   });
-  if (!selector.includes('path-light-svg')) {
+  if (options?.shouldLog) {
     console.log(
       `waitForElement: got ${builtSelector} after ${Date.now() - start}ms`,
     );
@@ -82,27 +92,33 @@ export async function waitForElement(
 }
 
 export async function waitForTextMessage(
-  window: Page,
+  window: Array<Page> | Page,
   text: string,
   maxWait?: number,
 ) {
-  const escapedText = text.replace(/"/g, '\\"');
-
-  const builtSelector = `css=[data-testid=message-content]:has-text("${escapedText}")`;
+  const builtSelector = buildSelectorEscapeText(
+    { selector: 'message-content', strategy: 'data-testid' },
+    text,
+  );
 
   console.info('waitForTextMessage: builtSelector:', builtSelector);
-  const el = await window.waitForSelector(builtSelector, { timeout: maxWait });
+  const windows = Array.isArray(window) ? window : [window];
+  const el = await Promise.all(
+    windows.map((w) => w.waitForSelector(builtSelector, { timeout: maxWait })),
+  );
   console.info(`Text message found. Text: "${text}"`);
-  return el;
+  return el[0];
 }
 
 export async function waitForTextMessages(
-  window: Page,
+  window: Array<Page> | Page,
   texts: Array<string>,
   maxWait?: number,
 ) {
+  const windows = Array.isArray(window) ? window : [window];
+
   return Promise.all(
-    texts.map(async (t) => waitForTextMessage(window, t, maxWait)),
+    texts.map(async (t) => waitForTextMessage(windows, t, maxWait)),
   );
 }
 
@@ -114,32 +130,50 @@ export async function waitForControlMessageWithText(
 }
 
 export async function waitForMatchingText(
-  window: Page,
+  window: Array<Page> | Page,
   text: string,
-  maxWait?: number,
+  maxWait: number,
 ) {
   const builtSelector = `css=:has-text("${text}")`;
-  const maxTimeout = maxWait ?? 55000;
-  console.info(`waitForMatchingText: ${text}`);
+  console.info(`waitForMatchingText: ${text} for maxWait: ${maxWait}ms`);
+  const start = Date.now();
 
-  return window.waitForSelector(builtSelector, { timeout: maxTimeout });
+  const windows = Array.isArray(window) ? window : [window];
+  const found = await Promise.all(
+    windows.map((w) => w.waitForSelector(builtSelector, { timeout: maxWait })),
+  );
+
+  console.info(
+    `waitForMatchingText: found "${text}" in ${Date.now() - start}ms`,
+  );
+  return found[0];
 }
 
 export async function waitForMatchingPlaceholder(
   window: Page,
-  dataTestId: string,
+  dataTestId: DataTestId,
   placeholder: string,
   maxWait: number = 30000,
 ) {
   let found = false;
   const start = Date.now();
   console.info(
-    `waitForMatchingPlaceholder: ${placeholder} with datatestId: ${dataTestId}`,
+    `waitForMatchingPlaceholder: ${placeholder} with dataTestId: ${dataTestId}`,
   );
 
   do {
     try {
-      const elem = await waitForElement(window, 'data-testid', dataTestId);
+      const elem = await waitForElement({
+        window,
+        locator: {
+          strategy: 'data-testid',
+          selector: dataTestId,
+        },
+        options: {
+          shouldLog: false,
+          maxWaitMs: 100,
+        },
+      });
       const elemPlaceholder = await elem.getAttribute('placeholder');
       if (elemPlaceholder === placeholder) {
         console.info(
@@ -161,7 +195,7 @@ export async function waitForMatchingPlaceholder(
 
   if (!found) {
     throw new Error(
-      `Failed to find datatestid:"${dataTestId}" with placeholder: "${placeholder}"`,
+      `Failed to find dataTestId:"${dataTestId}" with placeholder: "${placeholder}"`,
     );
   }
 }
@@ -172,18 +206,38 @@ export async function waitForLoadingAnimationToFinish(
 ) {
   let loadingAnimation: ElementHandle<HTMLElement | SVGElement> | undefined;
 
-  await waitForElement(window, 'data-testid', `${loader}`, maxWait);
+  await waitForElement({
+    window,
 
+    locator: {
+      strategy: 'data-testid',
+      selector: `${loader}`,
+    },
+    options: {
+      maxWaitMs: maxWait,
+      shouldLog: false,
+    },
+  });
+
+  let hasLoggedAlready = false;
   do {
     try {
-      loadingAnimation = await waitForElement(
+      loadingAnimation = await waitForElement({
         window,
-        'data-testid',
-        `${loader}`,
-        100,
-      );
+        locator: {
+          strategy: 'data-testid',
+          selector: `${loader}`,
+        },
+        options: {
+          maxWaitMs: 100,
+          shouldLog: false,
+        },
+      });
       await sleepFor(500);
-      console.info(`${loader} was found, waiting for it to be gone`);
+      if (!hasLoggedAlready) {
+        console.info(`${loader} was found, waiting for it to be gone`);
+        hasLoggedAlready = true;
+      }
     } catch (_e) {
       loadingAnimation = undefined;
     }
@@ -227,12 +281,18 @@ export async function checkPathLight(window: Page, maxWait?: number) {
   let pathFilter: string | null = null;
 
   await doWhileWithMax(maxWaitTime, waitPerLoop, 'checkPathLight', async () => {
-    const pathLight = await waitForElement(
+    const pathLight = await waitForElement({
       window,
-      'data-testid',
-      'path-light-svg',
-      maxWait,
-    );
+      locator: {
+        strategy: 'data-testid',
+        selector: 'path-light-svg',
+      },
+      options: {
+        maxWaitMs: maxWait,
+        shouldLog: false,
+      },
+    });
+
     pathFilter = await pathLight.getAttribute('style');
 
     if (Date.now() - start >= maxWaitTime / 10) {
@@ -258,6 +318,8 @@ export async function reloadWindow(
 
 // ACTIONS
 
+// TODO: convert the clickOn* methods to take destructured args
+// like waitForElement does
 /**
  * Clicks on an element using a locator object
  * @param window - Playwright page instance
@@ -287,6 +349,21 @@ export async function clickOn(
   );
 }
 
+export function buildSelectorEscapeText(
+  locator: StrategyExtractionObj,
+  text?: string,
+) {
+  const strategyWithSelector =
+    locator.strategy === 'class'
+      ? `.${locator.selector}`
+      : `[${locator.strategy}=${locator.selector}]`;
+  const textSelector = text ? `:has-text("${text.replace(/"/g, '\\"')}")` : '';
+
+  const builtSelector = `css=${strategyWithSelector}${textSelector}`;
+
+  return builtSelector;
+}
+
 /**
  * Clicks on an element that contains specific text
  * @param window - Playwright page instance
@@ -298,30 +375,51 @@ export async function clickOnWithText(
   window: Page,
   locator: StrategyExtractionObj,
   text: string,
-  options?: ElementOptions,
+  options?: Omit<ElementOptions, 'rightButton'>,
 ) {
-  let builtSelector: string;
-
-  if (locator.strategy === 'class') {
-    builtSelector = `css=.${locator.selector}:has-text("${text.replace(
-      /"/g,
-      '\\"',
-    )}")`;
-  } else {
-    builtSelector = `css=[${locator.strategy}=${
-      locator.selector
-    }]:has-text("${text.replace(/"/g, '\\"')}")`;
-  }
+  const builtSelector = buildSelectorEscapeText(locator, text);
 
   const sharedOpts = {
     timeout: options?.maxWait,
     strict: options?.strictMode ?? true,
   };
-  await window.click(
-    builtSelector,
-    options?.rightButton ? { ...sharedOpts, button: 'right' } : sharedOpts,
+  await window.click(builtSelector, sharedOpts);
+}
+
+export async function rightClickOnWithText(
+  window: Page,
+  locator: StrategyExtractionObj,
+  text: string,
+  options?: Omit<ElementOptions, 'rightButton'>,
+) {
+  const builtSelector = buildSelectorEscapeText(locator, text);
+
+  const sharedOpts = {
+    timeout: options?.maxWait,
+    strict: options?.strictMode ?? true,
+    button: 'right' as const,
+  };
+
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await window.click(builtSelector, sharedOpts);
+    // This is a hack, but sometimes the right click makes the window move slightly, and close the context menu.
+    // So we wait for the context menu to appear (and to stay visible for 100ms), and if it doesn't, we try again.
+    await sleepFor(100, false);
+    const menuVisible = await window
+      .waitForSelector('[data-testid="context-menu-item"]', { timeout: 100 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (menuVisible) {
+      return;
+    }
+    await sleepFor(500, true);
+  }
+  throw new Error(
+    `rightClickOnWithText: context menu never appeared for "${text}"`,
   );
 }
+
 // Legacy wrapper for backwards compatibility
 export async function clickOnElement({
   window,
@@ -372,7 +470,10 @@ export async function clickOnTextMessage(
   rightButton?: boolean,
   maxWait?: number,
 ) {
-  const builtSelector = `css=[data-testid=message-content]:has-text("${text}")`;
+  const builtSelector = buildSelectorEscapeText(
+    { selector: 'message-content', strategy: 'data-testid' },
+    text,
+  );
   const sharedOpts = { timeout: maxWait };
 
   await window.click(
@@ -429,36 +530,62 @@ export async function grabTextFromElement(
 
 export async function hasElementBeenDeleted(
   window: Page,
-  strategy: Strategy,
-  selector: string,
-  maxWait: number,
-  text?: string,
+  locator: StrategyExtractionObj,
+  options: {
+    maxWait: number;
+    text?: string;
+  },
 ) {
   const start = Date.now();
 
   let el: ElementHandle<HTMLElement | SVGElement> | undefined;
+  console.info(
+    `waiting for element to be deleted "${locator.strategy}:${locator.selector}:${options.text}", maxWait: ${options.maxWait}ms`,
+  );
+  let hasLoggedAlready = false;
   do {
     try {
-      el = await waitForElement(window, strategy, selector, maxWait, text);
+      el = await waitForElement({
+        window,
+        locator,
+        options: {
+          maxWaitMs: 100, // the outer loop is the one using the options.maxWait, not this one.
+          text: options.text,
+          shouldLog: false,
+        },
+      });
       await sleepFor(100);
-      console.info(`Element has been found, waiting for deletion`);
+      if (!hasLoggedAlready) {
+        console.info(`Element has been found, waiting for deletion`);
+        hasLoggedAlready = true;
+      }
     } catch (_e) {
       el = undefined;
       console.info(`Element has been deleted, woohoo!`);
     }
-  } while (Date.now() - start <= maxWait && el);
+  } while (Date.now() - start <= options.maxWait && el);
   try {
-    el = await waitForElement(window, strategy, selector, 1000, text);
+    el = await waitForElement({
+      window,
+      locator,
+      options: {
+        maxWaitMs: 100, // the element should be there once the loop exits. if it's not right away it's an error.
+        text: options.text,
+        shouldLog: false,
+      },
+    });
   } catch (_e) {
     // if we did throw here it's actually because the element is gone, so it's ok
   }
 
   if (el) {
     throw new Error(
-      `hasElementBeenDeleted: element with selector ${selector} was expected to be gone but is still there`,
+      `hasElementBeenDeleted: element with selector ${locator.selector} was expected to be gone but is still there`,
     );
   }
-  console.info(`Element has been deleted yay`);
+  console.info(
+    `Element "${locator.strategy}:${locator.selector}:${options.text}" has been deleted yay`,
+  );
 }
 
 export async function hasTextMessageBeenDeleted(
@@ -472,13 +599,15 @@ export async function hasTextMessageBeenDeleted(
     'waiting for text message to be deleted',
     async () => {
       try {
-        await waitForElement(
+        await waitForElement({
           window,
-          'data-testid',
-          'message-content',
-          maxWait,
-          text,
-        );
+          locator: Conversation.messageContent,
+          options: {
+            maxWaitMs: maxWait,
+            text,
+            shouldLog: false,
+          },
+        });
         return false;
       } catch (_e) {
         console.info(`Text message not found, yay!`);
@@ -490,15 +619,12 @@ export async function hasTextMessageBeenDeleted(
 
 export async function hasElementPoppedUpThatShouldnt(
   window: Page,
-  strategy: Strategy,
-  selector: string,
+  locator: StrategyExtractionObj,
   text?: string,
 ) {
-  const builtSelector = !text
-    ? `css=[${strategy}=${selector}]`
-    : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
+  const builtSelector = buildSelectorEscapeText(locator, text);
 
-  const fakeError = `Found ${selector}, oops..`;
+  const fakeError = `Found ${locator.selector}, oops..`;
   const elVisible = await window.isVisible(builtSelector);
   if (elVisible === true) {
     throw new Error(fakeError);
@@ -508,21 +634,18 @@ export async function hasElementPoppedUpThatShouldnt(
 
 export async function doesElementExist(
   window: Page,
-  strategy: Strategy,
-  selector: string,
+  locator: StrategyExtractionObj,
   text?: string,
 ) {
-  const builtSelector = !text
-    ? `css=[${strategy}=${selector}]`
-    : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
+  const builtSelector = buildSelectorEscapeText(locator, text);
 
-  const fakeError = `Element ${selector} does not exist`;
+  const fakeError = `Element ${locator.selector} does not exist`;
   const elVisible = await window.isVisible(builtSelector);
   if (!elVisible) {
     console.log(fakeError);
     return undefined;
   }
-  console.log(`Element ${selector} exists`);
+  console.log(`Element ${locator.selector} exists`);
   return builtSelector;
 }
 
@@ -565,7 +688,7 @@ function assertTextMatches(
 export async function checkModalStrings(
   window: Page,
   expectedHeading: string,
-  expectedDescription: string,
+  expectedDescription?: string,
   modalId?: ModalId,
 ) {
   let modalSelector = '[data-modal-id]'; // Base selector for modals
@@ -583,41 +706,33 @@ export async function checkModalStrings(
 
   // Get elements within this specific modal
   const heading = targetModal.locator('[data-testid="modal-heading"]');
-  const description = targetModal.locator('[data-testid="modal-description"]');
 
   // Wait for these elements to be visible
   await heading.waitFor({ state: 'visible' });
-  await description.waitFor({ state: 'visible' });
 
   const headingText = await heading.innerText();
-  const descriptionText = await description.innerText();
   assertTextMatches(headingText, expectedHeading, 'Modal heading');
-  assertTextMatches(descriptionText, expectedDescription, 'Modal description');
+  if (expectedDescription) {
+    const description = targetModal.locator(
+      '[data-testid="modal-description"]',
+    );
+    await description.waitFor({ state: 'visible' });
+    const descriptionText = await description.innerText();
+    assertTextMatches(
+      descriptionText,
+      expectedDescription,
+      'Modal description',
+    );
+  }
 }
 
 export async function verifyNoCTAShows(window: Page) {
   await sleepFor(1_000); // Let the UI settle
   await Promise.all([
-    hasElementPoppedUpThatShouldnt(
-      window,
-      CTA.heading.strategy,
-      CTA.heading.selector,
-    ),
-    hasElementPoppedUpThatShouldnt(
-      window,
-      CTA.description.strategy,
-      CTA.description.selector,
-    ),
-    hasElementPoppedUpThatShouldnt(
-      window,
-      CTA.confirmButton.strategy,
-      CTA.confirmButton.selector,
-    ),
-    hasElementPoppedUpThatShouldnt(
-      window,
-      CTA.cancelButton.strategy,
-      CTA.cancelButton.selector,
-    ),
+    hasElementPoppedUpThatShouldnt(window, CTA.heading),
+    hasElementPoppedUpThatShouldnt(window, CTA.description),
+    hasElementPoppedUpThatShouldnt(window, CTA.confirmButton),
+    hasElementPoppedUpThatShouldnt(window, CTA.cancelButton),
   ]);
 }
 
@@ -719,8 +834,7 @@ export async function assertUrlIsReachable(url: string): Promise<void> {
 export async function scrollToBottomIfNecessary(window: Page): Promise<void> {
   const canScroll = await doesElementExist(
     window,
-    Conversation.scrollToBottomButton.strategy,
-    Conversation.scrollToBottomButton.selector,
+    Conversation.scrollToBottomButton,
   );
   if (canScroll) {
     await clickOn(window, Conversation.scrollToBottomButton);

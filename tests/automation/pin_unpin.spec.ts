@@ -11,25 +11,24 @@ import {
   clickOnWithText,
   getConversationOrder,
   pasteIntoInput,
+  rightClickOnWithText,
   waitForTestIdWithText,
 } from './utilities/utils';
 
 async function pinConversation(window: Page, conversationName: string) {
-  await clickOnWithText(
+  await rightClickOnWithText(
     window,
     HomeScreen.conversationItemName,
     conversationName,
-    { rightButton: true },
   );
   await clickOnWithText(window, Global.contextMenuItem, tStripped('pin'));
 }
 
 async function unpinConversation(window: Page, conversationName: string) {
-  await clickOnWithText(
+  await rightClickOnWithText(
     window,
     HomeScreen.conversationItemName,
     conversationName,
-    { rightButton: true },
   );
   await clickOnWithText(window, Global.contextMenuItem, tStripped('pinUnpin'));
 }

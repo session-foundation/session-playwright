@@ -25,17 +25,14 @@ import {
   clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnTextMessage,
   clickOnWithText,
   doWhileWithMax,
   hasElementBeenDeleted,
-  hasTextMessageBeenDeleted,
   pasteIntoInput,
+  rightClickOnWithText,
   waitForLoadingAnimationToFinish,
   waitForMatchingPlaceholder,
-  waitForMatchingText,
   waitForTestIdWithText,
-  waitForTextMessage,
 } from './utilities/utils';
 
 sessionTestOneWindow('Link a device', async ([aliceWindow1]) => {
@@ -178,86 +175,6 @@ test_Alice_2W_Bob_1W(
 );
 
 test_Alice_2W_Bob_1W(
-  'Deleted message syncs',
-  async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
-    const messageToDelete = 'Testing deletion functionality for linked device';
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await sendMessage(aliceWindow1, messageToDelete);
-    // Navigate to conversation on linked device and for message from user A to user B
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
-    await Promise.all([
-      waitForTextMessage(aliceWindow2, messageToDelete),
-      waitForTextMessage(bobWindow1, messageToDelete),
-    ]);
-    await clickOnTextMessage(aliceWindow1, messageToDelete, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnWithText(
-      aliceWindow1,
-      Global.confirmButton,
-      tStripped('delete'),
-    );
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
-    await hasTextMessageBeenDeleted(aliceWindow1, messageToDelete, 6_000);
-    // linked device for deleted message
-    // Waiting for message to be removed
-    // Check for linked device
-    await hasTextMessageBeenDeleted(aliceWindow2, messageToDelete, 30_000);
-    // Still should exist for user B
-    await waitForMatchingText(bobWindow1, messageToDelete);
-  },
-);
-
-test_Alice_2W_Bob_1W(
-  'Unsent message syncs',
-  async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
-    const unsentMessage = 'Testing unsending functionality for linked device';
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await sendMessage(aliceWindow1, unsentMessage);
-    // Navigate to conversation on linked device and for message from user A to user B
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
-    await Promise.all([
-      waitForTextMessage(aliceWindow2, unsentMessage),
-      waitForTextMessage(bobWindow1, unsentMessage),
-    ]);
-    await clickOnTextMessage(aliceWindow1, unsentMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(
-      aliceWindow1,
-      tStripped('clearMessagesForEveryone'),
-    );
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
-    await hasTextMessageBeenDeleted(aliceWindow1, unsentMessage, 1000);
-    await waitForMatchingText(
-      bobWindow1,
-      tStripped('deleteMessageDeletedGlobally'),
-    );
-    // linked device for deleted message
-    await hasTextMessageBeenDeleted(aliceWindow2, unsentMessage, 5_000);
-  },
-);
-
-test_Alice_2W_Bob_1W(
   'Blocked user syncs',
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     const testMessage = 'Testing blocking functionality for linked device';
@@ -265,11 +182,10 @@ test_Alice_2W_Bob_1W(
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await sendMessage(aliceWindow1, testMessage);
     // Navigate to conversation on linked device and check for message from user A to user B
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow2,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     // Select block
     await clickOnWithText(
@@ -316,7 +232,6 @@ test_Alice_2W_Bob_1W(
   async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await clickOn(bobWindow1, Global.backButton);
     await Promise.all(
       [aliceWindow1, aliceWindow2, bobWindow1].map((w) =>
         clickOnElement({
@@ -349,11 +264,10 @@ test_Alice_2W_Bob_1W(
       ),
     );
     // Delete contact
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,
@@ -374,13 +288,10 @@ test_Alice_2W_Bob_1W(
     // Need to wait for deletion to propagate to linked device
     await Promise.all(
       [aliceWindow1, aliceWindow2].map((w) =>
-        hasElementBeenDeleted(
-          w,
-          'data-testid',
-          HomeScreen.conversationItemName.selector,
-          10_000,
-          bob.userName,
-        ),
+        hasElementBeenDeleted(w, HomeScreen.conversationItemName, {
+          maxWait: 10_000,
+          text: bob.userName,
+        }),
       ),
     );
   },
@@ -410,11 +321,10 @@ test_Alice_2W(
       HomeScreen.conversationItemName.selector,
       tStripped('noteToSelf'),
     );
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       tStripped('noteToSelf'),
-      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,
@@ -434,20 +344,14 @@ test_Alice_2W(
     // Check linked device for hidden note to self
     await sleepFor(1000);
     await Promise.all([
-      hasElementBeenDeleted(
-        aliceWindow1,
-        'data-testid',
-        HomeScreen.conversationItemName.selector,
-        5000,
-        tStripped('noteToSelf'),
-      ),
-      hasElementBeenDeleted(
-        aliceWindow2,
-        'data-testid',
-        HomeScreen.conversationItemName.selector,
-        15_000,
-        tStripped('noteToSelf'),
-      ),
+      hasElementBeenDeleted(aliceWindow1, HomeScreen.conversationItemName, {
+        maxWait: 5000,
+        text: tStripped('noteToSelf'),
+      }),
+      hasElementBeenDeleted(aliceWindow2, HomeScreen.conversationItemName, {
+        maxWait: 15_000,
+        text: tStripped('noteToSelf'),
+      }),
     ]);
   },
 );

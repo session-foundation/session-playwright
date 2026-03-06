@@ -159,8 +159,7 @@ test_Alice_1W_no_network(
 
     await hasElementPoppedUpThatShouldnt(
       aliceWindow1,
-      'data-testid',
-      Settings.recoveryPasswordContainer.selector,
+      Settings.recoveryPasswordContainer,
       recoveryPassword,
     );
 

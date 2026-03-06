@@ -61,10 +61,7 @@ function getExpectedStringFromKey(
         return count === 1 ? 'Message deleted' : 'Messages deleted';
       case 'deleteMessage':
         return count === 1 ? 'Delete Message' : 'Delete Messages';
-      case 'deleteMessageConfirm':
-        return count === 1
-          ? 'Are you sure you want to delete this message?'
-          : 'Are you sure you want to delete these messages?';
+
       default:
         return null;
     }
@@ -106,14 +103,16 @@ function getExpectedStringFromKey(
       return 'Delete';
     case 'copy':
       return 'Copy';
-    case 'clearMessagesForEveryone':
-      return 'Clear for everyone';
+    case 'deleteMessageEveryone':
+      return 'Delete for everyone';
     case 'block':
       return 'Block';
     case 'blockBlockedDescription':
       return 'Unblock this contact to send a message';
     case 'attachmentsClickToDownload':
       return 'Click to download {file_type}';
+    case 'banUnbanUserUnbanned':
+      return 'User unbanned';
     case 'media':
       return 'Media';
     case 'file':
@@ -126,6 +125,14 @@ function getExpectedStringFromKey(
       return 'Clear for me';
     case 'clearAll':
       return 'Clear All';
+    case 'deleteMessageDeviceOnly':
+      return 'Delete on this device only';
+    case 'clearDeviceOnly':
+      return 'Clear device only';
+    case 'deleteMessageDevicesAll':
+      return 'Delete on all my devices';
+    case 'deleteMessageDeletedLocally':
+      return 'This message was deleted on this device';
     case 'sessionMessageRequests':
       return 'Message Requests';
     case 'done':

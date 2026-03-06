@@ -1,12 +1,13 @@
 import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { defaultDisappearingOptions } from './constants/variables';
-import { Conversation, HomeScreen } from './locators';
+import { Conversation, Global } from './locators';
 import {
   test_Alice_2W,
   test_Alice_2W_Bob_1W,
   test_group_Alice_2W_Bob_1W_Charlie_1W,
 } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { createContact } from './utilities/create_contact';
 import { sendMessage } from './utilities/message';
 import { sendNewMessage } from './utilities/send_message';
@@ -15,7 +16,6 @@ import {
   clickOn,
   clickOnElement,
   clickOnMatchingText,
-  clickOnWithText,
   doesTextIncludeString,
   formatTimeOption,
   hasElementBeenDeleted,
@@ -40,11 +40,7 @@ test_Alice_2W_Bob_1W(
     // Create Contact
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Click on conversation in linked device
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
+    await openConversationWith(aliceWindow2, bob.userName);
 
     await setDisappearingMessages(
       aliceWindow1,
@@ -96,11 +92,7 @@ test_Alice_2W_Bob_1W(
     await createContact(aliceWindow1, bobWindow1, alice, bob);
 
     // Click on conversation in linked device
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
+    await openConversationWith(aliceWindow2, bob.userName);
     await setDisappearingMessages(
       aliceWindow1,
       ['1:1', disappearingMessagesType, timeOption, disappearAction],
@@ -146,11 +138,7 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     });
     const testMessage = 'Testing disappearing messages in groups';
 
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(aliceWindow2, groupCreated.userName);
     await setDisappearingMessages(aliceWindow1, [
       'group',
       disappearingMessagesType,
@@ -195,11 +183,7 @@ test_Alice_2W(
     // Open Note to self conversation
     await sendNewMessage(aliceWindow1, alice.accountid, testMessage);
     // Check messages are syncing across linked devices
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      tStripped('noteToSelf'),
-    );
+    await openConversationWith(aliceWindow2, tStripped('noteToSelf'));
     await waitForTextMessage(aliceWindow2, testMessage);
     // Enable disappearing messages
     await setDisappearingMessages(aliceWindow1, [
@@ -232,11 +216,7 @@ test_Alice_2W_Bob_1W(
     const formattedTime = formatTimeOption(timeOption);
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     // Click on conversation on linked device
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
+    await openConversationWith(aliceWindow2, bob.userName);
     // Set disappearing messages to on
     await setDisappearingMessages(
       aliceWindow1,
@@ -299,11 +279,9 @@ test_Alice_2W_Bob_1W(
       bobWindow1,
       tStripped('disappearingMessagesFollowSetting'),
     );
-    await clickOnElement({
-      window: bobWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
+
+    await clickOn(bobWindow1, Global.confirmButton);
+
     // Check control message are visible and correct
     // Each window has two control messages: You turned off and other user turned off (because we're following settings)
     await Promise.all([
@@ -340,12 +318,9 @@ test_Alice_2W_Bob_1W(
     ]);
     await Promise.all(
       [aliceWindow1, aliceWindow2, bobWindow1].map((w) =>
-        hasElementBeenDeleted(
-          w,
-          'data-testid',
-          'disappear-messages-type-and-time',
-          1_000,
-        ),
+        hasElementBeenDeleted(w, Conversation.DisappearMessagesTypeAndTime, {
+          maxWait: 1_000,
+        }),
       ),
     );
   },

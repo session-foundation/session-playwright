@@ -9,12 +9,13 @@ import {
   LeftPane,
   Settings,
 } from './locators';
-import { openApp } from './setup/open';
+import { openAppsAndWaitWindows } from './setup/open';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import {
   test_group_Alice_1W_Bob_1W_Charlie_1W,
   test_group_Alice_2W_Bob_1W_Charlie_1W,
 } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { leaveGroup } from './utilities/leave_group';
 import {
   checkModalStrings,
@@ -46,11 +47,8 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     // Check for user A for control message that userC left group
     // await sleepFor(1000);
     // Click on group
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(aliceWindow1, groupCreated.userName);
+
     await waitForTestIdWithText(
       aliceWindow1,
       'group-update-message',
@@ -59,11 +57,7 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
       }),
     );
     // Check for linked device (userA)
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(aliceWindow2, groupCreated.userName);
     await waitForTestIdWithText(
       aliceWindow2,
       'group-update-message',
@@ -85,7 +79,7 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Restore group',
   async ({ alice, bob, charlie, groupCreated }) => {
-    const [aliceWindow2] = await openApp(1);
+    const [aliceWindow2] = await openAppsAndWaitWindows(1);
     // Check group conversation is in conversation list on linked device
     // Restore account on a linked device
     await recoverFromSeed(aliceWindow2, alice.recoveryPassword);
@@ -96,11 +90,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(aliceWindow2, groupCreated.userName);
+
     // Check header name
     await waitForTestIdWithText(
       aliceWindow2,
@@ -166,7 +157,7 @@ async function clearDataOnWindow(window: Page) {
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Delete and restore group',
   async ({ alice, bob, charlie, groupCreated }) => {
-    const [aliceWindow2] = await openApp(1);
+    const [aliceWindow2] = await openAppsAndWaitWindows(1);
     // Check group conversation is in conversation list on linked device
     // Restore account on a linked device
     await recoverFromSeed(aliceWindow2, alice.recoveryPassword);
@@ -177,11 +168,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnWithText(
-      aliceWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(aliceWindow2, groupCreated.userName);
     // Check header name
     await waitForTestIdWithText(
       aliceWindow2,
@@ -211,9 +198,9 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     ]);
     await clickOn(aliceWindow2, Global.cancelButton);
     await clickOn(aliceWindow2, Global.modalCloseButton);
-    // Delete device data on alicewindow2
+    // Delete device data on aliceWindow2
     await clearDataOnWindow(aliceWindow2);
-    const [restoredWindow] = await openApp(1);
+    const [restoredWindow] = await openAppsAndWaitWindows(1);
     await recoverFromSeed(restoredWindow, alice.recoveryPassword);
     // Does group appear?
     await waitForTestIdWithText(
@@ -222,11 +209,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnWithText(
-      restoredWindow,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(restoredWindow, groupCreated.userName);
     // Check header name
     await waitForTestIdWithText(
       restoredWindow,
@@ -259,7 +242,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOn(restoredWindow, Global.modalCloseButton);
     // Delete device data on restoredWindow
     await clearDataOnWindow(restoredWindow);
-    const [restoredWindow2] = await openApp(1);
+    const [restoredWindow2] = await openAppsAndWaitWindows(1);
     await recoverFromSeed(restoredWindow2, alice.recoveryPassword);
     // Does group appear?
     await waitForTestIdWithText(
@@ -268,11 +251,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
       groupCreated.userName,
     );
     // Check group for members, conversation name and messages
-    await clickOnWithText(
-      restoredWindow2,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(restoredWindow2, groupCreated.userName);
     // Check header name
     await waitForTestIdWithText(
       restoredWindow2,
@@ -336,13 +315,10 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
     );
     await Promise.all(
       [aliceWindow1, aliceWindow2].map(async (w) => {
-        await hasElementBeenDeleted(
-          w,
-          'data-testid',
-          HomeScreen.conversationItemName.selector,
-          10_000,
-          groupCreated.userName,
-        );
+        await hasElementBeenDeleted(w, HomeScreen.conversationItemName, {
+          maxWait: 10_000,
+          text: groupCreated.userName,
+        });
       }),
     );
   },

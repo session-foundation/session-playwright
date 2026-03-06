@@ -70,10 +70,10 @@ export class HomeScreen extends Locator {
   static readonly conversationItemName = this.testId(
     'module-conversation__user__profile-name',
   );
+  static readonly messageRequestBanner = this.testId('message-request-banner');
   static readonly pinnedConversationIcon = this.testId(
     'conversation-item-pinned',
   );
-  static readonly messageRequestBanner = this.testId('message-request-banner');
   static readonly plusButton = this.testId('new-conversation-button');
   static readonly revealRecoveryPhraseButton = this.testId(
     'reveal-recovery-phrase',
@@ -87,6 +87,7 @@ export class Conversation extends Locator {
   static readonly acceptMessageRequestButton = this.testId(
     'accept-message-request',
   );
+  static readonly audioPlayer = this.testId('audio-player');
   static readonly banAndDeleteAllButton = this.testId(
     'ban-user-delete-all-confirm-button',
   );
@@ -96,6 +97,15 @@ export class Conversation extends Locator {
     'decline-and-block-message-request',
   );
   static readonly callButton = this.testId('call-button');
+  static readonly callNotificationAnswered = this.testId(
+    'call-notification-answered-a-call',
+  );
+  static readonly callNotificationStarted = this.testId(
+    'call-notification-started-call',
+  );
+  static readonly communityInvitationDetails = this.testId(
+    'community-invitation-details',
+  );
   static readonly conversationHeader = this.testId('header-conversation-name');
   static readonly conversationSettingsIcon = this.testId(
     'conversation-options-avatar',
@@ -106,20 +116,41 @@ export class Conversation extends Locator {
   static readonly disappearingControlMessage = this.testId(
     'disappear-control-message',
   );
-  static readonly quoteText = this.testId('quote-text');
+  static readonly DisappearMessagesTypeAndTime = this.testId(
+    'disappear-messages-type-and-time',
+  );
+  static readonly EmptyMessageViewCreated = this.testId(
+    'empty-msg-view-account-created',
+  );
+  static readonly EmptyMessageViewWelcome = this.testId(
+    'empty-msg-view-welcome',
+  );
   static readonly endCallButton = this.testId('end-call');
   static readonly endVoiceMessageButton = this.testId('end-voice-message');
+
+  static readonly groupName = this.testId('group-name');
+  static readonly linkPreviewTitle = this.testId('msg-link-preview-title');
   static readonly mentionsContainer = this.testId('mentions-container'); // This is also the locator for emojis
   static readonly mentionsItem = this.testId('mentions-container-row'); // This is also the locator for emojis
   static readonly messageContent = this.testId('message-content');
   static readonly messageInput = this.testId('message-input-text-area');
+
   static readonly messageRequestAcceptControlMessage = this.testId(
     'message-request-response-message',
   );
   static readonly microphoneButton = this.testId('microphone-button');
+
+  static readonly quoteText = this.testId('quote-text');
   static readonly scrollToBottomButton = this.testId('scroll-to-bottom-button');
   static readonly sendMessageButton = this.testId('send-message-button');
+
+  static readonly SessionConversation = this.className('session-conversation');
+
+  static readonly tooltipCharacterCount = this.testId(
+    'tooltip-character-count',
+  );
   static readonly unbanUserButton = this.testId('unban-user-confirm-button');
+  static readonly unbanUserInput = this.testId('unban-user-input');
 }
 
 export class ConversationSettings extends Locator {

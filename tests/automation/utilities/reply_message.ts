@@ -3,7 +3,8 @@ import { Page } from '@playwright/test';
 import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
 import { Conversation } from '../locators';
-import { Strategy } from '../types/testing';
+import { type StrategyExtractionObj } from '../types/testing';
+import { scrollToBottomLookingForMessage } from './conversation';
 import { sendMessage } from './message';
 import { verifyMediaPreviewLoaded } from './send_media';
 import {
@@ -36,7 +37,10 @@ export const replyTo = async ({
   receiverWindow: Page | null;
   shouldCheckMediaPreview?: boolean;
 }) => {
-  await waitForTextMessage(senderWindow, textMessage);
+  await scrollToBottomLookingForMessage({
+    msg: textMessage,
+    window: senderWindow,
+  });
 
   // If the original message has media, verify sender sees it before replying
   if (shouldCheckMediaPreview) {
@@ -81,18 +85,23 @@ export const replyTo = async ({
 
 export const replyToMedia = async ({
   replyText,
-  strategy,
-  selector,
+  locator,
   receiverWindow,
   senderWindow,
 }: {
   replyText: string;
-  strategy: Strategy;
-  selector: string;
+  locator: StrategyExtractionObj;
   receiverWindow: Page;
   senderWindow: Page;
 }) => {
-  const selc = await waitForElement(senderWindow, strategy, selector);
+  const selc = await waitForElement({
+    window: senderWindow,
+    locator,
+    options: {
+      shouldLog: true,
+      maxWaitMs: 20_000,
+    },
+  });
   // the right click context menu, for some reasons, often doesn't show up on the first try. Let's loop a few times
 
   for (let index = 0; index < 5; index++) {

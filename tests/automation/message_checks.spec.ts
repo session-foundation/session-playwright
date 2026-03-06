@@ -1,7 +1,12 @@
 import { tStripped } from '../localization/lib';
 import { sleepFor } from '../promise_utils';
 import { testCommunityName } from './constants/community';
-import { longText, mediaArray, testLink } from './constants/variables';
+import {
+  longText,
+  mediaArray,
+  testLink,
+  testLinkTitle,
+} from './constants/variables';
 import {
   Conversation,
   ConversationSettings,
@@ -14,10 +19,17 @@ import {
   sessionTestTwoWindows,
   test_Alice_1W,
   test_Alice_1W_Bob_1W,
+  test_Alice_2W,
+  test_Alice_2W_Bob_1W,
 } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
-import { sendMessage } from './utilities/message';
+import {
+  confirmMessageDeletedFor,
+  deleteMessageFor,
+  sendMessage,
+} from './utilities/message';
 import { replyTo, replyToMedia } from './utilities/reply_message';
 import {
   sendLinkPreview,
@@ -25,21 +37,18 @@ import {
   sendVoiceMessage,
   trustUser,
 } from './utilities/send_media';
+import { sendNewMessage } from './utilities/send_message';
 import {
   checkCTAStrings,
   checkModalStrings,
   clickOn,
   clickOnElement,
-  clickOnMatchingText,
-  clickOnTextMessage,
   clickOnWithText,
   hasElementPoppedUpThatShouldnt,
-  hasTextMessageBeenDeleted,
   measureSendingTime,
   pasteIntoInput,
   waitForElement,
   waitForLoadingAnimationToFinish,
-  waitForMatchingText,
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utilities/utils';
@@ -71,8 +80,7 @@ mediaArray.forEach(
         if (mediaType === 'voice') {
           await replyToMedia({
             senderWindow: bobWindow1,
-            strategy: 'data-testid',
-            selector: 'audio-player',
+            locator: Conversation.audioPlayer,
             replyText: testReply,
             receiverWindow: aliceWindow1,
           });
@@ -114,19 +122,21 @@ test_Alice_1W_Bob_1W(
 );
 
 test_Alice_1W_Bob_1W(
-  'Send link 1:1',
+  'Send link preview 1:1',
   async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
     const testReply = `${bob.userName} replying to link from ${alice.userName}`;
 
     await createContact(aliceWindow1, bobWindow1, alice, bob);
     await sendLinkPreview(aliceWindow1, testLink);
-    await waitForElement(
-      bobWindow1,
-      'data-testid',
-      'msg-link-preview-title',
-      undefined,
-      'Session | Send Messages, Not Metadata. | Private Messenger',
-    );
+    await waitForElement({
+      window: bobWindow1,
+      locator: Conversation.linkPreviewTitle,
+      options: {
+        maxWaitMs: 3_000,
+        shouldLog: true,
+        text: testLinkTitle,
+      },
+    });
     await replyTo({
       senderWindow: bobWindow1,
       textMessage: testLink,
@@ -157,86 +167,101 @@ test_Alice_1W_Bob_1W(
       .click();
     // Close UCS modal
     await clickOn(aliceWindow1, Global.modalCloseButton);
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
-    await Promise.all([
-      waitForElement(
-        aliceWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
+    await openConversationWith(aliceWindow1, bob.userName);
+    await Promise.all(
+      [aliceWindow1, bobWindow1].map((w) =>
+        waitForElement({
+          window: w,
+          locator: Conversation.communityInvitationDetails,
+          options: {
+            maxWaitMs: 15_000,
+            shouldLog: true,
+            text: testCommunityName,
+          },
+        }),
       ),
-      waitForElement(
-        bobWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
-      ),
-    ]);
-  },
-);
-
-test_Alice_1W_Bob_1W(
-  'Unsend message 1:1',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const unsendMessage = 'Testing unsend functionality';
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-
-    await sendMessage(aliceWindow1, unsendMessage);
-    await waitForTextMessage(bobWindow1, unsendMessage);
-    await clickOnTextMessage(aliceWindow1, unsendMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnMatchingText(
-      aliceWindow1,
-      tStripped('clearMessagesForEveryone'),
-    );
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
-    await sleepFor(1000);
-    await waitForMatchingText(
-      bobWindow1,
-      tStripped('deleteMessageDeletedGlobally'),
     );
   },
 );
 
-test_Alice_1W_Bob_1W(
-  'Delete message 1:1',
-  async ({ alice, aliceWindow1, bob, bobWindow1 }) => {
-    const deletedMessage = 'Testing deletion functionality';
-    await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await sendMessage(aliceWindow1, deletedMessage);
-    await waitForTextMessage(bobWindow1, deletedMessage);
-    await clickOnTextMessage(aliceWindow1, deletedMessage, true);
-    await clickOnMatchingText(aliceWindow1, tStripped('delete'));
-    await clickOnElement({
-      window: aliceWindow1,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
-    });
-    await waitForTestIdWithText(
-      aliceWindow1,
-      'session-toast',
-      tStripped('deleteMessageDeleted', { count: 1 }),
-    );
-    await hasTextMessageBeenDeleted(aliceWindow1, deletedMessage, 1000);
-    // Still should exist in window B
-    await waitForMatchingText(bobWindow1, deletedMessage);
-  },
-);
+const delete1o1TypeArray = [
+  'device_only_outgoing',
+  'device_only_incoming',
+  'for_everyone',
+] as const;
+
+delete1o1TypeArray.forEach((deleteType) => {
+  test_Alice_2W_Bob_1W(
+    `Delete message 1:1 ${deleteType}`,
+    async ({ alice, aliceWindow1, aliceWindow2, bob, bobWindow1 }) => {
+      const messageToDelete = `Testing deletion functionality for ${deleteType}`;
+      await createContact(aliceWindow1, bobWindow1, alice, bob);
+      await sendMessage(aliceWindow1, messageToDelete);
+      // Navigate to conversation on linked device and for message from user A to user B
+      await openConversationWith(aliceWindow2, bob.userName);
+
+      await Promise.all([
+        waitForTextMessage(aliceWindow2, messageToDelete, 15_000),
+        waitForTextMessage(bobWindow1, messageToDelete, 15_000),
+      ]);
+
+      // Alice sent the message, device_only_incoming means getting Bob to delete Alice's message locally.
+      // Otherwise, it's an action that Alice does on her own message.
+
+      const windowInitiatingDelete =
+        deleteType === 'device_only_incoming' ? bobWindow1 : aliceWindow1;
+      const otherWindows = [aliceWindow1, aliceWindow2, bobWindow1].filter(
+        (w) => w !== windowInitiatingDelete,
+      );
+
+      const simplifiedDeleteType =
+        deleteType === 'device_only_incoming' ||
+        deleteType === 'device_only_outgoing'
+          ? 'device_only'
+          : 'for_everyone';
+
+      await deleteMessageFor(
+        windowInitiatingDelete,
+        messageToDelete,
+        simplifiedDeleteType,
+      );
+
+      await confirmMessageDeletedFor({
+        deleteType: simplifiedDeleteType,
+        messageToDelete,
+        otherWindows,
+        windowInitiatingDelete,
+      });
+    },
+  );
+});
+
+const deleteNtsTypeArray = ['device_only', 'for_all_my_devices'] as const;
+
+deleteNtsTypeArray.forEach((deleteType) => {
+  test_Alice_2W(
+    `Delete message NTS ${deleteType}`,
+    async ({ aliceWindow1, aliceWindow2, alice }) => {
+      const messageToDelete = `Testing deletion functionality for NTS ${deleteType}`;
+      await sendNewMessage(aliceWindow1, alice.accountid, messageToDelete);
+      // Navigate to conversation on linked device
+      await openConversationWith(aliceWindow2, tStripped('noteToSelf'));
+      await Promise.all([
+        waitForTextMessage(aliceWindow1, messageToDelete, 15_000),
+        waitForTextMessage(aliceWindow2, messageToDelete, 15_000),
+      ]);
+
+      await deleteMessageFor(aliceWindow1, messageToDelete, deleteType);
+
+      await confirmMessageDeletedFor({
+        deleteType,
+        messageToDelete,
+        otherWindows: [aliceWindow2],
+        windowInitiatingDelete: aliceWindow1,
+      });
+    },
+  );
+});
 
 sessionTestTwoWindows(
   'Check performance',
@@ -300,20 +325,22 @@ messageLengthTestCases.forEach((testCase) => {
 
       // Check countdown behavior
       if (expectedCount) {
-        await waitForTestIdWithText(
-          aliceWindow1,
-          'tooltip-character-count',
-          expectedCount,
-        );
+        await waitForElement({
+          window: aliceWindow1,
+          locator: Conversation.tooltipCharacterCount,
+          options: { text: expectedCount },
+        });
       } else {
         // Verify countdown tooltip is not present
         try {
-          await waitForElement(
-            aliceWindow1,
-            'data-testid',
-            'tooltip-character-count',
-            1000,
-          );
+          await waitForElement({
+            window: aliceWindow1,
+            locator: Conversation.tooltipCharacterCount,
+            options: {
+              maxWaitMs: 1_000,
+              shouldLog: true,
+            },
+          });
           throw new Error(
             `Countdown should not be visible for messages under ${countdownThreshold} chars`,
           );
@@ -406,8 +433,7 @@ test_Alice_1W(
     );
     await hasElementPoppedUpThatShouldnt(
       aliceWindow1,
-      Conversation.mentionsContainer.strategy,
-      Conversation.mentionsContainer.selector,
+      Conversation.mentionsContainer,
     );
     await pasteIntoInput(
       aliceWindow1,
@@ -416,8 +442,7 @@ test_Alice_1W(
     );
     await hasElementPoppedUpThatShouldnt(
       aliceWindow1,
-      Conversation.mentionsContainer.strategy,
-      Conversation.mentionsContainer.selector,
+      Conversation.mentionsContainer,
     );
   },
 );
@@ -450,8 +475,7 @@ test_Alice_1W(
     await clickOn(aliceWindow1, Conversation.messageInput);
     await hasElementPoppedUpThatShouldnt(
       aliceWindow1,
-      Conversation.mentionsContainer.strategy,
-      Conversation.mentionsContainer.selector,
+      Conversation.mentionsContainer,
     );
   },
 );

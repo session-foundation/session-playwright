@@ -81,6 +81,12 @@ export default tseslint.config(
           ],
         },
       ],
+      'perfectionist/sort-classes': [
+        'error',
+        {
+          partitionByComment: true,
+        },
+      ],
     },
   },
 );

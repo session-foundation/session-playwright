@@ -1,12 +1,25 @@
 import { Page } from '@playwright/test';
 
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export const sleepFor = async (ms: number, showLog = false) => {
   if (showLog || ms > 5000) {
     console.info(`sleeping for ${ms}ms...`);
+
+    if (ms > 5000) {
+      const chunks = 6;
+      const msPerChunk = Math.floor(ms / chunks);
+      for (let index = 0; index < chunks; index++) {
+        await sleep(msPerChunk);
+        console.info(`slept for ${msPerChunk * (index + 1)}/${ms}ms...`);
+      }
+
+      return;
+    }
   }
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+  return sleep(ms);
 };
 
 export async function doForAll<T>(

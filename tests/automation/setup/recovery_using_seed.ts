@@ -19,8 +19,7 @@ export async function recoverFromSeed(
   await waitForLoadingAnimationToFinish(window, 'loading-animation');
   const displayNameInput = await doesElementExist(
     window,
-    'data-testid',
-    'display-name-input',
+    Onboarding.displayNameInput,
   );
   if (displayNameInput) {
     if (!options?.fallbackName) {

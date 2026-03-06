@@ -1,7 +1,7 @@
 import { Page } from '@playwright/test';
 
 import { tStripped } from '../../localization/lib';
-import { Conversation, ConversationSettings } from '../locators';
+import { Conversation, ConversationSettings, Global } from '../locators';
 import {
   ConversationType,
   DataTestId,
@@ -15,7 +15,6 @@ import {
   clickOnMatchingText,
   formatTimeOption,
   waitForElement,
-  waitForTestIdWithText,
 } from './utils';
 
 export const setDisappearingMessages = async (
@@ -49,20 +48,33 @@ export const setDisappearingMessages = async (
     let defaultTime;
     if (timerType === 'disappear-after-read-option') {
       // making explicit DataTestId here as `waitForElement` currently allows a string
-      // TODO: add explicit typing to waitForElement
       const dataTestId: DataTestId = 'input-time-option-12-hours';
-      defaultTime = await waitForElement(windowA, 'data-testid', dataTestId);
+      defaultTime = await waitForElement({
+        window: windowA,
+        locator: {
+          strategy: 'data-testid',
+          selector: dataTestId,
+        },
+        options: {
+          maxWaitMs: 1_000,
+          shouldLog: true,
+        },
+      });
     } else {
       // making explicit DataTestId here as `waitForElement` currently allows a string
-      // TODO: add explicit typing to waitForElement
       const dataTestId: DataTestId = 'input-time-option-1-days';
 
-      defaultTime = await waitForElement(
-        windowA,
-        'data-testid',
-        dataTestId,
-        1000,
-      );
+      defaultTime = await waitForElement({
+        window: windowA,
+        locator: {
+          strategy: 'data-testid',
+          selector: dataTestId,
+        },
+        options: {
+          maxWaitMs: 1_000,
+          shouldLog: true,
+        },
+      });
     }
     const checked = await isChecked(defaultTime);
     if (checked) {
@@ -88,7 +100,10 @@ export const setDisappearingMessages = async (
     strategy: 'data-testid',
     selector: 'modal-close-button',
   });
-  await waitForTestIdWithText(windowA, 'disappear-messages-type-and-time');
+  await waitForElement({
+    window: windowA,
+    locator: Conversation.DisappearMessagesTypeAndTime,
+  });
   if (windowB) {
     await clickOnMatchingText(
       windowB,
@@ -114,11 +129,11 @@ export const setDisappearingMessages = async (
       tStripped('disappearingMessagesFollowSetting'),
       modalDescription,
     );
-    await clickOnElement({
+
+    await clickOn(windowB, Global.confirmButton);
+    await waitForElement({
       window: windowB,
-      strategy: 'data-testid',
-      selector: 'session-confirm-ok-button',
+      locator: Conversation.DisappearMessagesTypeAndTime,
     });
-    await waitForTestIdWithText(windowB, 'disappear-messages-type-and-time');
   }
 };

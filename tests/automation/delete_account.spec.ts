@@ -5,7 +5,7 @@ import { sleepFor } from '../promise_utils';
 import { Global, HomeScreen, LeftPane, Onboarding, Settings } from './locators';
 import { forceCloseAllWindows } from './setup/closeWindows';
 import { newUser } from './setup/new_user';
-import { openApp } from './setup/open';
+import { openAppsAndWaitWindows } from './setup/open';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import { sessionTestTwoWindows } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
@@ -62,7 +62,7 @@ sessionTestTwoWindows(
       // Wait for window to close and reopen
 
       // await windowA.close();
-      restoringWindows = await openApp(1); // not using sessionTest here as we need to close and reopen one of the window
+      restoringWindows = await openAppsAndWaitWindows(1); // not using sessionTest here as we need to close and reopen one of the window
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
       await clickOn(restoringWindow, Onboarding.iHaveAnAccountButton);
@@ -92,18 +92,19 @@ sessionTestTwoWindows(
 
       await hasElementBeenDeleted(
         restoringWindow,
-        'data-testid',
-        HomeScreen.conversationItemName.selector,
-        5_000,
+        HomeScreen.conversationItemName,
+        { maxWait: 5_000 },
       );
 
       await clickOn(restoringWindow, HomeScreen.plusButton); // Expect contacts list to be empty
 
       await hasElementBeenDeleted(
         restoringWindow,
-        'data-testid',
-        Global.contactItem.selector,
-        10000,
+
+        Global.contactItem,
+        {
+          maxWait: 10_000,
+        },
       );
     } finally {
       if (restoringWindows) {
@@ -124,6 +125,8 @@ sessionTestTwoWindows(
       ]);
       // Create contact and send new message
       await createContact(windowA, windowB, userA, userB);
+      // Allow some time so that Alice gets to push her first config message to the network
+      await sleepFor(5000, true);
       // Delete all data from device
       // Click on settings tab
       await clickOn(windowA, LeftPane.settingsButton);
@@ -134,31 +137,38 @@ sessionTestTwoWindows(
         tStripped('sessionClearData'),
       );
       // Keep 'Clear Device only' selection
+
+      await clickOnMatchingText(windowA, tStripped('clearDeviceOnly'));
       // Confirm deletion by clicking Clear, twice
       await clickOnMatchingText(windowA, tStripped('clear'));
       await clickOnMatchingText(windowA, tStripped('clear'));
-      restoringWindows = await openApp(1);
+      restoringWindows = await openAppsAndWaitWindows(1);
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
       await recoverFromSeed(restoringWindow, userA.recoveryPassword);
       await sleepFor(5000, true); // just to allow any messages from our swarm to show up
       // Check if message from user B is restored
-      await waitForElement(
-        restoringWindow,
-        'data-testid',
-        HomeScreen.conversationItemName.selector,
-        10000,
-        userB.userName,
-      );
+
+      await waitForElement({
+        window: restoringWindow,
+        locator: HomeScreen.conversationItemName,
+        options: {
+          maxWaitMs: 10_000,
+          shouldLog: true,
+          text: userB.userName,
+        },
+      });
       // Check if contact is available in contacts section
       await clickOn(restoringWindow, HomeScreen.plusButton);
-      await waitForElement(
-        restoringWindow,
-        'data-testid',
-        Global.contactItem.selector,
-        1000,
-        userB.userName,
-      );
+      await waitForElement({
+        window: restoringWindow,
+        locator: Global.contactItem,
+        options: {
+          maxWaitMs: 1000,
+          shouldLog: true,
+          text: userB.userName,
+        },
+      });
       console.log('Contacts have been restored');
     } finally {
       if (restoringWindows) {

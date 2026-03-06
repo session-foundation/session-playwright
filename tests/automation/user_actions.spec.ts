@@ -9,13 +9,12 @@ import {
   LeftPane,
   Settings,
 } from './locators';
-import { newUser } from './setup/new_user';
 import {
-  sessionTestTwoWindows,
   test_Alice_1W_Bob_1W,
   test_Alice_1W_no_network,
   test_Alice_2W,
 } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { createContact } from './utilities/create_contact';
 import { sendMessage, waitForMessageStatus } from './utilities/message';
 import { compareElementScreenshot } from './utilities/screenshot';
@@ -29,6 +28,7 @@ import {
   doesElementExist,
   hasElementBeenDeleted,
   pasteIntoInput,
+  rightClickOnWithText,
   waitForLoadingAnimationToFinish,
   waitForMatchingText,
   waitForTestIdWithText,
@@ -37,41 +37,6 @@ import {
 const cancelString = tStripped('cancel');
 const saveString = tStripped('save');
 const removeString = tStripped('remove');
-
-// Send message in one to one conversation with new contact
-sessionTestTwoWindows('Create contact', async ([windowA, windowB]) => {
-  // no fixture for that one
-  const [userA, userB] = await Promise.all([
-    newUser(windowA, 'Alice'),
-    newUser(windowB, 'Bob'),
-  ]);
-  await createContact(windowA, windowB, userA, userB);
-  // Navigate to contacts tab in User B's window
-  await waitForTestIdWithText(
-    windowB,
-    Conversation.messageRequestAcceptControlMessage.selector,
-    tStripped('messageRequestYouHaveAccepted', {
-      name: userA.userName,
-    }),
-  );
-  await clickOn(windowB, Global.backButton);
-  await Promise.all([
-    clickOnElement({
-      window: windowA,
-      strategy: 'data-testid',
-      selector: 'new-conversation-button',
-    }),
-    clickOnElement({
-      window: windowB,
-      strategy: 'data-testid',
-      selector: 'new-conversation-button',
-    }),
-  ]);
-  await Promise.all([
-    waitForTestIdWithText(windowA, Global.contactItem.selector, userB.userName),
-    waitForTestIdWithText(windowB, Global.contactItem.selector, userA.userName),
-  ]);
-});
 
 test_Alice_1W_Bob_1W(
   'Block user in conversation list',
@@ -88,11 +53,10 @@ test_Alice_1W_Bob_1W(
     // he is a contact, close the new conversation button tab as there is no right click allowed on it
     await clickOn(aliceWindow1, Global.backButton);
     // then right click on the contact conversation list item to show the menu
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     // Select block
     await clickOnWithText(
@@ -136,7 +100,11 @@ test_Alice_1W_Bob_1W(
       tStripped('blockUnblock'),
     );
     // make sure no blocked contacts are listed
-    await waitForMatchingText(aliceWindow1, tStripped('blockBlockedNone'));
+    await waitForMatchingText(
+      aliceWindow1,
+      tStripped('blockBlockedNone'),
+      1_000,
+    );
   },
 );
 
@@ -242,11 +210,10 @@ test_Alice_1W_Bob_1W(
     const nickname = 'new nickname for Bob';
 
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     await clickOnMatchingText(aliceWindow1, tStripped('nicknameSet'));
     await sleepFor(1000);
@@ -295,11 +262,8 @@ test_Alice_1W_Bob_1W(
       selector: Settings.enableReadReceipts.selector,
     });
     await clickOn(aliceWindow1, Global.modalCloseButton);
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      bob.userName,
-    );
+    await openConversationWith(aliceWindow1, bob.userName);
+
     await clickOnElement({
       window: bobWindow1,
       strategy: 'data-testid',
@@ -314,12 +278,7 @@ test_Alice_1W_Bob_1W(
     });
     await clickOn(bobWindow1, Global.modalCloseButton);
     await sendMessage(aliceWindow1, 'Testing read receipts');
-    await clickOn(bobWindow1, Global.backButton);
-    await clickOnWithText(
-      bobWindow1,
-      HomeScreen.conversationItemName,
-      alice.userName,
-    );
+    await openConversationWith(bobWindow1, alice.userName);
     await waitForMessageStatus(aliceWindow1, 'Testing read receipts', 'read');
   },
 );
@@ -329,7 +288,6 @@ test_Alice_1W_Bob_1W(
   async ({ aliceWindow1, bobWindow1, alice, bob }) => {
     // Create contact and send new message
     await createContact(aliceWindow1, bobWindow1, alice, bob);
-    await clickOn(bobWindow1, Global.backButton);
     await Promise.all(
       [aliceWindow1, bobWindow1].map((w) =>
         clickOnElement({
@@ -351,15 +309,16 @@ test_Alice_1W_Bob_1W(
         alice.userName,
       ),
     ]);
+
     await Promise.all(
       [aliceWindow1, bobWindow1].map((w) => clickOn(w, Global.backButton)),
     );
+
     // Delete contact
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       bob.userName,
-      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,
@@ -377,13 +336,10 @@ test_Alice_1W_Bob_1W(
       tStripped('delete'),
     );
     // Check if conversation is deleted
-    await hasElementBeenDeleted(
-      aliceWindow1,
-      'data-testid',
-      Global.contactItem.selector,
-      1000,
-      bob.userName,
-    );
+    await hasElementBeenDeleted(aliceWindow1, Global.contactItem, {
+      maxWait: 1000,
+      text: bob.userName,
+    });
   },
 );
 
@@ -413,11 +369,7 @@ test_Alice_2W(
     );
     // Click yes
     await clickOnWithText(aliceWindow1, Global.confirmButton, tStripped('yes'));
-    await doesElementExist(
-      aliceWindow1,
-      'data-testid',
-      Settings.recoveryPasswordMenuItem.selector,
-    );
+    await doesElementExist(aliceWindow1, Settings.recoveryPasswordMenuItem);
     // Check linked device if Recovery Password is still visible (it should be)
     await clickOn(aliceWindow2, LeftPane.settingsButton);
     await waitForTestIdWithText(
@@ -440,10 +392,11 @@ test_Alice_1W_no_network('Invite a friend', async ({ aliceWindow1, alice }) => {
   );
   // Wait for copy to resolve
   await sleepFor(1000);
-  await waitForMatchingText(aliceWindow1, tStripped('accountIdCopied'));
+  await waitForMatchingText(aliceWindow1, tStripped('accountIdCopied'), 1_000);
   await waitForMatchingText(
     aliceWindow1,
     tStripped('shareAccountIdDescriptionCopied'),
+    1_000,
   );
   // To exit invite a friend
   await clickOn(aliceWindow1, Global.backButton);
@@ -477,11 +430,10 @@ test_Alice_1W_no_network(
       Conversation.conversationHeader.selector,
       tStripped('noteToSelf'),
     );
-    await clickOnWithText(
+    await rightClickOnWithText(
       aliceWindow1,
       HomeScreen.conversationItemName,
       tStripped('noteToSelf'),
-      { rightButton: true },
     );
     await clickOnWithText(
       aliceWindow1,
@@ -498,13 +450,10 @@ test_Alice_1W_no_network(
       Global.confirmButton,
       tStripped('hide'),
     );
-    await hasElementBeenDeleted(
-      aliceWindow1,
-      'data-testid',
-      'module-conversation__user__profile-name',
-      5000,
-      tStripped('noteToSelf'),
-    );
+    await hasElementBeenDeleted(aliceWindow1, HomeScreen.conversationItemName, {
+      maxWait: 5000,
+      text: tStripped('noteToSelf'),
+    });
   },
 );
 

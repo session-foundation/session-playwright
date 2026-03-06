@@ -1,4 +1,7 @@
-import { _electron as electron } from '@playwright/test';
+import {
+  _electron as electron,
+  type ElectronApplication,
+} from '@playwright/test';
 import chalk from 'chalk';
 import { isEmpty } from 'lodash';
 import { join } from 'path';
@@ -129,8 +132,7 @@ const openElectronAppOnly = async (multi: string, context?: TestContext) => {
 
 const logBrowserConsole = process.env.LOG_BROWSER_CONSOLE === '1';
 
-const openAppAndWait = async (multi: string, context?: TestContext) => {
-  const electronApp = await openElectronAppOnly(multi, context);
+export async function waitFirstWindow(electronApp: ElectronApplication) {
   // Get the first window that the app opens, wait if necessary.
   const start = Date.now();
   const window = await electronApp.firstWindow();
@@ -146,9 +148,9 @@ const openAppAndWait = async (multi: string, context?: TestContext) => {
     }
   });
   return window;
-};
+}
 
-export async function openApp(windowsToCreate: number, context?: TestContext) {
+export async function openApps(windowsToCreate: number, context?: TestContext) {
   if (windowsToCreate >= multisAvailable.length) {
     throw new Error(`Do you really need ${multisAvailable.length} windows?!`);
   }
@@ -156,18 +158,29 @@ export async function openApp(windowsToCreate: number, context?: TestContext) {
   const multisToUse = multisAvailable.slice(0, windowsToCreate);
 
   const array = [...multisToUse];
-  const toRet = [];
+  const apps = [];
   // not too sure why, but launching those windows with Promise.all triggers a sqlite error...
   for (let index = 0; index < array.length; index++) {
-    const element = array[index];
+    const multi = array[index];
 
-    const openedWindow = await openAppAndWait(`${element}`, context);
-    toRet.push(openedWindow);
+    const electronApp = await openElectronAppOnly(multi, context);
+
+    apps.push(electronApp);
   }
   console.log(
     chalk.bgRedBright(`Pathway to app: `, process.env.SESSION_DESKTOP_ROOT),
   );
-  return toRet;
+  return apps;
+}
+
+export async function openAppsAndWaitWindows(
+  windowsToCreate: number,
+  context?: TestContext,
+) {
+  const apps = await openApps(windowsToCreate, context);
+
+  const windows = await Promise.all(apps.map((app) => waitFirstWindow(app)));
+  return windows;
 }
 
 export function getTrackedElectronPids(): Array<number> {

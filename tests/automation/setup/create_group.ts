@@ -4,12 +4,12 @@ import { tStripped } from '../../localization/lib';
 import { sortByPubkey } from '../../pubkey';
 import { HomeScreen } from '../locators';
 import { Group, User } from '../types/testing';
+import { openConversationWith } from '../utilities/conversation';
 import { sendMessage } from '../utilities/message';
 import { sendNewMessage } from '../utilities/send_message';
 import {
   clickOn,
   clickOnMatchingText,
-  clickOnWithText,
   pasteIntoInput,
   waitForTestIdWithText,
   waitForTextMessages,
@@ -25,34 +25,34 @@ export const createGroup = async (
   windowC: Page,
 ): Promise<Group> => {
   const group: Group = { userName, userOne, userTwo, userThree };
-  const messageAB = `${userOne.userName} to ${userTwo.userName}`;
-  const messageBA = `${userTwo.userName} to ${userOne.userName}`;
-  const messageCA = `${userThree.userName} to ${userOne.userName}`;
-  const messageAC = `${userOne.userName} to ${userThree.userName}`;
-  const msgAToGroup = `${userOne.userName} -> ${group.userName}`;
-  const msgBToGroup = `${userTwo.userName} -> ${group.userName}`;
-  const msgCToGroup = `${userThree.userName} -> ${group.userName}`;
-  // Add contacts
-  await sendNewMessage(
-    windowA,
-    userThree.accountid,
-    `${messageAC} Time: ${Date.now()}`,
+
+  const actionsToDo = [
+    { window: windowA, sender: userOne, receivers: [userTwo, userThree] },
+    { window: windowB, sender: userTwo, receivers: [userOne, userThree] },
+    { window: windowC, sender: userThree, receivers: [userOne, userTwo] },
+  ];
+  // make everyone a friend of everyone, by sending a message to each other
+  // Note: we need to do one send per window to avoid race conditions
+  await Promise.all(
+    actionsToDo.map(async (action) =>
+      sendNewMessage(
+        action.window,
+        action.receivers[0].accountid,
+        `${action.sender.userName} to ${action.receivers[0].userName}`,
+      ),
+    ),
   );
-  await sendNewMessage(
-    windowA,
-    userTwo.accountid,
-    `${messageAB} Time: ${Date.now()}`,
+  // once the first batch is sent, we can start the second batch
+  await Promise.all(
+    actionsToDo.map(async (action) =>
+      sendNewMessage(
+        action.window,
+        action.receivers[1].accountid,
+        `${action.sender.userName} to ${action.receivers[1].userName}`,
+      ),
+    ),
   );
-  await sendNewMessage(
-    windowB,
-    userOne.accountid,
-    `${messageBA} Time: ${Date.now()}`,
-  );
-  await sendNewMessage(
-    windowC,
-    userOne.accountid,
-    `${messageCA} Time: ${Date.now()}`,
-  );
+
   // Click new closed group tab
   await clickOn(windowA, HomeScreen.plusButton);
   await clickOn(windowA, HomeScreen.createGroupOption);
@@ -86,9 +86,7 @@ export const createGroup = async (
   );
   // Click on test group
   await Promise.all(
-    [windowB, windowC].map((w) =>
-      clickOnWithText(w, HomeScreen.conversationItemName, group.userName),
-    ),
+    [windowB, windowC].map((w) => openConversationWith(w, group.userName)),
   );
   // Make sure the empty state is in windowB & windowC
   await Promise.all([
@@ -105,29 +103,30 @@ export const createGroup = async (
       tStripped('groupInviteYouAndOtherNew', { other_name: userTwo.userName }),
     ),
   ]);
-  // Send message in group chat from user A
-  await sendMessage(windowA, msgAToGroup);
-  // Focus screen
-  await clickOnMatchingText(windowA, msgAToGroup);
 
-  // Send message in group chat from user B
-  await sendMessage(windowB, msgBToGroup);
-  await clickOnMatchingText(windowB, msgBToGroup);
-
-  // Send message from C to the group
-  await sendMessage(windowC, msgCToGroup);
-  await clickOnMatchingText(windowC, msgCToGroup);
+  const msgsSent = await Promise.all(
+    [
+      [windowA, userOne] as const,
+      [windowB, userTwo] as const,
+      [windowC, userThree] as const,
+    ].map(async ([w, u]) => {
+      const msgToGroup = `${u.userName} to ${group.userName}`;
+      await sendMessage(w, msgToGroup);
+      await clickOnMatchingText(w, msgToGroup);
+      return msgToGroup;
+    }),
+  );
 
   // Verify that each messages was received by the other two accounts
 
   // windowA should see the message from B and the message from C
-  await waitForTextMessages(windowA, [msgBToGroup, msgCToGroup]);
+  await waitForTextMessages(windowA, [msgsSent[1], msgsSent[2]]);
 
   // windowB should see the message from A and the message from C
-  await waitForTextMessages(windowB, [msgAToGroup, msgCToGroup]);
+  await waitForTextMessages(windowB, [msgsSent[0], msgsSent[2]]);
 
   // windowC must see the message from A and the message from B
-  await waitForTextMessages(windowC, [msgAToGroup, msgBToGroup]);
+  await waitForTextMessages(windowC, [msgsSent[0], msgsSent[1]]);
 
   return { userName, userOne, userTwo, userThree };
 };

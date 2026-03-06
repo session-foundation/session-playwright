@@ -135,80 +135,34 @@ function wrapLine(line: string, width: number): string[] {
 // --- Main class ---
 
 export class TerminalTui {
-  private tests: Map<string, TuiTestEntry> = new Map();
-  private testOrder: string[] = [];
-  private selectedIndex = 0;
-  private outputScrollOffset = 0;
   private activePaneFocus: 'list' | 'output' = 'list';
+  private autoFollow = true;
+  private elapsedTimer: ReturnType<typeof setInterval> | null = null;
+  private exitHandler: (() => void) | null = null;
+  private flashMessage: string | null = null;
+  private flashTimeout: ReturnType<typeof setTimeout> | null = null;
+  private frozenElapsedMs: number | null = null; // set when suite finishes
+  private isActive = false;
+  private keyHandler: ((data: Buffer) => void) | null = null;
+  private lastLeftWidth = 30; // saved from render() for mouse click mapping
+  private lastListStart = 0; // saved from render() for mouse click mapping
+  private lastOutputLines: string[] = []; // cached from last render for selection copy
+  private lastUserInteractionTime = 0;
+  private onStopCallback: StopCallback | null = null;
+  private originalStdinRawMode: boolean | undefined;
+  private outputScrollOffset = 0;
   private progress: TuiProgress = {
     completed: 0,
     estimatedMinsLeft: 0,
     total: 0,
   };
-  private isActive = false;
   private renderScheduled = false;
-  private originalStdinRawMode: boolean | undefined;
-  private keyHandler: ((data: Buffer) => void) | null = null;
   private resizeHandler: (() => void) | null = null;
-  private exitHandler: (() => void) | null = null;
-  private flashMessage: string | null = null;
-  private flashTimeout: ReturnType<typeof setTimeout> | null = null;
-  private onStopCallback: StopCallback | null = null;
-  private lastListStart = 0; // saved from render() for mouse click mapping
-  private lastLeftWidth = 30; // saved from render() for mouse click mapping
-  private autoFollow = true;
-  private lastUserInteractionTime = 0;
+  private selectedIndex = 0;
   private selection: { startRow: number; endRow: number } | null = null;
-  private lastOutputLines: string[] = []; // cached from last render for selection copy
-
-  start(): void {
-    if (!process.stdout.isTTY) return;
-
-    this.isActive = true;
-    this.originalStdinRawMode = process.stdin.isRaw;
-
-    process.stdout.write(ALT_SCREEN_ON + CURSOR_HIDE + MOUSE_ON);
-
-    if (process.stdin.isTTY) {
-      process.stdin.setRawMode(true);
-    }
-    process.stdin.resume();
-    process.stdin.ref();
-
-    this.keyHandler = (data: Buffer) => {
-      this.handleKey(data);
-    };
-    process.stdin.on('data', this.keyHandler);
-
-    this.resizeHandler = () => {
-      this.scheduleRender();
-    };
-    process.stdout.on('resize', this.resizeHandler);
-
-    this.exitHandler = () => {
-      this.restoreTerminal();
-    };
-    process.on('exit', this.exitHandler);
-
-    this.scheduleRender();
-  }
-
-  stop(): void {
-    if (!this.isActive) return;
-    this.isActive = false;
-
-    if (this.flashTimeout) {
-      clearTimeout(this.flashTimeout);
-      this.flashTimeout = null;
-    }
-
-    this.removeListeners();
-    this.restoreTerminal();
-  }
-
-  onStop(cb: StopCallback): void {
-    this.onStopCallback = cb;
-  }
+  private startTime: number | null = null;
+  private testOrder: string[] = [];
+  private tests: Map<string, TuiTestEntry> = new Map();
 
   addTest(id: string, title: string): void {
     this.tests.set(id, {
@@ -221,35 +175,6 @@ export class TerminalTui {
       title,
     });
     this.testOrder.push(id);
-    this.scheduleRender();
-  }
-
-  updateTest(
-    id: string,
-    status: TestStatus,
-    duration?: number,
-    retry?: number,
-  ): void {
-    const entry = this.tests.get(id);
-    if (!entry) return;
-    entry.status = status;
-    if (duration !== undefined) entry.duration = duration;
-    if (retry !== undefined) entry.retry = retry;
-
-    // Auto-follow: scroll to the test that just started running
-    if (
-      this.autoFollow &&
-      (status === 'running' || status === 'retrying') &&
-      Date.now() - this.lastUserInteractionTime > 30_000
-    ) {
-      const idx = this.testOrder.indexOf(id);
-      if (idx >= 0) {
-        this.selectedIndex = idx;
-        this.outputScrollOffset = Number.MAX_SAFE_INTEGER; // clamped in render
-        // Don't update lastUserInteractionTime — this is auto-follow, not user action
-      }
-    }
-
     this.scheduleRender();
   }
 
@@ -286,6 +211,10 @@ export class TerminalTui {
     }
   }
 
+  onStop(cb: StopCallback): void {
+    this.onStopCallback = cb;
+  }
+
   setError(
     id: string,
     errors: Array<{ message?: string; snippet?: string; stack?: string }>,
@@ -302,6 +231,87 @@ export class TerminalTui {
     estimatedMinsLeft: number,
   ): void {
     this.progress = { completed, estimatedMinsLeft, total };
+    this.scheduleRender();
+  }
+
+  start(): void {
+    if (!process.stdout.isTTY) return;
+
+    this.isActive = true;
+    this.originalStdinRawMode = process.stdin.isRaw;
+
+    process.stdout.write(ALT_SCREEN_ON + CURSOR_HIDE + MOUSE_ON);
+
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+    }
+    process.stdin.resume();
+    process.stdin.ref();
+
+    this.keyHandler = (data: Buffer) => {
+      this.handleKey(data);
+    };
+    process.stdin.on('data', this.keyHandler);
+
+    this.resizeHandler = () => {
+      this.scheduleRender();
+    };
+    process.stdout.on('resize', this.resizeHandler);
+
+    this.exitHandler = () => {
+      this.restoreTerminal();
+    };
+    process.on('exit', this.exitHandler);
+
+    this.startTime = Date.now();
+    this.elapsedTimer = setInterval(() => this.scheduleRender(), 1000);
+    this.scheduleRender();
+  }
+
+  stop(): void {
+    if (!this.isActive) return;
+    this.isActive = false;
+
+    if (this.elapsedTimer) {
+      clearInterval(this.elapsedTimer);
+      this.elapsedTimer = null;
+    }
+
+    if (this.flashTimeout) {
+      clearTimeout(this.flashTimeout);
+      this.flashTimeout = null;
+    }
+
+    this.removeListeners();
+    this.restoreTerminal();
+  }
+
+  updateTest(
+    id: string,
+    status: TestStatus,
+    duration?: number,
+    retry?: number,
+  ): void {
+    const entry = this.tests.get(id);
+    if (!entry) return;
+    entry.status = status;
+    if (duration !== undefined) entry.duration = duration;
+    if (retry !== undefined) entry.retry = retry;
+
+    // Auto-follow: scroll to the test that just started running
+    if (
+      this.autoFollow &&
+      (status === 'running' || status === 'retrying') &&
+      Date.now() - this.lastUserInteractionTime > 30_000
+    ) {
+      const idx = this.testOrder.indexOf(id);
+      if (idx >= 0) {
+        this.selectedIndex = idx;
+        this.outputScrollOffset = Number.MAX_SAFE_INTEGER; // clamped in render
+        // Don't update lastUserInteractionTime — this is auto-follow, not user action
+      }
+    }
+
     this.scheduleRender();
   }
 
@@ -326,6 +336,16 @@ export class TerminalTui {
     this.selectedIndex = 0;
     this.outputScrollOffset = 0;
     this.autoFollow = false;
+
+    // Freeze elapsed time and stop the live ticker
+    if (this.startTime !== null) {
+      this.frozenElapsedMs = Date.now() - this.startTime;
+    }
+    if (this.elapsedTimer) {
+      clearInterval(this.elapsedTimer);
+      this.elapsedTimer = null;
+    }
+
     this.scheduleRender();
   }
 
@@ -352,11 +372,6 @@ export class TerminalTui {
   }
 
   /** Adjust output scroll offset (clamped in render) */
-  private scrollOutput(offset: number): void {
-    this.outputScrollOffset = Math.max(0, offset);
-    this.scheduleRender();
-  }
-
   private scheduleRender(): void {
     if (!this.isActive || this.renderScheduled) return;
     this.renderScheduled = true;
@@ -366,179 +381,12 @@ export class TerminalTui {
     });
   }
 
-  private render(): void {
-    const cols = process.stdout.columns || 80;
-    const rows = process.stdout.rows || 24;
-
-    if (cols < 60 || rows < 10) {
-      const msg = 'Terminal too small (min 60x10)';
-      const r = Math.floor(rows / 2);
-      const c = Math.max(1, Math.floor((cols - msg.length) / 2));
-      process.stdout.write(
-        MOVE_TO(1, 1) + ESC + '[2J' + MOVE_TO(r, c) + chalk.yellow(msg),
-      );
-      return;
-    }
-
-    const leftWidth = Math.min(Math.max(30, Math.floor(cols * 0.4)), cols - 22);
-    const rightWidth = cols - leftWidth - 3; // 3 = left border + divider + right border
-    const contentHeight = rows - 3; // header + bottom divider + status bar
-
-    let buf = MOVE_TO(1, 1);
-
-    // --- Header ---
-    const leftHeader = ` Tests (${this.progress.completed}/${this.progress.total}) `;
-    const selectedTest = this.tests.get(
-      this.testOrder[this.selectedIndex] ?? '',
-    );
-    const rightHeaderLabel = selectedTest
-      ? ` Output: ${truncate(selectedTest.title, rightWidth - 12)} `
-      : ' Output ';
-
-    const leftFill = Math.max(0, leftWidth - leftHeader.length - 1);
-    const rightFill = Math.max(0, rightWidth - rightHeaderLabel.length - 1);
-
-    buf += CLEAR_LINE;
-    buf +=
-      chalk.dim('\u250c') +
-      chalk.dim('\u2500') +
-      chalk.bold(leftHeader) +
-      chalk.dim('\u2500'.repeat(leftFill));
-    buf +=
-      chalk.dim('\u252c') +
-      chalk.dim('\u2500') +
-      chalk.bold(rightHeaderLabel) +
-      chalk.dim('\u2500'.repeat(rightFill));
-    buf += chalk.dim('\u2510');
-
-    // --- Content rows ---
-    // Left pane: scrolling window around selectedIndex
-    const listLen = this.testOrder.length;
-    let listStart = 0;
-    if (listLen > contentHeight) {
-      listStart = Math.max(
-        0,
-        Math.min(
-          this.selectedIndex - Math.floor(contentHeight / 2),
-          listLen - contentHeight,
-        ),
-      );
-    }
-    this.lastListStart = listStart;
-    this.lastLeftWidth = leftWidth;
-
-    // Right pane: build wrapped output lines
-    const outputLines = this.buildOutputLines(selectedTest, rightWidth - 2);
-    this.lastOutputLines = outputLines;
-    const maxScroll = Math.max(0, outputLines.length - contentHeight);
-    this.outputScrollOffset = Math.min(this.outputScrollOffset, maxScroll);
-
-    // Selection range (normalized)
-    const selLo = this.selection
-      ? Math.min(this.selection.startRow, this.selection.endRow)
-      : -1;
-    const selHi = this.selection
-      ? Math.max(this.selection.startRow, this.selection.endRow)
-      : -1;
-
-    for (let row = 0; row < contentHeight; row++) {
-      const screenRow = row + 2;
-      buf += MOVE_TO(screenRow, 1) + CLEAR_LINE;
-
-      // Left cell
-      const testIdx = listStart + row;
-      let leftCell;
-      if (testIdx < listLen) {
-        const entry = this.tests.get(this.testOrder[testIdx])!;
-        const isSelected = testIdx === this.selectedIndex;
-        const label = statusLabel(entry.status);
-        const retryStr =
-          entry.retry > 0 ? chalk.dim(`r:${entry.retry}`) + ' ' : '';
-        const durStr =
-          entry.duration !== null
-            ? chalk.dim(formatDuration(entry.duration))
-            : chalk.dim('--');
-        const maxTitleLen =
-          leftWidth -
-          4 -
-          5 -
-          (entry.retry > 0 ? 4 + String(entry.retry).length : 0) -
-          5;
-        const title = truncate(entry.title, Math.max(5, maxTitleLen));
-
-        const line = ` ${label} ${retryStr}${title}`;
-        const lineWithDur =
-          padRight(line, leftWidth - visibleLength(durStr) - 2) + durStr + ' ';
-
-        leftCell = isSelected
-          ? this.activePaneFocus === 'list'
-            ? chalk.inverse(padRight(lineWithDur, leftWidth))
-            : chalk.bgGray(padRight(lineWithDur, leftWidth))
-          : padRight(lineWithDur, leftWidth);
-      } else {
-        leftCell = ' '.repeat(leftWidth);
-      }
-
-      buf += chalk.dim('\u2502') + leftCell;
-
-      // Divider
-      buf += chalk.dim('\u2502');
-
-      // Right cell
-      const outIdx = this.outputScrollOffset + row;
-      let rightCell = '';
-      if (outIdx < outputLines.length) {
-        rightCell = ' ' + truncate(outputLines[outIdx], rightWidth - 2) + RESET;
-      }
-      const isSelected = outIdx >= selLo && outIdx <= selHi;
-      buf += isSelected
-        ? chalk.inverse(padRight(rightCell, rightWidth))
-        : padRight(rightCell, rightWidth);
-    }
-
-    // --- Bottom divider ---
-    const bottomRow = contentHeight + 2;
-    buf += MOVE_TO(bottomRow, 1) + CLEAR_LINE;
-    buf += chalk.dim(
-      '\u2514' +
-        '\u2500'.repeat(leftWidth) +
-        '\u2534' +
-        '\u2500'.repeat(rightWidth) +
-        '\u2518',
-    );
-
-    // --- Status bar ---
-    const statusRow = bottomRow + 1;
-    buf += MOVE_TO(statusRow, 1) + CLEAR_LINE;
-
-    const listHint =
-      this.activePaneFocus === 'list'
-        ? chalk.bold('\u2191\u2193 navigate')
-        : chalk.dim('\u2191\u2193 scroll');
-    const tabHint = chalk.dim('Tab') + ' switch';
-    const qHint = chalk.dim('q') + ' quit';
-    const cHint = chalk.dim('c') + ' copy';
-    const isFollowing =
-      this.autoFollow && Date.now() - this.lastUserInteractionTime > 30_000;
-    const fHint = isFollowing
-      ? chalk.green('f') + chalk.green(' follow')
-      : chalk.dim('f') + ' follow';
-    const progressStr = chalk.dim(
-      `${this.progress.completed}/${this.progress.total} done`,
-    );
-    const estStr =
-      this.progress.estimatedMinsLeft > 0
-        ? chalk.dim(`, ~${this.progress.estimatedMinsLeft}min left`)
-        : '';
-    const flash = this.flashMessage ? chalk.green(` ${this.flashMessage}`) : '';
-
-    buf += ` ${listHint}  ${tabHint}  ${qHint}  ${cHint}  ${fHint}  ${chalk.dim(
-      '|',
-    )} ${progressStr}${estStr}${flash}`;
-
-    process.stdout.write(buf);
+  private scrollOutput(offset: number): void {
+    this.outputScrollOffset = Math.max(0, offset);
+    this.scheduleRender();
   }
 
+  /** Returns a 1-char scrollbar indicator for a given row in the track. */
   private buildOutputLines(
     entry: TuiTestEntry | undefined,
     width: number,
@@ -592,6 +440,82 @@ export class TerminalTui {
     return lines;
   }
 
+  private copyLeftPane(): void {
+    if (this.testOrder.length === 0) {
+      this.showFlash('No tests');
+      return;
+    }
+
+    const lines: string[] = [
+      `Tests: ${this.progress.completed}/${this.progress.total}`,
+      '',
+    ];
+
+    for (const id of this.testOrder) {
+      const entry = this.tests.get(id)!;
+      const status = entry.status.toUpperCase().padEnd(10);
+      const retry = entry.retry > 0 ? ` (retry #${entry.retry})` : '';
+      const dur =
+        entry.duration !== null ? ` [${formatDuration(entry.duration)}]` : '';
+      lines.push(`${status} ${entry.title}${retry}${dur}`);
+    }
+
+    this.copyToClipboard(lines.join('\n'));
+  }
+
+  private copySelectedOutput(): void {
+    const entry = this.tests.get(this.testOrder[this.selectedIndex] ?? '');
+    if (!entry) return;
+
+    let text = `Test: ${entry.title}\nStatus: ${entry.status}`;
+    if (entry.duration !== null) {
+      text += ` (${formatDuration(entry.duration)})`;
+    }
+    if (entry.retry > 0) {
+      text += ` retry #${entry.retry}`;
+    }
+    text += '\n\n';
+
+    if (entry.output.length > 0) {
+      text += entry.output.map(stripAnsi).join('\n') + '\n';
+    }
+
+    for (const err of entry.errors) {
+      text += '\n--- Error ---\n';
+      if (err.message) text += err.message + '\n';
+      if (err.snippet) text += err.snippet + '\n';
+      if (err.stack) text += err.stack + '\n';
+    }
+
+    this.copyToClipboard(text);
+  }
+
+  private copyToClipboard(text: string): void {
+    const candidates: Array<{ cmd: string; args: string[] }> = [];
+    if (process.platform === 'darwin') {
+      candidates.push({ cmd: 'pbcopy', args: [] });
+    } else if (process.platform === 'win32') {
+      candidates.push({ cmd: 'clip', args: [] });
+    } else {
+      if (process.env.WAYLAND_DISPLAY) {
+        candidates.push({ cmd: 'wl-copy', args: [] });
+      }
+      candidates.push({ cmd: 'xclip', args: ['-selection', 'clipboard'] });
+      candidates.push({ cmd: 'xsel', args: ['--clipboard', '--input'] });
+    }
+    this.tryCopyWithCandidates(text, candidates, 0);
+  }
+
+  private copyViaOsc52(text: string): void {
+    try {
+      const encoded = Buffer.from(text).toString('base64');
+      process.stdout.write(`\x1b]52;c;${encoded}\x07`);
+      this.showFlash('Copied (OSC 52)');
+    } catch {
+      this.showFlash('Copy failed');
+    }
+  }
+
   private handleKey(data: Buffer): void {
     const key = data.toString('utf-8');
 
@@ -626,9 +550,13 @@ export class TerminalTui {
       return;
     }
 
-    // c to copy
-    if (key === 'c' || key === 'C') {
+    // c to copy output, C to copy left pane
+    if (key === 'c') {
       this.copySelectedOutput();
+      return;
+    }
+    if (key === 'C') {
+      this.copyLeftPane();
       return;
     }
 
@@ -777,47 +705,264 @@ export class TerminalTui {
     }
   }
 
-  private copySelectedOutput(): void {
-    const entry = this.tests.get(this.testOrder[this.selectedIndex] ?? '');
-    if (!entry) return;
-
-    let text = `Test: ${entry.title}\nStatus: ${entry.status}`;
-    if (entry.duration !== null) {
-      text += ` (${formatDuration(entry.duration)})`;
+  private removeListeners(): void {
+    if (this.keyHandler) {
+      process.stdin.removeListener('data', this.keyHandler);
+      this.keyHandler = null;
     }
-    if (entry.retry > 0) {
-      text += ` retry #${entry.retry}`;
+    if (this.resizeHandler) {
+      process.stdout.removeListener('resize', this.resizeHandler);
+      this.resizeHandler = null;
     }
-    text += '\n\n';
-
-    if (entry.output.length > 0) {
-      text += entry.output.map(stripAnsi).join('\n') + '\n';
+    if (this.exitHandler) {
+      process.removeListener('exit', this.exitHandler);
+      this.exitHandler = null;
     }
-
-    for (const err of entry.errors) {
-      text += '\n--- Error ---\n';
-      if (err.message) text += err.message + '\n';
-      if (err.snippet) text += err.snippet + '\n';
-      if (err.stack) text += err.stack + '\n';
-    }
-
-    this.copyToClipboard(text);
   }
 
-  private copyToClipboard(text: string): void {
-    const candidates: Array<{ cmd: string; args: string[] }> = [];
-    if (process.platform === 'darwin') {
-      candidates.push({ cmd: 'pbcopy', args: [] });
-    } else if (process.platform === 'win32') {
-      candidates.push({ cmd: 'clip', args: [] });
-    } else {
-      if (process.env.WAYLAND_DISPLAY) {
-        candidates.push({ cmd: 'wl-copy', args: [] });
-      }
-      candidates.push({ cmd: 'xclip', args: ['-selection', 'clipboard'] });
-      candidates.push({ cmd: 'xsel', args: ['--clipboard', '--input'] });
+  private render(): void {
+    const cols = process.stdout.columns || 80;
+    const rows = process.stdout.rows || 24;
+
+    if (cols < 60 || rows < 10) {
+      const msg = 'Terminal too small (min 60x10)';
+      const r = Math.floor(rows / 2);
+      const c = Math.max(1, Math.floor((cols - msg.length) / 2));
+      process.stdout.write(
+        MOVE_TO(1, 1) + ESC + '[2J' + MOVE_TO(r, c) + chalk.yellow(msg),
+      );
+      return;
     }
-    this.tryCopyWithCandidates(text, candidates, 0);
+
+    const leftWidth = Math.min(Math.max(30, Math.floor(cols * 0.4)), cols - 22);
+    const rightWidth = cols - leftWidth - 3; // 3 = left border + divider + right border
+    const contentHeight = rows - 3; // header + bottom divider + status bar
+
+    let buf = MOVE_TO(1, 1);
+
+    // --- Header ---
+    const leftHeader = ` Tests (${this.progress.completed}/${this.progress.total}) `;
+    const selectedTest = this.tests.get(
+      this.testOrder[this.selectedIndex] ?? '',
+    );
+    const rightHeaderLabel = selectedTest
+      ? ` Output: ${truncate(selectedTest.title, rightWidth - 12)} `
+      : ' Output ';
+
+    const leftFill = Math.max(0, leftWidth - leftHeader.length - 1);
+    const rightFill = Math.max(0, rightWidth - rightHeaderLabel.length - 1);
+
+    buf += CLEAR_LINE;
+    buf +=
+      chalk.dim('\u250c') +
+      chalk.dim('\u2500') +
+      chalk.bold(leftHeader) +
+      chalk.dim('\u2500'.repeat(leftFill));
+    buf +=
+      chalk.dim('\u252c') +
+      chalk.dim('\u2500') +
+      chalk.bold(rightHeaderLabel) +
+      chalk.dim('\u2500'.repeat(rightFill));
+    buf += chalk.dim('\u2510');
+
+    // --- Content rows ---
+    // Left pane: scrolling window around selectedIndex
+    const listLen = this.testOrder.length;
+    let listStart = 0;
+    if (listLen > contentHeight) {
+      listStart = Math.max(
+        0,
+        Math.min(
+          this.selectedIndex - Math.floor(contentHeight / 2),
+          listLen - contentHeight,
+        ),
+      );
+    }
+    this.lastListStart = listStart;
+    this.lastLeftWidth = leftWidth;
+
+    // Right pane: build wrapped output lines (−1 for scrollbar column)
+    const outputLines = this.buildOutputLines(selectedTest, rightWidth - 3);
+    this.lastOutputLines = outputLines;
+    const maxScroll = Math.max(0, outputLines.length - contentHeight);
+    this.outputScrollOffset = Math.min(this.outputScrollOffset, maxScroll);
+
+    // Selection range (normalized)
+    const selLo = this.selection
+      ? Math.min(this.selection.startRow, this.selection.endRow)
+      : -1;
+    const selHi = this.selection
+      ? Math.max(this.selection.startRow, this.selection.endRow)
+      : -1;
+
+    for (let row = 0; row < contentHeight; row++) {
+      const screenRow = row + 2;
+      buf += MOVE_TO(screenRow, 1) + CLEAR_LINE;
+
+      // Left cell
+      const testIdx = listStart + row;
+      let leftCell;
+      if (testIdx < listLen) {
+        const entry = this.tests.get(this.testOrder[testIdx])!;
+        const isSelected = testIdx === this.selectedIndex;
+        const label = statusLabel(entry.status);
+        const retryStr =
+          entry.retry > 0 ? chalk.dim(`r:${entry.retry}`) + ' ' : '';
+        const durStr =
+          entry.duration !== null
+            ? chalk.dim(formatDuration(entry.duration))
+            : chalk.dim('--');
+        const maxTitleLen =
+          leftWidth -
+          1 - // scrollbar column
+          4 -
+          5 -
+          (entry.retry > 0 ? 4 + String(entry.retry).length : 0) -
+          5;
+        const title = truncate(entry.title, Math.max(5, maxTitleLen));
+
+        const line = ` ${label} ${retryStr}${title}`;
+        const lineWithDur =
+          padRight(line, leftWidth - 1 - visibleLength(durStr) - 2) +
+          durStr +
+          ' ';
+
+        leftCell = isSelected
+          ? this.activePaneFocus === 'list'
+            ? chalk.inverse(padRight(lineWithDur, leftWidth - 1))
+            : chalk.bgGray(padRight(lineWithDur, leftWidth - 1))
+          : padRight(lineWithDur, leftWidth - 1);
+      } else {
+        leftCell = ' '.repeat(leftWidth - 1);
+      }
+
+      const leftScrollbar = this.scrollbarChar(
+        listLen,
+        contentHeight,
+        listStart,
+        contentHeight,
+        row,
+      );
+      buf += chalk.dim('\u2502') + leftCell + leftScrollbar;
+
+      // Divider
+      buf += chalk.dim('\u2502');
+
+      // Right cell (−1 for scrollbar column)
+      const outIdx = this.outputScrollOffset + row;
+      let rightCell = '';
+      if (outIdx < outputLines.length) {
+        rightCell = ' ' + truncate(outputLines[outIdx], rightWidth - 3) + RESET;
+      }
+      const isSelected = outIdx >= selLo && outIdx <= selHi;
+      const rightScrollbar = this.scrollbarChar(
+        outputLines.length,
+        contentHeight,
+        this.outputScrollOffset,
+        contentHeight,
+        row,
+      );
+      buf +=
+        (isSelected
+          ? chalk.inverse(padRight(rightCell, rightWidth - 1))
+          : padRight(rightCell, rightWidth - 1)) + rightScrollbar;
+    }
+
+    // --- Bottom divider ---
+    const bottomRow = contentHeight + 2;
+    buf += MOVE_TO(bottomRow, 1) + CLEAR_LINE;
+    buf += chalk.dim(
+      '\u2514' +
+        '\u2500'.repeat(leftWidth) +
+        '\u2534' +
+        '\u2500'.repeat(rightWidth) +
+        '\u2518',
+    );
+
+    // --- Status bar ---
+    const statusRow = bottomRow + 1;
+    buf += MOVE_TO(statusRow, 1) + CLEAR_LINE;
+
+    const listHint =
+      this.activePaneFocus === 'list'
+        ? chalk.bold('\u2191\u2193 navigate')
+        : chalk.dim('\u2191\u2193 scroll');
+    const tabHint = chalk.dim('Tab') + ' switch';
+    const qHint = chalk.dim('q') + ' quit';
+    const cHint =
+      chalk.dim('c') + ' copy output  ' + chalk.dim('C') + ' copy list';
+    const isFollowing =
+      this.autoFollow && Date.now() - this.lastUserInteractionTime > 30_000;
+    const fHint = isFollowing
+      ? chalk.green('f') + chalk.green(' follow')
+      : chalk.dim('f') + ' follow';
+    const elapsedMs =
+      this.frozenElapsedMs ??
+      (this.startTime !== null ? Date.now() - this.startTime : null);
+    const elapsedStr =
+      elapsedMs !== null
+        ? chalk.dim(` ${formatDuration(elapsedMs)} elapsed`)
+        : '';
+    const progressStr = chalk.dim(
+      `${this.progress.completed}/${this.progress.total} done`,
+    );
+    const estStr =
+      this.progress.estimatedMinsLeft > 0
+        ? chalk.dim(`, ~${this.progress.estimatedMinsLeft}min left`)
+        : '';
+    const flash = this.flashMessage ? chalk.green(` ${this.flashMessage}`) : '';
+
+    buf += ` ${listHint}  ${tabHint}  ${qHint}  ${cHint}  ${fHint}  ${chalk.dim(
+      '|',
+    )} ${progressStr}${elapsedStr}${estStr}${flash}`;
+
+    process.stdout.write(buf);
+  }
+
+  private restoreTerminal(): void {
+    try {
+      if (process.stdin.isTTY) {
+        process.stdin.setRawMode(this.originalStdinRawMode ?? false);
+      }
+      process.stdin.pause();
+      process.stdin.unref();
+      process.stdout.write(MOUSE_OFF + ALT_SCREEN_OFF + CURSOR_SHOW);
+    } catch {
+      // Terminal may already be gone
+    }
+  }
+
+  private scrollbarChar(
+    total: number,
+    visible: number,
+    offset: number,
+    trackHeight: number,
+    row: number,
+  ): string {
+    if (total <= visible) {
+      return chalk.dim('\u2502'); // │ — no scrolling needed
+    }
+    const thumbSize = Math.max(1, Math.round((visible / total) * trackHeight));
+    const maxOffset = total - visible;
+    const clampedOffset = Math.min(offset, maxOffset);
+    const thumbStart = Math.round(
+      (clampedOffset / maxOffset) * (trackHeight - thumbSize),
+    );
+    if (row >= thumbStart && row < thumbStart + thumbSize) {
+      return chalk.white('\u2588'); // █ thumb
+    }
+    return chalk.dim('\u2591'); // ░ track
+  }
+
+  private showFlash(msg: string): void {
+    this.flashMessage = msg;
+    this.scheduleRender();
+    if (this.flashTimeout) clearTimeout(this.flashTimeout);
+    this.flashTimeout = setTimeout(() => {
+      this.flashMessage = null;
+      this.flashTimeout = null;
+      this.scheduleRender();
+    }, 1500);
   }
 
   private tryCopyWithCandidates(
@@ -848,55 +993,6 @@ export class TerminalTui {
       });
     } catch {
       this.tryCopyWithCandidates(text, candidates, index + 1);
-    }
-  }
-
-  private copyViaOsc52(text: string): void {
-    try {
-      const encoded = Buffer.from(text).toString('base64');
-      process.stdout.write(`\x1b]52;c;${encoded}\x07`);
-      this.showFlash('Copied (OSC 52)');
-    } catch {
-      this.showFlash('Copy failed');
-    }
-  }
-
-  private showFlash(msg: string): void {
-    this.flashMessage = msg;
-    this.scheduleRender();
-    if (this.flashTimeout) clearTimeout(this.flashTimeout);
-    this.flashTimeout = setTimeout(() => {
-      this.flashMessage = null;
-      this.flashTimeout = null;
-      this.scheduleRender();
-    }, 1500);
-  }
-
-  private removeListeners(): void {
-    if (this.keyHandler) {
-      process.stdin.removeListener('data', this.keyHandler);
-      this.keyHandler = null;
-    }
-    if (this.resizeHandler) {
-      process.stdout.removeListener('resize', this.resizeHandler);
-      this.resizeHandler = null;
-    }
-    if (this.exitHandler) {
-      process.removeListener('exit', this.exitHandler);
-      this.exitHandler = null;
-    }
-  }
-
-  private restoreTerminal(): void {
-    try {
-      if (process.stdin.isTTY) {
-        process.stdin.setRawMode(this.originalStdinRawMode ?? false);
-      }
-      process.stdin.pause();
-      process.stdin.unref();
-      process.stdout.write(MOUSE_OFF + ALT_SCREEN_OFF + CURSOR_SHOW);
-    } catch {
-      // Terminal may already be gone
     }
   }
 }

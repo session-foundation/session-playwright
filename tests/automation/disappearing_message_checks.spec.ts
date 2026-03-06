@@ -6,14 +6,11 @@ import {
   longText,
   mediaArray,
   testLink,
+  testLinkTitle,
 } from './constants/variables';
-import {
-  Conversation,
-  ConversationSettings,
-  Global,
-  HomeScreen,
-} from './locators';
+import { Conversation, ConversationSettings, Global } from './locators';
 import { test_Alice_1W_Bob_1W } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { createContact } from './utilities/create_contact';
 import { joinCommunity } from './utilities/join_community';
 import { waitForMessageStatus } from './utilities/message';
@@ -93,12 +90,9 @@ mediaArray.forEach(
         if (mediaType === 'voice') {
           await waitForTestIdWithText(bobWindow1, 'audio-player');
           await sleepFor(30000);
-          await hasElementBeenDeleted(
-            bobWindow1,
-            'data-testid',
-            'audio-player',
-            1_000,
-          );
+          await hasElementBeenDeleted(bobWindow1, Conversation.audioPlayer, {
+            maxWait: 1_000,
+          });
         } else {
           await waitForTextMessage(bobWindow1, testMessage);
           // Wait 30 seconds for image to disappear
@@ -182,22 +176,21 @@ test_Alice_1W_Bob_1W(
       ),
     ]);
     await sendLinkPreview(aliceWindow1, testLink);
-    await waitForElement(
-      bobWindow1,
-      'data-testid',
-      'msg-link-preview-title',
-      3_000,
-      'Session | Send Messages, Not Metadata. | Private Messenger',
-    );
+    await waitForElement({
+      window: bobWindow1,
+      locator: Conversation.linkPreviewTitle,
+      options: {
+        maxWaitMs: 10_000,
+        shouldLog: true,
+        text: testLinkTitle,
+      },
+    });
     // Wait 30 seconds for link preview to disappear
     await sleepFor(30_000);
-    await hasElementBeenDeleted(
-      bobWindow1,
-      'data-testid',
-      'msg-link-preview-title',
-      1_000, // no need to wait too long here, it should have disappeared already
-      'Session | Send Messages, Not Metadata. | Private Messenger',
-    );
+    await hasElementBeenDeleted(bobWindow1, Conversation.linkPreviewTitle, {
+      maxWait: 1_000, // no need to wait too long here, it should have disappeared already
+      text: testLinkTitle,
+    });
   },
 );
 
@@ -249,38 +242,29 @@ test_Alice_1W_Bob_1W(
       .getByTestId('modal-close-button')
       .click();
     await clickOn(aliceWindow1, Global.modalCloseButton);
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      bob.userName,
+
+    await openConversationWith(aliceWindow1, bob.userName);
+    await Promise.all(
+      [aliceWindow1, bobWindow1].map((w) =>
+        waitForElement({
+          window: w,
+          locator: Conversation.communityInvitationDetails,
+          options: {
+            maxWaitMs: 15_000,
+            shouldLog: true,
+            text: testCommunityName,
+          },
+        }),
+      ),
     );
-    await Promise.all([
-      waitForElement(
-        aliceWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
-      ),
-      waitForElement(
-        bobWindow1,
-        'class',
-        'group-name',
-        undefined,
-        testCommunityName,
-      ),
-    ]);
     // Wait 30 seconds for community invite to disappear
     await sleepFor(30000);
     await Promise.all(
       [bobWindow1, aliceWindow1].map((w) =>
-        hasElementBeenDeleted(
-          w,
-          'class',
-          'group-name',
-          1_000,
-          testCommunityName,
-        ),
+        hasElementBeenDeleted(w, Conversation.communityInvitationDetails, {
+          maxWait: 1_000,
+          text: testCommunityName,
+        }),
       ),
     );
   },
@@ -319,11 +303,15 @@ test_Alice_1W_Bob_1W(
     await makeVoiceCall(aliceWindow1, bobWindow1);
     // In the receivers window, the message is 'Call in progress'
     await Promise.all([
-      waitForTestIdWithText(
-        bobWindow1,
-        'call-notification-answered-a-call',
-        tStripped('callsInProgress'),
-      ),
+      waitForElement({
+        window: bobWindow1,
+        locator: Conversation.callNotificationAnswered,
+        options: {
+          text: tStripped('callsInProgress'),
+          shouldLog: true,
+          maxWaitMs: 15_000,
+        },
+      }),
       // In the callers window, the message is 'You called {receiverName}'
       waitForTestIdWithText(
         aliceWindow1,
@@ -335,19 +323,17 @@ test_Alice_1W_Bob_1W(
     await sleepFor(30000);
 
     await Promise.all([
-      hasElementBeenDeleted(
-        bobWindow1,
-        'data-testid',
-        'call-notification-answered-a-call',
-        1_000,
-        tStripped('callsInProgress'),
-      ),
+      hasElementBeenDeleted(bobWindow1, Conversation.callNotificationAnswered, {
+        maxWait: 1_000,
+        text: tStripped('callsInProgress'),
+      }),
       hasElementBeenDeleted(
         aliceWindow1,
-        'data-testid',
-        'call-notification-started-call',
-        1_000,
-        tStripped('callsYouCalled', { name: bob.userName }),
+        Conversation.callNotificationStarted,
+        {
+          maxWait: 1_000,
+          text: tStripped('callsYouCalled', { name: bob.userName }),
+        },
       ),
     ]);
   },

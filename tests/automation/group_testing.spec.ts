@@ -1,11 +1,6 @@
 import { tStripped } from '../localization/lib';
 import { doForAll, sleepFor } from '../promise_utils';
-import {
-  Conversation,
-  ConversationSettings,
-  Global,
-  HomeScreen,
-} from './locators';
+import { Conversation, ConversationSettings, Global } from './locators';
 import { createGroup } from './setup/create_group';
 import { newUser } from './setup/new_user';
 import {
@@ -13,6 +8,7 @@ import {
   test_group_Alice_1W_Bob_1W_Charlie_1W,
   test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W,
 } from './setup/sessionTest';
+import { openConversationWith } from './utilities/conversation';
 import { createContact } from './utilities/create_contact';
 import { leaveGroup } from './utilities/leave_group';
 import { renameGroup } from './utilities/rename_group';
@@ -63,11 +59,8 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
     groupCreated,
   }) => {
     await createContact(aliceWindow1, draculaWindow1, alice, dracula);
-    await clickOnWithText(
-      aliceWindow1,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+
+    await openConversationWith(aliceWindow1, groupCreated.userName);
     await clickOnElement({
       window: aliceWindow1,
       strategy: 'data-testid',
@@ -94,12 +87,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W_Dracula_1W(
       },
       [aliceWindow1, bobWindow1, charlieWindow1],
     );
-    await clickOn(draculaWindow1, Global.backButton);
-    await clickOnWithText(
-      draculaWindow1,
-      HomeScreen.conversationItemName,
-      groupCreated.userName,
-    );
+    await openConversationWith(draculaWindow1, groupCreated.userName);
   },
 );
 
@@ -117,11 +105,13 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await waitForMatchingText(
       bobWindow1,
       tStripped('groupNameNew', { group_name: newGroupName }),
+      15_000,
     );
     await clickOnMatchingText(charlieWindow1, newGroupName);
     await waitForMatchingText(
       charlieWindow1,
       tStripped('groupNameNew', { group_name: newGroupName }),
+      15_000,
     );
     // Click on conversation options
     // Check to see that you can't change group name to empty string
@@ -164,13 +154,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
 
     // All users open group conversation
     await Promise.all(
-      members.map((m) =>
-        clickOnWithText(
-          m.window,
-          HomeScreen.conversationItemName,
-          groupCreated.userName,
-        ),
-      ),
+      members.map((m) => openConversationWith(m.window, groupCreated.userName)),
     );
 
     // All users type @ to open mentions

@@ -1,10 +1,7 @@
 import { Page } from '@playwright/test';
 
-import { HomeScreen } from '../locators';
 import { User } from '../types/testing';
-import { replyTo } from './reply_message';
 import { sendNewMessage } from './send_message';
-import { clickOnElement, clickOnWithText } from './utils';
 
 export const createContact = async (
   windowA: Page,
@@ -12,31 +9,13 @@ export const createContact = async (
   userA: User,
   userB: User,
 ) => {
+  const start = Date.now();
   const testMessage = `${userA.userName} to ${userB.userName}`;
   const testReply = `${userB.userName} to ${userA.userName}`;
   // User A sends message to User B
-  await sendNewMessage(windowA, userB.accountid, testMessage);
-  await clickOnElement({
-    window: windowB,
-    strategy: 'data-testid',
-    selector: 'message-request-banner',
-  });
-  await clickOnWithText(
-    windowB,
-    HomeScreen.conversationItemName,
-    userA.userName,
-  );
-  await clickOnElement({
-    window: windowB,
-    strategy: 'data-testid',
-    selector: 'accept-message-request',
-  });
-  // Note: when creating a contact, we want to make sure both sides are friends when we finish this function,
-  // so passing the windowA here is very important, so we wait for windowA to have received the reply
-  await replyTo({
-    senderWindow: windowB,
-    textMessage: testMessage,
-    replyText: testReply,
-    receiverWindow: windowA,
-  });
+  await Promise.all([
+    sendNewMessage(windowA, userB.accountid, testMessage),
+    sendNewMessage(windowB, userA.accountid, testReply),
+  ]);
+  console.warn(`createContact took ${Date.now() - start}ms`);
 };
