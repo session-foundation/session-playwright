@@ -318,7 +318,7 @@ export async function reloadWindow(
 
 // ACTIONS
 
-// TODO: convert the clickOn* methods to take destructured args 
+// TODO: convert the clickOn* methods to take destructured args
 // like waitForElement does
 /**
  * Clicks on an element using a locator object
