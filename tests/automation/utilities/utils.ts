@@ -40,7 +40,7 @@ export function assertUnreachable(_x: never, message: string): never {
 }
 
 // TODO Unify element interaction functions to use locator objects the way clickOn and clickOnWithText do
-// Remaining functions to migrate: waitForElement, pasteIntoInput, grabTextFromElement etc.
+// Remaining functions to migrate: pasteIntoInput, grabTextFromElement etc.
 
 // WAIT FOR FUNCTIONS
 
@@ -318,6 +318,8 @@ export async function reloadWindow(
 
 // ACTIONS
 
+// TODO: convert the clickOn* methods to take destructured args 
+// like waitForElement does
 /**
  * Clicks on an element using a locator object
  * @param window - Playwright page instance
