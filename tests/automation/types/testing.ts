@@ -167,6 +167,7 @@ export type DataTestId =
   | 'market-cap-amount'
   | 'mentions-container-row'
   | 'mentions-container'
+  | 'message-container'
   | 'message-content'
   | 'message-input-text-area'
   | 'message-request-banner'

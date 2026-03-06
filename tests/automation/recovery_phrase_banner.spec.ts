@@ -18,8 +18,7 @@ async function bannerShouldNotAppear(window: Page) {
   await waitForTestIdWithText(window, HomeScreen.plusButton.selector);
   await hasElementPoppedUpThatShouldnt(
     window,
-    HomeScreen.revealRecoveryPhraseButton.strategy,
-    HomeScreen.revealRecoveryPhraseButton.selector,
+    HomeScreen.revealRecoveryPhraseButton,
   );
   console.log('On home screen, banner did not appear');
 }

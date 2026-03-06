@@ -5,6 +5,7 @@ import { sleepFor } from '../../promise_utils';
 import { Global } from '../locators';
 import { MessageStatus } from '../types/testing';
 import {
+  buildSelectorEscapeText,
   checkModalStrings,
   clickOn,
   clickOnElement,
@@ -26,7 +27,14 @@ export const waitForMessageStatus = async (
   message: string,
   status: MessageStatus,
 ) => {
-  const selector = `css=[data-testid=message-container]:has-text("${message}"):has([data-testid=msg-status][data-testtype=${status}])`;
+  const selector =
+    buildSelectorEscapeText(
+      {
+        strategy: 'data-testid',
+        selector: 'message-container',
+      } as const,
+      message,
+    ) + `:has([data-testid=msg-status][data-testtype=${status}])`;
   const logSig = `${status} status of message '${message}'`;
 
   const messageStatus = await window.waitForSelector(selector, {
@@ -78,9 +86,8 @@ export async function deleteMessageFor(
 }
 
 /**
- * Wait 15s and then confirms that all of the windows have the message is the expected state, depending on the delete type.
- *
- * A local deletion
+ * Wait 15s and then confirms that all of the windows have the message
+ * in the expected state, depending on the delete type.
  */
 export async function confirmMessageDeletedFor({
   deleteType,

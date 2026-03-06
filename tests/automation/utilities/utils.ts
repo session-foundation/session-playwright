@@ -29,7 +29,7 @@ export function escapeText(text: string) {
 }
 
 /**
- * This function can be used to make sure all the possible values as input of a switch as taken care off, without having a default case.
+ * This function can be used to make sure all the possible values as input of a switch is taken care off, without having a default case.
  */
 export function assertUnreachable(_x: never, message: string): never {
   const msg = `assertUnreachable: Didn't expect to get here with "${message}"`;
@@ -50,23 +50,13 @@ export async function waitForTestIdWithText(
   text?: string,
   maxWait?: number,
 ) {
-  let builtSelector = `css=[data-testid="${dataTestId}"]`;
-  if (text) {
-    /* prettier-ignore */
-
-    // " =>  \\\"
-
-    const escapedText = escapeText(text);
-
-    builtSelector += `:has-text("${escapedText}")`;
-    // console.info('builtSelector:', builtSelector);
-    // console.info('Text is tiny bubble: ', escapedText);
-  }
-  // console.info('looking for selector', builtSelector);
+  const builtSelector = buildSelectorEscapeText(
+    { strategy: 'data-testid', selector: dataTestId },
+    text,
+  );
   const found = await window.waitForSelector(builtSelector, {
     timeout: maxWait,
   });
-  // console.info('found selector', builtSelector);
 
   return found;
 }
@@ -80,9 +70,7 @@ export async function waitForElement({
   locator: StrategyExtractionObj;
   options?: { maxWaitMs?: number; text?: string; shouldLog?: boolean };
 }) {
-  const builtSelector = !options?.text
-    ? `css=[${locator.strategy}=${locator.selector}]`
-    : `css=[${locator.strategy}=${locator.selector}]:has-text("${options.text.replace(/"/g, '\\"')}")`;
+  const builtSelector = buildSelectorEscapeText(locator, options?.text);
 
   const start = Date.now();
   if (options?.shouldLog) {
@@ -108,9 +96,10 @@ export async function waitForTextMessage(
   text: string,
   maxWait?: number,
 ) {
-  const escapedText = text.replace(/"/g, '\\"');
-
-  const builtSelector = `css=[data-testid=message-content]:has-text("${escapedText}")`;
+  const builtSelector = buildSelectorEscapeText(
+    { selector: 'message-content', strategy: 'data-testid' },
+    text,
+  );
 
   console.info('waitForTextMessage: builtSelector:', builtSelector);
   const windows = Array.isArray(window) ? window : [window];
@@ -146,15 +135,12 @@ export async function waitForMatchingText(
   maxWait: number,
 ) {
   const builtSelector = `css=:has-text("${text}")`;
-  const maxTimeout = maxWait ?? 55000;
-  console.info(`waitForMatchingText: ${text} for maxWait: ${maxTimeout}ms`);
+  console.info(`waitForMatchingText: ${text} for maxWait: ${maxWait}ms`);
   const start = Date.now();
 
   const windows = Array.isArray(window) ? window : [window];
   const found = await Promise.all(
-    windows.map((w) =>
-      w.waitForSelector(builtSelector, { timeout: maxTimeout }),
-    ),
+    windows.map((w) => w.waitForSelector(builtSelector, { timeout: maxWait })),
   );
 
   console.info(
@@ -361,22 +347,17 @@ export async function clickOn(
   );
 }
 
-function buildSelectorForClickWithText(
+export function buildSelectorEscapeText(
   locator: StrategyExtractionObj,
-  text: string,
+  text?: string,
 ) {
-  let builtSelector: string;
+  const strategyWithSelector =
+    locator.strategy === 'class'
+      ? `.${locator.selector}`
+      : `[${locator.strategy}=${locator.selector}]`;
+  const textSelector = text ? `:has-text("${text.replace(/"/g, '\\"')}")` : '';
 
-  if (locator.strategy === 'class') {
-    builtSelector = `css=.${locator.selector}:has-text("${text.replace(
-      /"/g,
-      '\\"',
-    )}")`;
-  } else {
-    builtSelector = `css=[${locator.strategy}=${
-      locator.selector
-    }]:has-text("${text.replace(/"/g, '\\"')}")`;
-  }
+  const builtSelector = `css=${strategyWithSelector}${textSelector}`;
 
   return builtSelector;
 }
@@ -394,7 +375,7 @@ export async function clickOnWithText(
   text: string,
   options?: Omit<ElementOptions, 'rightButton'>,
 ) {
-  const builtSelector = buildSelectorForClickWithText(locator, text);
+  const builtSelector = buildSelectorEscapeText(locator, text);
 
   const sharedOpts = {
     timeout: options?.maxWait,
@@ -409,7 +390,7 @@ export async function rightClickOnWithText(
   text: string,
   options?: Omit<ElementOptions, 'rightButton'>,
 ) {
-  const builtSelector = buildSelectorForClickWithText(locator, text);
+  const builtSelector = buildSelectorEscapeText(locator, text);
 
   const sharedOpts = {
     timeout: options?.maxWait,
@@ -487,7 +468,10 @@ export async function clickOnTextMessage(
   rightButton?: boolean,
   maxWait?: number,
 ) {
-  const builtSelector = `css=[data-testid=message-content]:has-text("${text}")`;
+  const builtSelector = buildSelectorEscapeText(
+    { selector: 'message-content', strategy: 'data-testid' },
+    text,
+  );
   const sharedOpts = { timeout: maxWait };
 
   await window.click(
@@ -633,15 +617,12 @@ export async function hasTextMessageBeenDeleted(
 
 export async function hasElementPoppedUpThatShouldnt(
   window: Page,
-  strategy: Strategy,
-  selector: string,
+  locator: StrategyExtractionObj,
   text?: string,
 ) {
-  const builtSelector = !text
-    ? `css=[${strategy}=${selector}]`
-    : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
+  const builtSelector = buildSelectorEscapeText(locator, text);
 
-  const fakeError = `Found ${selector}, oops..`;
+  const fakeError = `Found ${locator.selector}, oops..`;
   const elVisible = await window.isVisible(builtSelector);
   if (elVisible === true) {
     throw new Error(fakeError);
@@ -651,21 +632,18 @@ export async function hasElementPoppedUpThatShouldnt(
 
 export async function doesElementExist(
   window: Page,
-  strategy: Strategy,
-  selector: string,
+  locator: StrategyExtractionObj,
   text?: string,
 ) {
-  const builtSelector = !text
-    ? `css=[${strategy}=${selector}]`
-    : `css=[${strategy}=${selector}]:has-text("${text.replace(/"/g, '\\"')}")`;
+  const builtSelector = buildSelectorEscapeText(locator, text);
 
-  const fakeError = `Element ${selector} does not exist`;
+  const fakeError = `Element ${locator.selector} does not exist`;
   const elVisible = await window.isVisible(builtSelector);
   if (!elVisible) {
     console.log(fakeError);
     return undefined;
   }
-  console.log(`Element ${selector} exists`);
+  console.log(`Element ${locator.selector} exists`);
   return builtSelector;
 }
 
@@ -749,26 +727,10 @@ export async function checkModalStrings(
 export async function verifyNoCTAShows(window: Page) {
   await sleepFor(1_000); // Let the UI settle
   await Promise.all([
-    hasElementPoppedUpThatShouldnt(
-      window,
-      CTA.heading.strategy,
-      CTA.heading.selector,
-    ),
-    hasElementPoppedUpThatShouldnt(
-      window,
-      CTA.description.strategy,
-      CTA.description.selector,
-    ),
-    hasElementPoppedUpThatShouldnt(
-      window,
-      CTA.confirmButton.strategy,
-      CTA.confirmButton.selector,
-    ),
-    hasElementPoppedUpThatShouldnt(
-      window,
-      CTA.cancelButton.strategy,
-      CTA.cancelButton.selector,
-    ),
+    hasElementPoppedUpThatShouldnt(window, CTA.heading),
+    hasElementPoppedUpThatShouldnt(window, CTA.description),
+    hasElementPoppedUpThatShouldnt(window, CTA.confirmButton),
+    hasElementPoppedUpThatShouldnt(window, CTA.cancelButton),
   ]);
 }
 
@@ -870,8 +832,7 @@ export async function assertUrlIsReachable(url: string): Promise<void> {
 export async function scrollToBottomIfNecessary(window: Page): Promise<void> {
   const canScroll = await doesElementExist(
     window,
-    Conversation.scrollToBottomButton.strategy,
-    Conversation.scrollToBottomButton.selector,
+    Conversation.scrollToBottomButton,
   );
   if (canScroll) {
     await clickOn(window, Conversation.scrollToBottomButton);

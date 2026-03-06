@@ -69,9 +69,7 @@ test_Alice_2W(
       ].map(async (builder) =>
         hasElementPoppedUpThatShouldnt(
           aliceWindow2,
-          'data-testid',
-          'empty-msg-view-account-created',
-
+          Conversation.EmptyMessageViewCreated,
           builder.toString(),
         ),
       ),

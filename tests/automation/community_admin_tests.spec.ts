@@ -88,8 +88,7 @@ actionsToDo.forEach((action) => {
       await waitForMessageStatus(bob1, secondMsgBanned, 'failed');
       await hasElementPoppedUpThatShouldnt(
         alice1,
-        Conversation.messageContent.strategy,
-        Conversation.messageContent.selector,
+        Conversation.messageContent,
         secondMsgBanned,
       );
       // Alice unban Bob via the convo right click modal (as all messages from Bob have been removed)

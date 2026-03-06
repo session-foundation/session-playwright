@@ -184,7 +184,11 @@ test_Alice_1W_Bob_1W(
   },
 );
 
-const delete1o1TypeArray = ['device_only', 'for_everyone'] as const;
+const delete1o1TypeArray = [
+  'device_only_outgoing',
+  'device_only_incoming',
+  'for_everyone',
+] as const;
 
 delete1o1TypeArray.forEach((deleteType) => {
   test_Alice_2W_Bob_1W(
@@ -200,39 +204,34 @@ delete1o1TypeArray.forEach((deleteType) => {
         waitForTextMessage(aliceWindow2, messageToDelete, 15_000),
         waitForTextMessage(bobWindow1, messageToDelete, 15_000),
       ]);
-      await openConversationWith(aliceWindow2, bob.userName);
 
-      await deleteMessageFor(aliceWindow1, messageToDelete, deleteType);
+      // Alice sent the message, device_only_incoming means getting Bob to delete Alice's message locally.
+      // Otherwise, it's an action that Alice does on her own message.
+
+      const windowInitiatingDelete =
+        deleteType === 'device_only_incoming' ? bobWindow1 : aliceWindow1;
+      const otherWindows = [aliceWindow1, aliceWindow2, bobWindow1].filter(
+        (w) => w !== windowInitiatingDelete,
+      );
+
+      const simplifiedDeleteType =
+        deleteType === 'device_only_incoming' ||
+        deleteType === 'device_only_outgoing'
+          ? 'device_only'
+          : 'for_everyone';
+
+      await deleteMessageFor(
+        windowInitiatingDelete,
+        messageToDelete,
+        simplifiedDeleteType,
+      );
 
       await confirmMessageDeletedFor({
-        deleteType,
+        deleteType: simplifiedDeleteType,
         messageToDelete,
-        otherWindows: [aliceWindow2, bobWindow1],
-        windowInitiatingDelete: aliceWindow1,
+        otherWindows,
+        windowInitiatingDelete,
       });
-
-      if (deleteType === 'device_only') {
-        // when testing the device_only deletion, we also want to check that
-        // an incoming message can be deleted locally.
-        const messageToDelete2 = `Testing deletion functionality for ${deleteType} #2`;
-
-        await sendMessage(aliceWindow1, messageToDelete2);
-        await waitForTextMessage(
-          [aliceWindow2, bobWindow1],
-          messageToDelete2,
-          15_000,
-        );
-
-        // bob now deletes Alice's message locally
-        await deleteMessageFor(bobWindow1, messageToDelete2, deleteType);
-
-        await confirmMessageDeletedFor({
-          deleteType,
-          messageToDelete: messageToDelete2,
-          otherWindows: [aliceWindow1, aliceWindow2],
-          windowInitiatingDelete: bobWindow1,
-        });
-      }
     },
   );
 });
@@ -434,8 +433,7 @@ test_Alice_1W(
     );
     await hasElementPoppedUpThatShouldnt(
       aliceWindow1,
-      Conversation.mentionsContainer.strategy,
-      Conversation.mentionsContainer.selector,
+      Conversation.mentionsContainer,
     );
     await pasteIntoInput(
       aliceWindow1,
@@ -444,8 +442,7 @@ test_Alice_1W(
     );
     await hasElementPoppedUpThatShouldnt(
       aliceWindow1,
-      Conversation.mentionsContainer.strategy,
-      Conversation.mentionsContainer.selector,
+      Conversation.mentionsContainer,
     );
   },
 );
@@ -478,8 +475,7 @@ test_Alice_1W(
     await clickOn(aliceWindow1, Conversation.messageInput);
     await hasElementPoppedUpThatShouldnt(
       aliceWindow1,
-      Conversation.mentionsContainer.strategy,
-      Conversation.mentionsContainer.selector,
+      Conversation.mentionsContainer,
     );
   },
 );

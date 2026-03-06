@@ -369,11 +369,7 @@ test_Alice_2W(
     );
     // Click yes
     await clickOnWithText(aliceWindow1, Global.confirmButton, tStripped('yes'));
-    await doesElementExist(
-      aliceWindow1,
-      'data-testid',
-      Settings.recoveryPasswordMenuItem.selector,
-    );
+    await doesElementExist(aliceWindow1, Settings.recoveryPasswordMenuItem);
     // Check linked device if Recovery Password is still visible (it should be)
     await clickOn(aliceWindow2, LeftPane.settingsButton);
     await waitForTestIdWithText(

@@ -9,7 +9,7 @@ import {
   LeftPane,
   Settings,
 } from './locators';
-import { openApp } from './setup/open';
+import { openAppsAndWaitWindows } from './setup/open';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import {
   test_group_Alice_1W_Bob_1W_Charlie_1W,
@@ -79,7 +79,7 @@ test_group_Alice_2W_Bob_1W_Charlie_1W(
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Restore group',
   async ({ alice, bob, charlie, groupCreated }) => {
-    const [aliceWindow2] = await openApp(1);
+    const [aliceWindow2] = await openAppsAndWaitWindows(1);
     // Check group conversation is in conversation list on linked device
     // Restore account on a linked device
     await recoverFromSeed(aliceWindow2, alice.recoveryPassword);
@@ -157,7 +157,7 @@ async function clearDataOnWindow(window: Page) {
 test_group_Alice_1W_Bob_1W_Charlie_1W(
   'Delete and restore group',
   async ({ alice, bob, charlie, groupCreated }) => {
-    const [aliceWindow2] = await openApp(1);
+    const [aliceWindow2] = await openAppsAndWaitWindows(1);
     // Check group conversation is in conversation list on linked device
     // Restore account on a linked device
     await recoverFromSeed(aliceWindow2, alice.recoveryPassword);
@@ -200,7 +200,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOn(aliceWindow2, Global.modalCloseButton);
     // Delete device data on aliceWindow2
     await clearDataOnWindow(aliceWindow2);
-    const [restoredWindow] = await openApp(1);
+    const [restoredWindow] = await openAppsAndWaitWindows(1);
     await recoverFromSeed(restoredWindow, alice.recoveryPassword);
     // Does group appear?
     await waitForTestIdWithText(
@@ -242,7 +242,7 @@ test_group_Alice_1W_Bob_1W_Charlie_1W(
     await clickOn(restoredWindow, Global.modalCloseButton);
     // Delete device data on restoredWindow
     await clearDataOnWindow(restoredWindow);
-    const [restoredWindow2] = await openApp(1);
+    const [restoredWindow2] = await openAppsAndWaitWindows(1);
     await recoverFromSeed(restoredWindow2, alice.recoveryPassword);
     // Does group appear?
     await waitForTestIdWithText(

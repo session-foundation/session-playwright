@@ -5,7 +5,7 @@ import { sleepFor } from '../promise_utils';
 import { Global, HomeScreen, LeftPane, Onboarding, Settings } from './locators';
 import { forceCloseAllWindows } from './setup/closeWindows';
 import { newUser } from './setup/new_user';
-import { openApp } from './setup/open';
+import { openAppsAndWaitWindows } from './setup/open';
 import { recoverFromSeed } from './setup/recovery_using_seed';
 import { sessionTestTwoWindows } from './setup/sessionTest';
 import { createContact } from './utilities/create_contact';
@@ -62,7 +62,7 @@ sessionTestTwoWindows(
       // Wait for window to close and reopen
 
       // await windowA.close();
-      restoringWindows = await openApp(1); // not using sessionTest here as we need to close and reopen one of the window
+      restoringWindows = await openAppsAndWaitWindows(1); // not using sessionTest here as we need to close and reopen one of the window
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
       await clickOn(restoringWindow, Onboarding.iHaveAnAccountButton);
@@ -142,7 +142,7 @@ sessionTestTwoWindows(
       // Confirm deletion by clicking Clear, twice
       await clickOnMatchingText(windowA, tStripped('clear'));
       await clickOnMatchingText(windowA, tStripped('clear'));
-      restoringWindows = await openApp(1);
+      restoringWindows = await openAppsAndWaitWindows(1);
       const [restoringWindow] = restoringWindows;
       // Sign in with deleted account and check that nothing restores
       await recoverFromSeed(restoringWindow, userA.recoveryPassword);
