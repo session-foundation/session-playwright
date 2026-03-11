@@ -74,7 +74,11 @@ export async function deleteMessageFor(
       break;
   }
 
-  await checkModalStrings(window, tStripped('deleteMessage', { count: 1 }));
+  await checkModalStrings(
+    window,
+    tStripped('deleteMessage', { count: 1 }),
+    tStripped('deleteMessageConfirm', { count: 1 }),
+  );
 
   await clickOn(window, Global.confirmButton);
 
