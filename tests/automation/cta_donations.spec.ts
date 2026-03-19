@@ -1,13 +1,10 @@
 import { Page } from '@playwright/test';
 
 import { tStripped } from '../localization/lib';
-import { CTA, Global } from './locators';
 import { test_Alice_1W } from './setup/sessionTest';
 import { mockDBCreationTime } from './utilities/time_travel';
 import {
   checkCTAStrings,
-  checkModalStrings,
-  clickOn,
   reloadWindow,
   verifyNoCTAShows,
 } from './utilities/utils';
@@ -15,9 +12,9 @@ import {
 async function verifyDonateCTAShows(window: Page) {
   await checkCTAStrings(
     window,
-    tStripped('donateSessionHelp'),
-    tStripped('donateSessionDescription'),
-    [tStripped('donate'), tStripped('maybeLater')],
+    tStripped('donateSessionAppealTitle'),
+    tStripped('donateSessionAppealDescription'),
+    [tStripped('donateSessionAppealReadMore')],
   );
 }
 
@@ -42,45 +39,6 @@ test_Alice_1W(
     }),
   },
 );
-
-const urlModalButtons = [
-  { button: Global.openUrlButton, name: 'Open' },
-  { button: Global.copyUrlButton, name: 'Copy' },
-];
-
-urlModalButtons.forEach(({ button, name }) => {
-  test_Alice_1W(
-    `Donate CTA, never shows after ${name}`,
-    async ({ aliceWindow1 }) => {
-      const url = 'https://getsession.org/donate';
-
-      // First time: CTA should appear
-      await verifyDonateCTAShows(aliceWindow1);
-
-      await clickOn(aliceWindow1, CTA.confirmButton);
-      await checkModalStrings(
-        aliceWindow1,
-        tStripped('urlOpen'),
-        tStripped('urlOpenDescription', { url }),
-        'openUrlModal',
-      );
-
-      // Click the Open or Copy button
-      // Note: "Open" spawns a system browser outside Playwright's control
-      await clickOn(aliceWindow1, button);
-
-      // Reload and verify CTA never appears again
-      await reloadWindow(aliceWindow1);
-      await verifyNoCTAShows(aliceWindow1);
-    },
-    {
-      dbCreationTimestampMs: mockDBCreationTime({
-        days: -7,
-        minutes: -2,
-      }),
-    },
-  );
-});
 
 test_Alice_1W(
   'Donate CTA, DB age < 7 days',

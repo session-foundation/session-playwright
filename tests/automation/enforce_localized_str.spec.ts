@@ -289,12 +289,12 @@ function getExpectedStringFromKey(
       return 'You cannot go back further. In order to stop loading your account, Session needs to quit.';
     case 'quitButton':
       return 'Quit';
-    case 'donateSessionHelp':
-      return 'Session Needs Your Help';
-    case 'donateSessionDescription':
-      return 'Powerful forces are trying to weaken privacy, but we can’t continue this fight alone. Donating helps keep Session secure, independent, and online.';
-    case 'donate':
-      return 'Donate';
+    case 'donateSessionAppealTitle':
+      return 'Please Read: A Personal Appeal From Cofounder of Session Chris McCabe';
+    case 'donateSessionAppealDescription':
+      return 'Eight years ago, Session was founded with a mission to restore your privacy. Today, Session faces a funding shortage which puts its very survival at risk. If you’ve ever found value in Session or its mission, please give me a moment of your time and read this appeal.';
+    case 'donateSessionAppealReadMore':
+      return 'Read Appeal';
     case 'maybeLater':
       return 'Maybe Later';
     case 'upgradeTo':
