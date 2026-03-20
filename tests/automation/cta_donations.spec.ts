@@ -1,10 +1,12 @@
 import { Page } from '@playwright/test';
 
 import { tStripped } from '../localization/lib';
+import { CTA } from './locators';
 import { test_Alice_1W } from './setup/sessionTest';
 import { mockDBCreationTime } from './utilities/time_travel';
 import {
   checkCTAStrings,
+  clickOn,
   reloadWindow,
   verifyNoCTAShows,
 } from './utilities/utils';
@@ -50,6 +52,25 @@ test_Alice_1W(
       days: -6,
       hours: -23,
       minutes: -58,
+    }),
+  },
+);
+
+test_Alice_1W(
+  `Donate CTA, never shows after 'Read Appeal'`,
+  async ({ aliceWindow1 }) => {
+    // First time: CTA should appear
+    await verifyDonateCTAShows(aliceWindow1);
+    // Note: This spawns a system browser outside Playwright's control
+    await clickOn(aliceWindow1, CTA.confirmButton);
+    // Reload and verify CTA never appears again
+    await reloadWindow(aliceWindow1);
+    await verifyNoCTAShows(aliceWindow1);
+  },
+  {
+    dbCreationTimestampMs: mockDBCreationTime({
+      days: -7,
+      minutes: -2,
     }),
   },
 );
