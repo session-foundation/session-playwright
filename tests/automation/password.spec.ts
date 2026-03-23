@@ -13,6 +13,10 @@ import {
 } from './utilities/utils';
 
 const testPassword = '123456';
+/**
+ * A password with spaces around. We don't trim anymore the passwords. So if the user enters a password with spaces around the text, so be it.
+ */
+const testPasswordSpace = '  123456 ';
 const newTestPassword = '789101112';
 
 async function expectRecoveryPhraseToBeVisible(
@@ -181,5 +185,57 @@ test_Alice_1W_no_network(
       Global.errorMessage.selector,
       tStripped('passwordIncorrect'),
     );
+  },
+);
+
+test_Alice_1W_no_network(
+  'Do not trim spaces from password',
+  async ({ alice, aliceWindow1 }) => {
+    // Click on settings tab
+    await clickOn(aliceWindow1, LeftPane.settingsButton);
+    // Click on privacy
+    await clickOn(aliceWindow1, Settings.privacyMenuItem);
+    // Click set password
+    await clickOn(aliceWindow1, Settings.setPasswordSettingsButton);
+    // Enter password
+    await pasteIntoInput(
+      aliceWindow1,
+      Settings.passwordInput.selector,
+      testPasswordSpace,
+    );
+    // Confirm password
+    await pasteIntoInput(
+      aliceWindow1,
+      Settings.confirmPasswordInput.selector,
+      testPasswordSpace,
+    );
+    await clickOn(aliceWindow1, Settings.setPasswordButton);
+    // Check toast notification
+    await waitForTestIdWithText(
+      aliceWindow1,
+      Global.toast.selector,
+      tStripped('passwordSetDescriptionToast'),
+    );
+    // Click on settings tab
+    await sleepFor(300, true);
+    await clickOn(aliceWindow1, Global.modalCloseButton);
+    await clickOn(aliceWindow1, LeftPane.settingsButton);
+    await clickOn(aliceWindow1, Settings.recoveryPasswordMenuItem);
+    await sleepFor(300, true);
+
+    // Type password into input field and validate it
+    await pasteIntoInput(
+      aliceWindow1,
+      Settings.passwordInput.selector,
+      testPasswordSpace,
+    );
+    // Click Done
+    await clickOnMatchingText(aliceWindow1, tStripped('enter'));
+
+    // check that the seed is visible now
+    await expectRecoveryPhraseToBeVisible(aliceWindow1, alice.recoveryPassword);
+    await clickOn(aliceWindow1, Global.modalCloseButton);
+    await clickOn(aliceWindow1, LeftPane.settingsButton);
+    await clickOn(aliceWindow1, Settings.privacyMenuItem);
   },
 );
