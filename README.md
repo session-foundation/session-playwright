@@ -1,55 +1,30 @@
 # Automation testing for Session Desktop
 
-This repository holds the code to do regression testing with Playwright for Session Desktop.
+This repository holds the code to run regression test for Session Desktop with Playwright.
 
-## Setup
+## Prerequisites 
 
+- Node.js 24.12.0
+- pnpm 10.28.1
+- [Session Desktop](https://github.com/session-foundation/session-desktop/) built from source
 
-`git clone https://github.com/session-foundation/session-playwright/`
+Note: The tests currently are only compatible with Linux and macOS.
 
-Install [nvm](https://github.com/nvm-sh/nvm) or [nvm for windows](https://github.com/coreybutler/nvm-windows).
+## Quick setup 
+```bash
+pnpm install --frozen-lockfile
+git submodule update --init --recursive
+```
 
-Once nvm is installed, install the node version declared in the `.nvmrc` file:
-- `nvm install` on linux/macos
-- `nvm install <specific version from the .nvmrc>` on windows
+## Environment configuration
 
-Install [pnpm](https://pnpm.io/installation):
-You can install it by running `npm install --global pnpm`, but you should read the [installation instructions](https://pnpm.io/installation) as other methods are better.
+- `cp .env.sample .env`
+- Edit the `.env` file to match your desired configuration
+- The usage of each environment variable is documented in the sample file.
 
-Install dependencies:
-- `pnpm install`
+## Running tests
 
-## Config
-
-Create your own config from the `.env.sample` and edit the values to match your environment & how you want to test.
-- `cp .env.sample .env` Copy .env.sample to .env
-- edit the `.env` file
-
-
-### Config details
-
-- `SESSION_DESKTOP_ROOT`
-  - *type*: string
-  - *default*: 1
-  - *description*: the path to the root of session-desktop to test
-- `PLAYWRIGHT_REPEAT_COUNT`
-  - *type*: number
-  - *default*: 0
-  - *description*: how many times to repeat each test. So, if a test **passed or failed** on attempt x, and our current attempt is `< PLAYWRIGHT_REPEAT_COUNT` the test will be scheduled to be run again. This can be used to debug flaky tests
-- `PLAYWRIGHT_RETRIES_COUNT`
-  - *type*: number
-  - *default*: 0
-  - *description*: the number of retries each test. i.e. if a test **failed** on attempt x, and our current attempt is `< PLAYWRIGHT_RETRIES_COUNT` the test will be scheduled to be run again. This can be used to debug flaky tests
-- `PLAYWRIGHT_WORKERS_COUNT`
-  - *type*: number
-  - *default*: 1
-  - *description*: the number of workers to start in parallel. The more, the faster the test suite is going to run, but if you hit your CPU limit they'll start to be unnecessarily flaky. Should be fine with a value between 10-20 depending on the machine.
-
-
-## Test run
-
-To run a specific test, or tests matching a string you can do so with
-`pnpm test -g "<string to match>"`.
-
-To run all the test suite, just do
-`pnpm test`.
+```bash
+pnpm test                           # Run the entire suite
+pnpm test -g "grep pattern"         # Run specific tests 
+```
