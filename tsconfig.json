@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "module": "nodenext",
     "sourceMap": true,
     "noEmit": true,
     "target": "esnext",
@@ -13,7 +14,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
+    "moduleResolution": "nodenext",
     "resolveJsonModule": true,
     "useUnknownInCatchVariables": false,
     "esModuleInterop": true,
