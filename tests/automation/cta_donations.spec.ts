@@ -14,9 +14,9 @@ import {
 async function verifyDonateCTAShows(window: Page) {
   await checkCTAStrings(
     window,
-    tStripped('donateSessionAppealTitle'),
-    tStripped('donateSessionAppealDescription'),
-    [tStripped('donateSessionAppealReadMore')],
+    tStripped('finalAppeal'),
+    tStripped('finalAppealDescription'),
+    [tStripped('readMoreCapital')],
   );
 }
 
