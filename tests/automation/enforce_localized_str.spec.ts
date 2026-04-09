@@ -291,6 +291,12 @@ function getExpectedStringFromKey(
       return 'Quit';
     case 'donateSessionAppealTitle':
       return 'Please Read: A Personal Appeal From Cofounder of Session Chris McCabe';
+    case 'finalAppealDescription':
+      return "Your donations have helped, but the Session Technology Foundation (STF) has only received enough funding to support critical operations until the 8th of July. Development has been paused, and without additional funding the STF will shut down, resulting in Session being removed from the app stores and essential services going offline. Please help us secure Session's future.";
+    case 'readMoreCapital':
+      return 'Read More';
+    case 'finalAppeal':
+      return 'Our Final Appeal: Session is shutting down in 90 days';
     case 'donateSessionAppealDescription':
       return 'Eight years ago, Session was founded with a mission to restore your privacy. Today, Session faces a funding shortage which puts its very survival at risk. If you’ve ever found value in Session or its mission, please give me a moment of your time and read this appeal.';
     case 'donateSessionAppealReadMore':
