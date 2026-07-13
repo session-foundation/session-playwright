@@ -4,7 +4,6 @@ import { tStripped } from '../../localization/lib';
 import { sleepFor } from '../../promise_utils';
 import { testLinkTitle } from '../constants/variables';
 import { Conversation, Global, Settings } from '../locators';
-import { isRunningOnDevNet } from '../setup/open';
 import { MediaType } from '../types/testing';
 import { waitForMessageStatus } from './message';
 import {
@@ -15,7 +14,6 @@ import {
   clickOnWithText,
   controlOrMetaFor,
   pasteIntoInput,
-  waitForLoadingAnimationToFinish,
   waitForTestIdWithText,
   waitForTextMessage,
 } from './utils';
@@ -144,13 +142,7 @@ export const sendLinkPreview = async (window: Page, testLink: string) => {
     tStripped('linkPreviewsFirstDescription'),
   );
   await clickOnWithText(window, Global.confirmButton, tStripped('enable'));
-  if (!isRunningOnDevNet()) {
-    // when on devnet, often we don't even see the loading spinner
-    await waitForLoadingAnimationToFinish(
-      window,
-      Global.loadingSpinner.selector,
-    );
-  }
+
   await waitForTestIdWithText(window, 'link-preview-image');
   await waitForTestIdWithText(window, 'link-preview-title', testLinkTitle);
   await clickOnElement({
