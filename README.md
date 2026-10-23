@@ -4,7 +4,7 @@ This repository holds the code to run regression test for Session Desktop with P
 
 ## Prerequisites 
 
-- Node.js 24.12.0
+- Node.js 24.22.1
 - pnpm 10.28.1
 - [Session Desktop](https://github.com/session-foundation/session-desktop/) built from source
 
